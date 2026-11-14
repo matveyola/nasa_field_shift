@@ -21,7 +21,7 @@ from contracts.models import (
 from . import citations, scenarios
 from .agent import AgentFailure, AgentOutput, TurnEvidence
 from .attestation import UNTRUSTED, RequestTrust
-from .grounding import Grounded, check, paragraph_chunks, redact
+from .grounding import Grounded, check, is_farmer_arithmetic, paragraph_chunks, redact, visible_text
 from .llm.provider import AssistantTurn, LLMProvider, ProviderError, ToolResult, ToolResults, Usage, UserText
 from .prompts import SYSTEM_PROMPT, ContextTooLarge, prompt_version, repair_message, response_language, user_message
 from .tools import EXPLAINED_REFUSALS, Tool, TurnState, default_registry, execute, never_runs
@@ -182,8 +182,10 @@ class LLMAgent:
                     raise AgentFailure("llm_error", "error.agent_no_progress", retryable=False)
                 continue
 
-            # end_turn: ground the draft before anything reaches the farmer.
-            grounded = self._ground(response.text, state, lang)
+            # end_turn: ground the draft before anything reaches the farmer (without invisible characters that
+            # could hide a number from the checks).
+            draft = visible_text(response.text)
+            grounded = self._ground(draft, state, lang)
             if (grounded.violations or not grounded.markdown.strip()) and repairs < self.limits.max_repairs \
                     and round_no < self.limits.max_rounds:
                 repairs += 1
@@ -196,7 +198,7 @@ class LLMAgent:
             if grounded.violations:
                 categories = sorted({v.category for v in grounded.violations})
                 log.warning("grounding redaction turn_id=%s violations=%s", turn_id, categories)
-                grounded = self._ground(redact(response.text, grounded.violations), state, lang)
+                grounded = self._ground(redact(draft, grounded.violations), state, lang)
                 extra.append(AgentWarning(code="ungrounded_number",
                                           detail=f"Unsupported statements were removed ({', '.join(categories)})."[:300]))
             text = grounded.markdown.strip() if not grounded.violations else ""
@@ -226,11 +228,12 @@ class LLMAgent:
     def _ground(self, text: str, state: TurnState, lang: str) -> Grounded:
         unverified = state.unverified_real_fact_ids()
         return check(
-            text, retrieved=state.retrieved, known_ids=set(state.facts), farmer_text=" ".join(state.farmer_texts()),
+            text, retrieved=state.retrieved, known_ids=set(state.facts), farmer_text=state.farmer_message(),
             simulation_ran=bool(state.comparisons),  # only a verified compare_rotations result counts
             # Only a confirmed live value may back a "live / real-time" claim; a request saying "live" is not proof.
+            # The farmer's own figures and arithmetic on them are "live" for this turn but are not live data.
             any_live_fact=any(f.provenance.data_status == "live" and fid not in unverified
-                              for fid, f in state.retrieved.items()), lang=lang,
+                              and not is_farmer_arithmetic(f) for fid, f in state.retrieved.items()), lang=lang,
             # Every value of the field and of this turn is demo data: "actual observations" would be false.
             demo_only=bool(seen := [*state.facts.values(), *state.retrieved.values()])
             and all(f.provenance.data_status in ("fixture", "unavailable") for f in seen),
@@ -262,6 +265,10 @@ class LLMAgent:
             warn("source_unavailable", "Some requested field data is not available.")
         if state.insufficient_evidence and not citations:
             warn("source_unavailable", "The knowledge base had no passage for this question.")
+        # One warning per code: replacing a confirmed condition is the one the farmer must not miss.
+        if state.replaced_confirmed & set(state.constraints):
+            warn("low_confidence", "A proposed condition would replace one you confirmed earlier; nothing changes "
+                                   "until you confirm it.")
         if any(c.source == "agent_inferred" for c in state.constraints.values()):
             warn("low_confidence", "Some conditions were inferred, not stated; please confirm them.")
         if state.conflicting_fact_ids & set(fact_ids):
@@ -269,6 +276,10 @@ class LLMAgent:
         if state.unverified_real_fact_ids() & set(fact_ids):
             warn("low_confidence", "Some values claim to be real measurements but were supplied by the app and not "
                                    "confirmed by a data service.")
+        # A compared rotation shown to the farmer breaks a condition they confirmed (tools.constraint_conflicts).
+        if state.conflicting_rotation_facts & set(fact_ids):
+            warn("low_confidence", "A compared rotation does not match a condition you confirmed (an excluded crop or a "
+                                   "different rotation length); the calculation did not apply your conditions.")
         if any(t.tool == "compare_rotations" and t.status == "error" for t in state.traces):
             warn("source_unavailable", "The simulation service did not produce a result for this answer.")
         if state.geo_note and state.geo_note.get("status") not in (None, "ok"):

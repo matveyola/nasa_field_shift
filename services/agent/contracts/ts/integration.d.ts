@@ -132,7 +132,11 @@ export interface Quantity {
     | "g/kg"
     | "cmol/kg"
     | "MJ/m2/d"
-    | "m/s";
+    | "m/s"
+    | "UAH"
+    | "USD"
+    | "UAH/ha"
+    | "USD/ha";
   uncertainty?: Uncertainty | null;
 }
 export interface Uncertainty {
@@ -210,7 +214,11 @@ export interface TimeseriesInfo {
     | "g/kg"
     | "cmol/kg"
     | "MJ/m2/d"
-    | "m/s";
+    | "m/s"
+    | "UAH"
+    | "USD"
+    | "UAH/ha"
+    | "USD/ha";
   range: TimeRange;
   provenance: Provenance;
 }
@@ -434,7 +442,11 @@ export interface Score {
     | "g/kg"
     | "cmol/kg"
     | "MJ/m2/d"
-    | "m/s";
+    | "m/s"
+    | "UAH"
+    | "USD"
+    | "UAH/ha"
+    | "USD/ha";
   uncertainty?: Uncertainty | null;
   provenance: Provenance;
 }

@@ -5,6 +5,7 @@ import {
   type ActionResult,
   backAction,
   confirmationEnvelope,
+  type ConstraintDecision,
   type HostCapabilities,
   type RejectReason,
   requiresClick,
@@ -189,23 +190,32 @@ export function useAssistant(config: AssistantConfig) {
     [runAction],
   );
 
-  /** The farmer confirmed one or more proposed constraints. Only now does anything reach the host. */
-  const confirmConstraints = useCallback(async (itemId: string, constraints: Constraint[], label: string) => {
+  /**
+   * The farmer confirmed or rejected one or more proposed constraints. Only now does anything reach the host, and
+   * only as the farmer's own decision: an agent's action never confirms or rejects on the farmer's behalf.
+   */
+  const decideConstraints = useCallback(async (itemId: string, constraints: Constraint[], label: string, decision: ConstraintDecision) => {
     const ctx = live.current.fieldContext;
     const fid = ctx?.field_id;
     const item = fid ? findItem(fid, itemId) : undefined;
     if (!ctx || !fid || !item || constraints.length === 0) return;
     const ids = constraints.map((c) => c.id);
     const set = (phase: AssistantItem["constraints"][string]) => dispatch({ type: "constraintPhase", fieldId: fid, itemId, constraintIds: ids, phase });
+    // Phases that remember the exact constraint sent (the farmer's edit, if any), one per constraint.
+    const setEach = (phase: "applying" | "confirmed" | "declined") => {
+      for (const constraint of constraints) {
+        dispatch({ type: "constraintPhase", fieldId: fid, itemId, constraintIds: [constraint.id], phase: { phase, constraint } });
+      }
+    };
     if (item.fieldId !== ctx.field_id) return set({ phase: "rejected", reason: "field_changed" });
     if (!live.current.capabilities.actions.includes("compare.set_constraints")) return set({ phase: "rejected", reason: "module_unavailable" });
-    // A confirmation is the farmer's own decision, made now, for this field: it carries the current revision.
-    const base = confirmationEnvelope(constraints[0]!, { ...ctx, revision: liveRevision(ctx) }, label);
+    // A decision is the farmer's own, made now, for this field: it carries the current revision.
+    const base = confirmationEnvelope(constraints[0]!, { ...ctx, revision: liveRevision(ctx) }, label, decision);
     const envelope: UIActionEnvelope =
       constraints.length === 1
         ? base
-        : { ...base, id: `confirm.${itemId}`, action: { type: "compare.set_constraints", constraints: constraints.map((c) => ({ ...c, status: "confirmed" })) } };
-    set({ phase: "applying" });
+        : { ...base, id: `${decision === "confirmed" ? "confirm" : "reject"}.${itemId}`, action: { type: "compare.set_constraints", constraints: constraints.map((c) => ({ ...c, status: decision })) } };
+    setEach("applying");
     let result: ActionResult;
     try {
       result = await live.current.onAction({ envelope, fieldId: fid, origin: "farmer_click" });
@@ -214,11 +224,22 @@ export function useAssistant(config: AssistantConfig) {
     }
     if (result.status === "applied") {
       recordRevision(fid, itemId, result.revision);
-      set({ phase: "confirmed" });
+      setEach(decision === "confirmed" ? "confirmed" : "declined");
+    } else if (result.reason === "cancelled") {
+      set({ phase: "proposed" }); // the farmer stepped back: nothing changed, the choice is open again
     } else {
       set({ phase: "rejected", reason: result.reason });
     }
   }, []);
+
+  const confirmConstraints = useCallback(
+    (itemId: string, constraints: Constraint[], label: string) => decideConstraints(itemId, constraints, label, "confirmed"),
+    [decideConstraints],
+  );
+  const rejectConstraints = useCallback(
+    (itemId: string, constraints: Constraint[], label: string) => decideConstraints(itemId, constraints, label, "rejected"),
+    [decideConstraints],
+  );
 
   const dismissConstraint = useCallback((itemId: string, constraintId: string) => {
     const fid = live.current.fieldContext?.field_id;
@@ -310,8 +331,8 @@ export function useAssistant(config: AssistantConfig) {
 
   // Stable identity unless something visible changed, so message components can skip re-renders.
   return useMemo(
-    () => ({ thread, busy, backend, checking, refreshBackend, send, cancel, retry, applyAction, goBack, confirmConstraints, dismissConstraint }),
-    [thread, busy, backend, checking, refreshBackend, send, cancel, retry, applyAction, goBack, confirmConstraints, dismissConstraint],
+    () => ({ thread, busy, backend, checking, refreshBackend, send, cancel, retry, applyAction, goBack, confirmConstraints, rejectConstraints, dismissConstraint }),
+    [thread, busy, backend, checking, refreshBackend, send, cancel, retry, applyAction, goBack, confirmConstraints, rejectConstraints, dismissConstraint],
   );
 }
 

@@ -13,7 +13,7 @@ from collections.abc import Callable, Sequence
 from itertools import count
 from typing import Any
 
-from .. import citations, plain, scenarios
+from .. import citations, plain, scenarios, scope
 from ..dev_agent import _extract_constraints
 from .provider import (
     Capabilities, ModelResponse, ProviderError, ToolCall, ToolResults, ToolSpec, TranscriptItem, Usage, UserText,
@@ -168,12 +168,26 @@ def _comparison_answer(result: dict, uk: bool, header: bool = True) -> ModelResp
         lines = [("Demo mode (not AI). " if header else "") +
                  f"A separate program calculated the rotations for the “{name}” case. This is a calculation, not a "
                  "real harvest" + (", and the numbers are **made up for testing** for now." if synthetic else ".")]
+    if result.get("constraints_sent"):
+        lines.append("Ваших підтверджених умов цей розрахунок поки не враховує." if uk else
+                     "This calculation does not take into account your confirmed conditions yet.")
     for r in result["rotations"]:
         crops = " → ".join(plain.crop(step["crop"], lang) for step in r["sequence"])
         scores = "; ".join(f"{_METRICS[lang].get(m, m)} {v['cite_as']}" for m, v in r["scores"].items())
         place = f"місце {r['rank']}" if uk else f"place {r['rank']}"
-        lines.append(f"- **{plain.rotation(r['rotation_id'], lang)}** ({place}): {crops}. {_capital(scores)}.")
+        line = f"- **{plain.rotation(r['rotation_id'], lang)}** ({place}): {crops}. {_capital(scores)}."
+        lines.append(line + "".join(" " + _conflict_text(c, lang) for c in r.get("farmer_constraint_conflicts", [])))
     return say("\n".join(lines))
+
+
+def _conflict_text(conflict: dict, lang: str) -> str:
+    """One confirmed farmer rule a compared rotation breaks, in plain words (tools.constraint_conflicts)."""
+    if conflict["type"] == "excluded_crops":
+        crops = ", ".join(plain.crop(c, lang) for c in conflict["crops"])
+        return f"Тут є культура, яку ви виключили: {crops}." if lang == "uk" else f"It includes a crop you excluded: {crops}."
+    years, confirmed = conflict["years"], conflict["confirmed_years"]
+    return (f"Її тривалість ({years} р.) не збігається з вашою підтвердженою умовою ({confirmed} р.)." if lang == "uk"
+            else f"Its length ({years} years) differs from your confirmed condition ({confirmed} years).")
 
 
 def _capital(text: str) -> str:
@@ -347,6 +361,8 @@ def demo_script(transcript: Sequence[TranscriptItem], tools: Sequence[ToolSpec])
         if knowledge:
             return call(("search_knowledge", {"query": farmer[:300], "topic": "any", "content": "text", "max_results": 5}),
                         text="Scripted demo model (not an LLM): searching FAO-56.")
+        if farmer and not scope.asks_about_the_field(farmer):  # no rule matched and it is not about the field
+            return say(scope.DEMO_LIMITS["uk" if uk else "en"])
         return call(("get_field_facts", {"domains": [], "fact_ids": []}),
                     text="Scripted demo model (not an LLM): reading the field context.")
     last = results[-1]

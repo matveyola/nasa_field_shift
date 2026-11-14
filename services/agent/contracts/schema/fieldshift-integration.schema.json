@@ -1584,7 +1584,11 @@
             "g/kg",
             "cmol/kg",
             "MJ/m2/d",
-            "m/s"
+            "m/s",
+            "UAH",
+            "USD",
+            "UAH/ha",
+            "USD/ha"
           ],
           "type": "string"
         },
@@ -1886,7 +1890,11 @@
             "g/kg",
             "cmol/kg",
             "MJ/m2/d",
-            "m/s"
+            "m/s",
+            "UAH",
+            "USD",
+            "UAH/ha",
+            "USD/ha"
           ],
           "type": "string"
         },
@@ -2168,7 +2176,11 @@
             "g/kg",
             "cmol/kg",
             "MJ/m2/d",
-            "m/s"
+            "m/s",
+            "UAH",
+            "USD",
+            "UAH/ha",
+            "USD/ha"
           ],
           "type": "string"
         },
