@@ -61,7 +61,8 @@ class SurfaceResult:
     model_id: str = "fieldshift-sm05-024c35a39470"
     artifact_sha256: str = "024c35a39470c964c6863af8d73e624ee869d211e5a10f6b954d5d2122dbe914"
     product: str = "historical_surface_reconstruction"
-    target_depth_cm: tuple[int, int] = (0, 5)  # Returned quantity; raw ERA5 fallback overrides to 0–7.
+    # Depth of the returned quantity; raw ERA5 fallback overrides to 0–7 cm.
+    target_depth_cm: tuple[int, int] = (0, 5)
     grid: str = "ERA5-Land ~0.1 degree; not field-resolution moisture"
     validation_status: str = "experimental_not_independently_reproduced"
     interval_status: str = "source_research_parameters_no_calibrated_coverage_claim"
