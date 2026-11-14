@@ -1,0 +1,1646 @@
+// Generated compile-time check; no type assertion or runtime fallback.
+import type { PlanningContracts } from "../../../apps/web/src/api/planningV1.generated";
+export const example = {
+  "schema_version": "1.0.0",
+  "field_profile": {
+    "schema_version": "1.0.0",
+    "snapshot_id": "snapshot-1",
+    "farm_id": "farm-demo",
+    "field_id": "field-demo",
+    "profile_revision": 1,
+    "geometry_revision": 0,
+    "as_of": "2026-11-14T00:00:00Z",
+    "geometry": {
+      "type": "Polygon",
+      "crs": "EPSG:4326",
+      "coordinates": [
+        [
+          [
+            30.5,
+            50.4
+          ],
+          [
+            30.501,
+            50.4
+          ],
+          [
+            30.501,
+            50.401
+          ],
+          [
+            30.5,
+            50.401
+          ],
+          [
+            30.5,
+            50.4
+          ]
+        ]
+      ]
+    },
+    "area_ha": 0.79,
+    "land_status": "arable",
+    "history": [
+      {
+        "season": 2026,
+        "crop": null,
+        "status": "unknown",
+        "sowing_date": null,
+        "harvest_date": null,
+        "source_ids": []
+      }
+    ],
+    "history_complete_since": null,
+    "current_crop": null,
+    "soil": [
+      {
+        "top_cm": 0.0,
+        "bottom_cm": 100.0,
+        "sand_fraction": 0.4,
+        "silt_fraction": 0.4,
+        "clay_fraction": 0.2,
+        "field_capacity_m3_m3": 0.3,
+        "wilting_point_m3_m3": 0.15,
+        "saturation_m3_m3": 0.45,
+        "organic_carbon_g_kg": null,
+        "ph": null,
+        "salinity_ds_m": null,
+        "source_ids": [
+          "synthetic-input"
+        ],
+        "quality": "partial"
+      }
+    ],
+    "water_state": {
+      "observed_at": "2026-11-14T00:00:00Z",
+      "available_at": "2026-11-14T00:00:00Z",
+      "depth_top_cm": 0.0,
+      "depth_bottom_cm": 100.0,
+      "volumetric_m3_m3": 0.25,
+      "available_reserve_mm": 100.0,
+      "available_capacity_mm": 150.0,
+      "source_ids": [
+        "synthetic-input"
+      ]
+    },
+    "management": {
+      "production_system": "outdoor",
+      "irrigation": [
+        {
+          "season": 2027,
+          "max_mm": 0.0,
+          "system": "none",
+          "source_ids": [
+            "synthetic-input"
+          ]
+        }
+      ],
+      "equipment_ids": [],
+      "residue_cover_fraction": null,
+      "tillage": "unknown"
+    },
+    "terrain": null,
+    "hazards": [],
+    "sources": [
+      {
+        "id": "synthetic-input",
+        "provider": "Contract fixtures",
+        "product": "synthetic-example",
+        "version": "1",
+        "kind": "synthetic",
+        "acquired_at": "2026-11-14T00:00:00Z",
+        "available_at": "2026-11-14T00:00:00Z",
+        "retrieved_at": "2026-11-14T00:00:00Z",
+        "checksum_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "licence": "Repository fixture",
+        "attribution": "Synthetic contract fixture",
+        "native_resolution_m": 9000.0,
+        "coverage_fraction": 1.0,
+        "spatial_method": "representative_point",
+        "quality": "valid"
+      }
+    ],
+    "missing_data": [
+      {
+        "code": "synthetic_fixture",
+        "message": "Controlled contract example; no empirical validation.",
+        "evidence": [
+          {
+            "id": "fixture-v1",
+            "kind": "assumption",
+            "version": "1",
+            "locator": "cases.v1.json"
+          }
+        ]
+      }
+    ]
+  },
+  "weather": {
+    "schema_version": "1.0.0",
+    "scenario_set_id": "scenario-set-1",
+    "as_of": "2026-11-14T00:00:00Z",
+    "issued_at": "2026-11-14T00:00:00Z",
+    "cycle_at": "2026-11-14T00:00:00Z",
+    "model_version": "synthetic-weather-v1",
+    "valid_window": {
+      "start": "2027-04-01",
+      "end": "2027-04-01"
+    },
+    "scenario_type": "synthetic",
+    "stale_after": "2026-11-15T00:00:00Z",
+    "weight_calibration": null,
+    "sources": [
+      {
+        "id": "synthetic-input",
+        "provider": "Contract fixtures",
+        "product": "synthetic-example",
+        "version": "1",
+        "kind": "synthetic",
+        "acquired_at": "2026-11-14T00:00:00Z",
+        "available_at": "2026-11-14T00:00:00Z",
+        "retrieved_at": "2026-11-14T00:00:00Z",
+        "checksum_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "licence": "Repository fixture",
+        "attribution": "Synthetic contract fixture",
+        "native_resolution_m": 9000.0,
+        "coverage_fraction": 1.0,
+        "spatial_method": "representative_point",
+        "quality": "valid"
+      }
+    ],
+    "scenarios": [
+      {
+        "trajectory_id": "reference",
+        "member_id": "synthetic-0",
+        "weight": null,
+        "traces": [
+          {
+            "field_snapshot_id": "snapshot-1",
+            "grid_id": "synthetic-grid",
+            "source_id": "synthetic-input",
+            "native_resolution_m": 9000.0,
+            "representative_latitude": 50.4,
+            "representative_longitude": 30.5,
+            "days": [
+              {
+                "date": "2027-04-01",
+                "source_date": null,
+                "lead_days": null,
+                "tmin_c": 14.0,
+                "tmax_c": 26.0,
+                "liquid_rain_mm": 0.0,
+                "et0_mm": 3.5,
+                "shortwave_mj_m2": 18.0,
+                "wind_m_s": null,
+                "relative_humidity_fraction": null,
+                "snow_water_equivalent_mm": null,
+                "soil_frozen": null,
+                "quality": "partial"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "suitability": {
+    "schema_version": "1.0.0",
+    "assessment_id": "assessment-1",
+    "field_snapshot_id": "snapshot-1",
+    "season": 2027,
+    "crop": {
+      "crop_id": "Wheat",
+      "cultivar_id": null,
+      "profile_version": "synthetic-wheat-v1"
+    },
+    "status": "insufficient_data",
+    "rulebook_version": "synthetic-rules-v1",
+    "required_capabilities": [
+      "yield",
+      "root_zone_water"
+    ],
+    "checked_rule_ids": [],
+    "unchecked_rule_ids": [
+      "crop-history"
+    ],
+    "reasons": [
+      {
+        "code": "synthetic_fixture",
+        "message": "Controlled contract example; no empirical validation.",
+        "evidence": [
+          {
+            "id": "fixture-v1",
+            "kind": "assumption",
+            "version": "1",
+            "locator": "cases.v1.json"
+          }
+        ]
+      }
+    ]
+  },
+  "candidate": {
+    "schema_version": "1.0.0",
+    "sequence_id": "sequence-1",
+    "field_snapshot_id": "snapshot-1",
+    "field_id": "field-demo",
+    "rulebook_version": "synthetic-rules-v1",
+    "assignments": [
+      {
+        "field_id": "field-demo",
+        "season": 2027,
+        "crop": {
+          "crop_id": "Wheat",
+          "cultivar_id": null,
+          "profile_version": "synthetic-wheat-v1"
+        },
+        "sowing_window": null,
+        "harvest_window": null,
+        "locked": false,
+        "commitment_id": null
+      }
+    ],
+    "assessments": [
+      {
+        "schema_version": "1.0.0",
+        "assessment_id": "assessment-1",
+        "field_snapshot_id": "snapshot-1",
+        "season": 2027,
+        "crop": {
+          "crop_id": "Wheat",
+          "cultivar_id": null,
+          "profile_version": "synthetic-wheat-v1"
+        },
+        "status": "insufficient_data",
+        "rulebook_version": "synthetic-rules-v1",
+        "required_capabilities": [
+          "yield",
+          "root_zone_water"
+        ],
+        "checked_rule_ids": [],
+        "unchecked_rule_ids": [
+          "crop-history"
+        ],
+        "reasons": [
+          {
+            "code": "synthetic_fixture",
+            "message": "Controlled contract example; no empirical validation.",
+            "evidence": [
+              {
+                "id": "fixture-v1",
+                "kind": "assumption",
+                "version": "1",
+                "locator": "cases.v1.json"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "evaluation": {
+    "schema_version": "1.0.0",
+    "evaluation_id": "evaluation-1",
+    "sequence_id": "sequence-1",
+    "field_snapshot_id": "snapshot-1",
+    "scenario_set_id": "scenario-set-1",
+    "as_of": "2026-11-14T00:00:00Z",
+    "model": {
+      "model_id": "fixture-engine",
+      "version": "0",
+      "artifact_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "parameter_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "applicability": "experimental",
+    "uncertainty_scope": "No model execution or observed validation in this fixture.",
+    "seasons": [
+      {
+        "season": 2027,
+        "crop": {
+          "crop_id": "Wheat",
+          "cultivar_id": null,
+          "profile_version": "synthetic-wheat-v1"
+        },
+        "trajectory_id": "reference",
+        "status": "insufficient_data",
+        "yield_t_ha": {
+          "status": "insufficient_data",
+          "value": null,
+          "lower": null,
+          "upper": null,
+          "unit": "t/ha",
+          "uncertainty": {
+            "kind": "none",
+            "coverage": null,
+            "calibration_scope": null,
+            "method_version": "fixture-v1"
+          },
+          "reasons": [
+            {
+              "code": "synthetic_fixture",
+              "message": "Controlled contract example; no empirical validation.",
+              "evidence": [
+                {
+                  "id": "fixture-v1",
+                  "kind": "assumption",
+                  "version": "1",
+                  "locator": "cases.v1.json"
+                }
+              ]
+            }
+          ]
+        },
+        "harvest_basis": null,
+        "root_zone_reserve_mm": {
+          "status": "insufficient_data",
+          "value": null,
+          "lower": null,
+          "upper": null,
+          "unit": "mm",
+          "uncertainty": {
+            "kind": "none",
+            "coverage": null,
+            "calibration_scope": null,
+            "method_version": "fixture-v1"
+          },
+          "reasons": [
+            {
+              "code": "synthetic_fixture",
+              "message": "Controlled contract example; no empirical validation.",
+              "evidence": [
+                {
+                  "id": "fixture-v1",
+                  "kind": "assumption",
+                  "version": "1",
+                  "locator": "cases.v1.json"
+                }
+              ]
+            }
+          ]
+        },
+        "root_depth_cm": null,
+        "surface_moisture_m3_m3": {
+          "status": "insufficient_data",
+          "value": null,
+          "lower": null,
+          "upper": null,
+          "unit": "m3/m3",
+          "uncertainty": {
+            "kind": "none",
+            "coverage": null,
+            "calibration_scope": null,
+            "method_version": "fixture-v1"
+          },
+          "reasons": [
+            {
+              "code": "synthetic_fixture",
+              "message": "Controlled contract example; no empirical validation.",
+              "evidence": [
+                {
+                  "id": "fixture-v1",
+                  "kind": "assumption",
+                  "version": "1",
+                  "locator": "cases.v1.json"
+                }
+              ]
+            }
+          ]
+        },
+        "surface_depth_top_cm": null,
+        "surface_depth_bottom_cm": null,
+        "stress_days": {
+          "status": "insufficient_data",
+          "value": null,
+          "lower": null,
+          "upper": null,
+          "unit": "days",
+          "uncertainty": {
+            "kind": "none",
+            "coverage": null,
+            "calibration_scope": null,
+            "method_version": "fixture-v1"
+          },
+          "reasons": [
+            {
+              "code": "synthetic_fixture",
+              "message": "Controlled contract example; no empirical validation.",
+              "evidence": [
+                {
+                  "id": "fixture-v1",
+                  "kind": "assumption",
+                  "version": "1",
+                  "locator": "cases.v1.json"
+                }
+              ]
+            }
+          ]
+        },
+        "irrigation_mm": {
+          "status": "insufficient_data",
+          "value": null,
+          "lower": null,
+          "upper": null,
+          "unit": "mm",
+          "uncertainty": {
+            "kind": "none",
+            "coverage": null,
+            "calibration_scope": null,
+            "method_version": "fixture-v1"
+          },
+          "reasons": [
+            {
+              "code": "synthetic_fixture",
+              "message": "Controlled contract example; no empirical validation.",
+              "evidence": [
+                {
+                  "id": "fixture-v1",
+                  "kind": "assumption",
+                  "version": "1",
+                  "locator": "cases.v1.json"
+                }
+              ]
+            }
+          ]
+        },
+        "opening_state_id": null,
+        "closing_state_id": null,
+        "reasons": [
+          {
+            "code": "synthetic_fixture",
+            "message": "Controlled contract example; no empirical validation.",
+            "evidence": [
+              {
+                "id": "fixture-v1",
+                "kind": "assumption",
+                "version": "1",
+                "locator": "cases.v1.json"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "input_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "reasons": [
+      {
+        "code": "synthetic_fixture",
+        "message": "Controlled contract example; no empirical validation.",
+        "evidence": [
+          {
+            "id": "fixture-v1",
+            "kind": "assumption",
+            "version": "1",
+            "locator": "cases.v1.json"
+          }
+        ]
+      }
+    ]
+  },
+  "request": {
+    "schema_version": "1.0.0",
+    "request_id": "request-1",
+    "farm_id": "farm-demo",
+    "as_of": "2026-11-14T00:00:00Z",
+    "start_season": 2027,
+    "season_count": 1,
+    "fields": [
+      {
+        "schema_version": "1.0.0",
+        "snapshot_id": "snapshot-1",
+        "farm_id": "farm-demo",
+        "field_id": "field-demo",
+        "profile_revision": 1,
+        "geometry_revision": 0,
+        "as_of": "2026-11-14T00:00:00Z",
+        "geometry": {
+          "type": "Polygon",
+          "crs": "EPSG:4326",
+          "coordinates": [
+            [
+              [
+                30.5,
+                50.4
+              ],
+              [
+                30.501,
+                50.4
+              ],
+              [
+                30.501,
+                50.401
+              ],
+              [
+                30.5,
+                50.401
+              ],
+              [
+                30.5,
+                50.4
+              ]
+            ]
+          ]
+        },
+        "area_ha": 0.79,
+        "land_status": "arable",
+        "history": [
+          {
+            "season": 2026,
+            "crop": null,
+            "status": "unknown",
+            "sowing_date": null,
+            "harvest_date": null,
+            "source_ids": []
+          }
+        ],
+        "history_complete_since": null,
+        "current_crop": null,
+        "soil": [
+          {
+            "top_cm": 0.0,
+            "bottom_cm": 100.0,
+            "sand_fraction": 0.4,
+            "silt_fraction": 0.4,
+            "clay_fraction": 0.2,
+            "field_capacity_m3_m3": 0.3,
+            "wilting_point_m3_m3": 0.15,
+            "saturation_m3_m3": 0.45,
+            "organic_carbon_g_kg": null,
+            "ph": null,
+            "salinity_ds_m": null,
+            "source_ids": [
+              "synthetic-input"
+            ],
+            "quality": "partial"
+          }
+        ],
+        "water_state": {
+          "observed_at": "2026-11-14T00:00:00Z",
+          "available_at": "2026-11-14T00:00:00Z",
+          "depth_top_cm": 0.0,
+          "depth_bottom_cm": 100.0,
+          "volumetric_m3_m3": 0.25,
+          "available_reserve_mm": 100.0,
+          "available_capacity_mm": 150.0,
+          "source_ids": [
+            "synthetic-input"
+          ]
+        },
+        "management": {
+          "production_system": "outdoor",
+          "irrigation": [
+            {
+              "season": 2027,
+              "max_mm": 0.0,
+              "system": "none",
+              "source_ids": [
+                "synthetic-input"
+              ]
+            }
+          ],
+          "equipment_ids": [],
+          "residue_cover_fraction": null,
+          "tillage": "unknown"
+        },
+        "terrain": null,
+        "hazards": [],
+        "sources": [
+          {
+            "id": "synthetic-input",
+            "provider": "Contract fixtures",
+            "product": "synthetic-example",
+            "version": "1",
+            "kind": "synthetic",
+            "acquired_at": "2026-11-14T00:00:00Z",
+            "available_at": "2026-11-14T00:00:00Z",
+            "retrieved_at": "2026-11-14T00:00:00Z",
+            "checksum_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "licence": "Repository fixture",
+            "attribution": "Synthetic contract fixture",
+            "native_resolution_m": 9000.0,
+            "coverage_fraction": 1.0,
+            "spatial_method": "representative_point",
+            "quality": "valid"
+          }
+        ],
+        "missing_data": [
+          {
+            "code": "synthetic_fixture",
+            "message": "Controlled contract example; no empirical validation.",
+            "evidence": [
+              {
+                "id": "fixture-v1",
+                "kind": "assumption",
+                "version": "1",
+                "locator": "cases.v1.json"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "weather": {
+      "schema_version": "1.0.0",
+      "scenario_set_id": "scenario-set-1",
+      "as_of": "2026-11-14T00:00:00Z",
+      "issued_at": "2026-11-14T00:00:00Z",
+      "cycle_at": "2026-11-14T00:00:00Z",
+      "model_version": "synthetic-weather-v1",
+      "valid_window": {
+        "start": "2027-04-01",
+        "end": "2027-04-01"
+      },
+      "scenario_type": "synthetic",
+      "stale_after": "2026-11-15T00:00:00Z",
+      "weight_calibration": null,
+      "sources": [
+        {
+          "id": "synthetic-input",
+          "provider": "Contract fixtures",
+          "product": "synthetic-example",
+          "version": "1",
+          "kind": "synthetic",
+          "acquired_at": "2026-11-14T00:00:00Z",
+          "available_at": "2026-11-14T00:00:00Z",
+          "retrieved_at": "2026-11-14T00:00:00Z",
+          "checksum_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+          "licence": "Repository fixture",
+          "attribution": "Synthetic contract fixture",
+          "native_resolution_m": 9000.0,
+          "coverage_fraction": 1.0,
+          "spatial_method": "representative_point",
+          "quality": "valid"
+        }
+      ],
+      "scenarios": [
+        {
+          "trajectory_id": "reference",
+          "member_id": "synthetic-0",
+          "weight": null,
+          "traces": [
+            {
+              "field_snapshot_id": "snapshot-1",
+              "grid_id": "synthetic-grid",
+              "source_id": "synthetic-input",
+              "native_resolution_m": 9000.0,
+              "representative_latitude": 50.4,
+              "representative_longitude": 30.5,
+              "days": [
+                {
+                  "date": "2027-04-01",
+                  "source_date": null,
+                  "lead_days": null,
+                  "tmin_c": 14.0,
+                  "tmax_c": 26.0,
+                  "liquid_rain_mm": 0.0,
+                  "et0_mm": 3.5,
+                  "shortwave_mj_m2": 18.0,
+                  "wind_m_s": null,
+                  "relative_humidity_fraction": null,
+                  "snow_water_equivalent_mm": null,
+                  "soil_frozen": null,
+                  "quality": "partial"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "enabled_crops": [
+      {
+        "crop_id": "Wheat",
+        "cultivar_id": null,
+        "profile_version": "synthetic-wheat-v1"
+      }
+    ],
+    "rulebook_version": "synthetic-rules-v1",
+    "goal": "water_demand",
+    "reference_trajectory_id": null,
+    "locks": [],
+    "resources": [
+      {
+        "constraint_id": "water-limit",
+        "season": 2027,
+        "budget": null,
+        "currency": null,
+        "irrigation_m3": 0.0
+      }
+    ],
+    "crop_areas": [],
+    "equipment": [],
+    "economics": [],
+    "economic_correlation_note": "No economic inputs; no expected profit.",
+    "solver_limits": {
+      "max_nodes": 120000,
+      "max_seconds": 30,
+      "max_candidates_per_field": 216,
+      "max_alternatives": 3
+    }
+  },
+  "run": {
+    "schema_version": "1.0.0",
+    "run_id": "run-1",
+    "request": {
+      "schema_version": "1.0.0",
+      "request_id": "request-1",
+      "farm_id": "farm-demo",
+      "as_of": "2026-11-14T00:00:00Z",
+      "start_season": 2027,
+      "season_count": 1,
+      "fields": [
+        {
+          "schema_version": "1.0.0",
+          "snapshot_id": "snapshot-1",
+          "farm_id": "farm-demo",
+          "field_id": "field-demo",
+          "profile_revision": 1,
+          "geometry_revision": 0,
+          "as_of": "2026-11-14T00:00:00Z",
+          "geometry": {
+            "type": "Polygon",
+            "crs": "EPSG:4326",
+            "coordinates": [
+              [
+                [
+                  30.5,
+                  50.4
+                ],
+                [
+                  30.501,
+                  50.4
+                ],
+                [
+                  30.501,
+                  50.401
+                ],
+                [
+                  30.5,
+                  50.401
+                ],
+                [
+                  30.5,
+                  50.4
+                ]
+              ]
+            ]
+          },
+          "area_ha": 0.79,
+          "land_status": "arable",
+          "history": [
+            {
+              "season": 2026,
+              "crop": null,
+              "status": "unknown",
+              "sowing_date": null,
+              "harvest_date": null,
+              "source_ids": []
+            }
+          ],
+          "history_complete_since": null,
+          "current_crop": null,
+          "soil": [
+            {
+              "top_cm": 0.0,
+              "bottom_cm": 100.0,
+              "sand_fraction": 0.4,
+              "silt_fraction": 0.4,
+              "clay_fraction": 0.2,
+              "field_capacity_m3_m3": 0.3,
+              "wilting_point_m3_m3": 0.15,
+              "saturation_m3_m3": 0.45,
+              "organic_carbon_g_kg": null,
+              "ph": null,
+              "salinity_ds_m": null,
+              "source_ids": [
+                "synthetic-input"
+              ],
+              "quality": "partial"
+            }
+          ],
+          "water_state": {
+            "observed_at": "2026-11-14T00:00:00Z",
+            "available_at": "2026-11-14T00:00:00Z",
+            "depth_top_cm": 0.0,
+            "depth_bottom_cm": 100.0,
+            "volumetric_m3_m3": 0.25,
+            "available_reserve_mm": 100.0,
+            "available_capacity_mm": 150.0,
+            "source_ids": [
+              "synthetic-input"
+            ]
+          },
+          "management": {
+            "production_system": "outdoor",
+            "irrigation": [
+              {
+                "season": 2027,
+                "max_mm": 0.0,
+                "system": "none",
+                "source_ids": [
+                  "synthetic-input"
+                ]
+              }
+            ],
+            "equipment_ids": [],
+            "residue_cover_fraction": null,
+            "tillage": "unknown"
+          },
+          "terrain": null,
+          "hazards": [],
+          "sources": [
+            {
+              "id": "synthetic-input",
+              "provider": "Contract fixtures",
+              "product": "synthetic-example",
+              "version": "1",
+              "kind": "synthetic",
+              "acquired_at": "2026-11-14T00:00:00Z",
+              "available_at": "2026-11-14T00:00:00Z",
+              "retrieved_at": "2026-11-14T00:00:00Z",
+              "checksum_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+              "licence": "Repository fixture",
+              "attribution": "Synthetic contract fixture",
+              "native_resolution_m": 9000.0,
+              "coverage_fraction": 1.0,
+              "spatial_method": "representative_point",
+              "quality": "valid"
+            }
+          ],
+          "missing_data": [
+            {
+              "code": "synthetic_fixture",
+              "message": "Controlled contract example; no empirical validation.",
+              "evidence": [
+                {
+                  "id": "fixture-v1",
+                  "kind": "assumption",
+                  "version": "1",
+                  "locator": "cases.v1.json"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "weather": {
+        "schema_version": "1.0.0",
+        "scenario_set_id": "scenario-set-1",
+        "as_of": "2026-11-14T00:00:00Z",
+        "issued_at": "2026-11-14T00:00:00Z",
+        "cycle_at": "2026-11-14T00:00:00Z",
+        "model_version": "synthetic-weather-v1",
+        "valid_window": {
+          "start": "2027-04-01",
+          "end": "2027-04-01"
+        },
+        "scenario_type": "synthetic",
+        "stale_after": "2026-11-15T00:00:00Z",
+        "weight_calibration": null,
+        "sources": [
+          {
+            "id": "synthetic-input",
+            "provider": "Contract fixtures",
+            "product": "synthetic-example",
+            "version": "1",
+            "kind": "synthetic",
+            "acquired_at": "2026-11-14T00:00:00Z",
+            "available_at": "2026-11-14T00:00:00Z",
+            "retrieved_at": "2026-11-14T00:00:00Z",
+            "checksum_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "licence": "Repository fixture",
+            "attribution": "Synthetic contract fixture",
+            "native_resolution_m": 9000.0,
+            "coverage_fraction": 1.0,
+            "spatial_method": "representative_point",
+            "quality": "valid"
+          }
+        ],
+        "scenarios": [
+          {
+            "trajectory_id": "reference",
+            "member_id": "synthetic-0",
+            "weight": null,
+            "traces": [
+              {
+                "field_snapshot_id": "snapshot-1",
+                "grid_id": "synthetic-grid",
+                "source_id": "synthetic-input",
+                "native_resolution_m": 9000.0,
+                "representative_latitude": 50.4,
+                "representative_longitude": 30.5,
+                "days": [
+                  {
+                    "date": "2027-04-01",
+                    "source_date": null,
+                    "lead_days": null,
+                    "tmin_c": 14.0,
+                    "tmax_c": 26.0,
+                    "liquid_rain_mm": 0.0,
+                    "et0_mm": 3.5,
+                    "shortwave_mj_m2": 18.0,
+                    "wind_m_s": null,
+                    "relative_humidity_fraction": null,
+                    "snow_water_equivalent_mm": null,
+                    "soil_frozen": null,
+                    "quality": "partial"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "enabled_crops": [
+        {
+          "crop_id": "Wheat",
+          "cultivar_id": null,
+          "profile_version": "synthetic-wheat-v1"
+        }
+      ],
+      "rulebook_version": "synthetic-rules-v1",
+      "goal": "water_demand",
+      "reference_trajectory_id": null,
+      "locks": [],
+      "resources": [
+        {
+          "constraint_id": "water-limit",
+          "season": 2027,
+          "budget": null,
+          "currency": null,
+          "irrigation_m3": 0.0
+        }
+      ],
+      "crop_areas": [],
+      "equipment": [],
+      "economics": [],
+      "economic_correlation_note": "No economic inputs; no expected profit.",
+      "solver_limits": {
+        "max_nodes": 120000,
+        "max_seconds": 30,
+        "max_candidates_per_field": 216,
+        "max_alternatives": 3
+      }
+    },
+    "input_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "status": "queued",
+    "attempt": 0,
+    "created_at": "2026-11-14T00:00:00Z",
+    "updated_at": "2026-11-14T00:00:00Z",
+    "comparison": null,
+    "error": null
+  },
+  "alternative": {
+    "schema_version": "1.0.0",
+    "alternative_id": "alternative-shape-only",
+    "label": "Synthetic shape example, not a recommendation",
+    "assignments": [
+      {
+        "field_id": "field-demo",
+        "season": 2027,
+        "crop": {
+          "crop_id": "Wheat",
+          "cultivar_id": null,
+          "profile_version": "synthetic-wheat-v1"
+        },
+        "sowing_window": null,
+        "harvest_window": null,
+        "locked": false,
+        "commitment_id": null
+      }
+    ],
+    "sequence_ids": [
+      "sequence-1"
+    ],
+    "evaluation_ids": [
+      "evaluation-1"
+    ],
+    "scenario_results": [],
+    "objective_value": null,
+    "objective_unit": "mm_ha",
+    "reasons": [
+      {
+        "code": "synthetic_fixture",
+        "message": "Controlled contract example; no empirical validation.",
+        "evidence": [
+          {
+            "id": "fixture-v1",
+            "kind": "assumption",
+            "version": "1",
+            "locator": "cases.v1.json"
+          }
+        ]
+      }
+    ]
+  },
+  "comparison": {
+    "schema_version": "1.0.0",
+    "comparison_id": "comparison-1",
+    "request_id": "request-1",
+    "farm_id": "farm-demo",
+    "solver_status": "not_run",
+    "explored_nodes": 0,
+    "elapsed_seconds": 0.0,
+    "alternatives": [],
+    "snapshots": [
+      {
+        "field_id": "field-demo",
+        "snapshot_id": "snapshot-1",
+        "profile_revision": 1,
+        "geometry_revision": 0
+      }
+    ],
+    "scenario_set_id": "scenario-set-1",
+    "rulebook_version": "synthetic-rules-v1",
+    "input_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "diagnostics": [
+      {
+        "code": "synthetic_fixture",
+        "message": "Controlled contract example; no empirical validation.",
+        "evidence": [
+          {
+            "id": "fixture-v1",
+            "kind": "assumption",
+            "version": "1",
+            "locator": "cases.v1.json"
+          }
+        ]
+      }
+    ]
+  },
+  "model_card": {
+    "schema_version": "1.0.0",
+    "model": {
+      "model_id": "fixture-engine",
+      "version": "0",
+      "artifact_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "parameter_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "licence_identifier": "fixture-only",
+    "licence_source": "No model artifact provided",
+    "licence_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "commercial_use": "unverified",
+    "data_permissions": [],
+    "capabilities": [
+      "root_zone_water"
+    ],
+    "supported_crops": [
+      {
+        "crop_id": "Wheat",
+        "cultivar_id": null,
+        "profile_version": "synthetic-wheat-v1"
+      }
+    ],
+    "supported_region_ids": [],
+    "validated_scope": null,
+    "training_status": "insufficient_training_data",
+    "cohorts": [],
+    "promotion": "insufficient_evidence",
+    "gate_protocol_version": "fixture-gates-v1",
+    "gate_frozen_at": "2026-11-14T00:00:00Z",
+    "holdout_opened_at": null,
+    "fallback_model": null,
+    "reasons": [
+      {
+        "code": "synthetic_fixture",
+        "message": "Controlled contract example; no empirical validation.",
+        "evidence": [
+          {
+            "id": "fixture-v1",
+            "kind": "assumption",
+            "version": "1",
+            "locator": "cases.v1.json"
+          }
+        ]
+      }
+    ]
+  },
+  "observation": {
+    "schema_version": "1.0.0",
+    "observation_id": "observation-fixture",
+    "farm_group_id": "synthetic-farm",
+    "field_id": "field-demo",
+    "geographic_group_id": "synthetic-region",
+    "grid_group_id": "synthetic-grid",
+    "geometry_revision": 0,
+    "region_id": "synthetic",
+    "crop": {
+      "crop_id": "Wheat",
+      "cultivar_id": null,
+      "profile_version": "synthetic-wheat-v1"
+    },
+    "observed_at": "2026-11-14T00:00:00Z",
+    "available_at": "2026-11-14T00:00:00Z",
+    "kind": "soil_moisture",
+    "value": 0.25,
+    "unit": "m3/m3",
+    "depth_top_cm": 0.0,
+    "depth_bottom_cm": 5.0,
+    "crop_stage": null,
+    "sowing_date": null,
+    "harvest_date": null,
+    "irrigation_mm": null,
+    "harvest_basis": null,
+    "field_snapshot_id": "snapshot-1",
+    "source_checksum_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "source_locator": "synthetic-example",
+    "permission": "Contract-test use; not empirical data",
+    "quality": "valid",
+    "synthetic": true
+  },
+  "crop_registry": {
+    "schema_version": "1.0.0",
+    "registry_version": "planning-crops-v1",
+    "entries": [
+      {
+        "crop_id": "Wheat",
+        "family": "poaceae",
+        "required_capabilities": [],
+        "note": "Species identifier only; not a calibrated cultivar or suitability rule."
+      },
+      {
+        "crop_id": "Maize",
+        "family": "poaceae",
+        "required_capabilities": [],
+        "note": "Species identifier only; not a calibrated cultivar or suitability rule."
+      },
+      {
+        "crop_id": "Soy",
+        "family": "fabaceae",
+        "required_capabilities": [],
+        "note": "Species identifier only; not a calibrated cultivar or suitability rule."
+      },
+      {
+        "crop_id": "Barley",
+        "family": "poaceae",
+        "required_capabilities": [],
+        "note": "Species identifier only; not a calibrated cultivar or suitability rule."
+      },
+      {
+        "crop_id": "Sunflower",
+        "family": "asteraceae",
+        "required_capabilities": [],
+        "note": "Species identifier only; not a calibrated cultivar or suitability rule."
+      },
+      {
+        "crop_id": "Rapeseed",
+        "family": "brassicaceae",
+        "required_capabilities": [],
+        "note": "Species identifier only; not a calibrated cultivar or suitability rule."
+      },
+      {
+        "crop_id": "Peas",
+        "family": "fabaceae",
+        "required_capabilities": [],
+        "note": "Species identifier only; not a calibrated cultivar or suitability rule."
+      },
+      {
+        "crop_id": "Rice",
+        "family": "poaceae",
+        "required_capabilities": [
+          "paddy"
+        ],
+        "note": "Managed paddy requires a paddy-capable engine; upland rice needs a separate reviewed profile."
+      }
+    ]
+  },
+  "profile_write": {
+    "schema_version": "1.0.0",
+    "request_id": "profile-write-1",
+    "expected_revision": 0,
+    "profile": {
+      "schema_version": "1.0.0",
+      "snapshot_id": "snapshot-1",
+      "farm_id": "farm-demo",
+      "field_id": "field-demo",
+      "profile_revision": 1,
+      "geometry_revision": 0,
+      "as_of": "2026-11-14T00:00:00Z",
+      "geometry": {
+        "type": "Polygon",
+        "crs": "EPSG:4326",
+        "coordinates": [
+          [
+            [
+              30.5,
+              50.4
+            ],
+            [
+              30.501,
+              50.4
+            ],
+            [
+              30.501,
+              50.401
+            ],
+            [
+              30.5,
+              50.401
+            ],
+            [
+              30.5,
+              50.4
+            ]
+          ]
+        ]
+      },
+      "area_ha": 0.79,
+      "land_status": "arable",
+      "history": [
+        {
+          "season": 2026,
+          "crop": null,
+          "status": "unknown",
+          "sowing_date": null,
+          "harvest_date": null,
+          "source_ids": []
+        }
+      ],
+      "history_complete_since": null,
+      "current_crop": null,
+      "soil": [
+        {
+          "top_cm": 0.0,
+          "bottom_cm": 100.0,
+          "sand_fraction": 0.4,
+          "silt_fraction": 0.4,
+          "clay_fraction": 0.2,
+          "field_capacity_m3_m3": 0.3,
+          "wilting_point_m3_m3": 0.15,
+          "saturation_m3_m3": 0.45,
+          "organic_carbon_g_kg": null,
+          "ph": null,
+          "salinity_ds_m": null,
+          "source_ids": [
+            "synthetic-input"
+          ],
+          "quality": "partial"
+        }
+      ],
+      "water_state": {
+        "observed_at": "2026-11-14T00:00:00Z",
+        "available_at": "2026-11-14T00:00:00Z",
+        "depth_top_cm": 0.0,
+        "depth_bottom_cm": 100.0,
+        "volumetric_m3_m3": 0.25,
+        "available_reserve_mm": 100.0,
+        "available_capacity_mm": 150.0,
+        "source_ids": [
+          "synthetic-input"
+        ]
+      },
+      "management": {
+        "production_system": "outdoor",
+        "irrigation": [
+          {
+            "season": 2027,
+            "max_mm": 0.0,
+            "system": "none",
+            "source_ids": [
+              "synthetic-input"
+            ]
+          }
+        ],
+        "equipment_ids": [],
+        "residue_cover_fraction": null,
+        "tillage": "unknown"
+      },
+      "terrain": null,
+      "hazards": [],
+      "sources": [
+        {
+          "id": "synthetic-input",
+          "provider": "Contract fixtures",
+          "product": "synthetic-example",
+          "version": "1",
+          "kind": "synthetic",
+          "acquired_at": "2026-11-14T00:00:00Z",
+          "available_at": "2026-11-14T00:00:00Z",
+          "retrieved_at": "2026-11-14T00:00:00Z",
+          "checksum_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+          "licence": "Repository fixture",
+          "attribution": "Synthetic contract fixture",
+          "native_resolution_m": 9000.0,
+          "coverage_fraction": 1.0,
+          "spatial_method": "representative_point",
+          "quality": "valid"
+        }
+      ],
+      "missing_data": [
+        {
+          "code": "synthetic_fixture",
+          "message": "Controlled contract example; no empirical validation.",
+          "evidence": [
+            {
+              "id": "fixture-v1",
+              "kind": "assumption",
+              "version": "1",
+              "locator": "cases.v1.json"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "apply_request": {
+    "schema_version": "1.0.0",
+    "request_id": "apply-1",
+    "farm_id": "farm-demo",
+    "run_id": "run-1",
+    "alternative_id": "alternative-shape-only",
+    "expected_input_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "expected_snapshots": [
+      {
+        "field_id": "field-demo",
+        "snapshot_id": "snapshot-1",
+        "profile_revision": 1,
+        "geometry_revision": 0
+      }
+    ],
+    "confirmed_by_human": true
+  },
+  "apply_result": {
+    "schema_version": "1.0.0",
+    "request_id": "apply-1",
+    "status": "infeasible",
+    "applied_at": null,
+    "reasons": [
+      {
+        "code": "synthetic_fixture",
+        "message": "Controlled contract example; no empirical validation.",
+        "evidence": [
+          {
+            "id": "fixture-v1",
+            "kind": "assumption",
+            "version": "1",
+            "locator": "cases.v1.json"
+          }
+        ]
+      }
+    ]
+  },
+  "replan": {
+    "schema_version": "1.0.0",
+    "previous_run_id": "run-previous",
+    "request": {
+      "schema_version": "1.0.0",
+      "request_id": "request-1",
+      "farm_id": "farm-demo",
+      "as_of": "2026-11-14T00:00:00Z",
+      "start_season": 2027,
+      "season_count": 1,
+      "fields": [
+        {
+          "schema_version": "1.0.0",
+          "snapshot_id": "snapshot-1",
+          "farm_id": "farm-demo",
+          "field_id": "field-demo",
+          "profile_revision": 1,
+          "geometry_revision": 0,
+          "as_of": "2026-11-14T00:00:00Z",
+          "geometry": {
+            "type": "Polygon",
+            "crs": "EPSG:4326",
+            "coordinates": [
+              [
+                [
+                  30.5,
+                  50.4
+                ],
+                [
+                  30.501,
+                  50.4
+                ],
+                [
+                  30.501,
+                  50.401
+                ],
+                [
+                  30.5,
+                  50.401
+                ],
+                [
+                  30.5,
+                  50.4
+                ]
+              ]
+            ]
+          },
+          "area_ha": 0.79,
+          "land_status": "arable",
+          "history": [
+            {
+              "season": 2026,
+              "crop": null,
+              "status": "unknown",
+              "sowing_date": null,
+              "harvest_date": null,
+              "source_ids": []
+            }
+          ],
+          "history_complete_since": null,
+          "current_crop": null,
+          "soil": [
+            {
+              "top_cm": 0.0,
+              "bottom_cm": 100.0,
+              "sand_fraction": 0.4,
+              "silt_fraction": 0.4,
+              "clay_fraction": 0.2,
+              "field_capacity_m3_m3": 0.3,
+              "wilting_point_m3_m3": 0.15,
+              "saturation_m3_m3": 0.45,
+              "organic_carbon_g_kg": null,
+              "ph": null,
+              "salinity_ds_m": null,
+              "source_ids": [
+                "synthetic-input"
+              ],
+              "quality": "partial"
+            }
+          ],
+          "water_state": {
+            "observed_at": "2026-11-14T00:00:00Z",
+            "available_at": "2026-11-14T00:00:00Z",
+            "depth_top_cm": 0.0,
+            "depth_bottom_cm": 100.0,
+            "volumetric_m3_m3": 0.25,
+            "available_reserve_mm": 100.0,
+            "available_capacity_mm": 150.0,
+            "source_ids": [
+              "synthetic-input"
+            ]
+          },
+          "management": {
+            "production_system": "outdoor",
+            "irrigation": [
+              {
+                "season": 2027,
+                "max_mm": 0.0,
+                "system": "none",
+                "source_ids": [
+                  "synthetic-input"
+                ]
+              }
+            ],
+            "equipment_ids": [],
+            "residue_cover_fraction": null,
+            "tillage": "unknown"
+          },
+          "terrain": null,
+          "hazards": [],
+          "sources": [
+            {
+              "id": "synthetic-input",
+              "provider": "Contract fixtures",
+              "product": "synthetic-example",
+              "version": "1",
+              "kind": "synthetic",
+              "acquired_at": "2026-11-14T00:00:00Z",
+              "available_at": "2026-11-14T00:00:00Z",
+              "retrieved_at": "2026-11-14T00:00:00Z",
+              "checksum_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+              "licence": "Repository fixture",
+              "attribution": "Synthetic contract fixture",
+              "native_resolution_m": 9000.0,
+              "coverage_fraction": 1.0,
+              "spatial_method": "representative_point",
+              "quality": "valid"
+            }
+          ],
+          "missing_data": [
+            {
+              "code": "synthetic_fixture",
+              "message": "Controlled contract example; no empirical validation.",
+              "evidence": [
+                {
+                  "id": "fixture-v1",
+                  "kind": "assumption",
+                  "version": "1",
+                  "locator": "cases.v1.json"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "weather": {
+        "schema_version": "1.0.0",
+        "scenario_set_id": "scenario-set-1",
+        "as_of": "2026-11-14T00:00:00Z",
+        "issued_at": "2026-11-14T00:00:00Z",
+        "cycle_at": "2026-11-14T00:00:00Z",
+        "model_version": "synthetic-weather-v1",
+        "valid_window": {
+          "start": "2027-04-01",
+          "end": "2027-04-01"
+        },
+        "scenario_type": "synthetic",
+        "stale_after": "2026-11-15T00:00:00Z",
+        "weight_calibration": null,
+        "sources": [
+          {
+            "id": "synthetic-input",
+            "provider": "Contract fixtures",
+            "product": "synthetic-example",
+            "version": "1",
+            "kind": "synthetic",
+            "acquired_at": "2026-11-14T00:00:00Z",
+            "available_at": "2026-11-14T00:00:00Z",
+            "retrieved_at": "2026-11-14T00:00:00Z",
+            "checksum_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "licence": "Repository fixture",
+            "attribution": "Synthetic contract fixture",
+            "native_resolution_m": 9000.0,
+            "coverage_fraction": 1.0,
+            "spatial_method": "representative_point",
+            "quality": "valid"
+          }
+        ],
+        "scenarios": [
+          {
+            "trajectory_id": "reference",
+            "member_id": "synthetic-0",
+            "weight": null,
+            "traces": [
+              {
+                "field_snapshot_id": "snapshot-1",
+                "grid_id": "synthetic-grid",
+                "source_id": "synthetic-input",
+                "native_resolution_m": 9000.0,
+                "representative_latitude": 50.4,
+                "representative_longitude": 30.5,
+                "days": [
+                  {
+                    "date": "2027-04-01",
+                    "source_date": null,
+                    "lead_days": null,
+                    "tmin_c": 14.0,
+                    "tmax_c": 26.0,
+                    "liquid_rain_mm": 0.0,
+                    "et0_mm": 3.5,
+                    "shortwave_mj_m2": 18.0,
+                    "wind_m_s": null,
+                    "relative_humidity_fraction": null,
+                    "snow_water_equivalent_mm": null,
+                    "soil_frozen": null,
+                    "quality": "partial"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "enabled_crops": [
+        {
+          "crop_id": "Wheat",
+          "cultivar_id": null,
+          "profile_version": "synthetic-wheat-v1"
+        }
+      ],
+      "rulebook_version": "synthetic-rules-v1",
+      "goal": "water_demand",
+      "reference_trajectory_id": null,
+      "locks": [],
+      "resources": [
+        {
+          "constraint_id": "water-limit",
+          "season": 2027,
+          "budget": null,
+          "currency": null,
+          "irrigation_m3": 0.0
+        }
+      ],
+      "crop_areas": [],
+      "equipment": [],
+      "economics": [],
+      "economic_correlation_note": "No economic inputs; no expected profit.",
+      "solver_limits": {
+        "max_nodes": 120000,
+        "max_seconds": 30,
+        "max_candidates_per_field": 216,
+        "max_alternatives": 3
+      }
+    },
+    "preserve_commitment_ids": []
+  },
+  "error": {
+    "schema_version": "1.0.0",
+    "request_id": "request-1",
+    "code": "unavailable",
+    "retryable": false,
+    "reasons": [
+      {
+        "code": "synthetic_fixture",
+        "message": "Controlled contract example; no empirical validation.",
+        "evidence": [
+          {
+            "id": "fixture-v1",
+            "kind": "assumption",
+            "version": "1",
+            "locator": "cases.v1.json"
+          }
+        ]
+      }
+    ]
+  }
+} satisfies PlanningContracts;

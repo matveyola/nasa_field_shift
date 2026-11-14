@@ -1,0 +1,3698 @@
+{
+  "$defs": {
+    "ApplyPlanRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "farm_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "run_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "alternative_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "expected_input_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "expected_snapshots": {
+          "items": {
+            "$ref": "#/$defs/SnapshotRef"
+          },
+          "maxItems": 30,
+          "minItems": 1,
+          "type": "array"
+        },
+        "confirmed_by_human": {
+          "const": true,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "request_id",
+        "farm_id",
+        "run_id",
+        "alternative_id",
+        "expected_input_sha256",
+        "expected_snapshots",
+        "confirmed_by_human"
+      ],
+      "title": "ApplyPlanRequest",
+      "type": "object"
+    },
+    "ApplyPlanResult": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "applied",
+            "already_applied",
+            "stale",
+            "forbidden",
+            "infeasible",
+            "error"
+          ],
+          "type": "string"
+        },
+        "applied_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reasons": {
+          "items": {
+            "$ref": "#/$defs/Reason"
+          },
+          "maxItems": 100,
+          "type": "array"
+        }
+      },
+      "required": [
+        "request_id",
+        "status",
+        "applied_at",
+        "reasons"
+      ],
+      "title": "ApplyPlanResult",
+      "type": "object"
+    },
+    "CandidateSequence": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "type": "string"
+        },
+        "sequence_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "field_snapshot_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "field_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "rulebook_version": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "assignments": {
+          "items": {
+            "$ref": "#/$defs/CropAssignment"
+          },
+          "maxItems": 3,
+          "minItems": 1,
+          "type": "array"
+        },
+        "assessments": {
+          "items": {
+            "$ref": "#/$defs/SuitabilityAssessment"
+          },
+          "maxItems": 3,
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "sequence_id",
+        "field_snapshot_id",
+        "field_id",
+        "rulebook_version",
+        "assignments",
+        "assessments"
+      ],
+      "title": "CandidateSequence",
+      "type": "object"
+    },
+    "CropAreaLimit": {
+      "additionalProperties": false,
+      "properties": {
+        "constraint_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "season": {
+          "maximum": 2200,
+          "minimum": 1900,
+          "type": "integer"
+        },
+        "crop_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "min_ha": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "max_ha": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "max_share": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "constraint_id",
+        "season",
+        "crop_id",
+        "min_ha",
+        "max_ha",
+        "max_share"
+      ],
+      "title": "CropAreaLimit",
+      "type": "object"
+    },
+    "CropAssignment": {
+      "additionalProperties": false,
+      "properties": {
+        "field_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "season": {
+          "maximum": 2200,
+          "minimum": 1900,
+          "type": "integer"
+        },
+        "crop": {
+          "$ref": "#/$defs/CropRef"
+        },
+        "sowing_window": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DateWindow"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "harvest_window": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DateWindow"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "locked": {
+          "type": "boolean"
+        },
+        "commitment_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "field_id",
+        "season",
+        "crop",
+        "sowing_window",
+        "harvest_window",
+        "locked",
+        "commitment_id"
+      ],
+      "title": "CropAssignment",
+      "type": "object"
+    },
+    "CropHistoryEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "season": {
+          "maximum": 2200,
+          "minimum": 1900,
+          "type": "integer"
+        },
+        "crop": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CropRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status": {
+          "enum": [
+            "confirmed",
+            "reported",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "sowing_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "harvest_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 20,
+          "type": "array"
+        }
+      },
+      "required": [
+        "season",
+        "crop",
+        "status",
+        "sowing_date",
+        "harvest_date",
+        "source_ids"
+      ],
+      "title": "CropHistoryEntry",
+      "type": "object"
+    },
+    "CropRef": {
+      "additionalProperties": false,
+      "properties": {
+        "crop_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "cultivar_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "profile_version": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "crop_id",
+        "cultivar_id",
+        "profile_version"
+      ],
+      "title": "CropRef",
+      "type": "object"
+    },
+    "CropRegistry": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "type": "string"
+        },
+        "registry_version": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "entries": {
+          "items": {
+            "$ref": "#/$defs/CropRegistryEntry"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "registry_version",
+        "entries"
+      ],
+      "title": "CropRegistry",
+      "type": "object"
+    },
+    "CropRegistryEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "crop_id": {
+          "enum": [
+            "Wheat",
+            "Maize",
+            "Soy",
+            "Barley",
+            "Sunflower",
+            "Rapeseed",
+            "Peas",
+            "Rice"
+          ],
+          "type": "string"
+        },
+        "family": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "required_capabilities": {
+          "items": {
+            "enum": [
+              "phenology",
+              "yield",
+              "root_zone_water",
+              "surface_moisture",
+              "irrigation",
+              "state_carry",
+              "winter",
+              "snow",
+              "frozen_soil",
+              "paddy",
+              "salinity",
+              "fertility",
+              "waterlogging",
+              "inundation",
+              "solar_geometry"
+            ],
+            "type": "string"
+          },
+          "maxItems": 20,
+          "type": "array"
+        },
+        "note": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "crop_id",
+        "family",
+        "required_capabilities",
+        "note"
+      ],
+      "title": "CropRegistryEntry",
+      "type": "object"
+    },
+    "DailyWeather": {
+      "additionalProperties": false,
+      "properties": {
+        "date": {
+          "format": "date",
+          "type": "string"
+        },
+        "source_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lead_days": {
+          "anyOf": [
+            {
+              "maximum": 2192,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tmin_c": {
+          "anyOf": [
+            {
+              "maximum": 65,
+              "minimum": -100,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tmax_c": {
+          "anyOf": [
+            {
+              "maximum": 65,
+              "minimum": -100,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "liquid_rain_mm": {
+          "anyOf": [
+            {
+              "maximum": 3000,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "et0_mm": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "shortwave_mj_m2": {
+          "anyOf": [
+            {
+              "maximum": 60,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "wind_m_s": {
+          "anyOf": [
+            {
+              "maximum": 150,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "relative_humidity_fraction": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "snow_water_equivalent_mm": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "soil_frozen": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "quality": {
+          "enum": [
+            "valid",
+            "partial",
+            "missing",
+            "rejected"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "date",
+        "source_date",
+        "lead_days",
+        "tmin_c",
+        "tmax_c",
+        "liquid_rain_mm",
+        "et0_mm",
+        "shortwave_mj_m2",
+        "wind_m_s",
+        "relative_humidity_fraction",
+        "snow_water_equivalent_mm",
+        "soil_frozen",
+        "quality"
+      ],
+      "title": "DailyWeather",
+      "type": "object"
+    },
+    "DateWindow": {
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "format": "date",
+          "type": "string"
+        },
+        "end": {
+          "format": "date",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "DateWindow",
+      "type": "object"
+    },
+    "EconomicAssumption": {
+      "additionalProperties": false,
+      "properties": {
+        "assumption_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "crop": {
+          "$ref": "#/$defs/CropRef"
+        },
+        "season": {
+          "maximum": 2200,
+          "minimum": 1900,
+          "type": "integer"
+        },
+        "trajectory_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "price_per_t": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "variable_cost_per_ha": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "irrigation_cost_per_mm_ha": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "price_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "harvest_basis": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/HarvestBasis"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "available_at": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "user_yield_t_ha": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "yield_origin": {
+          "enum": [
+            "model",
+            "user_assumption"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "assumption_id",
+        "crop",
+        "season",
+        "trajectory_id",
+        "price_per_t",
+        "variable_cost_per_ha",
+        "irrigation_cost_per_mm_ha",
+        "currency",
+        "price_date",
+        "harvest_basis",
+        "source",
+        "available_at",
+        "user_yield_t_ha",
+        "yield_origin"
+      ],
+      "title": "EconomicAssumption",
+      "type": "object"
+    },
+    "EquipmentLimit": {
+      "additionalProperties": false,
+      "properties": {
+        "constraint_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "equipment_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "window": {
+          "$ref": "#/$defs/DateWindow"
+        },
+        "capacity_ha": {
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "constraint_id",
+        "equipment_id",
+        "window",
+        "capacity_ha"
+      ],
+      "title": "EquipmentLimit",
+      "type": "object"
+    },
+    "EvidenceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "source",
+            "rule",
+            "model",
+            "constraint",
+            "assumption",
+            "result"
+          ],
+          "type": "string"
+        },
+        "version": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "locator": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "version",
+        "locator"
+      ],
+      "title": "EvidenceRef",
+      "type": "object"
+    },
+    "FarmPlanComparison": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "type": "string"
+        },
+        "comparison_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "farm_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "solver_status": {
+          "enum": [
+            "not_run",
+            "optimal",
+            "feasible",
+            "infeasible",
+            "limit_reached",
+            "error"
+          ],
+          "type": "string"
+        },
+        "explored_nodes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "elapsed_seconds": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "alternatives": {
+          "items": {
+            "$ref": "#/$defs/PlanAlternative"
+          },
+          "maxItems": 3,
+          "type": "array"
+        },
+        "snapshots": {
+          "items": {
+            "$ref": "#/$defs/SnapshotRef"
+          },
+          "maxItems": 30,
+          "minItems": 1,
+          "type": "array"
+        },
+        "scenario_set_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "rulebook_version": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "input_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "diagnostics": {
+          "items": {
+            "$ref": "#/$defs/Reason"
+          },
+          "maxItems": 100,
+          "type": "array"
+        }
+      },
+      "required": [
+        "comparison_id",
+        "request_id",
+        "farm_id",
+        "solver_status",
+        "explored_nodes",
+        "elapsed_seconds",
+        "alternatives",
+        "snapshots",
+        "scenario_set_id",
+        "rulebook_version",
+        "input_sha256",
+        "diagnostics"
+      ],
+      "title": "FarmPlanComparison",
+      "type": "object"
+    },
+    "FarmPlanningRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "farm_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "as_of": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "start_season": {
+          "maximum": 2200,
+          "minimum": 1900,
+          "type": "integer"
+        },
+        "season_count": {
+          "enum": [
+            1,
+            3
+          ],
+          "type": "integer"
+        },
+        "fields": {
+          "items": {
+            "$ref": "#/$defs/FieldProfileSnapshot"
+          },
+          "maxItems": 30,
+          "minItems": 1,
+          "type": "array"
+        },
+        "weather": {
+          "$ref": "#/$defs/WeatherScenarioSet"
+        },
+        "enabled_crops": {
+          "items": {
+            "$ref": "#/$defs/CropRef"
+          },
+          "maxItems": 30,
+          "minItems": 1,
+          "type": "array"
+        },
+        "rulebook_version": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "goal": {
+          "enum": [
+            "reference_margin",
+            "worst_case_margin",
+            "water_demand"
+          ],
+          "type": "string"
+        },
+        "reference_trajectory_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "locks": {
+          "items": {
+            "$ref": "#/$defs/CropAssignment"
+          },
+          "maxItems": 90,
+          "type": "array"
+        },
+        "resources": {
+          "items": {
+            "$ref": "#/$defs/ResourceLimit"
+          },
+          "maxItems": 3,
+          "type": "array"
+        },
+        "crop_areas": {
+          "items": {
+            "$ref": "#/$defs/CropAreaLimit"
+          },
+          "maxItems": 90,
+          "type": "array"
+        },
+        "equipment": {
+          "items": {
+            "$ref": "#/$defs/EquipmentLimit"
+          },
+          "maxItems": 100,
+          "type": "array"
+        },
+        "economics": {
+          "items": {
+            "$ref": "#/$defs/EconomicAssumption"
+          },
+          "maxItems": 5760,
+          "type": "array"
+        },
+        "economic_correlation_note": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "solver_limits": {
+          "$ref": "#/$defs/SolverLimits"
+        }
+      },
+      "required": [
+        "request_id",
+        "farm_id",
+        "as_of",
+        "start_season",
+        "season_count",
+        "fields",
+        "weather",
+        "enabled_crops",
+        "rulebook_version",
+        "goal",
+        "reference_trajectory_id",
+        "locks",
+        "resources",
+        "crop_areas",
+        "equipment",
+        "economics",
+        "economic_correlation_note",
+        "solver_limits"
+      ],
+      "title": "FarmPlanningRequest",
+      "type": "object"
+    },
+    "FieldGeometry": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "Polygon",
+          "type": "string"
+        },
+        "crs": {
+          "const": "EPSG:4326",
+          "type": "string"
+        },
+        "coordinates": {
+          "items": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "maximum": 180,
+                  "minimum": -180,
+                  "type": "number"
+                },
+                {
+                  "maximum": 90,
+                  "minimum": -90,
+                  "type": "number"
+                }
+              ],
+              "type": "array",
+              "tsType": "[number, number]"
+            },
+            "maxItems": 5000,
+            "minItems": 4,
+            "type": "array"
+          },
+          "maxItems": 50,
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "crs",
+        "coordinates"
+      ],
+      "title": "FieldGeometry",
+      "type": "object"
+    },
+    "FieldProfileSnapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "type": "string"
+        },
+        "snapshot_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "farm_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "field_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "profile_revision": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "geometry_revision": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "as_of": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "geometry": {
+          "$ref": "#/$defs/FieldGeometry"
+        },
+        "area_ha": {
+          "exclusiveMinimum": 0,
+          "maximum": 100000,
+          "type": "number"
+        },
+        "land_status": {
+          "enum": [
+            "arable",
+            "non_arable",
+            "ocean",
+            "ice",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "history": {
+          "items": {
+            "$ref": "#/$defs/CropHistoryEntry"
+          },
+          "maxItems": 100,
+          "type": "array"
+        },
+        "history_complete_since": {
+          "anyOf": [
+            {
+              "maximum": 2200,
+              "minimum": 1900,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "current_crop": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CropRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "soil": {
+          "items": {
+            "$ref": "#/$defs/SoilHorizon"
+          },
+          "maxItems": 30,
+          "type": "array"
+        },
+        "water_state": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/WaterState"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "management": {
+          "$ref": "#/$defs/Management"
+        },
+        "terrain": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TerrainRadiation"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "hazards": {
+          "items": {
+            "$ref": "#/$defs/HazardEvidence"
+          },
+          "maxItems": 50,
+          "type": "array"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/$defs/SourceRecord"
+          },
+          "maxItems": 200,
+          "type": "array"
+        },
+        "missing_data": {
+          "items": {
+            "$ref": "#/$defs/Reason"
+          },
+          "maxItems": 50,
+          "type": "array"
+        }
+      },
+      "required": [
+        "snapshot_id",
+        "farm_id",
+        "field_id",
+        "profile_revision",
+        "geometry_revision",
+        "as_of",
+        "geometry",
+        "area_ha",
+        "land_status",
+        "history",
+        "history_complete_since",
+        "current_crop",
+        "soil",
+        "water_state",
+        "management",
+        "terrain",
+        "hazards",
+        "sources",
+        "missing_data"
+      ],
+      "title": "FieldProfileSnapshot",
+      "type": "object"
+    },
+    "HarvestBasis": {
+      "additionalProperties": false,
+      "properties": {
+        "basis": {
+          "enum": [
+            "dry_matter",
+            "standard_moisture",
+            "fresh_weight"
+          ],
+          "type": "string"
+        },
+        "moisture_fraction": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "basis",
+        "moisture_fraction"
+      ],
+      "title": "HarvestBasis",
+      "type": "object"
+    },
+    "HazardEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "wind",
+            "frost",
+            "heat",
+            "heavy_rain",
+            "river_discharge",
+            "inundation"
+          ],
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "available",
+            "insufficient_data",
+            "unsupported",
+            "error"
+          ],
+          "type": "string"
+        },
+        "indicator": {
+          "enum": [
+            "threshold",
+            "efi",
+            "river_warning",
+            "hydraulic_depth"
+          ],
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "unit": {
+          "enum": [
+            "m/s",
+            "degC",
+            "mm/day",
+            "1",
+            "m3/s",
+            "m"
+          ],
+          "type": "string"
+        },
+        "valid_window": {
+          "$ref": "#/$defs/DateWindow"
+        },
+        "source_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 20,
+          "type": "array"
+        },
+        "reasons": {
+          "items": {
+            "$ref": "#/$defs/Reason"
+          },
+          "maxItems": 50,
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "status",
+        "indicator",
+        "value",
+        "unit",
+        "valid_window",
+        "source_ids",
+        "reasons"
+      ],
+      "title": "HazardEvidence",
+      "type": "object"
+    },
+    "IrrigationLimit": {
+      "additionalProperties": false,
+      "properties": {
+        "season": {
+          "maximum": 2200,
+          "minimum": 1900,
+          "type": "integer"
+        },
+        "max_mm": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "system": {
+          "enum": [
+            "none",
+            "drip",
+            "sprinkler",
+            "surface",
+            "managed_paddy",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 20,
+          "type": "array"
+        }
+      },
+      "required": [
+        "season",
+        "max_mm",
+        "system",
+        "source_ids"
+      ],
+      "title": "IrrigationLimit",
+      "type": "object"
+    },
+    "Management": {
+      "additionalProperties": false,
+      "properties": {
+        "production_system": {
+          "const": "outdoor",
+          "type": "string"
+        },
+        "irrigation": {
+          "items": {
+            "$ref": "#/$defs/IrrigationLimit"
+          },
+          "maxItems": 10,
+          "type": "array"
+        },
+        "equipment_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 100,
+          "type": "array"
+        },
+        "residue_cover_fraction": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tillage": {
+          "enum": [
+            "conventional",
+            "reduced",
+            "no_till",
+            "unknown"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "production_system",
+        "irrigation",
+        "equipment_ids",
+        "residue_cover_fraction",
+        "tillage"
+      ],
+      "title": "Management",
+      "type": "object"
+    },
+    "Metric": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "available",
+            "insufficient_data",
+            "out_of_domain",
+            "unsupported",
+            "not_applicable",
+            "error"
+          ],
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lower": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "upper": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "unit": {
+          "enum": [
+            "t/ha",
+            "mm",
+            "m3/m3",
+            "days",
+            "currency/ha",
+            "currency",
+            "ha",
+            "1"
+          ],
+          "type": "string"
+        },
+        "uncertainty": {
+          "$ref": "#/$defs/Uncertainty"
+        },
+        "reasons": {
+          "items": {
+            "$ref": "#/$defs/Reason"
+          },
+          "maxItems": 50,
+          "type": "array"
+        }
+      },
+      "required": [
+        "status",
+        "value",
+        "lower",
+        "upper",
+        "unit",
+        "uncertainty",
+        "reasons"
+      ],
+      "title": "Metric",
+      "type": "object"
+    },
+    "ModelCard": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "type": "string"
+        },
+        "model": {
+          "$ref": "#/$defs/ModelRef"
+        },
+        "licence_identifier": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "licence_source": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "licence_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "commercial_use": {
+          "enum": [
+            "permitted",
+            "restricted",
+            "unverified"
+          ],
+          "type": "string"
+        },
+        "data_permissions": {
+          "items": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 100,
+          "type": "array"
+        },
+        "capabilities": {
+          "items": {
+            "enum": [
+              "phenology",
+              "yield",
+              "root_zone_water",
+              "surface_moisture",
+              "irrigation",
+              "state_carry",
+              "winter",
+              "snow",
+              "frozen_soil",
+              "paddy",
+              "salinity",
+              "fertility",
+              "waterlogging",
+              "inundation",
+              "solar_geometry"
+            ],
+            "type": "string"
+          },
+          "maxItems": 20,
+          "minItems": 1,
+          "type": "array"
+        },
+        "supported_crops": {
+          "items": {
+            "$ref": "#/$defs/CropRef"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "type": "array"
+        },
+        "supported_region_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 100,
+          "type": "array"
+        },
+        "validated_scope": {
+          "anyOf": [
+            {
+              "maxLength": 2000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "training_status": {
+          "enum": [
+            "not_trained",
+            "insufficient_training_data",
+            "trained",
+            "failed"
+          ],
+          "type": "string"
+        },
+        "cohorts": {
+          "items": {
+            "$ref": "#/$defs/ValidationCohort"
+          },
+          "maxItems": 100,
+          "type": "array"
+        },
+        "promotion": {
+          "enum": [
+            "baseline_only",
+            "candidate",
+            "passed",
+            "failed",
+            "insufficient_evidence"
+          ],
+          "type": "string"
+        },
+        "gate_protocol_version": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "gate_frozen_at": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "holdout_opened_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "fallback_model": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ModelRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reasons": {
+          "items": {
+            "$ref": "#/$defs/Reason"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "model",
+        "licence_identifier",
+        "licence_source",
+        "licence_sha256",
+        "commercial_use",
+        "data_permissions",
+        "capabilities",
+        "supported_crops",
+        "supported_region_ids",
+        "validated_scope",
+        "training_status",
+        "cohorts",
+        "promotion",
+        "gate_protocol_version",
+        "gate_frozen_at",
+        "holdout_opened_at",
+        "fallback_model",
+        "reasons"
+      ],
+      "title": "ModelCard",
+      "type": "object"
+    },
+    "ModelRef": {
+      "additionalProperties": false,
+      "properties": {
+        "model_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "version": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "artifact_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "parameter_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "model_id",
+        "version",
+        "artifact_sha256",
+        "parameter_sha256"
+      ],
+      "title": "ModelRef",
+      "type": "object"
+    },
+    "PlanAlternative": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "type": "string"
+        },
+        "alternative_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "label": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "assignments": {
+          "items": {
+            "$ref": "#/$defs/CropAssignment"
+          },
+          "maxItems": 90,
+          "minItems": 1,
+          "type": "array"
+        },
+        "sequence_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 30,
+          "minItems": 1,
+          "type": "array"
+        },
+        "evaluation_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 30,
+          "type": "array"
+        },
+        "scenario_results": {
+          "items": {
+            "$ref": "#/$defs/ScenarioEconomics"
+          },
+          "maxItems": 192,
+          "type": "array"
+        },
+        "objective_value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "objective_unit": {
+          "enum": [
+            "currency",
+            "mm_ha",
+            "stress_days_ha"
+          ],
+          "type": "string"
+        },
+        "reasons": {
+          "items": {
+            "$ref": "#/$defs/Reason"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "alternative_id",
+        "label",
+        "assignments",
+        "sequence_ids",
+        "evaluation_ids",
+        "scenario_results",
+        "objective_value",
+        "objective_unit",
+        "reasons"
+      ],
+      "title": "PlanAlternative",
+      "type": "object"
+    },
+    "PlanningError": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "type": "string"
+        },
+        "request_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "code": {
+          "enum": [
+            "invalid_input",
+            "not_found",
+            "forbidden",
+            "stale",
+            "conflict",
+            "unavailable",
+            "internal"
+          ],
+          "type": "string"
+        },
+        "retryable": {
+          "type": "boolean"
+        },
+        "reasons": {
+          "items": {
+            "$ref": "#/$defs/Reason"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "request_id",
+        "code",
+        "retryable",
+        "reasons"
+      ],
+      "title": "PlanningError",
+      "type": "object"
+    },
+    "PlanningRun": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "type": "string"
+        },
+        "run_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "request": {
+          "$ref": "#/$defs/FarmPlanningRequest"
+        },
+        "input_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "queued",
+            "running",
+            "succeeded",
+            "failed",
+            "cancelled"
+          ],
+          "type": "string"
+        },
+        "attempt": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "created_at": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "updated_at": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "comparison": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FarmPlanComparison"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "error": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Reason"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "run_id",
+        "request",
+        "input_sha256",
+        "status",
+        "attempt",
+        "created_at",
+        "updated_at",
+        "comparison",
+        "error"
+      ],
+      "title": "PlanningRun",
+      "type": "object"
+    },
+    "ProfileWriteRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "expected_revision": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "profile": {
+          "$ref": "#/$defs/FieldProfileSnapshot"
+        }
+      },
+      "required": [
+        "request_id",
+        "expected_revision",
+        "profile"
+      ],
+      "title": "ProfileWriteRequest",
+      "type": "object"
+    },
+    "Reason": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "message": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "maxItems": 50,
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "evidence"
+      ],
+      "title": "Reason",
+      "type": "object"
+    },
+    "ReplanRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "type": "string"
+        },
+        "previous_run_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "request": {
+          "$ref": "#/$defs/FarmPlanningRequest"
+        },
+        "preserve_commitment_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 90,
+          "type": "array"
+        }
+      },
+      "required": [
+        "previous_run_id",
+        "request",
+        "preserve_commitment_ids"
+      ],
+      "title": "ReplanRequest",
+      "type": "object"
+    },
+    "ResourceLimit": {
+      "additionalProperties": false,
+      "properties": {
+        "constraint_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "season": {
+          "maximum": 2200,
+          "minimum": 1900,
+          "type": "integer"
+        },
+        "budget": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "irrigation_m3": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "constraint_id",
+        "season",
+        "budget",
+        "currency",
+        "irrigation_m3"
+      ],
+      "title": "ResourceLimit",
+      "type": "object"
+    },
+    "ScenarioEconomics": {
+      "additionalProperties": false,
+      "properties": {
+        "trajectory_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "season": {
+          "maximum": 2200,
+          "minimum": 1900,
+          "type": "integer"
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "gross_margin": {
+          "$ref": "#/$defs/Metric"
+        },
+        "irrigation_m3": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "variable_cost": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "assumption_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 300,
+          "type": "array"
+        }
+      },
+      "required": [
+        "trajectory_id",
+        "season",
+        "currency",
+        "gross_margin",
+        "irrigation_m3",
+        "variable_cost",
+        "assumption_ids"
+      ],
+      "title": "ScenarioEconomics",
+      "type": "object"
+    },
+    "SeasonEvaluation": {
+      "additionalProperties": false,
+      "properties": {
+        "season": {
+          "maximum": 2200,
+          "minimum": 1900,
+          "type": "integer"
+        },
+        "crop": {
+          "$ref": "#/$defs/CropRef"
+        },
+        "trajectory_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "available",
+            "insufficient_data",
+            "out_of_domain",
+            "unsupported",
+            "not_applicable",
+            "error"
+          ],
+          "type": "string"
+        },
+        "yield_t_ha": {
+          "$ref": "#/$defs/Metric"
+        },
+        "harvest_basis": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/HarvestBasis"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "root_zone_reserve_mm": {
+          "$ref": "#/$defs/Metric"
+        },
+        "root_depth_cm": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "surface_moisture_m3_m3": {
+          "$ref": "#/$defs/Metric"
+        },
+        "surface_depth_top_cm": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "surface_depth_bottom_cm": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stress_days": {
+          "$ref": "#/$defs/Metric"
+        },
+        "irrigation_mm": {
+          "$ref": "#/$defs/Metric"
+        },
+        "opening_state_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "closing_state_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reasons": {
+          "items": {
+            "$ref": "#/$defs/Reason"
+          },
+          "maxItems": 100,
+          "type": "array"
+        }
+      },
+      "required": [
+        "season",
+        "crop",
+        "trajectory_id",
+        "status",
+        "yield_t_ha",
+        "harvest_basis",
+        "root_zone_reserve_mm",
+        "root_depth_cm",
+        "surface_moisture_m3_m3",
+        "surface_depth_top_cm",
+        "surface_depth_bottom_cm",
+        "stress_days",
+        "irrigation_mm",
+        "opening_state_id",
+        "closing_state_id",
+        "reasons"
+      ],
+      "title": "SeasonEvaluation",
+      "type": "object"
+    },
+    "SequenceEvaluation": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "type": "string"
+        },
+        "evaluation_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "sequence_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "field_snapshot_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "scenario_set_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "as_of": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "model": {
+          "$ref": "#/$defs/ModelRef"
+        },
+        "applicability": {
+          "enum": [
+            "validated",
+            "baseline",
+            "experimental",
+            "out_of_domain",
+            "unsupported"
+          ],
+          "type": "string"
+        },
+        "uncertainty_scope": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "seasons": {
+          "items": {
+            "$ref": "#/$defs/SeasonEvaluation"
+          },
+          "maxItems": 192,
+          "minItems": 1,
+          "type": "array"
+        },
+        "input_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "reasons": {
+          "items": {
+            "$ref": "#/$defs/Reason"
+          },
+          "maxItems": 100,
+          "type": "array"
+        }
+      },
+      "required": [
+        "evaluation_id",
+        "sequence_id",
+        "field_snapshot_id",
+        "scenario_set_id",
+        "as_of",
+        "model",
+        "applicability",
+        "uncertainty_scope",
+        "seasons",
+        "input_sha256",
+        "reasons"
+      ],
+      "title": "SequenceEvaluation",
+      "type": "object"
+    },
+    "SnapshotRef": {
+      "additionalProperties": false,
+      "properties": {
+        "field_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "snapshot_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "profile_revision": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "geometry_revision": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "field_id",
+        "snapshot_id",
+        "profile_revision",
+        "geometry_revision"
+      ],
+      "title": "SnapshotRef",
+      "type": "object"
+    },
+    "SoilHorizon": {
+      "additionalProperties": false,
+      "properties": {
+        "top_cm": {
+          "maximum": 1000,
+          "minimum": 0,
+          "type": "number"
+        },
+        "bottom_cm": {
+          "exclusiveMinimum": 0,
+          "maximum": 1000,
+          "type": "number"
+        },
+        "sand_fraction": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "silt_fraction": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "clay_fraction": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "field_capacity_m3_m3": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "wilting_point_m3_m3": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "saturation_m3_m3": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "organic_carbon_g_kg": {
+          "anyOf": [
+            {
+              "maximum": 1000,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ph": {
+          "anyOf": [
+            {
+              "maximum": 14,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "salinity_ds_m": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 20,
+          "minItems": 1,
+          "type": "array"
+        },
+        "quality": {
+          "enum": [
+            "valid",
+            "partial",
+            "missing",
+            "rejected"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "top_cm",
+        "bottom_cm",
+        "sand_fraction",
+        "silt_fraction",
+        "clay_fraction",
+        "field_capacity_m3_m3",
+        "wilting_point_m3_m3",
+        "saturation_m3_m3",
+        "organic_carbon_g_kg",
+        "ph",
+        "salinity_ds_m",
+        "source_ids",
+        "quality"
+      ],
+      "title": "SoilHorizon",
+      "type": "object"
+    },
+    "SolverLimits": {
+      "additionalProperties": false,
+      "properties": {
+        "max_nodes": {
+          "maximum": 1000000,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "max_seconds": {
+          "maximum": 300,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "max_candidates_per_field": {
+          "maximum": 1000,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "max_alternatives": {
+          "maximum": 3,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "max_nodes",
+        "max_seconds",
+        "max_candidates_per_field",
+        "max_alternatives"
+      ],
+      "title": "SolverLimits",
+      "type": "object"
+    },
+    "SourceRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "provider": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "product": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "version": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "measured",
+            "modelled",
+            "user_entered",
+            "synthetic",
+            "reference"
+          ],
+          "type": "string"
+        },
+        "acquired_at": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "available_at": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "retrieved_at": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "checksum_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "licence": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "attribution": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "native_resolution_m": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "coverage_fraction": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "spatial_method": {
+          "enum": [
+            "sensor",
+            "representative_point",
+            "area_weighted",
+            "polygon",
+            "none"
+          ],
+          "type": "string"
+        },
+        "quality": {
+          "enum": [
+            "valid",
+            "partial",
+            "missing",
+            "rejected"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "provider",
+        "product",
+        "version",
+        "kind",
+        "acquired_at",
+        "available_at",
+        "retrieved_at",
+        "checksum_sha256",
+        "licence",
+        "attribution",
+        "native_resolution_m",
+        "coverage_fraction",
+        "spatial_method",
+        "quality"
+      ],
+      "title": "SourceRecord",
+      "type": "object"
+    },
+    "SuitabilityAssessment": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "type": "string"
+        },
+        "assessment_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "field_snapshot_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "season": {
+          "maximum": 2200,
+          "minimum": 1900,
+          "type": "integer"
+        },
+        "crop": {
+          "$ref": "#/$defs/CropRef"
+        },
+        "status": {
+          "enum": [
+            "eligible",
+            "ineligible",
+            "insufficient_data",
+            "out_of_domain",
+            "unsupported",
+            "error"
+          ],
+          "type": "string"
+        },
+        "rulebook_version": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "required_capabilities": {
+          "items": {
+            "enum": [
+              "phenology",
+              "yield",
+              "root_zone_water",
+              "surface_moisture",
+              "irrigation",
+              "state_carry",
+              "winter",
+              "snow",
+              "frozen_soil",
+              "paddy",
+              "salinity",
+              "fertility",
+              "waterlogging",
+              "inundation",
+              "solar_geometry"
+            ],
+            "type": "string"
+          },
+          "maxItems": 20,
+          "type": "array"
+        },
+        "checked_rule_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 200,
+          "type": "array"
+        },
+        "unchecked_rule_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 200,
+          "type": "array"
+        },
+        "reasons": {
+          "items": {
+            "$ref": "#/$defs/Reason"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "assessment_id",
+        "field_snapshot_id",
+        "season",
+        "crop",
+        "status",
+        "rulebook_version",
+        "required_capabilities",
+        "checked_rule_ids",
+        "unchecked_rule_ids",
+        "reasons"
+      ],
+      "title": "SuitabilityAssessment",
+      "type": "object"
+    },
+    "TerrainRadiation": {
+      "additionalProperties": false,
+      "properties": {
+        "latitude_deg": {
+          "maximum": 90,
+          "minimum": -90,
+          "type": "number"
+        },
+        "longitude_deg": {
+          "maximum": 180,
+          "minimum": -180,
+          "type": "number"
+        },
+        "elevation_m": {
+          "anyOf": [
+            {
+              "maximum": 9000,
+              "minimum": -500,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "slope_deg": {
+          "anyOf": [
+            {
+              "maximum": 90,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "aspect_deg": {
+          "anyOf": [
+            {
+              "exclusiveMaximum": 360,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "aspect_convention": {
+          "const": "clockwise_from_true_north",
+          "type": "string"
+        },
+        "solar_time": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "solar_zenith_deg": {
+          "anyOf": [
+            {
+              "maximum": 180,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "surface_shortwave_w_m2": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 20,
+          "type": "array"
+        }
+      },
+      "required": [
+        "latitude_deg",
+        "longitude_deg",
+        "elevation_m",
+        "slope_deg",
+        "aspect_deg",
+        "aspect_convention",
+        "solar_time",
+        "solar_zenith_deg",
+        "surface_shortwave_w_m2",
+        "source_ids"
+      ],
+      "title": "TerrainRadiation",
+      "type": "object"
+    },
+    "TrainingObservation": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "type": "string"
+        },
+        "observation_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "farm_group_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "field_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "geographic_group_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "grid_group_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "geometry_revision": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "region_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "crop": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CropRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "observed_at": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "available_at": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "soil_moisture",
+            "yield",
+            "phenology",
+            "canopy_cover",
+            "biomass",
+            "irrigation"
+          ],
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "unit": {
+          "enum": [
+            "m3/m3",
+            "t/ha",
+            "stage",
+            "1",
+            "kg/ha",
+            "mm"
+          ],
+          "type": "string"
+        },
+        "depth_top_cm": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "depth_bottom_cm": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "crop_stage": {
+          "anyOf": [
+            {
+              "maxLength": 2000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sowing_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "harvest_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "irrigation_mm": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "harvest_basis": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/HarvestBasis"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "field_snapshot_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_checksum_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "source_locator": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "permission": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "quality": {
+          "enum": [
+            "valid",
+            "partial",
+            "missing",
+            "rejected"
+          ],
+          "type": "string"
+        },
+        "synthetic": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "observation_id",
+        "farm_group_id",
+        "field_id",
+        "geographic_group_id",
+        "grid_group_id",
+        "geometry_revision",
+        "region_id",
+        "crop",
+        "observed_at",
+        "available_at",
+        "kind",
+        "value",
+        "unit",
+        "depth_top_cm",
+        "depth_bottom_cm",
+        "crop_stage",
+        "sowing_date",
+        "harvest_date",
+        "irrigation_mm",
+        "harvest_basis",
+        "field_snapshot_id",
+        "source_checksum_sha256",
+        "source_locator",
+        "permission",
+        "quality",
+        "synthetic"
+      ],
+      "title": "TrainingObservation",
+      "type": "object"
+    },
+    "Uncertainty": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "none",
+            "scenario_range",
+            "predictive_interval",
+            "measurement_interval"
+          ],
+          "type": "string"
+        },
+        "coverage": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "calibration_scope": {
+          "anyOf": [
+            {
+              "maxLength": 2000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "method_version": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "coverage",
+        "calibration_scope",
+        "method_version"
+      ],
+      "title": "Uncertainty",
+      "type": "object"
+    },
+    "ValidationCohort": {
+      "additionalProperties": false,
+      "properties": {
+        "partition": {
+          "enum": [
+            "fit",
+            "calibration",
+            "test"
+          ],
+          "type": "string"
+        },
+        "region_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 100,
+          "type": "array"
+        },
+        "farm_group_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 10000,
+          "type": "array"
+        },
+        "grid_group_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 10000,
+          "type": "array"
+        },
+        "crops": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 100,
+          "type": "array"
+        },
+        "years": {
+          "items": {
+            "maximum": 2200,
+            "minimum": 1900,
+            "type": "integer"
+          },
+          "maxItems": 200,
+          "type": "array"
+        },
+        "observation_count": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "metrics": {
+          "patternProperties": {
+            "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$": {
+              "$ref": "#/$defs/Metric"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "partition",
+        "region_ids",
+        "farm_group_ids",
+        "grid_group_ids",
+        "crops",
+        "years",
+        "observation_count",
+        "metrics"
+      ],
+      "title": "ValidationCohort",
+      "type": "object"
+    },
+    "WaterState": {
+      "additionalProperties": false,
+      "properties": {
+        "observed_at": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "available_at": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "depth_top_cm": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "depth_bottom_cm": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "volumetric_m3_m3": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "available_reserve_mm": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "available_capacity_mm": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 20,
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "observed_at",
+        "available_at",
+        "depth_top_cm",
+        "depth_bottom_cm",
+        "volumetric_m3_m3",
+        "available_reserve_mm",
+        "available_capacity_mm",
+        "source_ids"
+      ],
+      "title": "WaterState",
+      "type": "object"
+    },
+    "WeatherScenario": {
+      "additionalProperties": false,
+      "properties": {
+        "trajectory_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "member_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "weight": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "traces": {
+          "items": {
+            "$ref": "#/$defs/WeatherTrace"
+          },
+          "maxItems": 30,
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "trajectory_id",
+        "member_id",
+        "weight",
+        "traces"
+      ],
+      "title": "WeatherScenario",
+      "type": "object"
+    },
+    "WeatherScenarioSet": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "type": "string"
+        },
+        "scenario_set_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "as_of": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "issued_at": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "cycle_at": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "model_version": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "valid_window": {
+          "$ref": "#/$defs/DateWindow"
+        },
+        "scenario_type": {
+          "enum": [
+            "forecast",
+            "seasonal",
+            "historical_replay",
+            "synthetic"
+          ],
+          "type": "string"
+        },
+        "stale_after": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "weight_calibration": {
+          "anyOf": [
+            {
+              "maxLength": 2000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/$defs/SourceRecord"
+          },
+          "maxItems": 200,
+          "minItems": 1,
+          "type": "array"
+        },
+        "scenarios": {
+          "items": {
+            "$ref": "#/$defs/WeatherScenario"
+          },
+          "maxItems": 64,
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "scenario_set_id",
+        "as_of",
+        "issued_at",
+        "cycle_at",
+        "model_version",
+        "valid_window",
+        "scenario_type",
+        "stale_after",
+        "weight_calibration",
+        "sources",
+        "scenarios"
+      ],
+      "title": "WeatherScenarioSet",
+      "type": "object"
+    },
+    "WeatherTrace": {
+      "additionalProperties": false,
+      "properties": {
+        "field_snapshot_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "grid_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "source_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "native_resolution_m": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "representative_latitude": {
+          "maximum": 90,
+          "minimum": -90,
+          "type": "number"
+        },
+        "representative_longitude": {
+          "maximum": 180,
+          "minimum": -180,
+          "type": "number"
+        },
+        "days": {
+          "items": {
+            "$ref": "#/$defs/DailyWeather"
+          },
+          "maxItems": 2192,
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "field_snapshot_id",
+        "grid_id",
+        "source_id",
+        "native_resolution_m",
+        "representative_latitude",
+        "representative_longitude",
+        "days"
+      ],
+      "title": "WeatherTrace",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Export-only index of public DTOs, never an HTTP request body.",
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "type": "string"
+    },
+    "field_profile": {
+      "$ref": "#/$defs/FieldProfileSnapshot"
+    },
+    "weather": {
+      "$ref": "#/$defs/WeatherScenarioSet"
+    },
+    "suitability": {
+      "$ref": "#/$defs/SuitabilityAssessment"
+    },
+    "candidate": {
+      "$ref": "#/$defs/CandidateSequence"
+    },
+    "evaluation": {
+      "$ref": "#/$defs/SequenceEvaluation"
+    },
+    "request": {
+      "$ref": "#/$defs/FarmPlanningRequest"
+    },
+    "run": {
+      "$ref": "#/$defs/PlanningRun"
+    },
+    "alternative": {
+      "$ref": "#/$defs/PlanAlternative"
+    },
+    "comparison": {
+      "$ref": "#/$defs/FarmPlanComparison"
+    },
+    "model_card": {
+      "$ref": "#/$defs/ModelCard"
+    },
+    "observation": {
+      "$ref": "#/$defs/TrainingObservation"
+    },
+    "crop_registry": {
+      "$ref": "#/$defs/CropRegistry"
+    },
+    "profile_write": {
+      "$ref": "#/$defs/ProfileWriteRequest"
+    },
+    "apply_request": {
+      "$ref": "#/$defs/ApplyPlanRequest"
+    },
+    "apply_result": {
+      "$ref": "#/$defs/ApplyPlanResult"
+    },
+    "replan": {
+      "$ref": "#/$defs/ReplanRequest"
+    },
+    "error": {
+      "$ref": "#/$defs/PlanningError"
+    }
+  },
+  "required": [
+    "field_profile",
+    "weather",
+    "suitability",
+    "candidate",
+    "evaluation",
+    "request",
+    "run",
+    "alternative",
+    "comparison",
+    "model_card",
+    "observation",
+    "crop_registry",
+    "profile_write",
+    "apply_request",
+    "apply_result",
+    "replan",
+    "error"
+  ],
+  "title": "PlanningContracts",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Generated from apps/api/src/field_shift/contracts/planning_v1. Python validators additionally enforce cross-field semantics; see README.md."
+}

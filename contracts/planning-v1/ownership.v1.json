@@ -1,0 +1,91 @@
+{
+  "integration_branch": "nazar-jobs",
+  "prerequisite_issue": 2,
+  "parallel_issues": [
+    3,
+    4,
+    5,
+    6
+  ],
+  "integration_issue": 7,
+  "frozen_paths": [
+    "apps/api/src/field_shift/contracts/",
+    "contracts/planning-v1/",
+    "apps/web/src/api/planningV1.generated.ts",
+    "apps/api/tests/planning_v1_contracts/"
+  ],
+  "lanes": {
+    "A": {
+      "issue": 3,
+      "paths": [
+        "apps/api/src/field_shift/modules/fields/planning_profile/",
+        "apps/api/src/field_shift/modules/rotations/suitability/",
+        "apps/api/tests/planning_profile/",
+        "apps/api/tests/planning_suitability/",
+        "apps/api/migrations/versions/0011_field_profiles.py",
+        "docs/planning/spatial-inputs.md"
+      ]
+    },
+    "B": {
+      "issue": 4,
+      "paths": [
+        "packages/field-shift-models/",
+        "services/crop-model/",
+        "docs/planning/model-selection.md",
+        "docs/planning/model-data-requirements.md"
+      ]
+    },
+    "C": {
+      "issue": 5,
+      "paths": [
+        "apps/api/src/field_shift/modules/rotations/scenario_planning/",
+        "apps/api/tests/scenario_planning/",
+        "apps/api/migrations/versions/0012_planning_runs.py",
+        "docs/planning/decision-engine.md"
+      ]
+    },
+    "D": {
+      "issue": 6,
+      "paths": [
+        "apps/web/src/features/planning/",
+        "apps/web/src/features/field-profile/",
+        "apps/web/src/api/planningV1.ts",
+        "apps/web/tests/planning/",
+        "apps/web/e2e/planning-v1/",
+        "apps/web/playwright.planning.config.ts",
+        "docs/planning/user-workflows.md"
+      ]
+    }
+  },
+  "shared_integration_only": [
+    "apps/api/src/field_shift/api.py",
+    "apps/api/src/field_shift/models.py",
+    "apps/api/src/field_shift/jobs/",
+    "apps/api/pyproject.toml",
+    "apps/api/uv.lock",
+    "apps/web/src/app/App.tsx",
+    "apps/web/src/app/Shell.tsx",
+    "apps/web/src/app/routing.ts",
+    "apps/web/package.json",
+    "apps/web/package-lock.json",
+    "compose.yaml",
+    ".github/workflows/",
+    "docs/status.md",
+    "docs/roadmap.md",
+    "README.md",
+    "apps/api/migrations/versions/0013_merge_planning.py"
+  ],
+  "migration_parents": {
+    "0011_field_profiles": [
+      "0010_precision_plans"
+    ],
+    "0012_planning_runs": [
+      "0010_precision_plans"
+    ],
+    "0013_merge_planning": [
+      "0011_field_profiles",
+      "0012_planning_runs"
+    ]
+  },
+  "existing_files_outside_allowlists": "read-only; shared wiring and global translations belong to issue #7"
+}

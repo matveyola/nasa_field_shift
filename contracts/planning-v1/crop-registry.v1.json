@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0.0",
+  "registry_version": "planning-crops-v1",
+  "entries": [
+    {
+      "crop_id": "Wheat",
+      "family": "poaceae",
+      "required_capabilities": [],
+      "note": "Species identifier only; not a calibrated cultivar or suitability rule."
+    },
+    {
+      "crop_id": "Maize",
+      "family": "poaceae",
+      "required_capabilities": [],
+      "note": "Species identifier only; not a calibrated cultivar or suitability rule."
+    },
+    {
+      "crop_id": "Soy",
+      "family": "fabaceae",
+      "required_capabilities": [],
+      "note": "Species identifier only; not a calibrated cultivar or suitability rule."
+    },
+    {
+      "crop_id": "Barley",
+      "family": "poaceae",
+      "required_capabilities": [],
+      "note": "Species identifier only; not a calibrated cultivar or suitability rule."
+    },
+    {
+      "crop_id": "Sunflower",
+      "family": "asteraceae",
+      "required_capabilities": [],
+      "note": "Species identifier only; not a calibrated cultivar or suitability rule."
+    },
+    {
+      "crop_id": "Rapeseed",
+      "family": "brassicaceae",
+      "required_capabilities": [],
+      "note": "Species identifier only; not a calibrated cultivar or suitability rule."
+    },
+    {
+      "crop_id": "Peas",
+      "family": "fabaceae",
+      "required_capabilities": [],
+      "note": "Species identifier only; not a calibrated cultivar or suitability rule."
+    },
+    {
+      "crop_id": "Rice",
+      "family": "poaceae",
+      "required_capabilities": [
+        "paddy"
+      ],
+      "note": "Managed paddy requires a paddy-capable engine; upland rice needs a separate reviewed profile."
+    }
+  ]
+}

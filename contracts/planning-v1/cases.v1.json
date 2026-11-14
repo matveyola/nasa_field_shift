@@ -1,0 +1,604 @@
+{
+  "schema_version": "planning-acceptance-v1",
+  "created_at": "2026-11-14",
+  "status": "test_specification_not_executed",
+  "scope": "Outdoor crop planning; coordinates are illustrative public locations, not surveyed farm polygons.",
+  "warning": "All weather/soil descriptors below are synthetic controlled fixtures, not observations or forecasts for those places. No measured yields or profit targets are asserted.",
+  "required_fixture_expansion": [
+    "Generate dated daily records from recipes only for explicit windows; never silently fill missing winter/season transitions.",
+    "For empirical benchmarks acquire pinned historical polygons, issue-time data and measured outcomes with source checksums and permission.",
+    "Expected predicates must be bound to reviewed crop/rule/model versions before release."
+  ],
+  "weather_profiles": {
+    "cold_frozen": {
+      "recipe": "constant_daily",
+      "tmin_c": -30,
+      "tmax_c": -15,
+      "liquid_rain_mm": 0,
+      "et0_mm": 0,
+      "shortwave_mj_m2": 0,
+      "soil_frozen": true
+    },
+    "temperate_growth": {
+      "recipe": "constant_daily_on_window",
+      "tmin_c": 14,
+      "tmax_c": 26,
+      "liquid_rain_mm": 3,
+      "et0_mm": 3.5,
+      "shortwave_mj_m2": 18,
+      "window": [
+        "2027-04-01",
+        "2027-09-30"
+      ]
+    },
+    "hot_dry": {
+      "recipe": "constant_daily_on_window",
+      "tmin_c": 22,
+      "tmax_c": 36,
+      "liquid_rain_mm": 0.1,
+      "et0_mm": 6,
+      "shortwave_mj_m2": 23,
+      "window": [
+        "2027-04-01",
+        "2027-09-30"
+      ]
+    },
+    "warm_wet": {
+      "recipe": "constant_daily_on_window",
+      "tmin_c": 23,
+      "tmax_c": 31,
+      "liquid_rain_mm": 6,
+      "et0_mm": 4,
+      "shortwave_mj_m2": 17,
+      "window": [
+        "2027-05-01",
+        "2027-10-31"
+      ]
+    }
+  },
+  "cases": [
+    {
+      "id": "G01",
+      "title": "Antarctic interior: no outdoor seasonal crop recommendation",
+      "case_kind": "synthetic_contract",
+      "location": {
+        "latitude": -89.9,
+        "longitude": 0
+      },
+      "production_system": "outdoor",
+      "inputs": {
+        "weather": "cold_frozen",
+        "crops": [
+          "Wheat",
+          "Maize",
+          "Soy",
+          "Barley",
+          "Sunflower",
+          "Rice"
+        ],
+        "soil_observation": "ice_or_no_arable_soil"
+      },
+      "expected_invariants": [
+        "When valid cold/ice evidence is present, no enabled outdoor grain crop is recommended; cite hard limiting factors.",
+        "Yield and gross margin are null/not_applicable rather than invented zeros or positive values.",
+        "If climate evidence is unavailable, return insufficient_data, not a continent-based rule."
+      ],
+      "agronomist_reviewed": false
+    },
+    {
+      "id": "G02",
+      "title": "Polar missing inputs are not proof of impossibility",
+      "case_kind": "synthetic_contract",
+      "location": {
+        "latitude": -89.9,
+        "longitude": 0
+      },
+      "production_system": "outdoor",
+      "inputs": {
+        "weather": null,
+        "soil_observation": null
+      },
+      "expected_invariants": [
+        "Return insufficient_data with missing-source reasons; do not infer weather from the coordinate label."
+      ],
+      "agronomist_reviewed": false,
+      "paired_with": "G01"
+    },
+    {
+      "id": "G03",
+      "title": "Northern growing season: maturity depends on cultivar",
+      "case_kind": "synthetic_contract",
+      "location": {
+        "latitude": 65.0,
+        "longitude": 25.5
+      },
+      "production_system": "outdoor",
+      "inputs": {
+        "window": [
+          "2027-05-15",
+          "2027-09-01"
+        ],
+        "crops": [
+          "Barley",
+          "Maize"
+        ],
+        "weather": "temperate_growth",
+        "cultivar_profiles": "versioned_early_and_late_test_profiles"
+      },
+      "expected_invariants": [
+        "Evaluate crop/cultivar thermal-time and frost constraints using the supplied test profiles.",
+        "Do not assert that every crop is impossible solely because latitude is high.",
+        "Missing cultivar validation yields unsupported/experimental with reasons, not a guaranteed harvest."
+      ],
+      "agronomist_reviewed": false
+    },
+    {
+      "id": "G04",
+      "title": "Same northern location during frozen winter",
+      "case_kind": "synthetic_contract",
+      "location": {
+        "latitude": 65.0,
+        "longitude": 25.5
+      },
+      "production_system": "outdoor",
+      "inputs": {
+        "weather": "cold_frozen",
+        "window": [
+          "2027-01-01",
+          "2027-03-01"
+        ],
+        "purpose": "new_outdoor_sowing"
+      },
+      "expected_invariants": [
+        "Frozen-soil and insufficient growing-window rules prevent new sowing for the enabled test crops.",
+        "Distinguish sowing feasibility from a calibrated overwintering model."
+      ],
+      "agronomist_reviewed": false,
+      "paired_with": "G03"
+    },
+    {
+      "id": "G05",
+      "title": "Southern dry field without irrigation",
+      "case_kind": "synthetic_contract",
+      "location": {
+        "latitude": 46.63,
+        "longitude": 32.62
+      },
+      "production_system": "outdoor",
+      "inputs": {
+        "weather": "hot_dry",
+        "irrigation_limit_mm": 0,
+        "soil_capacity_mm": 120,
+        "opening_reserve_mm": 45
+      },
+      "expected_invariants": [
+        "Close the daily water balance and report deficit days.",
+        "Do not recommend an irrigation-dependent plan when available irrigation is zero."
+      ],
+      "agronomist_reviewed": false
+    },
+    {
+      "id": "G06",
+      "title": "Same field with bounded irrigation",
+      "case_kind": "synthetic_contract",
+      "location": {
+        "latitude": 46.63,
+        "longitude": 32.62
+      },
+      "production_system": "outdoor",
+      "inputs": {
+        "weather": "hot_dry",
+        "irrigation_limit_mm": 150,
+        "soil_capacity_mm": 120,
+        "opening_reserve_mm": 45
+      },
+      "expected_invariants": [
+        "For the same crop/parameters under a deficit-only fixture, feasible supplemental irrigation cannot increase deficit days.",
+        "Account for irrigation availability and costs; do not promise that margin must increase."
+      ],
+      "agronomist_reviewed": false,
+      "paired_with": "G05"
+    },
+    {
+      "id": "G07",
+      "title": "Favorable temperate soil is not a universal crop guarantee",
+      "case_kind": "synthetic_contract",
+      "location": {
+        "latitude": 50.4,
+        "longitude": 30.5
+      },
+      "production_system": "outdoor",
+      "inputs": {
+        "weather": "temperate_growth",
+        "soil": "well_drained_test_profile",
+        "salinity": "low",
+        "history": "known"
+      },
+      "expected_invariants": [
+        "Evaluate each crop against its own climate/calendar/history profile.",
+        "An eligible crop is not a promise of positive profit or support for every hybrid."
+      ],
+      "agronomist_reviewed": false
+    },
+    {
+      "id": "G08",
+      "title": "Fertile soil with drought remains water-limited",
+      "case_kind": "synthetic_contract",
+      "location": {
+        "latitude": 50.4,
+        "longitude": 30.5
+      },
+      "production_system": "outdoor",
+      "inputs": {
+        "weather": "hot_dry",
+        "soil": "same_as_G07",
+        "irrigation_limit_mm": 0
+      },
+      "expected_invariants": [
+        "Fertility does not bypass water constraints or turn missing fertility modeling into a yield bonus.",
+        "Report unsupported fertility response if the selected engine lacks it."
+      ],
+      "agronomist_reviewed": false,
+      "paired_with": "G07"
+    },
+    {
+      "id": "G09",
+      "title": "Managed rice system in a warm wet scenario",
+      "case_kind": "synthetic_contract",
+      "location": {
+        "latitude": 10.05,
+        "longitude": 105.78
+      },
+      "production_system": "outdoor",
+      "inputs": {
+        "weather": "warm_wet",
+        "crop": "Rice",
+        "management": "bounded_managed_paddy",
+        "cultivar": "explicit_test_profile"
+      },
+      "expected_invariants": [
+        "Require a documented rice/paddy-capable model and applicable cultivar inputs.",
+        "If unsupported, return unsupported; never substitute an upland wheat bucket as a rice model.",
+        "Do not use Asia as a suitability feature or equate managed shallow water with hazardous inundation."
+      ],
+      "agronomist_reviewed": false
+    },
+    {
+      "id": "G10",
+      "title": "Asian dry site: rice needs a supported water system",
+      "case_kind": "synthetic_contract",
+      "location": {
+        "latitude": 26.91,
+        "longitude": 70.91
+      },
+      "production_system": "outdoor",
+      "inputs": {
+        "weather": "hot_dry",
+        "crop": "Rice",
+        "irrigation_limit_mm": 0
+      },
+      "expected_invariants": [
+        "Do not recommend rice solely because the field is in Asia.",
+        "Explain deficit/management limitations or missing applicable model."
+      ],
+      "agronomist_reviewed": false,
+      "paired_with": "G09"
+    },
+    {
+      "id": "G11",
+      "title": "Hazardous submergence is distinct from managed paddy",
+      "case_kind": "synthetic_contract",
+      "location": {
+        "latitude": 10.05,
+        "longitude": 105.78
+      },
+      "production_system": "outdoor",
+      "inputs": {
+        "weather": "warm_wet",
+        "crop": "Rice",
+        "flood": "deep_long_duration_test_event",
+        "management": "same_as_G09"
+      },
+      "expected_invariants": [
+        "Do not mark all flooding beneficial for rice.",
+        "Use depth, duration, stage and validated cultivar tolerance when supported; otherwise mark impact unsupported."
+      ],
+      "agronomist_reviewed": false,
+      "paired_with": "G09"
+    },
+    {
+      "id": "G12",
+      "title": "Adjacent fields with identical supported inputs",
+      "case_kind": "synthetic_contract",
+      "location": {
+        "latitude": 46.63,
+        "longitude": 32.62
+      },
+      "production_system": "outdoor",
+      "inputs": {
+        "paired_location": [
+          46.631,
+          32.621
+        ],
+        "weather": "same_grid_same_issue",
+        "soil": "identical",
+        "management": "identical"
+      },
+      "expected_invariants": [
+        "Identical feature snapshots and model version/seed produce identical deterministic predictions within declared numerical tolerance.",
+        "Do not manufacture differences from field ID or claim sub-grid weather precision."
+      ],
+      "agronomist_reviewed": false
+    },
+    {
+      "id": "G13",
+      "title": "Adjacent fields with different measured water storage",
+      "case_kind": "synthetic_contract",
+      "location": {
+        "latitude": 46.63,
+        "longitude": 32.62
+      },
+      "production_system": "outdoor",
+      "inputs": {
+        "weather": "hot_dry",
+        "soil_A_capacity_mm": 60,
+        "soil_B_capacity_mm": 180,
+        "opening_fraction": 1,
+        "management": "identical_no_irrigation"
+      },
+      "expected_invariants": [
+        "Under this controlled deficit-only water-balance fixture, larger initial available storage does not produce earlier stress.",
+        "Do not transfer this ordering to all soils/weather/real crop yields without evidence."
+      ],
+      "agronomist_reviewed": false
+    },
+    {
+      "id": "G14",
+      "title": "Distant fields may share a forecast",
+      "case_kind": "synthetic_contract",
+      "location": {
+        "latitude": 46.63,
+        "longitude": 32.62
+      },
+      "production_system": "outdoor",
+      "inputs": {
+        "paired_location": [
+          -34.6,
+          -58.4
+        ],
+        "weather": "identical_fixture",
+        "soil": "identical_fixture",
+        "management": "identical_fixture",
+        "solar_features": "held_equal_for_this_test"
+      },
+      "expected_invariants": [
+        "Do not force prediction divergence solely because locations are far apart.",
+        "Out-of-domain status may differ if a learned adapter has a documented geographic gate."
+      ],
+      "agronomist_reviewed": false
+    },
+    {
+      "id": "G15",
+      "title": "North/south aspects and opposite hemispheres",
+      "case_kind": "synthetic_contract",
+      "location": {
+        "latitude": 45,
+        "longitude": 0
+      },
+      "production_system": "outdoor",
+      "inputs": {
+        "paired_location": [
+          -45,
+          0
+        ],
+        "slope_deg": 20,
+        "aspects_deg": [
+          0,
+          180
+        ],
+        "times": [
+          "2027-06-21T12:00:00Z",
+          "2027-12-21T12:00:00Z"
+        ],
+        "sky": "controlled_clear_sky"
+      },
+      "expected_invariants": [
+        "Compare solar geometry with a trusted pvlib reference and declared angle conventions.",
+        "Do not use a universal northern/southern-aspect yield multiplier.",
+        "Separate shortwave on a surface from validated crop-canopy response."
+      ],
+      "agronomist_reviewed": false
+    },
+    {
+      "id": "G16",
+      "title": "Ocean or non-arable location",
+      "case_kind": "synthetic_contract",
+      "location": {
+        "latitude": 0,
+        "longitude": -140
+      },
+      "production_system": "outdoor",
+      "inputs": {
+        "land_mask": "ocean",
+        "weather": "otherwise_valid"
+      },
+      "expected_invariants": [
+        "Reject open-field crop planning on ocean/non-arable geometry using land evidence; report a structured reason."
+      ],
+      "agronomist_reviewed": false
+    },
+    {
+      "id": "G17",
+      "title": "NoData versus genuine zero",
+      "case_kind": "synthetic_contract",
+      "location": {
+        "latitude": 50.4,
+        "longitude": 30.5
+      },
+      "production_system": "outdoor",
+      "inputs": {
+        "soil": null,
+        "rain_mm": [
+          0,
+          null
+        ],
+        "quality_flags": [
+          "valid",
+          "missing"
+        ]
+      },
+      "expected_invariants": [
+        "Preserve zero rainfall; retain missing data as null.",
+        "Never convert missing soil moisture to dry soil or zero economic return."
+      ],
+      "agronomist_reviewed": false
+    },
+    {
+      "id": "G18",
+      "title": "Issuance-time backtest",
+      "case_kind": "synthetic_contract",
+      "location": {
+        "latitude": 50.4,
+        "longitude": 30.5
+      },
+      "production_system": "outdoor",
+      "inputs": {
+        "as_of": "2026-11-14T00:00:00Z",
+        "observation_available_at": "2026-11-15T00:00:00Z",
+        "forecast_cycle": "pinned"
+      },
+      "expected_invariants": [
+        "Reject unavailable future labels/imagery as planning predictors.",
+        "Pair hindcasts with the same issuance, lead and model cycle; final reanalysis is not a historical forecast."
+      ],
+      "agronomist_reviewed": false
+    },
+    {
+      "id": "G19",
+      "title": "Cross-farm and cross-year holdout",
+      "case_kind": "synthetic_contract",
+      "location": {
+        "latitude": 50.4,
+        "longitude": 30.5
+      },
+      "production_system": "outdoor",
+      "inputs": {
+        "partitions": [
+          "fit",
+          "calibration",
+          "test"
+        ],
+        "neighbors": "same_weather_grid_and_farm"
+      },
+      "expected_invariants": [
+        "Keep whole farms and overlapping weather-grid/geographic groups out of other partitions.",
+        "Fit imputation/scaling/feature selection only on training folds; leave calibration and test untouched."
+      ],
+      "agronomist_reviewed": false
+    },
+    {
+      "id": "G20",
+      "title": "Unknown cultivar or model outside validated footprint",
+      "case_kind": "synthetic_contract",
+      "location": {
+        "latitude": 50.4,
+        "longitude": 30.5
+      },
+      "production_system": "outdoor",
+      "inputs": {
+        "cultivar_id": "unseen-hybrid",
+        "model_scope": "other_region"
+      },
+      "expected_invariants": [
+        "Return unsupported or experimental/out_of_domain with the applicable fallback.",
+        "No trained prediction is labeled locally validated solely because the crop species matches."
+      ],
+      "agronomist_reviewed": false
+    },
+    {
+      "id": "G21",
+      "title": "Missing economics and constrained budget",
+      "case_kind": "synthetic_contract",
+      "location": {
+        "latitude": 50.4,
+        "longitude": 30.5
+      },
+      "production_system": "outdoor",
+      "inputs": {
+        "price": null,
+        "yield_t_ha": null,
+        "currency": null,
+        "budget": "below_locked_plan_cost"
+      },
+      "expected_invariants": [
+        "With missing economics, margin is unavailable, not zero or LLM-generated.",
+        "A conflict with a mandatory locked decision yields infeasible diagnostics; never silently unlock."
+      ],
+      "agronomist_reviewed": false
+    },
+    {
+      "id": "G22",
+      "title": "Forecast extremes are not field inundation",
+      "case_kind": "synthetic_contract",
+      "location": {
+        "latitude": 50.4,
+        "longitude": 30.5
+      },
+      "production_system": "outdoor",
+      "inputs": {
+        "hazards": [
+          "extreme_precipitation_index",
+          "river_discharge_forecast"
+        ],
+        "field_hydraulic_model": null
+      },
+      "expected_invariants": [
+        "EFI is not a probability of crop loss.",
+        "River warnings do not imply a precise field flood depth; report unsupported inundation impact when hydraulic data are missing."
+      ],
+      "agronomist_reviewed": false
+    },
+    {
+      "id": "G23",
+      "title": "Agent explanation cannot change model facts",
+      "case_kind": "synthetic_contract",
+      "location": {
+        "latitude": 50.4,
+        "longitude": 30.5
+      },
+      "production_system": "outdoor",
+      "inputs": {
+        "model_yield_interval_t_ha": [
+          2,
+          5
+        ],
+        "margin": null,
+        "user_text": "Guarantee that profit will be positive."
+      },
+      "expected_invariants": [
+        "Preserve numeric values, units, intervals and abstention reasons exactly.",
+        "Do not generate guaranteed profit, fabricated confidence or autonomous plan application."
+      ],
+      "agronomist_reviewed": false
+    },
+    {
+      "id": "G24",
+      "title": "Synthetic fixture is not observed model validation",
+      "case_kind": "synthetic_contract",
+      "location": {
+        "latitude": 50.4,
+        "longitude": 30.5
+      },
+      "production_system": "outdoor",
+      "inputs": {
+        "source": "this_case_manifest",
+        "kind": "synthetic_contract"
+      },
+      "expected_invariants": [
+        "Passing these cases proves invariants and contract behavior only.",
+        "Release requires an independent real-field/year benchmark; no accuracy score is derived from these cases."
+      ],
+      "agronomist_reviewed": false
+    }
+  ]
+}
