@@ -1,5 +1,16 @@
 {
-  "purpose": "Raw source schema/readiness audit, not a predictive accuracy benchmark",
+  "schema_version": "public-crop-data-audit-v1",
+  "purpose": "Raw ARDN/CSCAP source schema/readiness audit, not a predictive accuracy benchmark",
+  "input_sha256": {
+    "ardn-agro.csv": "8ad1c3224f84cc715fe73a11d475fb5acd0c0f51319b86173aff4a923036519f",
+    "ardn-ops_plant.csv": "5a866c19379b5f02a35464baa050690243d603f6a1d9c0273dba077b776df4cd",
+    "ardn-ops_harv.csv": "e94fd10babbc27490dbb560b720232d5ea8df06d53f7e01b5addbee18b7ee220",
+    "ardn-weather_onsite.csv": "9a925cb450baf2bd017f7b51b055011e8a537e57deb87cbc5e0fcac4b052ecbe",
+    "ardn-sitemeta.csv": "c591b7e72a1e4e80af9cfdca58ccd6f2cfe8777016d74377cea55fd5730b2291",
+    "ardn-soil.csv": "5c1ad115d482336f0dac97d289c9804699e2b8b46ee8278e9034cf873848c192",
+    "ardn-plotid.csv": "ac93834e434eafd2847cc882b7b395522ea158c7db13b701665efd837161808c",
+    "cscap.xlsx": "b9e40bf74554c32849dcb6e6a613d6b7a60b4b8a2f8cbed33073d7c7732f95b6"
+  },
   "grain_records_by_crop": {
     "corn": {
       "grain_records": 2300,
@@ -77,6 +88,15 @@
   ],
   "unknown_state_rows": 0,
   "metadata_annotation_rows_excluded": 2,
+  "annotation_rows_excluded_by_file": {
+    "ardn-agro.csv": 0,
+    "ardn-ops_plant.csv": 2,
+    "ardn-ops_harv.csv": 2,
+    "ardn-weather_onsite.csv": 0,
+    "ardn-sitemeta.csv": 2,
+    "ardn-soil.csv": 0,
+    "ardn-plotid.csv": 0
+  },
   "independence_status": "Experiment/site codes, NOT necessarily independent farms; no untouched-holdout claim",
   "potential_shared_farm_groups_requiring_crosswalk": [
     [
@@ -95,10 +115,18 @@
       "wheat": 135
     },
     "differences_over_0_11kg_ha": 0,
-    "examples": []
+    "examples": [],
+    "source_standard_moisture_fractions": {
+      "corn": 0.155,
+      "soybean": 0.13,
+      "wheat": 0.135
+    },
+    "unit": "kg/ha",
+    "method": "parent standard yield * (1 - source standard moisture fraction)"
   },
   "soil_measured_max_depth_cm": 120.0,
   "soil_hydraulic_complete_rows": 4211,
+  "soil_hydraulic_completeness_method": "Finite source SOIL02/SOIL31/SOIL32 cells, not validated engine parameterization",
   "weather_columns": [
     "station",
     "day",
@@ -157,13 +185,14 @@
     "SOIL32"
   ],
   "full_strict_engine_ready_records": 0,
-  "readiness_count_method": "Structural blocking: required fields absent from source headers and measured depth below every current supported default root-depth requirement, not 3797 executed engine validations",
+  "readiness_scope": "Current Field Shift strict wrapper/default profiles only, NOT an intrinsic native-engine requirement",
+  "readiness_count_method": "No engine validations executed. Current wrapper inputs lack explicit field opening water, hydraulic/management/availability provenance and cultivar mapping. Source headers and measured depth are structural diagnostics, not proof that native AquaCrop/WOFOST cannot use other parameterizations.",
   "missing_required_inputs": [
-    "measured initial root/full-profile water",
-    "Ksat and penetrability",
-    "root-profile depth beyond120cm for current Maize/Wheat defaults",
-    "ET0 or humidity/vapor pressure to compute reference ET",
-    "snow/frozen-soil state",
+    "measured initial root/full-profile water for current wrapper",
+    "Ksat and penetrability parameterization for current wrapper",
+    "Deeper or reviewed root-profile parameterization for current Maize/Wheat wrapper defaults",
+    "ET0 or humidity/vapor pressure to compute reference ET for current wrapper",
+    "snow/frozen-soil state for current wrapper",
     "input availability/forecast issue-cycle-lead history",
     "validated ready-engine cultivar mapping",
     "plot geometry crosswalk (site corners are not plot polygons)"
