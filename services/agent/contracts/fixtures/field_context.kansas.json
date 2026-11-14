@@ -1,0 +1,102 @@
+{
+  "schema_version": "0.1",
+  "field_id": "demo-kansas-01",
+  "revision": 0,
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [[[-99.330, 38.880], [-99.322, 38.880], [-99.322, 38.886], [-99.330, 38.886], [-99.330, 38.880]]]
+  },
+  "centroid": [-99.326, 38.883],
+  "area_ha": 46.3,
+  "region": { "country_iso2": "US", "admin1": "Kansas" },
+  "facts": [
+    {
+      "id": "f_t2m_max_2025_07",
+      "domain": "climate",
+      "label_key": "fact.air_temperature_max_mean",
+      "quantity": { "value": 33.4, "unit": "Cel" },
+      "provenance": {
+        "kind": "satellite_product",
+        "data_status": "fixture",
+        "source": { "provider": "NASA LaRC POWER", "product_id": "T2M_MAX", "version": "unverified", "level": "MERRA-2 based reanalysis" },
+        "method": "Synthetic fixture value for development; not a real measurement.",
+        "spatial": { "resolution_m": 55000, "note": "0.5 x 0.625 degree" },
+        "temporal": { "start": "2025-07-01", "end": "2025-07-31", "aggregation": "monthly_mean" },
+        "retrieved_at": "2026-11-06T09:00:00Z"
+      }
+    },
+    {
+      "id": "f_precip_2025_07",
+      "domain": "water",
+      "label_key": "fact.precipitation_total",
+      "quantity": { "value": 71.0, "unit": "mm" },
+      "provenance": {
+        "kind": "satellite_product",
+        "data_status": "fixture",
+        "source": { "provider": "NASA GES DISC", "product_id": "GPM_3IMERGDF", "version": "07" },
+        "method": "Synthetic fixture value for development; not a real measurement.",
+        "temporal": { "start": "2025-07-01", "end": "2025-07-31", "aggregation": "sum" },
+        "retrieved_at": "2026-11-06T09:00:00Z"
+      }
+    },
+    {
+      "id": "f_hydrologic_group",
+      "domain": "soil",
+      "label_key": "fact.hydrologic_soil_group",
+      "category": "C",
+      "provenance": {
+        "kind": "satellite_product",
+        "data_status": "fixture",
+        "source": { "provider": "NASA ORNL DAAC", "product_id": "HYSOGs250m", "version": "unverified", "doi": "10.3334/ORNLDAAC/1566" },
+        "method": "Synthetic fixture value for development; not a real measurement.",
+        "spatial": { "resolution_m": 250 },
+        "retrieved_at": "2026-11-06T09:00:00Z"
+      }
+    },
+    {
+      "id": "f_gdd_2025",
+      "domain": "climate",
+      "label_key": "fact.growing_degree_days",
+      "quantity": { "value": 2410, "unit": "Cel.d" },
+      "provenance": {
+        "kind": "deterministic_calc",
+        "data_status": "fixture",
+        "method": "Sum of max(0, (Tmax+Tmin)/2 - 10 C); synthetic fixture value",
+        "inputs": ["power_t2m_max", "power_t2m_min"],
+        "temporal": { "start": "2025-04-01", "end": "2025-10-31", "aggregation": "sum" },
+        "retrieved_at": "2026-11-06T09:00:00Z"
+      }
+    }
+  ],
+  "timeseries_index": [
+    {
+      "metric_id": "m_precip",
+      "label_key": "metric.precipitation",
+      "unit": "mm",
+      "range": { "start": "2025-04-01", "end": "2025-10-31" },
+      "provenance": {
+        "kind": "satellite_product",
+        "data_status": "fixture",
+        "source": { "provider": "NASA GES DISC", "product_id": "GPM_3IMERGDF", "version": "07" },
+        "retrieved_at": "2026-11-06T09:00:00Z"
+      }
+    }
+  ],
+  "available_layers": [
+    {
+      "layer_id": "l_hls_ndvi",
+      "label_key": "layer.hls_ndvi",
+      "kind": "raster",
+      "provenance": {
+        "kind": "satellite_product",
+        "data_status": "fixture",
+        "source": { "provider": "NASA LP DAAC", "product_id": "HLSL30_VI", "version": "002" },
+        "retrieved_at": "2026-11-06T09:00:00Z"
+      }
+    }
+  ],
+  "available_charts": [
+    { "chart_id": "c_water_season", "metric_ids": ["m_precip"] }
+  ],
+  "locale": "en"
+}

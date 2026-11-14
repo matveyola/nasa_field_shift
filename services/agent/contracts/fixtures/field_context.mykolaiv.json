@@ -1,0 +1,56 @@
+{
+  "schema_version": "0.1",
+  "field_id": "demo-mykolaiv-01",
+  "revision": 1,
+  "geometry": { "type": "Point", "coordinates": [31.990, 46.970] },
+  "centroid": [31.990, 46.970],
+  "region": { "country_iso2": "UA", "admin1": "Mykolaiv Oblast" },
+  "facts": [
+    {
+      "id": "f_ph_0_30",
+      "domain": "soil",
+      "label_key": "fact.soil_ph",
+      "depth_cm": [0, 30],
+      "provenance": {
+        "kind": "satellite_product",
+        "data_status": "unavailable",
+        "source": { "provider": "ISRIC", "product_id": "SoilGrids phh2o", "version": "2.0" },
+        "method": "Not cached for this point; the SoilGrids REST API is suspended (team data brief, 2026-11-03).",
+        "retrieved_at": "2026-11-06T09:00:00Z"
+      }
+    },
+    {
+      "id": "f_precip_2025_07",
+      "domain": "water",
+      "label_key": "fact.precipitation_total",
+      "quantity": { "value": 9.0, "unit": "mm" },
+      "provenance": {
+        "kind": "satellite_product",
+        "data_status": "fixture",
+        "source": { "provider": "NASA GES DISC", "product_id": "GPM_3IMERGDF", "version": "07" },
+        "method": "Synthetic fixture value for development; not a real measurement.",
+        "temporal": { "start": "2025-07-01", "end": "2025-07-31", "aggregation": "sum" },
+        "retrieved_at": "2026-11-06T09:00:00Z"
+      }
+    }
+  ],
+  "constraints": [
+    {
+      "id": "k_erosion",
+      "type": "erosion_protection",
+      "value": true,
+      "status": "confirmed",
+      "source": "farmer_ui"
+    },
+    {
+      "id": "k_previous",
+      "type": "previous_crop",
+      "value": "sunflower",
+      "status": "proposed",
+      "source": "agent_inferred",
+      "confidence": 0.55
+    }
+  ],
+  "ui_state": { "scenario": "drought_2024" },
+  "locale": "uk"
+}

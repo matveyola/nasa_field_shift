@@ -1,0 +1,3654 @@
+{
+  "$defs": {
+    "AgentEvent": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/TurnStartedEvent"
+        },
+        {
+          "$ref": "#/$defs/TextDeltaEvent"
+        },
+        {
+          "$ref": "#/$defs/ToolStartedEvent"
+        },
+        {
+          "$ref": "#/$defs/ToolFinishedEvent"
+        },
+        {
+          "$ref": "#/$defs/TurnCompletedEvent"
+        },
+        {
+          "$ref": "#/$defs/ErrorEvent"
+        }
+      ]
+    },
+    "AgentMessage": {
+      "additionalProperties": false,
+      "properties": {
+        "turn_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "locale": {
+          "enum": [
+            "uk",
+            "en"
+          ],
+          "type": "string"
+        },
+        "blocks": {
+          "items": {
+            "$ref": "#/$defs/MessageBlock"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "facts": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Fact"
+          },
+          "type": "array"
+        },
+        "citations": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Citation"
+          },
+          "type": "array"
+        },
+        "constraints_proposed": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Constraint"
+          },
+          "type": "array"
+        },
+        "ui_actions": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/UIActionEnvelope"
+          },
+          "type": "array"
+        },
+        "warnings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/AgentWarning"
+          },
+          "type": "array"
+        },
+        "meta": {
+          "$ref": "#/$defs/ResponseMeta"
+        }
+      },
+      "required": [
+        "turn_id",
+        "locale",
+        "blocks",
+        "meta"
+      ],
+      "title": "AgentMessage",
+      "type": "object"
+    },
+    "AgentRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "request_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "session_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "locale": {
+          "enum": [
+            "uk",
+            "en",
+            "auto"
+          ],
+          "type": "string"
+        },
+        "message": {
+          "$ref": "#/$defs/UserMessage"
+        },
+        "history": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/HistoryTurn"
+          },
+          "maxItems": 10,
+          "type": "array"
+        },
+        "field_context": {
+          "$ref": "#/$defs/FieldContext"
+        },
+        "client": {
+          "$ref": "#/$defs/ClientInfo"
+        }
+      },
+      "required": [
+        "request_id",
+        "session_id",
+        "locale",
+        "message",
+        "field_context",
+        "client"
+      ],
+      "title": "AgentRequest",
+      "type": "object"
+    },
+    "AgentWarning": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "ungrounded_number",
+            "source_unavailable",
+            "fixture_data",
+            "low_confidence"
+          ],
+          "type": "string"
+        },
+        "detail": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "code"
+      ],
+      "title": "AgentWarning",
+      "type": "object"
+    },
+    "AppScreen": {
+      "additionalProperties": false,
+      "description": "A screen of the host app the assistant may open or point to. Host-declared UI data, not permission.",
+      "properties": {
+        "screen_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "label": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "how_to_open": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "screen_id",
+        "label"
+      ],
+      "title": "AppScreen",
+      "type": "object"
+    },
+    "Attachment": {
+      "additionalProperties": false,
+      "properties": {
+        "attachment_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "image",
+            "audio"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "attachment_id",
+        "kind"
+      ],
+      "title": "Attachment",
+      "type": "object"
+    },
+    "BarChartBlock": {
+      "additionalProperties": false,
+      "description": "One measure compared across options; all bars share one unit.",
+      "properties": {
+        "type": {
+          "const": "bar_chart",
+          "type": "string"
+        },
+        "title": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "bars": {
+          "items": {
+            "$ref": "#/$defs/ChartBar"
+          },
+          "maxItems": 8,
+          "minItems": 2,
+          "type": "array"
+        },
+        "scenario": {
+          "anyOf": [
+            {
+              "enum": [
+                "typical",
+                "drought_2024",
+                "heat_plus_2_5c",
+                "driest_recent_year",
+                "hottest_recent_year"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "bars"
+      ],
+      "title": "BarChartBlock",
+      "type": "object"
+    },
+    "CalloutBlock": {
+      "additionalProperties": false,
+      "description": "A short notice set apart from the text (a caution, or something to know).",
+      "properties": {
+        "type": {
+          "const": "callout",
+          "type": "string"
+        },
+        "tone": {
+          "enum": [
+            "info",
+            "warning"
+          ],
+          "type": "string"
+        },
+        "text": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "fact_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 3,
+          "type": "array"
+        },
+        "scenario": {
+          "anyOf": [
+            {
+              "enum": [
+                "typical",
+                "drought_2024",
+                "heat_plus_2_5c",
+                "driest_recent_year",
+                "hottest_recent_year"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "type",
+        "tone",
+        "text"
+      ],
+      "title": "CalloutBlock",
+      "type": "object"
+    },
+    "ChartBar": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "fact_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "fact_id"
+      ],
+      "title": "ChartBar",
+      "type": "object"
+    },
+    "ChartFocus": {
+      "additionalProperties": false,
+      "properties": {
+        "chart_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "metric_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "highlight": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TimeRange"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "chart_id",
+        "metric_ids"
+      ],
+      "title": "ChartFocus",
+      "type": "object"
+    },
+    "ChartInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "chart_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "metric_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "chart_id",
+        "metric_ids"
+      ],
+      "title": "ChartInfo",
+      "type": "object"
+    },
+    "Citation": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "chunk_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "doc_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "title": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "publisher": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "year": {
+          "maximum": 2100,
+          "minimum": 1900,
+          "type": "integer"
+        },
+        "edition": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "locator": {
+          "$ref": "#/$defs/Locator"
+        },
+        "url": {
+          "format": "uri",
+          "maxLength": 2083,
+          "minLength": 1,
+          "type": "string"
+        },
+        "quote": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "language": {
+          "enum": [
+            "uk",
+            "en"
+          ],
+          "type": "string"
+        },
+        "licence": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "chunk_id",
+        "doc_id",
+        "title",
+        "publisher",
+        "year",
+        "locator",
+        "url",
+        "quote",
+        "language",
+        "licence"
+      ],
+      "title": "Citation",
+      "type": "object"
+    },
+    "ClarifyingQuestionBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "clarifying_question",
+          "type": "string"
+        },
+        "text": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "options": {
+          "default": [],
+          "items": {
+            "maxLength": 300,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 6,
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "text"
+      ],
+      "title": "ClarifyingQuestionBlock",
+      "type": "object"
+    },
+    "ClientCapabilities": {
+      "additionalProperties": false,
+      "description": "What the host app can show or do right now (HostCapabilities of the widget). Unknown when absent.",
+      "properties": {
+        "actions": {
+          "default": [],
+          "items": {
+            "enum": [
+              "map.set_layers",
+              "map.focus_field",
+              "time.set_range",
+              "chart.focus",
+              "compare.set_constraints",
+              "compare.select_rotations",
+              "scenario.set",
+              "panel.open",
+              "app.open_screen"
+            ],
+            "type": "string"
+          },
+          "maxItems": 20,
+          "type": "array"
+        },
+        "screens": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/AppScreen"
+          },
+          "maxItems": 30,
+          "type": "array"
+        }
+      },
+      "title": "ClientCapabilities",
+      "type": "object"
+    },
+    "ClientInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "widget_version": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "capabilities": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ClientCapabilities"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "widget_version"
+      ],
+      "title": "ClientInfo",
+      "type": "object"
+    },
+    "CompareRotationsRequest": {
+      "additionalProperties": false,
+      "description": "Agent or host -> simulation service (member 2).",
+      "properties": {
+        "field_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "field_context_revision": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "constraints": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Constraint"
+          },
+          "type": "array"
+        },
+        "scenario": {
+          "enum": [
+            "typical",
+            "drought_2024",
+            "heat_plus_2_5c",
+            "driest_recent_year",
+            "hottest_recent_year"
+          ],
+          "type": "string"
+        },
+        "rotation_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "field_id",
+        "field_context_revision",
+        "scenario"
+      ],
+      "title": "CompareRotationsRequest",
+      "type": "object"
+    },
+    "Constraint": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/IrrigationConstraint"
+        },
+        {
+          "$ref": "#/$defs/FertilizerBudgetConstraint"
+        },
+        {
+          "$ref": "#/$defs/ErosionProtectionConstraint"
+        },
+        {
+          "$ref": "#/$defs/RotationLengthConstraint"
+        },
+        {
+          "$ref": "#/$defs/ExcludedCropsConstraint"
+        },
+        {
+          "$ref": "#/$defs/PreferredCropsConstraint"
+        },
+        {
+          "$ref": "#/$defs/PreviousCropConstraint"
+        },
+        {
+          "$ref": "#/$defs/OrganicOnlyConstraint"
+        },
+        {
+          "$ref": "#/$defs/MachineryLimitConstraint"
+        },
+        {
+          "$ref": "#/$defs/MarketPreferenceConstraint"
+        }
+      ]
+    },
+    "CropSeason": {
+      "additionalProperties": false,
+      "properties": {
+        "season": {
+          "pattern": "^\\d{4}(-\\d{4})?$",
+          "type": "string"
+        },
+        "crop_id": {
+          "pattern": "^[a-z][a-z0-9_]{1,63}$",
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "farmer_input",
+            "inferred"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "season",
+        "crop_id",
+        "source"
+      ],
+      "title": "CropSeason",
+      "type": "object"
+    },
+    "ErosionProtectionConstraint": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "proposed",
+            "confirmed",
+            "rejected"
+          ],
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "farmer_text",
+            "farmer_voice",
+            "farmer_ui",
+            "agent_inferred"
+          ],
+          "type": "string"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "erosion_protection",
+          "type": "string"
+        },
+        "value": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "source",
+        "type",
+        "value"
+      ],
+      "title": "ErosionProtectionConstraint",
+      "type": "object"
+    },
+    "ErrorBody": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "invalid_request",
+            "rate_limited",
+            "upstream_timeout",
+            "upstream_unavailable",
+            "llm_error",
+            "payload_too_large",
+            "internal"
+          ],
+          "type": "string"
+        },
+        "message_key": {
+          "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)+$",
+          "type": "string"
+        },
+        "retryable": {
+          "type": "boolean"
+        },
+        "request_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "detail": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "code",
+        "message_key",
+        "retryable"
+      ],
+      "title": "ErrorBody",
+      "type": "object"
+    },
+    "ErrorEnvelope": {
+      "additionalProperties": false,
+      "description": "Body of every non-2xx HTTP response from the agent service.",
+      "properties": {
+        "error": {
+          "$ref": "#/$defs/ErrorBody"
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "title": "ErrorEnvelope",
+      "type": "object"
+    },
+    "ErrorEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "invalid_request",
+            "rate_limited",
+            "upstream_timeout",
+            "upstream_unavailable",
+            "llm_error",
+            "payload_too_large",
+            "internal"
+          ],
+          "type": "string"
+        },
+        "message_key": {
+          "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)+$",
+          "type": "string"
+        },
+        "retryable": {
+          "type": "boolean"
+        },
+        "request_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "detail": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "event": {
+          "const": "error",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message_key",
+        "retryable",
+        "event"
+      ],
+      "title": "ErrorEvent",
+      "type": "object"
+    },
+    "ExcludedCropsConstraint": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "proposed",
+            "confirmed",
+            "rejected"
+          ],
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "farmer_text",
+            "farmer_voice",
+            "farmer_ui",
+            "agent_inferred"
+          ],
+          "type": "string"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "excluded_crops",
+          "type": "string"
+        },
+        "value": {
+          "items": {
+            "pattern": "^[a-z][a-z0-9_]{1,63}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "source",
+        "type",
+        "value"
+      ],
+      "title": "ExcludedCropsConstraint",
+      "type": "object"
+    },
+    "Fact": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "domain": {
+          "enum": [
+            "soil",
+            "water",
+            "climate",
+            "vegetation",
+            "terrain",
+            "farm",
+            "rotation"
+          ],
+          "type": "string"
+        },
+        "label_key": {
+          "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)+$",
+          "type": "string"
+        },
+        "quantity": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "category": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "depth_cm": {
+          "anyOf": [
+            {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "integer"
+                }
+              ],
+              "type": "array",
+              "tsType": "[number, number]"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        }
+      },
+      "required": [
+        "id",
+        "domain",
+        "label_key",
+        "provenance"
+      ],
+      "title": "Fact",
+      "type": "object"
+    },
+    "FertilizerBudgetConstraint": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "proposed",
+            "confirmed",
+            "rejected"
+          ],
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "farmer_text",
+            "farmer_voice",
+            "farmer_ui",
+            "agent_inferred"
+          ],
+          "type": "string"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "fertilizer_budget",
+          "type": "string"
+        },
+        "value": {
+          "enum": [
+            "minimize_n",
+            "low",
+            "normal"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "source",
+        "type",
+        "value"
+      ],
+      "title": "FertilizerBudgetConstraint",
+      "type": "object"
+    },
+    "FieldContext": {
+      "additionalProperties": false,
+      "description": "Shared state for the selected field. Owned by the host app (member 5).",
+      "properties": {
+        "schema_version": {
+          "const": "0.1",
+          "type": "string"
+        },
+        "field_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "revision": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "geometry": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Point"
+            },
+            {
+              "$ref": "#/$defs/Polygon"
+            }
+          ]
+        },
+        "centroid": {
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "maximum": 180,
+              "minimum": -180,
+              "type": "number"
+            },
+            {
+              "maximum": 90,
+              "minimum": -90,
+              "type": "number"
+            }
+          ],
+          "type": "array",
+          "tsType": "[number, number]"
+        },
+        "area_ha": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "region": {
+          "$ref": "#/$defs/Region"
+        },
+        "facts": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Fact"
+          },
+          "type": "array"
+        },
+        "timeseries_index": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/TimeseriesInfo"
+          },
+          "type": "array"
+        },
+        "available_layers": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/MapLayer"
+          },
+          "type": "array"
+        },
+        "available_charts": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ChartInfo"
+          },
+          "type": "array"
+        },
+        "crop_history": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/CropSeason"
+          },
+          "type": "array"
+        },
+        "constraints": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Constraint"
+          },
+          "type": "array"
+        },
+        "ui_state": {
+          "$ref": "#/$defs/UIState"
+        },
+        "locale": {
+          "enum": [
+            "uk",
+            "en"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "field_id",
+        "revision",
+        "geometry",
+        "centroid",
+        "region",
+        "locale"
+      ],
+      "title": "FieldContext",
+      "type": "object"
+    },
+    "FieldProfile": {
+      "additionalProperties": false,
+      "description": "What the geo service (member 1) returns for a field; the host merges it into FieldContext.",
+      "properties": {
+        "field_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "facts": {
+          "items": {
+            "$ref": "#/$defs/Fact"
+          },
+          "type": "array"
+        },
+        "timeseries_index": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/TimeseriesInfo"
+          },
+          "type": "array"
+        },
+        "available_layers": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/MapLayer"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "field_id",
+        "facts"
+      ],
+      "title": "FieldProfile",
+      "type": "object"
+    },
+    "FocusChartAction": {
+      "additionalProperties": false,
+      "properties": {
+        "chart_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "metric_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "highlight": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TimeRange"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "chart.focus",
+          "type": "string"
+        }
+      },
+      "required": [
+        "chart_id",
+        "metric_ids",
+        "type"
+      ],
+      "title": "FocusChartAction",
+      "type": "object"
+    },
+    "FocusFieldAction": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "map.focus_field",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "FocusFieldAction",
+      "type": "object"
+    },
+    "HistoryTurn": {
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "enum": [
+            "user",
+            "assistant"
+          ],
+          "type": "string"
+        },
+        "text": {
+          "maxLength": 16000,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "role",
+        "text"
+      ],
+      "title": "HistoryTurn",
+      "type": "object"
+    },
+    "IrrigationConstraint": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "proposed",
+            "confirmed",
+            "rejected"
+          ],
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "farmer_text",
+            "farmer_voice",
+            "farmer_ui",
+            "agent_inferred"
+          ],
+          "type": "string"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "irrigation_available",
+          "type": "string"
+        },
+        "value": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "source",
+        "type",
+        "value"
+      ],
+      "title": "IrrigationConstraint",
+      "type": "object"
+    },
+    "Locator": {
+      "additionalProperties": false,
+      "properties": {
+        "chapter": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "section": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "table": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "page": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "title": "Locator",
+      "type": "object"
+    },
+    "MachineryLimitConstraint": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "proposed",
+            "confirmed",
+            "rejected"
+          ],
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "farmer_text",
+            "farmer_voice",
+            "farmer_ui",
+            "agent_inferred"
+          ],
+          "type": "string"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "machinery_limit",
+          "type": "string"
+        },
+        "value": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "source",
+        "type",
+        "value"
+      ],
+      "title": "MachineryLimitConstraint",
+      "type": "object"
+    },
+    "MapLayer": {
+      "additionalProperties": false,
+      "properties": {
+        "layer_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "label_key": {
+          "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)+$",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "raster",
+            "vector",
+            "3d"
+          ],
+          "type": "string"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        }
+      },
+      "required": [
+        "layer_id",
+        "label_key",
+        "kind",
+        "provenance"
+      ],
+      "title": "MapLayer",
+      "type": "object"
+    },
+    "MarketPreferenceConstraint": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "proposed",
+            "confirmed",
+            "rejected"
+          ],
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "farmer_text",
+            "farmer_voice",
+            "farmer_ui",
+            "agent_inferred"
+          ],
+          "type": "string"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "market_preference",
+          "type": "string"
+        },
+        "value": {
+          "items": {
+            "pattern": "^[a-z][a-z0-9_]{1,63}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "source",
+        "type",
+        "value"
+      ],
+      "title": "MarketPreferenceConstraint",
+      "type": "object"
+    },
+    "MessageBlock": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/TextBlock"
+        },
+        {
+          "$ref": "#/$defs/ClarifyingQuestionBlock"
+        },
+        {
+          "$ref": "#/$defs/MetricsBlock"
+        },
+        {
+          "$ref": "#/$defs/TableBlock"
+        },
+        {
+          "$ref": "#/$defs/BarChartBlock"
+        },
+        {
+          "$ref": "#/$defs/CalloutBlock"
+        }
+      ]
+    },
+    "MetricsBlock": {
+      "additionalProperties": false,
+      "description": "A row of value cards: several values of this field at a glance.",
+      "properties": {
+        "type": {
+          "const": "metrics",
+          "type": "string"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "fact_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 6,
+          "minItems": 1,
+          "type": "array"
+        },
+        "scenario": {
+          "anyOf": [
+            {
+              "enum": [
+                "typical",
+                "drought_2024",
+                "heat_plus_2_5c",
+                "driest_recent_year",
+                "hottest_recent_year"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "type",
+        "fact_ids"
+      ],
+      "title": "MetricsBlock",
+      "type": "object"
+    },
+    "ModelInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "version": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "validation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Validation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "name",
+        "version"
+      ],
+      "title": "ModelInfo",
+      "type": "object"
+    },
+    "OpenPanelAction": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "panel.open",
+          "type": "string"
+        },
+        "panel": {
+          "enum": [
+            "soil_portrait",
+            "comparison",
+            "calendar",
+            "citations"
+          ],
+          "type": "string"
+        },
+        "ref_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "scenario": {
+          "anyOf": [
+            {
+              "enum": [
+                "typical",
+                "drought_2024",
+                "heat_plus_2_5c",
+                "driest_recent_year",
+                "hottest_recent_year"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "type",
+        "panel"
+      ],
+      "title": "OpenPanelAction",
+      "type": "object"
+    },
+    "OpenScreenAction": {
+      "additionalProperties": false,
+      "description": "Show one of the app's own screens (AppScreen.screen_id from the host's capabilities). View only.",
+      "properties": {
+        "type": {
+          "const": "app.open_screen",
+          "type": "string"
+        },
+        "screen_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "screen_id"
+      ],
+      "title": "OpenScreenAction",
+      "type": "object"
+    },
+    "OrganicOnlyConstraint": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "proposed",
+            "confirmed",
+            "rejected"
+          ],
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "farmer_text",
+            "farmer_voice",
+            "farmer_ui",
+            "agent_inferred"
+          ],
+          "type": "string"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "organic_only",
+          "type": "string"
+        },
+        "value": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "source",
+        "type",
+        "value"
+      ],
+      "title": "OrganicOnlyConstraint",
+      "type": "object"
+    },
+    "Point": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "Point",
+          "type": "string"
+        },
+        "coordinates": {
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "maximum": 180,
+              "minimum": -180,
+              "type": "number"
+            },
+            {
+              "maximum": 90,
+              "minimum": -90,
+              "type": "number"
+            }
+          ],
+          "type": "array",
+          "tsType": "[number, number]"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "Point",
+      "type": "object"
+    },
+    "Polygon": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "Polygon",
+          "type": "string"
+        },
+        "coordinates": {
+          "items": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "maximum": 180,
+                  "minimum": -180,
+                  "type": "number"
+                },
+                {
+                  "maximum": 90,
+                  "minimum": -90,
+                  "type": "number"
+                }
+              ],
+              "type": "array",
+              "tsType": "[number, number]"
+            },
+            "minItems": 4,
+            "type": "array"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "Polygon",
+      "type": "object"
+    },
+    "PreferredCropsConstraint": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "proposed",
+            "confirmed",
+            "rejected"
+          ],
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "farmer_text",
+            "farmer_voice",
+            "farmer_ui",
+            "agent_inferred"
+          ],
+          "type": "string"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "preferred_crops",
+          "type": "string"
+        },
+        "value": {
+          "items": {
+            "pattern": "^[a-z][a-z0-9_]{1,63}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "source",
+        "type",
+        "value"
+      ],
+      "title": "PreferredCropsConstraint",
+      "type": "object"
+    },
+    "PreviousCropConstraint": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "proposed",
+            "confirmed",
+            "rejected"
+          ],
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "farmer_text",
+            "farmer_voice",
+            "farmer_ui",
+            "agent_inferred"
+          ],
+          "type": "string"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "previous_crop",
+          "type": "string"
+        },
+        "value": {
+          "pattern": "^[a-z][a-z0-9_]{1,63}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "source",
+        "type",
+        "value"
+      ],
+      "title": "PreviousCropConstraint",
+      "type": "object"
+    },
+    "Provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "satellite_product",
+            "ml_estimate",
+            "deterministic_calc",
+            "reference",
+            "farmer_input",
+            "llm_explanation",
+            "weather_data"
+          ],
+          "type": "string"
+        },
+        "data_status": {
+          "enum": [
+            "live",
+            "cached",
+            "fixture",
+            "unavailable"
+          ],
+          "type": "string"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Source"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "method": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "model": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ModelInfo"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "inputs": {
+          "default": [],
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "spatial": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Spatial"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "temporal": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Temporal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "retrieved_at": {
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "data_status",
+        "retrieved_at"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "Quantity": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "type": "number"
+        },
+        "unit": {
+          "enum": [
+            "1",
+            "%",
+            "[pH]",
+            "mm",
+            "mm/d",
+            "m3/m3",
+            "Cel",
+            "Cel.d",
+            "d",
+            "m",
+            "cm",
+            "ha",
+            "deg",
+            "kg/ha",
+            "t/ha",
+            "g/kg",
+            "cmol/kg",
+            "MJ/m2/d",
+            "m/s"
+          ],
+          "type": "string"
+        },
+        "uncertainty": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Uncertainty"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "Quantity",
+      "type": "object"
+    },
+    "Region": {
+      "additionalProperties": false,
+      "properties": {
+        "country_iso2": {
+          "pattern": "^[A-Z]{2}$",
+          "type": "string"
+        },
+        "admin1": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "country_iso2"
+      ],
+      "title": "Region",
+      "type": "object"
+    },
+    "ResponseMeta": {
+      "additionalProperties": false,
+      "properties": {
+        "provider": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "model_id": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "prompt_version": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "latency_ms": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "provider",
+        "model_id",
+        "prompt_version",
+        "latency_ms"
+      ],
+      "title": "ResponseMeta",
+      "type": "object"
+    },
+    "RotationComparison": {
+      "additionalProperties": false,
+      "properties": {
+        "scenario": {
+          "enum": [
+            "typical",
+            "drought_2024",
+            "heat_plus_2_5c",
+            "driest_recent_year",
+            "hottest_recent_year"
+          ],
+          "type": "string"
+        },
+        "rotations": {
+          "items": {
+            "$ref": "#/$defs/RotationOption"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "facts": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Fact"
+          },
+          "type": "array"
+        },
+        "constraint_weights_applied": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "default": {},
+          "propertyNames": {
+            "enum": [
+              "irrigation_available",
+              "fertilizer_budget",
+              "erosion_protection",
+              "rotation_length_years",
+              "excluded_crops",
+              "preferred_crops",
+              "previous_crop",
+              "organic_only",
+              "machinery_limit",
+              "market_preference"
+            ]
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "scenario",
+        "rotations"
+      ],
+      "title": "RotationComparison",
+      "type": "object"
+    },
+    "RotationLengthConstraint": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "proposed",
+            "confirmed",
+            "rejected"
+          ],
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "farmer_text",
+            "farmer_voice",
+            "farmer_ui",
+            "agent_inferred"
+          ],
+          "type": "string"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "rotation_length_years",
+          "type": "string"
+        },
+        "value": {
+          "maximum": 6,
+          "minimum": 2,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "source",
+        "type",
+        "value"
+      ],
+      "title": "RotationLengthConstraint",
+      "type": "object"
+    },
+    "RotationOption": {
+      "additionalProperties": false,
+      "properties": {
+        "rotation_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "sequence": {
+          "items": {
+            "$ref": "#/$defs/RotationStep"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "scores": {
+          "$ref": "#/$defs/RotationScores"
+        },
+        "rank": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "reason_fact_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "rotation_id",
+        "sequence",
+        "scores",
+        "rank"
+      ],
+      "title": "RotationOption",
+      "type": "object"
+    },
+    "RotationScores": {
+      "additionalProperties": false,
+      "description": "A service sends only what it computes: an absent score is \"not computed\", never zero.",
+      "properties": {
+        "water_risk": {
+          "$ref": "#/$defs/Score"
+        },
+        "soil_cover_days": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Score"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "n_input": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Score"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "yield_risk": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Score"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "yield_loss_water": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Score"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "water_risk"
+      ],
+      "title": "RotationScores",
+      "type": "object"
+    },
+    "RotationStep": {
+      "additionalProperties": false,
+      "properties": {
+        "year_index": {
+          "maximum": 10,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "season": {
+          "enum": [
+            "winter",
+            "spring",
+            "summer",
+            "cover"
+          ],
+          "type": "string"
+        },
+        "crop_id": {
+          "pattern": "^[a-z][a-z0-9_]{1,63}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "year_index",
+        "season",
+        "crop_id"
+      ],
+      "title": "RotationStep",
+      "type": "object"
+    },
+    "Score": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "type": "number"
+        },
+        "unit": {
+          "enum": [
+            "1",
+            "%",
+            "[pH]",
+            "mm",
+            "mm/d",
+            "m3/m3",
+            "Cel",
+            "Cel.d",
+            "d",
+            "m",
+            "cm",
+            "ha",
+            "deg",
+            "kg/ha",
+            "t/ha",
+            "g/kg",
+            "cmol/kg",
+            "MJ/m2/d",
+            "m/s"
+          ],
+          "type": "string"
+        },
+        "uncertainty": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Uncertainty"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        }
+      },
+      "required": [
+        "value",
+        "unit",
+        "provenance"
+      ],
+      "title": "Score",
+      "type": "object"
+    },
+    "SelectRotationsAction": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "compare.select_rotations",
+          "type": "string"
+        },
+        "rotation_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "rotation_ids"
+      ],
+      "title": "SelectRotationsAction",
+      "type": "object"
+    },
+    "SetConstraintsAction": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "compare.set_constraints",
+          "type": "string"
+        },
+        "constraints": {
+          "items": {
+            "$ref": "#/$defs/Constraint"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "constraints"
+      ],
+      "title": "SetConstraintsAction",
+      "type": "object"
+    },
+    "SetLayersAction": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "map.set_layers",
+          "type": "string"
+        },
+        "layer_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "mode": {
+          "enum": [
+            "replace",
+            "add"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "layer_ids",
+        "mode"
+      ],
+      "title": "SetLayersAction",
+      "type": "object"
+    },
+    "SetScenarioAction": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "scenario.set",
+          "type": "string"
+        },
+        "scenario": {
+          "enum": [
+            "typical",
+            "drought_2024",
+            "heat_plus_2_5c",
+            "driest_recent_year",
+            "hottest_recent_year"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "scenario"
+      ],
+      "title": "SetScenarioAction",
+      "type": "object"
+    },
+    "SetTimeRangeAction": {
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "format": "date",
+          "type": "string"
+        },
+        "end": {
+          "format": "date",
+          "type": "string"
+        },
+        "type": {
+          "const": "time.set_range",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end",
+        "type"
+      ],
+      "title": "SetTimeRangeAction",
+      "type": "object"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "properties": {
+        "provider": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "product_id": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "version": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "level": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "doi": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "url": {
+          "anyOf": [
+            {
+              "format": "uri",
+              "maxLength": 2083,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "provider",
+        "product_id",
+        "version"
+      ],
+      "title": "Source",
+      "type": "object"
+    },
+    "Spatial": {
+      "additionalProperties": false,
+      "properties": {
+        "resolution_m": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "resolution_m"
+      ],
+      "title": "Spatial",
+      "type": "object"
+    },
+    "TableBlock": {
+      "additionalProperties": false,
+      "description": "Options side by side (rows) on the same measures (columns).",
+      "properties": {
+        "type": {
+          "const": "table",
+          "type": "string"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "columns": {
+          "items": {
+            "maxLength": 300,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 5,
+          "minItems": 1,
+          "type": "array"
+        },
+        "rows": {
+          "items": {
+            "$ref": "#/$defs/TableRow"
+          },
+          "maxItems": 10,
+          "minItems": 1,
+          "type": "array"
+        },
+        "scenario": {
+          "anyOf": [
+            {
+              "enum": [
+                "typical",
+                "drought_2024",
+                "heat_plus_2_5c",
+                "driest_recent_year",
+                "hottest_recent_year"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "type",
+        "columns",
+        "rows"
+      ],
+      "title": "TableBlock",
+      "type": "object"
+    },
+    "TableRow": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "fact_ids": {
+          "items": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "maxItems": 5,
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "label",
+        "fact_ids"
+      ],
+      "title": "TableRow",
+      "type": "object"
+    },
+    "Temporal": {
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "format": "date",
+          "type": "string"
+        },
+        "end": {
+          "format": "date",
+          "type": "string"
+        },
+        "aggregation": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "Temporal",
+      "type": "object"
+    },
+    "TextBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "text",
+          "type": "string"
+        },
+        "markdown": {
+          "maxLength": 20000,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "markdown"
+      ],
+      "title": "TextBlock",
+      "type": "object"
+    },
+    "TextDeltaEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event": {
+          "const": "text.delta",
+          "type": "string"
+        },
+        "text": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "event",
+        "text"
+      ],
+      "title": "TextDeltaEvent",
+      "type": "object"
+    },
+    "TimeRange": {
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "format": "date",
+          "type": "string"
+        },
+        "end": {
+          "format": "date",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "TimeRange",
+      "type": "object"
+    },
+    "Timeseries": {
+      "additionalProperties": false,
+      "properties": {
+        "metric_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "unit": {
+          "enum": [
+            "1",
+            "%",
+            "[pH]",
+            "mm",
+            "mm/d",
+            "m3/m3",
+            "Cel",
+            "Cel.d",
+            "d",
+            "m",
+            "cm",
+            "ha",
+            "deg",
+            "kg/ha",
+            "t/ha",
+            "g/kg",
+            "cmol/kg",
+            "MJ/m2/d",
+            "m/s"
+          ],
+          "type": "string"
+        },
+        "aggregation": {
+          "enum": [
+            "daily",
+            "dekad",
+            "monthly"
+          ],
+          "type": "string"
+        },
+        "points": {
+          "items": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            ],
+            "type": "array",
+            "tsType": "[string, number | null]"
+          },
+          "type": "array"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        }
+      },
+      "required": [
+        "metric_id",
+        "unit",
+        "aggregation",
+        "points",
+        "provenance"
+      ],
+      "title": "Timeseries",
+      "type": "object"
+    },
+    "TimeseriesInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "metric_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "label_key": {
+          "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)+$",
+          "type": "string"
+        },
+        "unit": {
+          "enum": [
+            "1",
+            "%",
+            "[pH]",
+            "mm",
+            "mm/d",
+            "m3/m3",
+            "Cel",
+            "Cel.d",
+            "d",
+            "m",
+            "cm",
+            "ha",
+            "deg",
+            "kg/ha",
+            "t/ha",
+            "g/kg",
+            "cmol/kg",
+            "MJ/m2/d",
+            "m/s"
+          ],
+          "type": "string"
+        },
+        "range": {
+          "$ref": "#/$defs/TimeRange"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        }
+      },
+      "required": [
+        "metric_id",
+        "label_key",
+        "unit",
+        "range",
+        "provenance"
+      ],
+      "title": "TimeseriesInfo",
+      "type": "object"
+    },
+    "TimeseriesQuery": {
+      "additionalProperties": false,
+      "description": "Agent -> geo service (member 1).",
+      "properties": {
+        "field_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "metric_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "range": {
+          "$ref": "#/$defs/TimeRange"
+        },
+        "aggregation": {
+          "enum": [
+            "daily",
+            "dekad",
+            "monthly"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "field_id",
+        "metric_id",
+        "range",
+        "aggregation"
+      ],
+      "title": "TimeseriesQuery",
+      "type": "object"
+    },
+    "ToolFinishedEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event": {
+          "const": "tool.finished",
+          "type": "string"
+        },
+        "call_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "ok",
+            "error",
+            "timeout"
+          ],
+          "type": "string"
+        },
+        "latency_ms": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "event",
+        "call_id",
+        "status",
+        "latency_ms"
+      ],
+      "title": "ToolFinishedEvent",
+      "type": "object"
+    },
+    "ToolStartedEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event": {
+          "const": "tool.started",
+          "type": "string"
+        },
+        "call_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "tool": {
+          "enum": [
+            "get_field_facts",
+            "get_timeseries",
+            "compare_rotations",
+            "search_knowledge",
+            "propose_constraints",
+            "propose_ui_actions",
+            "present_blocks",
+            "get_weather_forecast",
+            "get_season_weather",
+            "check_sowing_soil",
+            "analyze_soil_photo"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "event",
+        "call_id",
+        "tool"
+      ],
+      "title": "ToolStartedEvent",
+      "type": "object"
+    },
+    "TurnCompletedEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event": {
+          "const": "turn.completed",
+          "type": "string"
+        },
+        "message": {
+          "$ref": "#/$defs/AgentMessage"
+        }
+      },
+      "required": [
+        "event",
+        "message"
+      ],
+      "title": "TurnCompletedEvent",
+      "type": "object"
+    },
+    "TurnStartedEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event": {
+          "const": "turn.started",
+          "type": "string"
+        },
+        "turn_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event",
+        "turn_id"
+      ],
+      "title": "TurnStartedEvent",
+      "type": "object"
+    },
+    "UIAction": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/SetLayersAction"
+        },
+        {
+          "$ref": "#/$defs/FocusFieldAction"
+        },
+        {
+          "$ref": "#/$defs/SetTimeRangeAction"
+        },
+        {
+          "$ref": "#/$defs/FocusChartAction"
+        },
+        {
+          "$ref": "#/$defs/SetConstraintsAction"
+        },
+        {
+          "$ref": "#/$defs/SelectRotationsAction"
+        },
+        {
+          "$ref": "#/$defs/SetScenarioAction"
+        },
+        {
+          "$ref": "#/$defs/OpenPanelAction"
+        },
+        {
+          "$ref": "#/$defs/OpenScreenAction"
+        }
+      ]
+    },
+    "UIActionEnvelope": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "field_context_revision": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "trigger": {
+          "enum": [
+            "auto",
+            "chip"
+          ],
+          "type": "string"
+        },
+        "label": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "action": {
+          "$ref": "#/$defs/UIAction"
+        }
+      },
+      "required": [
+        "id",
+        "field_context_revision",
+        "trigger",
+        "label",
+        "action"
+      ],
+      "title": "UIActionEnvelope",
+      "type": "object"
+    },
+    "UIState": {
+      "additionalProperties": false,
+      "properties": {
+        "active_layer_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "time_range": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TimeRange"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "chart_focus": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ChartFocus"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "selected_rotation_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "scenario": {
+          "default": "typical",
+          "enum": [
+            "typical",
+            "drought_2024",
+            "heat_plus_2_5c",
+            "driest_recent_year",
+            "hottest_recent_year"
+          ],
+          "type": "string"
+        },
+        "screen_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "title": "UIState",
+      "type": "object"
+    },
+    "Uncertainty": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "sd",
+            "ci95",
+            "range",
+            "qualitative"
+          ],
+          "type": "string"
+        },
+        "low": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "high": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "sd": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "note": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "Uncertainty",
+      "type": "object"
+    },
+    "UserMessage": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "anyOf": [
+            {
+              "maxLength": 4000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "attachments": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Attachment"
+          },
+          "maxItems": 4,
+          "type": "array"
+        }
+      },
+      "title": "UserMessage",
+      "type": "object"
+    },
+    "Validation": {
+      "additionalProperties": false,
+      "properties": {
+        "metric": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "value": {
+          "type": "number"
+        },
+        "n": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "metric",
+        "value",
+        "n"
+      ],
+      "title": "Validation",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Index of the top-level contract types. Export root only; never sent over the wire.",
+  "properties": {
+    "field_context": {
+      "$ref": "#/$defs/FieldContext"
+    },
+    "field_profile": {
+      "$ref": "#/$defs/FieldProfile"
+    },
+    "agent_request": {
+      "$ref": "#/$defs/AgentRequest"
+    },
+    "agent_event": {
+      "$ref": "#/$defs/AgentEvent"
+    },
+    "agent_message": {
+      "$ref": "#/$defs/AgentMessage"
+    },
+    "ui_action_envelope": {
+      "$ref": "#/$defs/UIActionEnvelope"
+    },
+    "error_envelope": {
+      "$ref": "#/$defs/ErrorEnvelope"
+    },
+    "timeseries_query": {
+      "$ref": "#/$defs/TimeseriesQuery"
+    },
+    "timeseries": {
+      "$ref": "#/$defs/Timeseries"
+    },
+    "compare_rotations_request": {
+      "$ref": "#/$defs/CompareRotationsRequest"
+    },
+    "rotation_comparison": {
+      "$ref": "#/$defs/RotationComparison"
+    }
+  },
+  "required": [
+    "field_context",
+    "field_profile",
+    "agent_request",
+    "agent_event",
+    "agent_message",
+    "ui_action_envelope",
+    "error_envelope",
+    "timeseries_query",
+    "timeseries",
+    "compare_rotations_request",
+    "rotation_comparison"
+  ],
+  "title": "FieldShiftContracts",
+  "type": "object",
+  "$comment": "Field Shift contracts v0.1. Generated from contracts/models.py; do not edit."
+}

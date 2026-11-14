@@ -1,0 +1,3 @@
+# LF everywhere: the generated-file checks (contracts.export --check, check:validators) compare exact text.
+* text=auto eol=lf
+*.png binary

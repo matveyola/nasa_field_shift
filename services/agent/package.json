@@ -1,0 +1,13 @@
+{
+  "name": "field-shift-agent",
+  "private": true,
+  "scripts": {
+    "gen:ts": "json2ts -i contracts/schema/fieldshift-contracts.schema.json -o contracts/ts/index.d.ts --additionalProperties false --ignoreMinAndMaxItems --bannerComment \"/* Generated from contracts/schema/fieldshift-contracts.schema.json. Do not edit; run: npm run gen:ts */\"",
+    "check:ts": "tsc -p tsconfig.json",
+    "gen:ts:integration": "json2ts -i contracts/schema/fieldshift-integration.schema.json -o contracts/ts/integration.d.ts --additionalProperties false --ignoreMinAndMaxItems --bannerComment \"/* Generated from contracts/schema/fieldshift-integration.schema.json (PROPOSED v0.1). Do not edit; run: npm run gen:ts:integration */\""
+  },
+  "devDependencies": {
+    "json-schema-to-typescript": "16.0.0",
+    "typescript": "7.0.2"
+  }
+}

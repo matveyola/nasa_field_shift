@@ -1,0 +1,2329 @@
+{
+  "$defs": {
+    "CapabilitiesResponse": {
+      "additionalProperties": false,
+      "description": "GET /v1/capabilities on either service. A capability is an offer, never a completed computation.",
+      "properties": {
+        "service": {
+          "$ref": "#/$defs/ServiceInfo"
+        },
+        "geo": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/GeoCapabilities"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "simulation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SimulationCapabilities"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "service"
+      ],
+      "title": "CapabilitiesResponse",
+      "type": "object"
+    },
+    "CompareRotationsRequest": {
+      "additionalProperties": false,
+      "description": "Agent or host -> simulation service (member 2).",
+      "properties": {
+        "field_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "field_context_revision": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "constraints": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Constraint"
+          },
+          "type": "array"
+        },
+        "scenario": {
+          "enum": [
+            "typical",
+            "drought_2024",
+            "heat_plus_2_5c",
+            "driest_recent_year",
+            "hottest_recent_year"
+          ],
+          "type": "string"
+        },
+        "rotation_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "field_id",
+        "field_context_revision",
+        "scenario"
+      ],
+      "title": "CompareRotationsRequest",
+      "type": "object"
+    },
+    "ComparisonFailure": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "insufficient_data",
+            "unsupported_scenario",
+            "engine_error",
+            "timeout"
+          ],
+          "type": "string"
+        },
+        "message_key": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message_key"
+      ],
+      "title": "ComparisonFailure",
+      "type": "object"
+    },
+    "ComparisonRequest": {
+      "additionalProperties": false,
+      "description": "POST /v1/comparisons (simulation service). Send `Idempotency-Key: <idempotency_key>` too.",
+      "properties": {
+        "contract_version": {
+          "const": "0.1",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "idempotency_key": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "comparison": {
+          "$ref": "#/$defs/CompareRotationsRequest"
+        }
+      },
+      "required": [
+        "contract_version",
+        "request_id",
+        "idempotency_key",
+        "comparison"
+      ],
+      "title": "ComparisonRequest",
+      "type": "object"
+    },
+    "ComparisonResponse": {
+      "additionalProperties": false,
+      "description": "Answer to POST /v1/comparisons and GET /v1/comparisons/{result_id}.",
+      "properties": {
+        "contract_version": {
+          "const": "0.1",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "service": {
+          "$ref": "#/$defs/ServiceInfo"
+        },
+        "result_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "accepted",
+            "running",
+            "completed",
+            "failed"
+          ],
+          "type": "string"
+        },
+        "field_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "field_context_revision": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "scenario": {
+          "enum": [
+            "typical",
+            "drought_2024",
+            "heat_plus_2_5c",
+            "driest_recent_year",
+            "hottest_recent_year"
+          ],
+          "type": "string"
+        },
+        "engine": {
+          "$ref": "#/$defs/EngineInfo"
+        },
+        "created_at": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "computed_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "expires_at": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "comparison": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RotationComparison"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "failure": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ComparisonFailure"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "warnings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/IntegrationWarning"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "contract_version",
+        "request_id",
+        "service",
+        "result_id",
+        "status",
+        "field_id",
+        "field_context_revision",
+        "scenario",
+        "engine",
+        "created_at",
+        "expires_at"
+      ],
+      "title": "ComparisonResponse",
+      "type": "object"
+    },
+    "Constraint": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/IrrigationConstraint"
+        },
+        {
+          "$ref": "#/$defs/FertilizerBudgetConstraint"
+        },
+        {
+          "$ref": "#/$defs/ErosionProtectionConstraint"
+        },
+        {
+          "$ref": "#/$defs/RotationLengthConstraint"
+        },
+        {
+          "$ref": "#/$defs/ExcludedCropsConstraint"
+        },
+        {
+          "$ref": "#/$defs/PreferredCropsConstraint"
+        },
+        {
+          "$ref": "#/$defs/PreviousCropConstraint"
+        },
+        {
+          "$ref": "#/$defs/OrganicOnlyConstraint"
+        },
+        {
+          "$ref": "#/$defs/MachineryLimitConstraint"
+        },
+        {
+          "$ref": "#/$defs/MarketPreferenceConstraint"
+        }
+      ]
+    },
+    "DatasetCapability": {
+      "additionalProperties": false,
+      "properties": {
+        "dataset_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "satellite_product",
+            "ml_estimate",
+            "deterministic_calc",
+            "reference"
+          ],
+          "type": "string"
+        },
+        "available": {
+          "type": "boolean"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "dataset_id",
+        "kind",
+        "available"
+      ],
+      "title": "DatasetCapability",
+      "type": "object"
+    },
+    "EngineInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "version": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version"
+      ],
+      "title": "EngineInfo",
+      "type": "object"
+    },
+    "ErosionProtectionConstraint": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "proposed",
+            "confirmed",
+            "rejected"
+          ],
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "farmer_text",
+            "farmer_voice",
+            "farmer_ui",
+            "agent_inferred"
+          ],
+          "type": "string"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "erosion_protection",
+          "type": "string"
+        },
+        "value": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "source",
+        "type",
+        "value"
+      ],
+      "title": "ErosionProtectionConstraint",
+      "type": "object"
+    },
+    "ExcludedCropsConstraint": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "proposed",
+            "confirmed",
+            "rejected"
+          ],
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "farmer_text",
+            "farmer_voice",
+            "farmer_ui",
+            "agent_inferred"
+          ],
+          "type": "string"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "excluded_crops",
+          "type": "string"
+        },
+        "value": {
+          "items": {
+            "pattern": "^[a-z][a-z0-9_]{1,63}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "source",
+        "type",
+        "value"
+      ],
+      "title": "ExcludedCropsConstraint",
+      "type": "object"
+    },
+    "Fact": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "domain": {
+          "enum": [
+            "soil",
+            "water",
+            "climate",
+            "vegetation",
+            "terrain",
+            "farm",
+            "rotation"
+          ],
+          "type": "string"
+        },
+        "label_key": {
+          "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)+$",
+          "type": "string"
+        },
+        "quantity": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "category": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "depth_cm": {
+          "anyOf": [
+            {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "exclusiveMinimum": 0,
+                  "type": "integer"
+                }
+              ],
+              "type": "array",
+              "tsType": "[number, number]"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        }
+      },
+      "required": [
+        "id",
+        "domain",
+        "label_key",
+        "provenance"
+      ],
+      "title": "Fact",
+      "type": "object"
+    },
+    "FertilizerBudgetConstraint": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "proposed",
+            "confirmed",
+            "rejected"
+          ],
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "farmer_text",
+            "farmer_voice",
+            "farmer_ui",
+            "agent_inferred"
+          ],
+          "type": "string"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "fertilizer_budget",
+          "type": "string"
+        },
+        "value": {
+          "enum": [
+            "minimize_n",
+            "low",
+            "normal"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "source",
+        "type",
+        "value"
+      ],
+      "title": "FertilizerBudgetConstraint",
+      "type": "object"
+    },
+    "FieldProfile": {
+      "additionalProperties": false,
+      "description": "What the geo service (member 1) returns for a field; the host merges it into FieldContext.",
+      "properties": {
+        "field_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "facts": {
+          "items": {
+            "$ref": "#/$defs/Fact"
+          },
+          "type": "array"
+        },
+        "timeseries_index": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/TimeseriesInfo"
+          },
+          "type": "array"
+        },
+        "available_layers": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/MapLayer"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "field_id",
+        "facts"
+      ],
+      "title": "FieldProfile",
+      "type": "object"
+    },
+    "FieldProfileRequest": {
+      "additionalProperties": false,
+      "description": "POST /v1/field-profile (geo service).",
+      "properties": {
+        "contract_version": {
+          "const": "0.1",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "field_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "contract_version",
+        "request_id",
+        "field_id"
+      ],
+      "title": "FieldProfileRequest",
+      "type": "object"
+    },
+    "FieldProfileResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "0.1",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "service": {
+          "$ref": "#/$defs/ServiceInfo"
+        },
+        "status": {
+          "enum": [
+            "complete",
+            "partial"
+          ],
+          "type": "string"
+        },
+        "generated_at": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "geometry": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Point"
+            },
+            {
+              "$ref": "#/$defs/Polygon"
+            }
+          ]
+        },
+        "centroid": {
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "type": "array",
+          "tsType": "[number, number]"
+        },
+        "profile": {
+          "$ref": "#/$defs/FieldProfile"
+        },
+        "warnings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/IntegrationWarning"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "contract_version",
+        "request_id",
+        "service",
+        "status",
+        "generated_at",
+        "geometry",
+        "centroid",
+        "profile"
+      ],
+      "title": "FieldProfileResponse",
+      "type": "object"
+    },
+    "GeoCapabilities": {
+      "additionalProperties": false,
+      "properties": {
+        "field_profile": {
+          "type": "boolean"
+        },
+        "timeseries": {
+          "type": "boolean"
+        },
+        "datasets": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/DatasetCapability"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "field_profile",
+        "timeseries"
+      ],
+      "title": "GeoCapabilities",
+      "type": "object"
+    },
+    "IntegrationError": {
+      "additionalProperties": false,
+      "description": "Body of every non-2xx response from the geo or simulation service.",
+      "properties": {
+        "error": {
+          "$ref": "#/$defs/IntegrationErrorBody"
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "title": "IntegrationError",
+      "type": "object"
+    },
+    "IntegrationErrorBody": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "invalid_request",
+            "not_found",
+            "field_not_authorized",
+            "unsupported_scenario",
+            "unsupported_contract",
+            "expired",
+            "unavailable",
+            "internal"
+          ],
+          "type": "string"
+        },
+        "message_key": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "retryable": {
+          "type": "boolean"
+        },
+        "request_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "code",
+        "message_key",
+        "retryable"
+      ],
+      "title": "IntegrationErrorBody",
+      "type": "object"
+    },
+    "IntegrationWarning": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "partial_data",
+            "dataset_unavailable",
+            "unverified_version",
+            "coarse_resolution",
+            "model_not_validated",
+            "fixture_data",
+            "other"
+          ],
+          "type": "string"
+        },
+        "detail": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "code"
+      ],
+      "title": "IntegrationWarning",
+      "type": "object"
+    },
+    "IrrigationConstraint": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "proposed",
+            "confirmed",
+            "rejected"
+          ],
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "farmer_text",
+            "farmer_voice",
+            "farmer_ui",
+            "agent_inferred"
+          ],
+          "type": "string"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "irrigation_available",
+          "type": "string"
+        },
+        "value": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "source",
+        "type",
+        "value"
+      ],
+      "title": "IrrigationConstraint",
+      "type": "object"
+    },
+    "MachineryLimitConstraint": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "proposed",
+            "confirmed",
+            "rejected"
+          ],
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "farmer_text",
+            "farmer_voice",
+            "farmer_ui",
+            "agent_inferred"
+          ],
+          "type": "string"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "machinery_limit",
+          "type": "string"
+        },
+        "value": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "source",
+        "type",
+        "value"
+      ],
+      "title": "MachineryLimitConstraint",
+      "type": "object"
+    },
+    "MapLayer": {
+      "additionalProperties": false,
+      "properties": {
+        "layer_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "label_key": {
+          "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)+$",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "raster",
+            "vector",
+            "3d"
+          ],
+          "type": "string"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        }
+      },
+      "required": [
+        "layer_id",
+        "label_key",
+        "kind",
+        "provenance"
+      ],
+      "title": "MapLayer",
+      "type": "object"
+    },
+    "MarketPreferenceConstraint": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "proposed",
+            "confirmed",
+            "rejected"
+          ],
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "farmer_text",
+            "farmer_voice",
+            "farmer_ui",
+            "agent_inferred"
+          ],
+          "type": "string"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "market_preference",
+          "type": "string"
+        },
+        "value": {
+          "items": {
+            "pattern": "^[a-z][a-z0-9_]{1,63}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "source",
+        "type",
+        "value"
+      ],
+      "title": "MarketPreferenceConstraint",
+      "type": "object"
+    },
+    "ModelInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "version": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "validation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Validation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "name",
+        "version"
+      ],
+      "title": "ModelInfo",
+      "type": "object"
+    },
+    "OrganicOnlyConstraint": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "proposed",
+            "confirmed",
+            "rejected"
+          ],
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "farmer_text",
+            "farmer_voice",
+            "farmer_ui",
+            "agent_inferred"
+          ],
+          "type": "string"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "organic_only",
+          "type": "string"
+        },
+        "value": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "source",
+        "type",
+        "value"
+      ],
+      "title": "OrganicOnlyConstraint",
+      "type": "object"
+    },
+    "Point": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "Point",
+          "type": "string"
+        },
+        "coordinates": {
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "maximum": 180,
+              "minimum": -180,
+              "type": "number"
+            },
+            {
+              "maximum": 90,
+              "minimum": -90,
+              "type": "number"
+            }
+          ],
+          "type": "array",
+          "tsType": "[number, number]"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "Point",
+      "type": "object"
+    },
+    "Polygon": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "Polygon",
+          "type": "string"
+        },
+        "coordinates": {
+          "items": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "maximum": 180,
+                  "minimum": -180,
+                  "type": "number"
+                },
+                {
+                  "maximum": 90,
+                  "minimum": -90,
+                  "type": "number"
+                }
+              ],
+              "type": "array",
+              "tsType": "[number, number]"
+            },
+            "minItems": 4,
+            "type": "array"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "Polygon",
+      "type": "object"
+    },
+    "PreferredCropsConstraint": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "proposed",
+            "confirmed",
+            "rejected"
+          ],
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "farmer_text",
+            "farmer_voice",
+            "farmer_ui",
+            "agent_inferred"
+          ],
+          "type": "string"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "preferred_crops",
+          "type": "string"
+        },
+        "value": {
+          "items": {
+            "pattern": "^[a-z][a-z0-9_]{1,63}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "source",
+        "type",
+        "value"
+      ],
+      "title": "PreferredCropsConstraint",
+      "type": "object"
+    },
+    "PreviousCropConstraint": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "proposed",
+            "confirmed",
+            "rejected"
+          ],
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "farmer_text",
+            "farmer_voice",
+            "farmer_ui",
+            "agent_inferred"
+          ],
+          "type": "string"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "previous_crop",
+          "type": "string"
+        },
+        "value": {
+          "pattern": "^[a-z][a-z0-9_]{1,63}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "source",
+        "type",
+        "value"
+      ],
+      "title": "PreviousCropConstraint",
+      "type": "object"
+    },
+    "Provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "satellite_product",
+            "ml_estimate",
+            "deterministic_calc",
+            "reference",
+            "farmer_input",
+            "llm_explanation",
+            "weather_data"
+          ],
+          "type": "string"
+        },
+        "data_status": {
+          "enum": [
+            "live",
+            "cached",
+            "fixture",
+            "unavailable"
+          ],
+          "type": "string"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Source"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "method": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "model": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ModelInfo"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "inputs": {
+          "default": [],
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "spatial": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Spatial"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "temporal": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Temporal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "retrieved_at": {
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "data_status",
+        "retrieved_at"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "Quantity": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "type": "number"
+        },
+        "unit": {
+          "enum": [
+            "1",
+            "%",
+            "[pH]",
+            "mm",
+            "mm/d",
+            "m3/m3",
+            "Cel",
+            "Cel.d",
+            "d",
+            "m",
+            "cm",
+            "ha",
+            "deg",
+            "kg/ha",
+            "t/ha",
+            "g/kg",
+            "cmol/kg",
+            "MJ/m2/d",
+            "m/s"
+          ],
+          "type": "string"
+        },
+        "uncertainty": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Uncertainty"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "Quantity",
+      "type": "object"
+    },
+    "RotationComparison": {
+      "additionalProperties": false,
+      "properties": {
+        "scenario": {
+          "enum": [
+            "typical",
+            "drought_2024",
+            "heat_plus_2_5c",
+            "driest_recent_year",
+            "hottest_recent_year"
+          ],
+          "type": "string"
+        },
+        "rotations": {
+          "items": {
+            "$ref": "#/$defs/RotationOption"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "facts": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Fact"
+          },
+          "type": "array"
+        },
+        "constraint_weights_applied": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "default": {},
+          "propertyNames": {
+            "enum": [
+              "irrigation_available",
+              "fertilizer_budget",
+              "erosion_protection",
+              "rotation_length_years",
+              "excluded_crops",
+              "preferred_crops",
+              "previous_crop",
+              "organic_only",
+              "machinery_limit",
+              "market_preference"
+            ]
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "scenario",
+        "rotations"
+      ],
+      "title": "RotationComparison",
+      "type": "object"
+    },
+    "RotationLengthConstraint": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "proposed",
+            "confirmed",
+            "rejected"
+          ],
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "farmer_text",
+            "farmer_voice",
+            "farmer_ui",
+            "agent_inferred"
+          ],
+          "type": "string"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "rotation_length_years",
+          "type": "string"
+        },
+        "value": {
+          "maximum": 6,
+          "minimum": 2,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "source",
+        "type",
+        "value"
+      ],
+      "title": "RotationLengthConstraint",
+      "type": "object"
+    },
+    "RotationOption": {
+      "additionalProperties": false,
+      "properties": {
+        "rotation_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "sequence": {
+          "items": {
+            "$ref": "#/$defs/RotationStep"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "scores": {
+          "$ref": "#/$defs/RotationScores"
+        },
+        "rank": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "reason_fact_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "rotation_id",
+        "sequence",
+        "scores",
+        "rank"
+      ],
+      "title": "RotationOption",
+      "type": "object"
+    },
+    "RotationScores": {
+      "additionalProperties": false,
+      "description": "A service sends only what it computes: an absent score is \"not computed\", never zero.",
+      "properties": {
+        "water_risk": {
+          "$ref": "#/$defs/Score"
+        },
+        "soil_cover_days": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Score"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "n_input": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Score"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "yield_risk": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Score"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "yield_loss_water": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Score"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "water_risk"
+      ],
+      "title": "RotationScores",
+      "type": "object"
+    },
+    "RotationStep": {
+      "additionalProperties": false,
+      "properties": {
+        "year_index": {
+          "maximum": 10,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "season": {
+          "enum": [
+            "winter",
+            "spring",
+            "summer",
+            "cover"
+          ],
+          "type": "string"
+        },
+        "crop_id": {
+          "pattern": "^[a-z][a-z0-9_]{1,63}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "year_index",
+        "season",
+        "crop_id"
+      ],
+      "title": "RotationStep",
+      "type": "object"
+    },
+    "Score": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "type": "number"
+        },
+        "unit": {
+          "enum": [
+            "1",
+            "%",
+            "[pH]",
+            "mm",
+            "mm/d",
+            "m3/m3",
+            "Cel",
+            "Cel.d",
+            "d",
+            "m",
+            "cm",
+            "ha",
+            "deg",
+            "kg/ha",
+            "t/ha",
+            "g/kg",
+            "cmol/kg",
+            "MJ/m2/d",
+            "m/s"
+          ],
+          "type": "string"
+        },
+        "uncertainty": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Uncertainty"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        }
+      },
+      "required": [
+        "value",
+        "unit",
+        "provenance"
+      ],
+      "title": "Score",
+      "type": "object"
+    },
+    "ServiceInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "service": {
+          "enum": [
+            "geo",
+            "simulation"
+          ],
+          "type": "string"
+        },
+        "implementation": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "mode": {
+          "enum": [
+            "live",
+            "stub",
+            "fixture"
+          ],
+          "type": "string"
+        },
+        "contract_version": {
+          "const": "0.1",
+          "type": "string"
+        }
+      },
+      "required": [
+        "service",
+        "implementation",
+        "mode",
+        "contract_version"
+      ],
+      "title": "ServiceInfo",
+      "type": "object"
+    },
+    "SimulationCapabilities": {
+      "additionalProperties": false,
+      "properties": {
+        "compare_rotations": {
+          "type": "boolean"
+        },
+        "scenarios": {
+          "default": [],
+          "items": {
+            "enum": [
+              "typical",
+              "drought_2024",
+              "heat_plus_2_5c",
+              "driest_recent_year",
+              "hottest_recent_year"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "max_rotations": {
+          "default": 6,
+          "maximum": 20,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "result_ttl_s": {
+          "default": 3600,
+          "minimum": 60,
+          "type": "integer"
+        },
+        "async_jobs": {
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "compare_rotations"
+      ],
+      "title": "SimulationCapabilities",
+      "type": "object"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "properties": {
+        "provider": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "product_id": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "version": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "level": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "doi": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "url": {
+          "anyOf": [
+            {
+              "format": "uri",
+              "maxLength": 2083,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "provider",
+        "product_id",
+        "version"
+      ],
+      "title": "Source",
+      "type": "object"
+    },
+    "Spatial": {
+      "additionalProperties": false,
+      "properties": {
+        "resolution_m": {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "resolution_m"
+      ],
+      "title": "Spatial",
+      "type": "object"
+    },
+    "Temporal": {
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "format": "date",
+          "type": "string"
+        },
+        "end": {
+          "format": "date",
+          "type": "string"
+        },
+        "aggregation": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "Temporal",
+      "type": "object"
+    },
+    "TimeRange": {
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "format": "date",
+          "type": "string"
+        },
+        "end": {
+          "format": "date",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "TimeRange",
+      "type": "object"
+    },
+    "TimeseriesInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "metric_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "label_key": {
+          "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)+$",
+          "type": "string"
+        },
+        "unit": {
+          "enum": [
+            "1",
+            "%",
+            "[pH]",
+            "mm",
+            "mm/d",
+            "m3/m3",
+            "Cel",
+            "Cel.d",
+            "d",
+            "m",
+            "cm",
+            "ha",
+            "deg",
+            "kg/ha",
+            "t/ha",
+            "g/kg",
+            "cmol/kg",
+            "MJ/m2/d",
+            "m/s"
+          ],
+          "type": "string"
+        },
+        "range": {
+          "$ref": "#/$defs/TimeRange"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        }
+      },
+      "required": [
+        "metric_id",
+        "label_key",
+        "unit",
+        "range",
+        "provenance"
+      ],
+      "title": "TimeseriesInfo",
+      "type": "object"
+    },
+    "Uncertainty": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "sd",
+            "ci95",
+            "range",
+            "qualitative"
+          ],
+          "type": "string"
+        },
+        "low": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "high": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "sd": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "note": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "Uncertainty",
+      "type": "object"
+    },
+    "Validation": {
+      "additionalProperties": false,
+      "properties": {
+        "metric": {
+          "maxLength": 300,
+          "minLength": 1,
+          "type": "string"
+        },
+        "value": {
+          "type": "number"
+        },
+        "n": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "metric",
+        "value",
+        "n"
+      ],
+      "title": "Validation",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Index of the service integration envelopes (PROPOSED v0.1). Export root only.",
+  "properties": {
+    "capabilities_response": {
+      "$ref": "#/$defs/CapabilitiesResponse"
+    },
+    "field_profile_request": {
+      "$ref": "#/$defs/FieldProfileRequest"
+    },
+    "field_profile_response": {
+      "$ref": "#/$defs/FieldProfileResponse"
+    },
+    "comparison_request": {
+      "$ref": "#/$defs/ComparisonRequest"
+    },
+    "comparison_response": {
+      "$ref": "#/$defs/ComparisonResponse"
+    },
+    "integration_error": {
+      "$ref": "#/$defs/IntegrationError"
+    }
+  },
+  "required": [
+    "capabilities_response",
+    "field_profile_request",
+    "field_profile_response",
+    "comparison_request",
+    "comparison_response",
+    "integration_error"
+  ],
+  "title": "FieldShiftIntegrationContracts",
+  "type": "object",
+  "$comment": "Field Shift service integration contracts v0.1 (PROPOSED). Generated from contracts/integration.py; do not edit."
+}

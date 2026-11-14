@@ -1,0 +1,231 @@
+[
+  {
+    "event": "turn.started",
+    "turn_id": "turn_0001"
+  },
+  {
+    "event": "tool.started",
+    "call_id": "call_1",
+    "tool": "propose_constraints"
+  },
+  {
+    "event": "tool.finished",
+    "call_id": "call_1",
+    "status": "ok",
+    "latency_ms": 12
+  },
+  {
+    "event": "tool.started",
+    "call_id": "call_2",
+    "tool": "compare_rotations"
+  },
+  {
+    "event": "tool.finished",
+    "call_id": "call_2",
+    "status": "ok",
+    "latency_ms": 840
+  },
+  {
+    "event": "text.delta",
+    "text": "Без поливу адаптивна сівозміна має нижчий ризик водного дефіциту"
+  },
+  {
+    "event": "text.delta",
+    "text": "…"
+  },
+  {
+    "event": "turn.completed",
+    "message": {
+      "turn_id": "turn_0001",
+      "locale": "uk",
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "Без поливу адаптивна сівозміна має нижчий ризик водного дефіциту: **22 %** днів проти **41 %** у сівозміні пшениця → соняшник → кукурудза [1]. У липні 2025 року волога кореневої зони була **0,21 м³/м³** (модельна оцінка SMAP L4)."
+        },
+        {
+          "type": "clarifying_question",
+          "text": "Поле має помітний схил? Від цього залежить, чи додати захист від ерозії.",
+          "options": [
+            "Так, є схил",
+            "Ні, рівне"
+          ]
+        }
+      ],
+      "facts": [
+        {
+          "id": "rot_adaptive.water_risk",
+          "domain": "rotation",
+          "label_key": "fact.rotation_water_risk",
+          "quantity": {
+            "value": 22,
+            "unit": "%"
+          },
+          "provenance": {
+            "kind": "deterministic_calc",
+            "data_status": "fixture",
+            "method": "Share of days with FAO-56 root-zone depletion above RAW; synthetic fixture value",
+            "retrieved_at": "2026-11-06T09:00:00Z"
+          }
+        },
+        {
+          "id": "rot_conventional.water_risk",
+          "domain": "rotation",
+          "label_key": "fact.rotation_water_risk",
+          "quantity": {
+            "value": 41,
+            "unit": "%"
+          },
+          "provenance": {
+            "kind": "deterministic_calc",
+            "data_status": "fixture",
+            "method": "Share of days with FAO-56 root-zone depletion above RAW; synthetic fixture value",
+            "retrieved_at": "2026-11-06T09:00:00Z"
+          }
+        },
+        {
+          "id": "f_sm_rootzone_2025_07",
+          "domain": "water",
+          "label_key": "fact.root_zone_soil_moisture",
+          "quantity": {
+            "value": 0.21,
+            "unit": "m3/m3"
+          },
+          "depth_cm": [
+            0,
+            100
+          ],
+          "provenance": {
+            "kind": "satellite_product",
+            "data_status": "fixture",
+            "source": {
+              "provider": "NASA NSIDC DAAC",
+              "product_id": "SPL4SMGP",
+              "version": "008",
+              "level": "L4 (model-assimilated)"
+            },
+            "method": "Synthetic fixture value for development; not a real measurement.",
+            "temporal": {
+              "start": "2025-07-01",
+              "end": "2025-07-31",
+              "aggregation": "monthly_mean"
+            },
+            "retrieved_at": "2026-11-06T09:00:00Z"
+          }
+        }
+      ],
+      "citations": [
+        {
+          "id": "1",
+          "chunk_id": "fao56.ch8.0003",
+          "doc_id": "fao56",
+          "title": "Crop evapotranspiration - Guidelines for computing crop water requirements (FAO Irrigation and Drainage Paper 56)",
+          "publisher": "FAO",
+          "year": 1998,
+          "locator": {
+            "chapter": "8"
+          },
+          "url": "https://www.fao.org/4/x0490e/x0490e00.htm",
+          "quote": "[fixture placeholder: the real quote is the exact span of the ingested chunk]",
+          "language": "en",
+          "licence": "unverified"
+        }
+      ],
+      "constraints_proposed": [
+        {
+          "id": "k_irrigation",
+          "type": "irrigation_available",
+          "value": false,
+          "status": "proposed",
+          "source": "farmer_text",
+          "evidence": "Поливу немає",
+          "confidence": 0.97
+        },
+        {
+          "id": "k_fertilizer",
+          "type": "fertilizer_budget",
+          "value": "minimize_n",
+          "status": "proposed",
+          "source": "farmer_text",
+          "evidence": "хочу зменшити витрати на добрива",
+          "confidence": 0.86
+        }
+      ],
+      "ui_actions": [
+        {
+          "id": "a1",
+          "field_context_revision": 3,
+          "trigger": "auto",
+          "label": "Умови: без поливу, мінімум азоту",
+          "action": {
+            "type": "compare.set_constraints",
+            "constraints": [
+              {
+                "id": "k_irrigation",
+                "type": "irrigation_available",
+                "value": false,
+                "status": "proposed",
+                "source": "farmer_text",
+                "evidence": "Поливу немає",
+                "confidence": 0.97
+              },
+              {
+                "id": "k_fertilizer",
+                "type": "fertilizer_budget",
+                "value": "minimize_n",
+                "status": "proposed",
+                "source": "farmer_text",
+                "evidence": "хочу зменшити витрати на добрива",
+                "confidence": 0.86
+              }
+            ]
+          }
+        },
+        {
+          "id": "a2",
+          "field_context_revision": 3,
+          "trigger": "chip",
+          "label": "Дефіцит вологи в липні-серпні",
+          "reason": "Показує, коли волога кореневої зони була найнижчою",
+          "action": {
+            "type": "chart.focus",
+            "chart_id": "c_water_season",
+            "metric_ids": [
+              "m_sm_rootzone",
+              "m_precip"
+            ],
+            "highlight": {
+              "start": "2025-07-01",
+              "end": "2025-08-31"
+            }
+          }
+        },
+        {
+          "id": "a3",
+          "field_context_revision": 3,
+          "trigger": "chip",
+          "label": "Шар вологості SMAP",
+          "action": {
+            "type": "map.set_layers",
+            "layer_ids": [
+              "l_smap_rootzone"
+            ],
+            "mode": "replace"
+          }
+        }
+      ],
+      "warnings": [
+        {
+          "code": "fixture_data",
+          "detail": "All numbers in this message are synthetic fixtures."
+        }
+      ],
+      "meta": {
+        "provider": "fixture",
+        "model_id": "none",
+        "prompt_version": "fixture",
+        "latency_ms": 0
+      }
+    }
+  }
+]

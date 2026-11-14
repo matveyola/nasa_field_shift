@@ -1,0 +1,10 @@
+{
+  "schema_version": "0.1",
+  "field_id": "demo-marsden-01",
+  "revision": 1,
+  "geometry": { "type": "Point", "coordinates": [-93.78421, 42.01379] },
+  "centroid": [-93.78421, 42.01379],
+  "region": { "country_iso2": "US", "admin1": "Iowa" },
+  "facts": [],
+  "locale": "en"
+}
