@@ -1,0 +1,9 @@
+services:
+  boundary-model:
+    volumes:
+      - type: bind
+        source: ${FIELD_SHIFT_BOUNDARY_MODEL_WEIGHTS:?Set FIELD_SHIFT_BOUNDARY_MODEL_WEIGHTS to the downloaded checkpoint}
+        target: /models/DelineateAnythingv2.pt
+        read_only: true
+        bind:
+          create_host_path: false

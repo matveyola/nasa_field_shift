@@ -53,11 +53,25 @@ services:
       postgres:
         condition: service_healthy
 
+  boundary-model:
+    build: ./services/boundary-model
+    volumes:
+      - boundary-weights:/models
+    healthcheck:
+      test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://127.0.0.1:8091/health/ready', timeout=2).close()"]
+      interval: 5s
+      timeout: 3s
+      retries: 18
+      start_period: 3m
+    restart: unless-stopped
+
   api:
     <<: *api-image
     build: ./apps/api
     environment:
       <<: *api-environment
+      FIELD_SHIFT_BOUNDARY_MODEL_URL: ${FIELD_SHIFT_BOUNDARY_MODEL_URL:-http://boundary-model:8091/predict}
+      FIELD_SHIFT_BOUNDARY_DEMO_IMAGE: /app/imagery/bondurant-usgs-aerial.webp
       FIELD_SHIFT_AGENT_URL: ${FIELD_SHIFT_AGENT_URL:-}
       FIELD_SHIFT_AGENT_API_KEY: ${FIELD_SHIFT_AGENT_API_KEY:-}
       FIELD_SHIFT_AGENT_SIGNING_KEY: ${FIELD_SHIFT_AGENT_SIGNING_KEY:-}
@@ -66,9 +80,14 @@ services:
       FIELD_SHIFT_SECURE_COOKIE: ${FIELD_SHIFT_SECURE_COOKIE:-0}
       FIELD_SHIFT_PUBLIC_ORIGIN: ${FIELD_SHIFT_PUBLIC_ORIGIN:-}
       FIELD_SHIFT_BOOTSTRAP_TOKEN: ${FIELD_SHIFT_BOOTSTRAP_TOKEN:-}
+    volumes:
+      - ./apps/web/public/bondurant-usgs-aerial.webp:/app/imagery/bondurant-usgs-aerial.webp:ro
     depends_on:
       migrate:
         condition: service_completed_successfully
+      boundary-model:
+        condition: service_started
+        required: false
     healthcheck:
       test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://localhost:8000/api/health', timeout=3).close()"]
       interval: 5s
@@ -187,6 +206,8 @@ services:
   web:
     build:
       context: ./apps/web
+      args:
+        VITE_MAPTILER_KEY: ${VITE_MAPTILER_KEY:-}
       additional_contexts:
         agent-widget: ./services/agent/frontend/src/widget  # «Польовий помічник», built into the web app
     image: ${WEB_IMAGE:-field-shift-web:local}
@@ -200,3 +221,4 @@ services:
 volumes:
   postgres-data:
   redis-data:
+  boundary-weights:

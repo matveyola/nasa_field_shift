@@ -15,14 +15,19 @@ const colors: Record<PlanningCrop, string> = {
   Sunflower: '#a6a6a6', Rapeseed: '#c4c4c4', Peas: '#dcdcdc',
 }
 const defaultRule = (crop: PlanningCrop): CropRule => ({ crop, min_break_years: 1, preference: 0, max_share_percent: 100, min_area_ha: 0, max_area_ha: null })
-const defaults: CropRule[] = ['Wheat', 'Maize', 'Soy'].map((crop) => defaultRule(crop as PlanningCrop))
+const defaults: PlanningCrop[] = ['Wheat', 'Maize', 'Soy']
+const priorityNotes = {
+  water: 'Water is a priority. Compare water stress before applying a plan.',
+  soil: 'Soil health is a priority. Review crop return breaks and botanical families.',
+  low_change: 'Fewer changes is a priority. Use crop preferences to favor familiar crops.',
+} as const
 
 function usePlanningLocale() {
   const locale = useLocale()
   return { ...locale, t: (key: string) => locale.language === 'uk' && planningUkrainian[key] ? planningUkrainian[key] : locale.t(key) }
 }
 
-export function FarmRotationPlanner({ season, onApplied }: { season: number; onApplied: () => void }) {
+export function FarmRotationPlanner({ season, fieldId, onApplied }: { season: number; fieldId: string; onApplied: () => void }) {
   const { t } = usePlanningLocale()
   const [open, setOpen] = useState(false)
   return <section className="farm-planner" aria-labelledby="farm-planner-title">
@@ -32,11 +37,11 @@ export function FarmRotationPlanner({ season, onApplied }: { season: number; onA
         <SparklesIcon aria-hidden="true" />{t(open ? 'Close farm planner' : 'Open farm planner')}
       </button>
     </div>
-    {open && <PlannerLoader key={season} startSeason={Math.min(2098, season + 1)} onApplied={onApplied} />}
+    {open && <PlannerLoader key={season} fieldId={fieldId} startSeason={Math.min(2098, season + 1)} onApplied={onApplied} />}
   </section>
 }
 
-function PlannerLoader({ startSeason, onApplied }: { startSeason: number; onApplied: () => void }) {
+function PlannerLoader({ startSeason, fieldId, onApplied }: { startSeason: number; fieldId: string; onApplied: () => void }) {
   const { t } = usePlanningLocale()
   const [firstSeason, setFirstSeason] = useState(startSeason)
   const load = useCallback((signal: AbortSignal) => rotationPlanningApi.context(firstSeason, signal), [firstSeason])
@@ -47,16 +52,19 @@ function PlannerLoader({ startSeason, onApplied }: { startSeason: number; onAppl
     </select></label>
     {context.pending && <Loading text={t('Loading farm planning data…')} />}
     {context.error && <ErrorBox message={context.error} retry={context.reload} />}
-    {context.data && !context.pending && <PlannerEditor key={JSON.stringify([context.data.start_season, context.data.fields])} context={context.data} onApplied={onApplied} refresh={context.reload} />}
+    {context.data && !context.pending && <PlannerEditor key={JSON.stringify([context.data.start_season, context.data.fields])} context={context.data} fieldId={fieldId} onApplied={onApplied} refresh={context.reload} />}
   </div>
 }
 
-function PlannerEditor({ context, onApplied, refresh }: { context: PlanningContext; onApplied: () => void; refresh: () => void }) {
+function PlannerEditor({ context, fieldId, onApplied, refresh }: { context: PlanningContext; fieldId: string; onApplied: () => void; refresh: () => void }) {
   const { t, number } = usePlanningLocale()
   const { canEdit } = useAccess()
   const [name, setName] = useState(t('Farm rotation plan'))
-  const [selected, setSelected] = useState(context.fields.slice(0, 30).map(({ id }) => id))
-  const [rules, setRules] = useState<CropRule[]>(defaults)
+  const setupField = context.fields.find((field) => field.id === fieldId && field.allowed_crops?.length)
+  const [selected, setSelected] = useState(() =>
+    setupField ? [setupField.id] : context.fields.slice(0, 30).map(({ id }) => id))
+  const [rules, setRules] = useState<CropRule[]>(() =>
+    (setupField?.allowed_crops ?? defaults).map(defaultRule))
   const [familyBreak, setFamilyBreak] = useState(false)
   const [twoCrops, setTwoCrops] = useState(true)
   const [history, setHistory] = useState<CropDecision[]>(context.fields.flatMap(({ history }) => history))
@@ -155,6 +163,10 @@ function PlannerEditor({ context, onApplied, refresh }: { context: PlanningConte
               onChange={(event) => { changed(); setSelected(event.target.checked ? [...selected, field.id] : selected.filter((id) => id !== field.id)) }} />
             <span><strong>{field.name}</strong><small>{number(field.area_ha)} {t('ha')}</small></span>
           </label>)}</div><p className="planner-help">{t('Select up to 30 fields. Whole fields are allocated; a field is never split to meet an area target.')}</p>
+          {selectedFields.map((field) => field.allowed_crops?.length ? <p className="planner-help" key={field.id}>
+            <strong>{field.name}</strong> · {t('Allowed crops from field setup')}: {field.allowed_crops.map(t).join(', ')}.
+            {field.priority && <> {t(priorityNotes[field.priority])}</>}
+          </p> : null)}
         </fieldset>
         <div className="planner-section-title"><h3>{t('Crop rules')}</h3><p>{t('Limits apply separately in each of the three seasons.')} {t('Enabled crops are options. Set a minimum area to require a crop each season.')}</p></div>
         <div className="planner-crop-rules">{context.crops.map(({ crop }) => {
@@ -186,7 +198,8 @@ function PlannerEditor({ context, onApplied, refresh }: { context: PlanningConte
             </fieldset>
             <fieldset><legend>{t('Locked future crops')}</legend><div className="planner-year-choices">{years.map((year) =>
               <label key={year}>{year}<select value={locked.find((entry) => entry.field_id === field.id && entry.season === year)?.crop ?? ''} onChange={(event) => decide(field.id, year, event.target.value, false)}>
-                <option value="">{t('Let planner choose')}</option>{rules.map(({ crop }) => <option key={crop} value={crop}>{t(crop)}</option>)}</select></label>)}</div></fieldset>
+                <option value="">{t('Let planner choose')}</option>{rules.filter(({ crop }) => !field.allowed_crops || field.allowed_crops.includes(crop))
+                  .map(({ crop }) => <option key={crop} value={crop}>{t(crop)}</option>)}</select></label>)}</div></fieldset>
           </div>)}
         </details>
         <div className="planner-generate"><button className="button primary" disabled={!selected.length || rules.length < 2} type="submit"><SparklesIcon aria-hidden="true" />{t(busy ? 'Planning…' : 'Generate and save draft')}</button></div>

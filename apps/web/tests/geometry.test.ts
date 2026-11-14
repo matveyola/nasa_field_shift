@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { basemaps, coordinateFromMap, defaultBasemap } from '../src/features/fields/basemaps.ts'
+import { basemaps, coordinateFromMap, hasUsgsAerial, placeLabels, preferredAerial } from '../src/features/fields/basemaps.ts'
 import { moistureColor, parseVertices, polygonFrom } from '../src/features/fields/geometry.ts'
 
 test('GeoJSON polygon closes once and preserves absolute longitude and latitude', () => {
@@ -11,14 +11,24 @@ test('GeoJSON polygon closes once and preserves absolute longitude and latitude'
   assert.deepEqual(polygon.coordinates[0][1], [30.48, 50.24])
 })
 
-test('map clicks become longitude-first GeoJSON and choose a covered provider', () => {
+test('map clicks are longitude-first and local USGS coverage does not restrict the global basemap', () => {
   const coordinate = coordinateFromMap({ lat: 41.7, lng: -93.5 })
   assert.deepEqual(coordinate, [-93.5, 41.7])
-  assert.equal(defaultBasemap(coordinate), 'aerial')
-  assert.equal(defaultBasemap([30.47, 50.24]), 'street')
-  assert.equal(defaultBasemap(), 'street')
-  assert.match(basemaps.aerial.url, /\/tile\/\{z\}\/\{y\}\/\{x\}$/)
+  assert.equal(hasUsgsAerial(coordinate), true)
+  assert.equal(hasUsgsAerial([30.47, 50.24]), false)
+  assert.match(basemaps.aerial.url, /s2cloudless_3857\/default\/g\/\{z\}\/\{y\}\/\{x\}\.jpg$/)
   assert.match(basemaps.street.url, /\/\{z\}\/\{x\}\/\{y\}\.png$/)
+})
+
+test('imagery sources change with coverage and keep map labels above the field zoom', () => {
+  assert.ok(placeLabels.maxZoom < 15)
+  assert.equal(preferredAerial([1.786, 48.31], 6), undefined)
+  assert.match(preferredAerial([1.786, 48.31], 16)?.url ?? '', /data\.geopf\.fr/)
+  assert.match(preferredAerial([-4.25, 41.7], 16)?.url ?? '', /ign\.es/)
+  assert.equal(preferredAerial([13.59, 51.31], 16)?.wmsLayers, 'sn_dop_020')
+  assert.match(preferredAerial([-93.4561, 41.7269], 16)?.url ?? '', /nationalmap\.gov/)
+  assert.equal(preferredAerial([34.557, 49.667], 16), undefined)
+  assert.match(preferredAerial([34.557, 49.667], 16, 'a&b')?.url ?? '', /api\.maptiler\.com.*key=a%26b$/)
 })
 
 test('invalid or collinear coordinates fail before submission', () => {

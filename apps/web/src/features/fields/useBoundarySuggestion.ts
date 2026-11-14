@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import type { Position } from '../../api/contracts'
+import { request } from '../../api/client'
+import type { Polygon, Position } from '../../api/contracts'
+import { useLocale } from '../../shared/locale'
 import { errorText } from '../../shared/useResource'
 import { polygonFrom } from './geometry'
 import type { SatelliteRaster } from './satelliteRaster'
@@ -40,14 +42,25 @@ function runSegmentation({ width, height, pixels, seed, source }: ImageWindow, s
 }
 
 export type BoundarySuggestion = {
-  source: ImageWindow['source']
+  source: ImageWindow['source'] | 'model'
+  imageryDate?: string
+  imagerySource?: string
   preview?: SatelliteRaster
   points: Position[]
 }
 
 type Search = { seed?: Position; pending?: 'boundary' | 'imagery'; error?: string; preview?: SatelliteRaster }
 
+const missingContour = 'Delineate Anything v2 could not separate this field. Tap nearer the middle or draw it manually.'
+const modelErrors: Record<string, string> = {
+  no_imagery: 'No usable imagery loaded for this point. Try again or draw the field manually.',
+  no_contour: missingContour,
+  model_unavailable: 'The boundary model is temporarily unavailable. Try again in a moment.',
+  busy: 'The boundary model is still processing a request. Try again in a moment.',
+}
+
 export function useBoundarySuggestion() {
+  const { t } = useLocale()
   const [search, setSearch] = useState<Search>()
   const active = useRef<AbortController | undefined>(undefined)
 
@@ -63,11 +76,11 @@ export function useBoundarySuggestion() {
     setSearch(undefined)
   }
 
-  function begin() {
+  function begin(timeoutMs = 25_000) {
     active.current?.abort()
     const controller = new AbortController()
     active.current = controller
-    const timeout = AbortSignal.timeout(25_000)
+    const timeout = AbortSignal.timeout(timeoutMs)
     const signal = AbortSignal.any([controller.signal, timeout])
     return { controller, timeout, signal }
   }
@@ -87,10 +100,26 @@ export function useBoundarySuggestion() {
   }
 
   async function find(position: Position, satellite?: SatelliteRaster): Promise<BoundarySuggestion | undefined> {
-    const { controller, timeout, signal } = begin()
+    const { controller, timeout, signal } = begin(55_000)
     let preview = search?.preview
     setSearch({ seed: position, pending: 'boundary', preview })
     try {
+      const model = await request<{
+        geometry: Polygon | null; imagery_date: string | null; imagery_source: string | null
+        failure_reason?: string | null
+      } | null>(
+        '/fields/boundary-suggestion', { method: 'POST', body: JSON.stringify({ position }), signal },
+      )
+      signal.throwIfAborted()
+      if (model !== null) {
+        if (!model.geometry) throw new Error(t(modelErrors[model.failure_reason ?? ''] ?? missingContour))
+        const points = polygonFrom(model.geometry.coordinates[0]).coordinates[0].slice(0, -1)
+        setSearch(undefined)
+        return { points, source: 'model', imageryDate: model.imagery_date ?? undefined,
+          imagerySource: model.imagery_source ?? undefined }
+      }
+
+      // The browser algorithm supports deployments that explicitly disable the model.
       const { readSegmentationImage } = await import('./segmentationImage')
       const image = await readSegmentationImage(position, { satellite: preview ?? satellite, signal })
       preview = image.preview ?? preview
@@ -103,7 +132,7 @@ export function useBoundarySuggestion() {
     } catch (error) {
       if (!controller.signal.aborted) setSearch({
         seed: position, preview,
-        error: timeout.aborted ? 'The boundary search timed out. Try again.' : errorText(error),
+        error: timeout.aborted ? t('The boundary search timed out. Try again.') : errorText(error),
       })
     } finally {
       if (active.current === controller) active.current = undefined

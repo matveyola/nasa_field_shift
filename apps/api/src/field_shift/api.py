@@ -14,9 +14,13 @@ from field_shift.modules.agent.provider import AgentProvider, DemoAgentProvider
 from field_shift.modules.agent.remote import RemoteAgentError, RemoteAgentProvider
 from field_shift.modules.agent.routes import router as agent_router
 from field_shift.modules.farm.routes import router as farm_router
+from field_shift.modules.fields.boundary_suggestion_routes import (
+    router as boundary_suggestion_router,
+)
 from field_shift.modules.fields.history_routes import router as field_history_router
 from field_shift.modules.fields.routes import router as fields_router
 from field_shift.modules.imagery.routes import router as imagery_router
+from field_shift.modules.onboarding.routes import router as onboarding_router
 from field_shift.modules.precision.routes import router as precision_router
 from field_shift.modules.rotations.planning_routes import router as rotation_planning_router
 from field_shift.modules.rotations.routes import router as rotations_router
@@ -72,6 +76,8 @@ def create_app(
 
     for router in (
         access_router,
+        boundary_suggestion_router,
+        onboarding_router,
         field_history_router,
         rotation_planning_router,
         precision_router,

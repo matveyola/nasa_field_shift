@@ -11,10 +11,11 @@ type Props = {
   chooseField: (fieldId: string) => void
   openFields?: () => void
   disabled?: boolean
+  directSelection?: boolean
   children?: ReactNode
 }
 
-export function FieldWorkspaceBar({ field, fields, chooseField, openFields, disabled = false, children }: Props) {
+export function FieldWorkspaceBar({ field, fields, chooseField, openFields, disabled = false, directSelection, children }: Props) {
   const { t, number, crop } = useLocale()
   const index = fields.findIndex(({ id }) => id === field.id)
   const canSwitch = !disabled && fields.length > 1 && index >= 0
@@ -38,7 +39,12 @@ export function FieldWorkspaceBar({ field, fields, chooseField, openFields, disa
       <button id="field-workspace-previous" className="icon-button" type="button" aria-label={t('Previous field')} disabled={!canSwitch} onClick={() => step(-1)}>
         <ChevronLeftIcon aria-hidden="true" />
       </button>
-      <strong className="field-workspace-name" title={field.name} aria-live="polite">{field.name}</strong>
+      {directSelection && fields.length > 1
+        ? <select className="field-workspace-name" aria-label={t('Selected field')} value={field.id} disabled={disabled}
+            onChange={(event) => chooseField(event.currentTarget.value)}>
+            {fields.map(({ id, name }) => <option key={id} value={id}>{name}</option>)}
+          </select>
+        : <strong className="field-workspace-name" title={field.name} aria-live="polite">{field.name}</strong>}
       <button id="field-workspace-next" className="icon-button field-workspace-next" type="button" aria-label={t('Next field')} disabled={!canSwitch} onClick={() => step(1)}>
         <ChevronRightIcon aria-hidden="true" />
       </button>

@@ -20,6 +20,8 @@
   text-align: right;
 }
 .fields-content .real-map .leaflet-control-attribution a { color: var(--ink); text-decoration: underline; }
+.fields-content .real-map .map-aerial-brand { display: block; background: #fffe; padding: 4px; border-radius: 4px; }
+.fields-content .real-map .map-aerial-brand img { display: block; width: 76px; }
 .fields-content .map-place-label {
   pointer-events: none;
 }
