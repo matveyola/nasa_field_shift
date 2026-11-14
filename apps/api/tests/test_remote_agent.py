@@ -297,3 +297,91 @@ def test_assistant_health_shows_only_what_the_widget_needs(app, monkeypatch):
     body = response.json()
     assert body["agent"] == "llm/gemini" and body["knowledge"] == {"mode": "lexical"}
     assert "url" not in json.dumps(body) and "/secret" not in json.dumps(body)
+
+
+def _signed_stream_request(app, monkeypatch, widget_client, principal=None):
+    provider = app.state.agent_provider
+    opened = []
+    monkeypatch.setattr(
+        provider._opener, "open", lambda request, timeout: opened.append(request) or _Stream(b"")
+    )
+    payload = {
+        "request_id": "req_1",
+        "session_id": "ses_1",
+        "message": {"text": "x"},
+        "history": [],
+        "client": widget_client,
+    }
+    context = {"field_id": "F-03", "revision": 0}
+    args = (payload, context) if principal is None else (payload, context, principal)
+    b"".join(provider.stream(*args))
+    [request] = opened
+    headers = {key.casefold(): value for key, value in request.header_items()}
+    _, encoded, _ = headers["x-fieldshift-context-attestation"].split(".")
+    return json.loads(request.data), json.loads(_decode(encoded))
+
+
+def test_capabilities_a_browser_claims_beyond_the_host_are_not_signed(app, monkeypatch):
+    claimed = {
+        "widget_version": "w",
+        "capabilities": {
+            "actions": [
+                "map.set_layers",
+                "compare.set_constraints",
+                "scenario.set",
+                "panel.open",
+                "map.set_layers",
+                "chart.focus",
+                "app.open_screen",
+                "map.focus_field",
+            ],
+            "screens": [
+                {"screen_id": "water", "label": "Вода"},
+                {"screen_id": "admin", "label": "Admin"},
+            ],
+        },
+    }
+    body, _ = _signed_stream_request(app, monkeypatch, claimed)
+    caps = body["client"]["capabilities"]
+    host_order = ["map.set_layers", "chart.focus", "app.open_screen", "map.focus_field"]
+    assert caps["actions"] == host_order
+    assert [s["screen_id"] for s in caps["screens"]] == ["water"]
+    assert body["client"]["widget_version"] == "w"
+
+
+def test_a_client_without_capabilities_stays_a_text_only_client(app, monkeypatch):
+    body, _ = _signed_stream_request(app, monkeypatch, {"widget_version": "w"})
+    assert body["client"] == {"widget_version": "w"}
+
+
+def test_local_mode_signs_the_shared_workspace_and_team_mode_the_signed_in_member(app, monkeypatch):
+    from types import SimpleNamespace
+
+    from field_shift.modules.access.service import Principal
+    from field_shift.modules.agent.routes import _principal
+    from field_shift.modules.agent.signing import LOCAL_PRINCIPAL, agent_principal
+
+    def request_as(principal):
+        return SimpleNamespace(state=SimpleNamespace(principal=principal))
+
+    local = request_as(Principal(None, 1, "Local", None, "admin"))
+    member = request_as(Principal(7, 1, "Ann", "a@x", "editor"))
+    assert _principal(local) == LOCAL_PRINCIPAL == "field-shift-local-farm"
+    assert _principal(member) == agent_principal(7, 1) == "farm-1:user-7"
+    assert _principal(SimpleNamespace(state=SimpleNamespace())) == LOCAL_PRINCIPAL
+
+    _, signed = _signed_stream_request(app, monkeypatch, {"widget_version": "w"})
+    assert signed["principal"] == LOCAL_PRINCIPAL  # unchanged single-farm behaviour
+    _, signed = _signed_stream_request(app, monkeypatch, {"widget_version": "w"}, "farm-1:user-7")
+    assert signed["principal"] == "farm-1:user-7"
+
+
+def test_the_assistant_stream_route_attests_the_caller_of_the_request(app, monkeypatch):
+    provider = app.state.agent_provider
+    seen = []
+    monkeypatch.setattr(
+        provider, "stream", lambda payload, context, who: seen.append(who) or iter([b""])
+    )
+    with TestClient(app) as client:
+        client.post(ASSISTANT + "/v1/agent/stream", json={"session_id": "s", "client": {}})
+    assert seen == ["field-shift-local-farm"]  # local access mode: the shared workspace
