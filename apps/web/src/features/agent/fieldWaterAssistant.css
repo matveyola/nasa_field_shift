@@ -1,0 +1,50 @@
+/* «Помічник поля» in the field panel: the assistant widget's look. White cards with large radii and soft shadows,
+   a grey outlined pill for the badge, a black pill for the action; red only when water runs short. */
+.field-water-assistant { display: grid; align-content: start; gap: 12px; }
+.field-water-assistant-header { display: flex; align-items: center; gap: 10px; min-width: 0; padding-block: 8px; }
+.field-water-assistant-header h2 { font-size: 1.08rem; font-weight: 600; letter-spacing: -.025em; line-height: 1.2; }
+.field-water-assistant-header > .field-water-assistant-badge {
+  margin-left: auto; padding: 0 9px; border-radius: var(--r-pill); background: transparent; color: var(--ink-2);
+  box-shadow: inset 0 0 0 1px var(--line-strong); font-size: .6875rem; font-weight: 500; line-height: 1.8; white-space: nowrap;
+}
+.field-water-assistant-status {
+  display: flex; align-items: flex-start; gap: 10px; padding: 14px 16px; border: 0; border-radius: var(--r-card);
+  background: var(--card); box-shadow: var(--shadow-card); color: var(--ink-2);
+}
+.field-water-assistant-status.is-clear { color: var(--ink); }
+.field-water-assistant-status.is-shortage { color: var(--danger); background: var(--danger-soft); box-shadow: none; }
+.field-water-assistant-status > svg { width: 21px; height: 21px; flex: 0 0 auto; }
+.field-water-assistant-status h3 { color: inherit; font-size: .9rem; font-weight: 600; line-height: 1.3; }
+.field-water-assistant-status p { font-size: .78rem; line-height: 1.5; margin-top: 4px; }
+.field-water-assistant-status.is-clear p { color: var(--ink-2); }
+.field-water-assistant-status time { white-space: nowrap; }
+.field-assistant-risk-values { display: none; }
+.field-water-mini-chart {
+  margin: 0; padding: 14px 12px 4px; border: 0; border-radius: var(--r-card); background: var(--card); box-shadow: var(--shadow-card);
+}
+.field-water-mini-chart figcaption { font-size: .78rem; font-weight: 600; color: var(--ink); }
+.field-water-mini-chart svg { width: 100%; height: auto; }
+.field-water-mini-chart text { font: 9.5px var(--font); fill: var(--ink-3); }
+.button.field-water-assistant-action { width: 100%; justify-content: center; gap: 15px; min-height: 48px; }
+.field-water-assistant-action svg { width: 18px; height: 18px; }
+.field-water-assistant-source { color: var(--ink-3); font-size: .67rem; line-height: 1.45; overflow-wrap: anywhere; }
+@media (max-width: 1000px) {
+  .field-water-assistant { gap: 10px; }
+  .field-water-assistant-header { padding-block: 0 4px; padding-right: 34px; flex-wrap: wrap; }
+  .field-water-assistant-header h2 { font-size: 1.16rem; }
+  .field-water-assistant-header > .field-water-assistant-badge { font-size: .66rem; }
+  .field-water-assistant-status { padding: 12px 14px; }
+  .field-water-assistant-status h3 { font-size: .9rem; }
+  .field-water-assistant-status p { font-size: .77rem; }
+  .field-assistant-risk-values {
+    display: flex; margin: 0; padding: 12px 8px; border: 0; border-radius: var(--r-card); background: var(--card); box-shadow: var(--shadow-card);
+  }
+  .field-assistant-risk-values > div { flex: 1; padding-inline: 10px; }
+  .field-assistant-risk-values > div + div { border-left: 1px solid var(--line); }
+  .field-assistant-risk-values dt { font-size: .72rem; color: var(--ink-2); }
+  .field-assistant-risk-values dd { font-size: 1.25rem; font-weight: 600; letter-spacing: -.02em; font-variant-numeric: tabular-nums; margin: 2px 0 0; }
+  .field-water-mini-chart { padding-top: 12px; }
+  .field-water-mini-chart svg { max-height: 164px; }
+  .field-context-sheet .field-water-assistant-action { position: sticky; bottom: 0; z-index: 2; box-shadow: var(--shadow-btn), 0 -5px 0 4px var(--paper); }
+  .field-water-assistant-source { text-align: center; }
+}

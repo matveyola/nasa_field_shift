@@ -1,0 +1,56 @@
+.water-budget { margin-top: 25px; border-top: 1px solid var(--line); padding-top: 23px; min-width: 0; }
+.water-budget-heading { display: flex; justify-content: space-between; gap: 14px; align-items: flex-start; margin-bottom: 17px; }
+.water-budget-heading h3 { font-size: 1.2rem; letter-spacing: -.02em; }
+.water-budget-heading p { font-size: .8rem; color: var(--ink-2); line-height: 1.5; margin-top: 5px; }
+.water-budget-window select { min-height: 38px; max-width: 170px; border: 0; border-radius: var(--r-pill); padding: 6px 12px; background: var(--card); box-shadow: var(--shadow-float); font-size: .8rem; font-weight: 550; }
+.water-budget-content { min-width: 0; }
+.water-budget-summary { display: flex; gap: 15px; justify-content: space-between; align-items: center; padding: 15px 18px; border-radius: var(--r-md); background: var(--screen); }
+.water-budget-summary > div { display: grid; gap: 6px; }
+.water-budget-summary > div > span { font-size: .8rem; color: var(--ink-2); }
+.water-budget-summary strong { font-size: 1.9rem; line-height: 1; font-weight: 650; color: var(--ink); letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.water-budget-summary small { font-size: .9rem; font-weight: 500; }
+.water-budget-summary > p { display: grid; gap: 9px; text-align: right; font-size: .78rem; color: var(--ink-2); line-height: 1.5; }
+.water-budget-summary b { font-weight: 600; color: var(--ink); white-space: nowrap; }
+.water-budget-summary i { margin-inline: 8px; font-style: normal; }
+.water-budget-figure { margin: 14px 0 0; }
+.water-budget-figure figcaption { display: flex; align-items: center; flex-wrap: wrap; gap: 7px 20px; font-size: .76rem; padding: 4px 0 8px; }
+.water-budget-figure figcaption > span { display: flex; align-items: center; gap: 6px; }
+.water-budget-figure figcaption > span:last-child { margin-left: auto; color: var(--ink-2); }
+.water-budget-figure figcaption i { width: 17px; border-top: 3px solid; border-radius: 2px; }
+.water-budget-in { color: var(--series-1); }
+.water-budget-out { color: var(--series-2); }
+.water-budget-figure figcaption .water-budget-out { border-top-style: dashed; }
+.water-budget-figure svg { width: 100%; display: block; }
+.water-budget-figure svg text { fill: var(--ink-2); font-size: 11px; font-variant-numeric: tabular-nums; }
+.water-budget-slider { display: flex; align-items: center; gap: 16px; padding: 6px 0 13px; }
+.water-budget-slider > span { font-size: .77rem; flex-shrink: 0; color: var(--ink-2); }
+.water-budget-slider strong { font-weight: 600; color: var(--ink); }
+.water-budget-slider input { width: 100%; height: 30px; min-width: 0; accent-color: var(--black); cursor: pointer; padding: 0; }
+.water-budget-fluxes { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 13px 0; margin: 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.water-budget-fluxes > div { padding-inline: 15px; border-left: 1px solid var(--line); }
+.water-budget-fluxes > div:first-child { padding-left: 0; border-left: 0; }
+.water-budget-fluxes dt { font-size: .76rem; color: var(--ink-2); }
+.water-budget-fluxes dd { margin: 6px 0 0; font-size: 1.08rem; font-weight: 650; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.water-budget-fluxes dd > span { color: var(--ink-2); margin-right: 3px; }
+.water-budget-fluxes small { font-size: .75rem; font-weight: 400; }
+.water-budget-note { font-size: .73rem; line-height: 1.5; color: var(--ink-2); margin-top: 10px; }
+.water-budget-unavailable { padding: 15px; border-radius: var(--r-md); background: var(--screen); color: var(--ink-2); line-height: 1.5; }
+@media (max-width: 650px) {
+  .water-budget { margin-top: 20px; padding-top: 18px; }
+  .water-budget-heading { flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .water-budget-heading h3 { font-size: 1.05rem; }
+  .water-budget-heading p { font-size: .73rem; }
+  .water-budget-summary { padding: 12px; gap: 8px; align-items: flex-start; }
+  .water-budget-summary strong { font-size: 1.6rem; }
+  .water-budget-summary > div > span { font-size: .7rem; }
+  .water-budget-summary > p { font-size: .68rem; max-width: 165px; gap: 6px; }
+  .water-budget-summary > p > span:last-child { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 1px 5px; }
+  .water-budget-summary i { margin: 0 4px; }
+  .water-budget-figure figcaption { font-size: .67rem; gap: 7px 12px; }
+  .water-budget-slider { display: grid; gap: 2px; }
+  .water-budget-slider > span { font-size: .73rem; }
+  .water-budget-fluxes { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 14px; }
+  .water-budget-fluxes > div:nth-child(3) { padding-left: 0; border-left: 0; }
+  .water-budget-fluxes dt { font-size: .73rem; }
+  .water-budget-note { font-size: .68rem; }
+}

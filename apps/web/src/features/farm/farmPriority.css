@@ -1,0 +1,52 @@
+.farm-priorities { margin-bottom: 24px; }
+.farm-priorities .farm-section-heading { margin-bottom: 14px; }
+.farm-priorities .farm-section-heading .icon-button { min-height: 38px; width: 38px; flex-shrink: 0; }
+.farm-priority-summary { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 24px; padding-bottom: 17px; color: var(--ink-2); font-size: .8rem; }
+.farm-priority-summary > span { display: inline-flex; align-items: center; gap: 6px; }
+.farm-priority-summary > span[data-risk="true"] { color: var(--danger); }
+.farm-priority-summary svg { width: 17px; height: 17px; }
+.farm-priority-summary strong { color: inherit; }
+.farm-priority-list { margin: 0; padding: 0; list-style: none; }
+.farm-priority-list > li { display: grid; grid-template-columns: minmax(135px, .7fr) minmax(210px, 1.25fr) auto; gap: 17px; align-items: center; padding: 17px 0; border-top: 1px solid var(--line); }
+.farm-priority-field { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 4px 10px; align-items: center; min-width: 0; }
+.farm-priority-field .crop-icon { grid-row: span 2; width: 33px; height: 33px; }
+.farm-priority-field strong { font-size: .96rem; font-weight: 650; overflow-wrap: anywhere; }
+.farm-priority-field small { font-size: .77rem; color: var(--ink-2); }
+.farm-priority-message { display: flex; align-items: flex-start; gap: 9px; min-width: 0; }
+.farm-priority-message > svg { width: 20px; height: 20px; flex-shrink: 0; color: var(--ink); }
+[data-status="shortage"] .farm-priority-message > svg { color: var(--danger); }
+[data-status="unavailable"] .farm-priority-message > svg { color: var(--ink-3); }
+.farm-priority-message > div { display: grid; gap: 4px; min-width: 0; }
+.farm-priority-message strong { font-size: .83rem; font-weight: 600; line-height: 1.35; }
+.farm-priority-message span { font-size: .73rem; color: var(--ink-2); line-height: 1.4; }
+.farm-priority-message small { font-size: .66rem; color: var(--ink-2); line-height: 1.4; }
+.farm-priority-action { display: flex; gap: 16px; align-items: center; }
+.farm-priority-action .button { min-height: 38px; font-size: .76rem; padding: 8px 12px; gap: 8px; }
+.farm-priority-action .button svg { width: 17px; height: 17px; }
+.farm-priority-sparkline { width: 108px; height: 44px; }
+.farm-priority-note { border-top: 1px solid var(--line); padding-top: 12px; color: var(--ink-2); font-size: .72rem; line-height: 1.5; }
+@media (max-width: 1400px) { .farm-priority-sparkline { display: none; } }
+@media (max-width: 760px) {
+  .farm-priority-evidence { grid-column: 1 / -1; grid-row: 2; }
+  .farm-priority-list > li { grid-template-columns: minmax(0, 1fr) auto; gap: 11px 8px; padding-block: 15px; }
+  .farm-priority-field { grid-column: 1; }
+  .farm-priority-message { grid-column: 1 / -1; grid-row: 2; }
+  .farm-priority-action { grid-column: 2; grid-row: 1; }
+  .farm-priority-summary { font-size: .72rem; gap: 8px 16px; }
+  .farm-priorities .farm-section-heading p { max-width: none; font-size: .74rem; }
+  .farm-priority-action .button { min-height: 42px; font-size: .7rem; padding-inline: 9px; }
+  .farm-priority-action .button svg { width: 15px; height: 15px; }
+  .farm-priority-message strong { font-size: .8rem; }
+  .farm-priorities { margin-bottom: 18px; }
+}
+@media (max-width: 360px) {
+  .farm-priority-field { grid-template-columns: 27px minmax(0, 1fr); gap: 4px 6px; }
+  .farm-priority-field .crop-icon { width: 25px; height: 25px; }
+  .farm-priority-field strong { font-size: .85rem; }
+  .farm-priority-action .button { max-width: 112px; }
+}
+.farm-vegetation-cue { display: grid; gap: 4px; padding: 8px 12px; margin-top: 8px; text-align: left; font-size: .75rem; border: 0; border-radius: var(--r-btn); background: var(--screen); color: var(--ink); cursor: pointer; }
+.farm-vegetation-cue:hover { background: var(--sunken); }
+.farm-vegetation-cue small { color: var(--ink-2); font-size: .68rem; }
+.farm-record-observation { display: inline-flex; align-items: center; gap: 5px; min-height: 36px; margin-top: 5px; padding: 4px 0; background: transparent; border: 0; color: var(--ink); font-size: .76rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.farm-record-observation svg { width: 16px; height: 16px; }

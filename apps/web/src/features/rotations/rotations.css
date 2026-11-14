@@ -1,0 +1,151 @@
+.rotations-page .rotations-workspace {
+  display: grid;
+  gap: 28px;
+  max-width: 1540px;
+  margin: 0 auto;
+  padding: 14px clamp(16px, 2.1vw, 28px) 32px;
+  min-width: 0;
+}
+.rotations-page .rotation-irrigation { color: var(--ink-2); font-size: .8rem; white-space: nowrap; }
+.rotations-page .rotation-context-options { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; min-width: 0; padding: 0; margin: 0; border: 0; }
+.rotations-page .section-heading { margin-bottom: 16px; align-items: center; }
+.rotations-page .section-heading h2 { font-size: 1.5rem; }
+.rotations-page .rotation-planning > .section-heading h2 { font-size: clamp(1.5rem, 2.25vw, 2.1rem); }
+.rotations-page .section-heading p { margin-top: 5px; }
+.rotations-page .rotation-period { color: var(--ink-2); font-size: .9rem; font-variant-numeric: tabular-nums; }
+.rotations-page .rotation-plan-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(345px, 100%), 1fr)); gap: 14px; }
+.rotations-page .rotation-plan-card {
+  display: block; width: 100%; text-align: left; padding: 0;
+  border: 0; border-radius: var(--r-card);
+  background: var(--card); box-shadow: var(--shadow-card); overflow: hidden;
+  transition: box-shadow 120ms var(--ease-out);
+}
+.rotations-page .rotation-plan-card:not(:disabled):hover { box-shadow: var(--shadow-card-hover); }
+.rotations-page .rotation-plan-card[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--black), var(--shadow-card); }
+.rotations-page .rotation-plan-card-heading {
+  display: flex; align-items: center; gap: 10px; min-height: 49px;
+  padding: 11px 16px; border-bottom: 1px solid var(--line);
+}
+.rotations-page .rotation-plan-card-heading > strong { font-size: 1.04rem; }
+.rotations-page .rotation-plan-card-heading > small {
+  margin-left: auto; padding: 4px 10px; border-radius: var(--r-pill); color: #fff;
+  background: var(--black); font-size: .7rem; font-weight: 600;
+}
+.rotations-page .rotation-selection-mark {
+  display: grid; place-items: center; width: 21px; height: 21px; flex: 0 0 auto;
+  border: 1.5px solid var(--line-strong); border-radius: 50%; color: var(--ink);
+}
+.rotations-page .rotation-plan-card[aria-pressed="true"] .rotation-selection-mark { border-color: transparent; }
+.rotations-page .rotation-selection-mark svg { width: 23px; height: 23px; }
+.rotations-page .rotation-crop-timeline { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); padding: 14px 9px 16px; }
+.rotations-page .rotation-crop-stop { display: grid; justify-items: center; gap: 5px; min-width: 0; position: relative; padding: 0 5px; }
+.rotations-page .rotation-crop-stop + .rotation-crop-stop { border-left: 1px solid var(--line); }
+.rotations-page .rotation-crop-year { color: var(--ink-2); font-size: .76rem; font-weight: 400; font-variant-numeric: tabular-nums; }
+.rotations-page .rotation-crop-illustration { display: grid; place-items: center; width: 56px; height: 56px; }
+.rotations-page .rotation-crop-illustration .crop-icon { width: 45px; height: 45px; }
+.rotations-page .rotation-crop-stop > strong { font-size: .88rem; line-height: 1.3; text-align: center; overflow-wrap: anywhere; }
+.rotations-page .rotation-plan-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; padding-top: 14px; }
+.rotations-page .rotation-plan-actions > p { display: flex; align-items: center; gap: 8px; margin-right: auto; font-size: .85rem; }
+.rotations-page .rotation-plan-actions > p span { color: var(--ink-2); }
+.rotations-page .rotation-plan-actions .button { font-size: .82rem; }
+.rotations-page .rotation-plan-editor { border: 0; border-radius: var(--r-card); background: var(--card); box-shadow: var(--shadow-card); padding: 18px; margin-top: 14px; }
+.rotations-page .rotation-editor-actions { display: flex; align-items: center; justify-content: flex-end; gap: 9px; }
+.rotations-page .rotation-water-comparison, .rotations-page .rotation-yield-section { min-width: 0; }
+.rotations-page .rotation-water-comparison > .section-heading .button { font-size: .8rem; }
+.rotations-page .rotation-comparison-context { display: flex; align-items: flex-start; gap: 9px; margin-bottom: 12px; }
+.rotations-page .rotation-comparison-context .chip { flex: 0 0 auto; padding: 4px 9px; font-size: .69rem; }
+.rotations-page .rotation-comparison-context p { color: var(--ink-2); font-size: .75rem; line-height: 1.45; padding-top: 2px; }
+.rotations-page .rotation-comparison-charts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.rotations-page .rotation-comparison-chart { min-width: 0; margin: 0; padding: 16px 16px 18px; border: 0; border-radius: var(--r-card); background: var(--card); box-shadow: var(--shadow-card); }
+.rotations-page .rotation-comparison-chart figcaption { font-size: .9rem; font-weight: 650; margin-bottom: 16px; min-height: 1.3em; }
+.rotations-page .rotation-comparison-chart ul { display: grid; gap: 13px; padding: 0; margin: 0; list-style: none; }
+.rotations-page .rotation-comparison-chart li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 5px 9px; }
+.rotations-page .rotation-bar-label { display: inline-flex; align-items: center; gap: 6px; font-size: .76rem; color: var(--ink-2); }
+.rotations-page .rotation-bar-label i { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; }
+.rotations-page .rotation-comparison-chart li > strong { font-size: 1.12rem; font-weight: 650; font-variant-numeric: tabular-nums; }
+.rotations-page .rotation-comparison-chart li > strong small { font-size: .7rem; font-weight: 400; color: var(--ink-2); }
+.rotations-page .rotation-comparison-track { grid-column: 1 / -1; display: block; height: 8px; border-radius: var(--r-pill); overflow: hidden; background: var(--sunken-2); }
+.rotations-page .rotation-comparison-track > i { display: block; height: 100%; border-radius: inherit; }
+.rotations-page .rotation-yield-charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 12px; }
+.rotations-page .rotation-yield-chart { margin: 0; min-width: 0; padding: 16px 18px; border: 0; border-radius: var(--r-card); background: var(--card); box-shadow: var(--shadow-card); }
+.rotations-page .rotation-yield-chart figcaption { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; font-size: .9rem; }
+.rotations-page .rotation-yield-chart figcaption > span { color: var(--ink-2); font-size: .77rem; }
+.rotations-page .rotation-yield-sequence { gap: 9px; color: var(--ink-2); font-size: .8rem; }
+.rotations-page .rotation-yield-crop { gap: 5px; }
+.rotations-page .rotation-yield-crop .crop-icon { width: 24px; height: 24px; }
+.rotations-page .rotation-yield-value { display: block; font-size: 1.6rem; letter-spacing: -.03em; margin-top: 12px; font-variant-numeric: tabular-nums; }
+.rotations-page .rotation-yield-value small { font-size: .8rem; font-weight: 400; letter-spacing: 0; color: var(--ink-2); }
+.rotations-page .rotation-yield-track { position: relative; height: 22px; margin-top: 10px; background: var(--sunken); border-radius: var(--r-pill); }
+.rotations-page .rotation-yield-track::after { content: ''; position: absolute; width: 1px; inset: -3px auto -3px 50%; background: var(--ink-3); }
+.rotations-page .rotation-yield-bar { position: absolute; height: 12px; top: 5px; border-radius: var(--r-pill); }
+.rotations-page .rotation-yield-interval { position: absolute; height: 2px; top: 10px; background: var(--ink); box-shadow: 0 0 0 1px var(--card); z-index: 1; }
+.rotations-page .rotation-yield-interval::before, .rotations-page .rotation-yield-interval::after { content: ''; position: absolute; width: 2px; height: 8px; top: -3px; background: var(--ink); box-shadow: 0 0 0 1px var(--card); }
+.rotations-page .rotation-yield-interval::before { left: 0; }
+.rotations-page .rotation-yield-interval::after { right: 0; }
+.rotations-page .rotation-yield-axis { display: flex; justify-content: space-between; margin-top: 6px; font-size: .65rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.rotations-page .rotation-yield-range { display: block; color: var(--ink-2); font-size: .72rem; line-height: 1.4; margin-top: 9px; }
+.rotations-page .rotation-yield-chart > .muted { font-size: .82rem; margin-top: 12px; line-height: 1.5; }
+.rotations-page .rotation-yield-caution { color: var(--ink); font-weight: 550; font-size: .78rem; margin: -3px 0 12px; line-height: 1.4; }
+.rotations-page .rotation-yield-unavailable { margin-top: 12px; padding: 12px 16px; border: 0; border-radius: var(--r-card); background: var(--card); box-shadow: var(--shadow-card); font-size: .78rem; }
+.rotations-page .rotation-yield-unavailable > summary { cursor: pointer; color: var(--ink-2); }
+.rotations-page .rotation-yield-unavailable > summary > span { display: inline-block; margin-left: 5px; font-size: .69rem; min-width: 20px; text-align: center; background: var(--sunken); color: var(--ink); border-radius: var(--r-pill); padding: 2px 7px; }
+.rotations-page .rotation-yield-unavailable > div { display: grid; gap: 12px; padding-top: 12px; }
+.rotations-page .rotation-yield-unavailable section > p { color: var(--ink-2); line-height: 1.5; margin-bottom: 8px; }
+.rotations-page .rotation-yield-unavailable ul { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 8px 20px; }
+.rotations-page .rotation-yield-unavailable li { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; font-size: .73rem; }
+.rotations-page .rotation-yield-unavailable li > strong { font-weight: 500; }
+.rotations-page .rotation-yield-unavailable .rotation-yield-crop { color: var(--ink-2); }
+.rotations-page .rotation-yield-unavailable .crop-icon { width: 18px; height: 18px; }
+.rotations-page .rotation-yield-sources { font-size: .78rem; margin-top: 13px; }
+.rotations-page .rotation-yield-sources summary { cursor: pointer; width: fit-content; color: var(--ink); font-weight: 600; }
+.rotations-page .rotation-yield-sources > div { padding: 14px 16px; margin-top: 10px; border: 0; border-radius: var(--r-card); background: var(--card); box-shadow: var(--shadow-card); }
+.rotations-page .rotation-yield-sources p { color: var(--ink-2); line-height: 1.5; }
+.rotations-page .rotation-yield-sources .analysis-source-links { margin-top: 10px; font-size: .78rem; overflow-wrap: anywhere; }
+.rotations-page .rotation-footer { display: flex; justify-content: flex-end; }
+@media (min-width: 1001px) and (max-width: 1200px) {
+  .rotations-page .rotations-workspace { padding-inline: 20px; }
+  .rotations-page .rotation-plan-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rotations-page .rotation-comparison-chart { padding-inline: 12px; }
+  .rotations-page .rotation-comparison-chart figcaption { min-height: 2.6em; }
+}
+@media (max-width: 1000px) {
+  .rotations-page > .page-heading { border: 0; min-height: auto; padding: 12px 15px 4px; }
+  .rotations-page .rotations-workspace { padding: 8px 12px 18px; gap: 21px; }
+  .rotations-page .rotation-irrigation { font-size: .72rem; }
+  .rotations-page .section-heading { gap: 10px; margin-bottom: 12px; }
+  .rotations-page .section-heading h2, .rotations-page .rotation-planning > .section-heading h2 { font-size: 1.2rem; }
+  .rotations-page .section-heading p { font-size: .79rem; }
+  .rotations-page .rotation-period { display: none; }
+  .rotations-page .rotation-plan-options { gap: 10px; }
+  .rotations-page .rotation-plan-card-heading { padding: 10px 12px; min-height: 44px; }
+  .rotations-page .rotation-plan-card-heading > strong { font-size: .92rem; }
+  .rotations-page .rotation-crop-timeline { padding: 10px 7px 12px; }
+  .rotations-page .rotation-crop-illustration { width: 45px; height: 45px; }
+  .rotations-page .rotation-crop-illustration .crop-icon { width: 36px; height: 36px; }
+  .rotations-page .rotation-crop-stop > strong { font-size: .79rem; }
+  .rotations-page .rotation-crop-year { font-size: .7rem; }
+  .rotations-page .rotation-plan-actions { gap: 8px; padding-top: 11px; }
+  .rotations-page .rotation-plan-actions > p { width: 100%; font-size: .75rem; }
+  .rotations-page .rotation-plan-actions > .button { flex: 1; min-width: 0; font-size: .75rem; padding-inline: 9px; }
+  .rotations-page .rotation-plan-actions > .button svg { width: 18px; height: 18px; }
+  .rotations-page .rotation-plan-editor { padding: 12px; }
+  .rotations-page .rotation-water-comparison > .section-heading .button { font-size: .74rem; }
+  .rotations-page .rotation-comparison-context { flex-wrap: wrap; gap: 5px; }
+  .rotations-page .rotation-comparison-context p { font-size: .71rem; }
+  .rotations-page .rotation-comparison-charts { grid-template-columns: 1fr; gap: 9px; }
+  .rotations-page .rotation-comparison-chart { padding: 12px; }
+  .rotations-page .rotation-comparison-chart figcaption { font-size: .84rem; margin-bottom: 12px; }
+  .rotations-page .rotation-comparison-chart ul { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .rotations-page .rotation-comparison-chart li { gap: 6px; }
+  .rotations-page .rotation-comparison-chart li > strong { font-size: 1rem; }
+  .rotations-page .rotation-yield-section > .section-heading .chip { font-size: .65rem; }
+  .rotations-page .rotation-yield-chart { padding: 13px; }
+  .rotations-page .rotation-yield-value { font-size: 1.4rem; }
+  .rotations-page .rotation-footer { justify-content: stretch; }
+  .rotations-page .rotation-footer > .button { width: 100%; }
+}
+@media (min-width: 650px) and (max-width: 1000px) {
+  .rotations-page .rotation-plan-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rotations-page .rotation-comparison-charts { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .rotations-page .rotation-comparison-chart ul { grid-template-columns: 1fr; }
+}
