@@ -1,6 +1,56 @@
 # Стан проєкту
 
-## Поточна готовність — 2026-11-14
+## Інтеграція планування #7 — 2026-11-14
+
+Код #3–#6 присутній у `nazar-jobs` від спільної бази контрактів
+`ebefa04d9907e5c3819bd23757e032c4e565f6ff`; перевірено межі змін кожного lane.
+#7 підключає паспорти полів, перевірки культур, приватний CPU runtime OSPy,
+спільний вибір планів і web workspace. Міграції 0011/0012 об'єднано через 0013;
+активний head — 0014 із версійованими входами й durable delivery.
+
+**Технічний сценарний пілот перевірено. Незалежна точність урожайності й маржі
+не підтверджена.** Наукові критерії #4 і відповідна частина #7 залишаються
+відкритими: новий empirical manifest порожній, попередні негативні release gates
+збережено. OSPy abstains для змішаних сівозмін; перелік підтримуваних культур
+не є доказом регіональної точності. [Межі runtime](planning/runtime.md),
+[аудит файлів і потрібні дані](planning/data-audit.md).
+
+| Перевірка цього checkpoint | Фактичний результат |
+| --- | --- |
+| API fast | 491 tests; включно з admission, outbox, lease recovery, fencing, календарями та узгодженням часу погодного issue |
+| PostgreSQL/Redis | 22 integration tests, без пропусків; реальні конкурентні транзакції та відновлення доставки |
+| Web | 89 unit tests; TypeScript; production Docker build |
+| UI lane D | 111 browser tests: desktop/mobile/phone preview, G01–G24 та помилки/підтвердження |
+| Crop package B | 53 tests; frozen CPU benchmark відтворено; метрики точності залишаються null |
+| Контракти | Generated export, JSON shapes/invalid payloads, TypeScript boundaries; frozen файли не змінено |
+| Docker | API, web і crop-model зібрано з окремими tags; default/agent/crop-model Compose config перевірено |
+| Наскрізний реальний runtime | Team session + CSRF → 2 поля × 3 сезони → реальний OSPy → альтернативи/докази → підтвердження → replan; desktop/mobile без JS errors |
+| Перезапуск і restore | Збережений план переживає restart; PostgreSQL dump відновлено в нову БД; downgrade до 0010 та upgrade до 0014 зберігають baseline fields |
+| Відмова сервісу | Після зупинки приватної моделі API повертає unavailable без підставних результатів |
+| Попередній ML package | 52 tests passed; історичні empirical evaluations заново не запускалися |
+| Приватний асистент | 572 passed; 64 skipped через відсутній локальний knowledge index/optional embeddings у цьому worktree; цей компонент не змінювався |
+
+Наскрізні входи **явно синтетичні**. Початковий двопольовий розрахунок на
+ізольованому CPU стенді тривав 34,45 с; це одиничний acceptance run, не SLA.
+Вхідний SHA-256:
+`c82fc5f5e47418c779cc3bbd8bd01e03cde87287ccd18d21ef664b65944f1b6d`.
+Повторити перевірку: `python3 infra/verify-planning.py`; вона створює власні
+порти, credentials, volumes, образи й бази та прибирає свій стенд.
+
+Чесні виправлення інтеграції: timestamp оцінки моделі звіряється з погодним
+issue, а не часом натискання кнопки; після apply підтверджені commitments
+оновлюються без втрати поточного звіту й передаються в replan. Таймаут
+розрахунку має окрему причину. Синтетичний повний сценарій має явний бюджет
+120 с замість 30 с короткого wire example; обмеження production і негативні
+тести не послаблено.
+
+Платні provider calls, GPU training, deployment і зміни `main` не виконувались.
+Робочий користувацький Docker-стек не перезапускався. ClickHouse не додано:
+операційний стан лишається у PostgreSQL, offline observations — окремими
+версійованими файлами. Нові сирі дані та погодні архіви потрібно надати або
+отримати з перевірених джерел для наукового acceptance.
+
+## Попередній базовий зріз — 2026-11-14
 
 У репозиторії є повний склад застосунку: API, web, приватний асистент і widget, ML-пакет, усі десять міграцій БД, тести, ресурси, Compose, резервне копіювання та CI/release workflows. Локальний Docker-стек з agent profile запущений і доступний на http://localhost:8080. Готовність компонентів і результати перевірок наведені нижче.
 
