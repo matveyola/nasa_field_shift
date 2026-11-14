@@ -116,14 +116,14 @@ export function RotationsPage({ field, fields, context: { field_id, season, scen
         </button>}
         <fieldset className="rotation-context-options" disabled={saving}>
           <ScenarioSelect value={scenario} onChange={chooseScenario} />
-          <span className="rotation-irrigation">{irrigationAvailable ? t('No irrigation applied') : t('No irrigation')}</span>
+          <span className="rotation-irrigation">{irrigationAvailable ? t('Irrigation available') : t('No irrigation')}</span>
         </fieldset>
       </FieldWorkspaceBar>
       <div className="rotations-workspace">
         {fieldSetup.error && <ErrorBox message={fieldSetup.error} retry={fieldSetup.reload} />}
         {fieldSetup.data?.demo_plan && <OnboardingPlan setup={fieldSetup.data} />}
         {!fieldSetup.pending && <RotationTools fold={Boolean(fieldSetup.data?.demo_plan)}>
-        <FarmRotationPlanner season={season} onApplied={rotations.reload} />
+        <FarmRotationPlanner fieldId={field_id} season={season} onApplied={rotations.reload} />
         {create.error && <ErrorBox message={create.error} />}
         {jobId && <JobStatus job={current.job} error={current.error} />}
         {rotations.pending && <Loading text={t('Loading rotation plans…')} />}

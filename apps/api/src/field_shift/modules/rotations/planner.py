@@ -113,8 +113,16 @@ def optimize(
                     ),
                 )
             )
+        eligible = [
+            crop
+            for crop in crop_names
+            if field.allowed_crops is None or crop in field.allowed_crops
+        ]
         choices = [
-            [locks[field.id, year]] if (field.id, year) in locks else crop_names for year in years
+            [crop for crop in eligible if crop == locks[field.id, year]]
+            if (field.id, year) in locks
+            else eligible
+            for year in years
         ]
         sequences = [
             (field.area_ha * sum(rules[crop].preference for crop in sequence), sequence)
@@ -130,8 +138,8 @@ def optimize(
                     code="no_field_sequence",
                     field_id=field.id,
                     message=(
-                        "No crop sequence fits this field's history, locks, "
-                        "return intervals and area limits."
+                        "No crop sequence fits this field's allowed crops, history, "
+                        "locks, return intervals and area limits."
                     ),
                 )
             )
@@ -239,6 +247,8 @@ def optimize(
     for field in sorted(fields, key=lambda item: item.id):
         for year, crop in zip(years, best[field.id], strict=True):
             reasons = ["Respects configured return interval", "Within farm area limits"]
+            if field.allowed_crops is not None:
+                reasons.append("Allowed by the field setup")
             if (field.id, year) in locks:
                 reasons.append("Locked by farmer")
             if request.avoid_consecutive_family:

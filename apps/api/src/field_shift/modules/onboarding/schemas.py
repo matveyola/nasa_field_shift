@@ -4,7 +4,7 @@ from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_vali
 
 from field_shift.modules.fields.geometry import area_hectares
 from field_shift.modules.fields.schemas import MAX_AREA_HA, FieldRead, Polygon, Season
-from field_shift.modules.rotations.planning_schemas import Crop, PlannerSeason
+from field_shift.modules.rotations.planning_schemas import Crop, PlannerSeason, PlanningPriority
 
 
 class CropHistory(BaseModel):
@@ -32,7 +32,7 @@ class SetupInputs(BaseModel):
     history: Annotated[list[CropHistory], Field(max_length=8)] | None = None
     allowed_crops: Annotated[list[Crop], Field(max_length=7)] | None = None
     irrigation: bool | None = None
-    priority: Literal["water", "soil", "low_change"] | None = None
+    priority: PlanningPriority | None = None
     start_season: PlannerSeason | None = None
 
     @model_validator(mode="after")

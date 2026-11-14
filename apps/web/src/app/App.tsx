@@ -160,6 +160,7 @@ export function App() {
   else if (farm) {
     const season = farm.season
     const context = field ? { field_id: field.id, season, scenario } : undefined
+    const irrigationAvailable = field?.irrigation_available ?? farm.defaults.irrigation_available
     if (route.setupId && canEdit) content = (
       <Suspense fallback={<Loading />}>
         <FieldOnboarding key={route.setupId} id={route.setupId} fields={fields} season={season}
@@ -191,7 +192,7 @@ export function App() {
     </Empty>
     else if (route.page === 'water') content = (
       <WaterPage key={season} fields={fields} field={field} context={context} jobId={route.jobId} forecastDay={route.forecastDay}
-        irrigationAvailable={farm.defaults.irrigation_available}
+        irrigationAvailable={irrigationAvailable}
         openFields={() => { go('fields'); window.scrollTo(0, 0) }}
         chooseField={chooseField} chooseScenario={chooseScenario}
         showJob={showWaterJob} openAgent={(jobId) => go('agent', { jobId })} />
@@ -199,7 +200,7 @@ export function App() {
     else if (route.page === 'rotations') content = (
       <RotationsPage key={field.id + ':' + scenario} field={field} fields={fields} context={context}
         chooseField={chooseField} openFields={() => { go('fields'); window.scrollTo(0, 0) }}
-        irrigationAvailable={farm.defaults.irrigation_available} chooseScenario={chooseScenario} openWater={() => go('water')}
+        irrigationAvailable={irrigationAvailable} chooseScenario={chooseScenario} openWater={() => go('water')}
         onAddField={canEdit ? startSetup : undefined} />
     )
   }
