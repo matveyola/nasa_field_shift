@@ -1,6 +1,5 @@
 import gzip
 import json
-import os
 import unittest
 from datetime import date
 from pathlib import Path
@@ -8,12 +7,11 @@ from pathlib import Path
 from field_shift.modules.rotations.climate_balance import (
     ClimateBalanceError,
     compare_candidates,
+    engine_directory,
     required_weather_dates,
 )
 
-
 EXAMPLES = Path(__file__).resolve().parents[1] / "examples"
-RUSLAN_DIR = os.environ.get("FIELDSHIFT_RUSLAN_DIR")
 
 
 class ClimateBalanceDatesTests(unittest.TestCase):
@@ -31,7 +29,6 @@ class ClimateBalanceDatesTests(unittest.TestCase):
             required_weather_dates("2040-10-01")
 
 
-@unittest.skipUnless(RUSLAN_DIR, "Set FIELDSHIFT_RUSLAN_DIR to test the external engine")
 class ClimateBalanceIntegrationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -49,7 +46,7 @@ class ClimateBalanceIntegrationTests(unittest.TestCase):
             "latitude": example["field"]["latitude"], "longitude": example["field"]["longitude"],
             "soil_source": example["waterlogging_soil"]["source"], "soil_layers": layers,
             "historical_weather": json.loads((climate_dir / "calendar-weather.json").read_text()),
-            "climate_weather": climate, "ruslan_dir": RUSLAN_DIR,
+            "climate_weather": climate, "ruslan_dir": engine_directory(),
         }
 
     def test_alternatives_share_prior_crop_and_opening_state(self):

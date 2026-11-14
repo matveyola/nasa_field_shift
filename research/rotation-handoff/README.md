@@ -13,7 +13,7 @@ git merge --ff-only origin/research/rotation-handoff
 cd research/rotation-handoff
 ```
 
-Якщо працюєте з ZIP, відкрийте папку, де лежить `app.py`. Для локальної перевірки використовуйте Python 3.12. Перше встановлення залежностей потребує інтернету. Каталог і тестові приклади запускаються без бази даних, Redis і ключів погодних сервісів. Розрахунок прогнозу на довільну дату або координати може завантажувати дані зовні.
+Працюйте з папки, де лежить `app.py`. Для локальної перевірки використовуйте Python 3.12. Перше встановлення залежностей потребує інтернету. [Код водного балансу Руслана](vendor/ruslan/README.md) уже є в гілці й підключається автоматично. Каталог і тестові приклади запускаються без бази даних, Redis і ключів погодних сервісів. Розрахунок прогнозу на довільну дату або координати може завантажувати дані зовні.
 
 ## Інтеграція в застосунок
 
@@ -52,21 +52,21 @@ py -3 -m venv .venv
 ## Перевірка каталогу і Sutherland 50/50
 
 - Відкрийте [каталог гібридів і сортів](http://127.0.0.1:8081/api/rotations/cultivar-references). Очікується **20 записів**. За [фільтром сої для Айови](http://127.0.0.1:8081/api/rotations/cultivar-references?crop_id=soybeans&region_code=US-IA) має бути **5 записів із Sutherland**.
-- Для розрахунку через API задайте `FIELDSHIFT_RUSLAN_DIR` перед запуском сервера. Шлях має вести до `research/fieldshift_tasks`, де лежить `fstasks/balance.py`. Приклад налаштування для macOS, Linux і Windows є в [інструкції кліматичного API](CLIMATE_API.md#запуск). Потім викличте маршрут у [Swagger](http://127.0.0.1:8081/docs) або в другому терміналі.
+- Викличте маршрут у [Swagger](http://127.0.0.1:8081/docs) або в другому терміналі. Для запуску з цієї гілки достатньо стандартних команд вище. Якщо раніше задавали `FIELDSHIFT_RUSLAN_DIR`, приберіть цю змінну, щоб перейти на вбудовану копію.
 
 ```bash
 curl -fsS -X POST http://127.0.0.1:8081/api/rotations/scenarios/sutherland-2027
 ```
 
-У відповіді обидві ваги в `ensemble` мають бути `0.5`. Очікуваний порядок — `wheat_spring, maize_grain, sunflower, soybeans`. Без налаштованого коду Руслана маршрут повертає HTTP `503`.
+У відповіді обидві ваги в `ensemble` мають бути `0.5`. Очікуваний порядок — `wheat_spring, maize_grain, sunflower, soybeans`. Якщо файли рушія відсутні або шлях у `FIELDSHIFT_RUSLAN_DIR` неправильний, маршрут повертає HTTP `503`.
 
-Для офлайн-перевірки без запущеного API підставте той самий шлях у `--ruslan-dir`. Орієнтир версії — коміт `468a03d`. [Гілка Руслана](https://github.com/matveyola/nasa_preparation/tree/research/fieldshift-tasks-1-4)
+Для офлайн-перевірки запустіть скрипт у тій самій папці.
 
 ```bash
-.venv/bin/python replay_sutherland_2026_28.py --ruslan-dir "/шлях/до/nasa_preparation/research/fieldshift_tasks" --nasa-2027 --output sutherland-check.json
+.venv/bin/python replay_sutherland_2026_28.py --nasa-2027 --output sutherland-check.json
 ```
 
-На Windows використайте `./.venv/Scripts/python.exe` замість `.venv/bin/python` і свій шлях до коду Руслана. У `sutherland-check.json` обидві ваги в `ensemble` мають бути `0.5`. Очікуваний порядок у терміналі — `wheat_spring, maize_grain, sunflower, soybeans`.
+На Windows використайте `./.venv/Scripts/python.exe` замість `.venv/bin/python`. У `sutherland-check.json` мають бути ті самі ваги й порядок, що у відповіді API.
 
 ## Перевірка з другого термінала
 

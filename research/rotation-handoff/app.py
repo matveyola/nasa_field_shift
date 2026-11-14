@@ -1,6 +1,5 @@
 from datetime import UTC, datetime
 from logging import getLogger
-from os import environ
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -183,13 +182,10 @@ def compare_climate_rotations(request: climate_planner.ClimatePlansRequest) -> d
 )
 def calculate_sutherland_2027() -> Sutherland2027Result:
     """Recalculate the Sutherland 2027 scenario at fixed historical/NASA weights of 50/50."""
-    if not climate_planner.model_is_configured():
-        raise HTTPException(
-            status_code=503,
-            detail="Configure FIELDSHIFT_RUSLAN_DIR to a directory containing fstasks/balance.py.",
-        )
     try:
-        return run_sutherland_2027(environ[climate_planner.MODEL_ENV])
+        return run_sutherland_2027(climate_planner.require_engine_directory())
+    except climate_planner.ClimateModelUnavailable as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error
     except (OSError, EOFError, ValueError, KeyError, ClimateReferenceError) as error:
         logger.exception("Sutherland 2027 scenario could not run")
         raise HTTPException(

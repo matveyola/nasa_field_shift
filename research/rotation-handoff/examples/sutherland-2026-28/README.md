@@ -8,11 +8,10 @@
 
 ```bash
 python replay_sutherland_2026_28.py \
-  --ruslan-dir /path/to/nasa_preparation/research/fieldshift_tasks \
   --output sutherland-result.json
 ```
 
-У директорії `--ruslan-dir` має бути `fstasks/balance.py`. Поле `engine_file_sha256` у результаті дає змогу звірити версію п’яти файлів рушія, використаних для прикладу. Погодні ряди, параметри поля, довідник культур і температурний довідник для цього поля входять до архіву.
+Скрипт підключає [код Руслана з пакета](../../vendor/ruslan/README.md). Щоб звірити іншу копію, передайте її шлях через `--ruslan-dir`. Поле `engine_file_sha256` у результаті дає змогу звірити версію п’яти файлів рушія. Погодні ряди, параметри поля, довідник культур і температурний довідник теж є в пакеті.
 
 ## Які вхідні дані використовуються
 
@@ -43,7 +42,6 @@ python replay_sutherland_2026_28.py \
 
 ```bash
 python replay_sutherland_2026_28.py \
-  --ruslan-dir /path/to/nasa_preparation/research/fieldshift_tasks \
   --nasa-2027
 ```
 

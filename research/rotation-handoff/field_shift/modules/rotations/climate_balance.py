@@ -8,7 +8,9 @@ import sys
 from collections import defaultdict
 from contextlib import contextmanager
 from datetime import date, timedelta
+from itertools import pairwise
 from math import floor, fsum, isfinite
+from os import environ
 from pathlib import Path
 from statistics import mean
 from threading import Lock
@@ -40,6 +42,14 @@ SUPPORTED_CROPS = tuple(THERMAL_PARAMETERS)
 _ENGINE_LOCK = Lock()
 _ENGINE_PACKAGE = "fstasks"
 _ENGINE_MODULES = ("balance", "crops", "meteo", "soil", "weather")
+BUNDLED_ENGINE_DIR = Path(__file__).resolve().parents[3] / "vendor/ruslan"
+MODEL_ENV = "FIELDSHIFT_RUSLAN_DIR"
+
+
+def engine_directory() -> Path:
+    """Use the pinned copy unless an explicit engine directory is configured."""
+    override = environ.get(MODEL_ENV)
+    return Path(override).expanduser() if override else BUNDLED_ENGINE_DIR
 
 
 def _as_date(value):
@@ -75,7 +85,7 @@ def required_weather_dates(planting_date, selected=()):
     dates = [_as_date(row.get("planting_date")) for row in selected] + [_as_date(planting_date)]
     if any(not (3 <= day.month <= 7) for day in dates):
         raise ClimateBalanceError("This mode supports March through July sowing.")
-    if any(later.year <= earlier.year for earlier, later in zip(dates, dates[1:])):
+    if any(later.year <= earlier.year for earlier, later in pairwise(dates)):
         raise ClimateBalanceError("Use one sowing per year, in ascending order.")
     if dates[-1].year - dates[0].year > 4:
         raise ClimateBalanceError("The three farm decisions can span up to five calendar years.")

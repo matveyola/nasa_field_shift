@@ -4,15 +4,13 @@
 
 ## Запуск
 
-Розпакуйте пакет і встановіть залежності за [інструкцією запуску](README.md). Для кліматичних маршрутів також потрібен код Руслана з гілки `research/fieldshift-tasks-1-4`, коміт `468a03d`. `FIELDSHIFT_RUSLAN_DIR` має вказувати на папку `research/fieldshift_tasks`, де лежить `fstasks/balance.py`. [Гілка Руслана на GitHub](https://github.com/matveyola/nasa_preparation/tree/research/fieldshift-tasks-1-4)
+Встановіть залежності за [інструкцією запуску](README.md). За замовчуванням кліматичні маршрути використовують [код Руслана з пакета](vendor/ruslan/README.md). Для перевірки іншої версії можна задати `FIELDSHIFT_RUSLAN_DIR` на папку, де лежить `fstasks/balance.py`, і перезапустити сервер.
 
 ```bash
-export FIELDSHIFT_RUSLAN_DIR='/абсолютний/шлях/research/fieldshift_tasks'
 .venv/bin/python -m uvicorn app:app --host 127.0.0.1 --port 8081
 ```
 
 ```powershell
-$env:FIELDSHIFT_RUSLAN_DIR = 'C:\шлях\research\fieldshift_tasks'
 .\.venv\Scripts\python.exe -m uvicorn app:app --host 127.0.0.1 --port 8081
 ```
 

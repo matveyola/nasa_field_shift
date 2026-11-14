@@ -59,7 +59,6 @@ curl -sS --fail http://127.0.0.1:8081/api/rotations/compare-water-balances \
 
 ```bash
 python replay_marsden_climate.py \
-  --ruslan-dir '/шлях/до/nasa_preparation/research/fieldshift_tasks' \
   --weather examples/climate/climate-weather.json.gz \
   --calendar-weather examples/climate/calendar-weather.json \
   --output comparison-local.json \

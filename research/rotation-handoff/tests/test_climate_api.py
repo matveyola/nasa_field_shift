@@ -2,13 +2,12 @@ import asyncio
 import json
 import os
 from pathlib import Path
-from unittest import TestCase, skipUnless
+from unittest import TestCase
 from unittest.mock import patch
 
 from app import app
 
 EXAMPLES = Path(__file__).resolve().parents[1] / "examples/climate/api"
-CONFIGURED = os.getenv("FIELDSHIFT_RUSLAN_DIR")
 SUTHERLAND_2027_ROUTE = "/api/rotations/scenarios/sutherland-2027"
 
 
@@ -53,6 +52,8 @@ class ClimateAPITests(TestCase):
         self.assertIn("sutherland_nw", {field["id"] for field in catalog["fields"]})
         self.call("step", example("sutherland-step-1") | {"planting_date": "2050-05-01"}, status=422)
         with patch.dict(os.environ, {"FIELDSHIFT_RUSLAN_DIR": ""}):
+            self.assertTrue(self.call("catalog")["model_configured"])
+        with patch.dict(os.environ, {"FIELDSHIFT_RUSLAN_DIR": str(EXAMPLES / "missing-engine")}):
             self.call("step", example("sutherland-step-1"), status=503)
 
     def test_cultivar_references_use_trial_region(self):
@@ -74,12 +75,11 @@ class ClimateAPITests(TestCase):
         self.assertTrue(all(row["kind"] == "hybrid" for row in rows))
 
     def test_sutherland_2027_requires_configured_engine(self):
-        with patch.dict(os.environ, {"FIELDSHIFT_RUSLAN_DIR": ""}):
+        with patch.dict(os.environ, {"FIELDSHIFT_RUSLAN_DIR": str(EXAMPLES / "missing-engine")}):
             status, response = asyncio.run(request(SUTHERLAND_2027_ROUTE, {}))
         self.assertEqual(status, 503)
         self.assertIn("FIELDSHIFT_RUSLAN_DIR", response["detail"])
 
-    @skipUnless(CONFIGURED, "Ruslan balance directory is not configured")
     def test_sutherland_2027_replays_bundled_inputs(self):
         fixture = EXAMPLES.parents[1] / "sutherland-2026-28/result-nasa-2027.json"
         expected = json.loads(fixture.read_text(encoding="utf-8"))
@@ -91,7 +91,6 @@ class ClimateAPITests(TestCase):
         self.assertEqual(status, 200, result)
         self.assertEqual(result, expected)
 
-    @skipUnless(CONFIGURED, "Ruslan balance directory is not configured")
     def test_three_seasons_and_paired_rotations(self):
         responses = []
         for number in (1, 2, 3):
@@ -109,7 +108,6 @@ class ClimateAPITests(TestCase):
             alternative = next(row for row in responses[idx]["candidates"] if row["crop_id"] == selected)
             self.assertEqual(alternative["scenarios"], plan["seasons"][idx]["scenarios"])
 
-    @skipUnless(CONFIGURED, "Ruslan balance directory is not configured")
     def test_revenue_ranking_and_below_return_interval(self):
         payload = example("marsden-revenue")
         result = self.call("step", payload)
@@ -149,7 +147,6 @@ class ClimateAPITests(TestCase):
         self.assertNotIn("sunflower", repeated["ranking"]["selection_ids"])
         self.assertTrue(all(row["fallow_days_before_planting"] > 0 for row in sunflower["scenarios"].values()))
 
-    @skipUnless(CONFIGURED, "Ruslan balance directory is not configured")
     def test_coordinates_with_supplied_profile(self):
         payload = example("sutherland-step-1")
         payload.pop("field_id")
@@ -161,7 +158,6 @@ class ClimateAPITests(TestCase):
         self.assertIsNone(result["field"]["id"])
         self.assertEqual(result["available_water_capacity_mm"], 150)
 
-    @skipUnless(CONFIGURED, "Ruslan balance directory is not configured")
     def test_named_hybrid_calendar_options_are_distinct(self):
         payload = example("marsden-revenue")
         candidates = [

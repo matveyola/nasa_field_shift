@@ -107,7 +107,7 @@ class Sutherland2027Result(BaseModel):
     ranking_by_water_shortfall: SutherlandRanking
 
 
-def run_sutherland_2027(engine_dir: str) -> Sutherland2027Result:
+def run_sutherland_2027(engine_dir: Path) -> Sutherland2027Result:
     """Recalculate the bundled scenario using the same engine lock as climate requests."""
     with balance._ENGINE_LOCK:
         result = replay(
@@ -397,7 +397,10 @@ def replay(engine_dir, weather_path, *, nasa_path=None, nasa_weight=DEFAULT_NASA
 
 def main():
     parser = ArgumentParser(description=__doc__)
-    parser.add_argument("--ruslan-dir", required=True, type=Path, help="Directory containing Ruslan's fstasks package")
+    parser.add_argument(
+        "--ruslan-dir", type=Path, default=balance.engine_directory(),
+        help="Override the bundled Ruslan engine directory",
+    )
     parser.add_argument("--weather", type=Path, default=EXAMPLE / "weather.json.gz")
     parser.add_argument("--nasa-2027", action="store_true", help="Compare the 2027 historical and NASA scenarios")
     parser.add_argument(

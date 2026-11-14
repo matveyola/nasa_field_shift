@@ -4,7 +4,6 @@ import json
 from dataclasses import dataclass
 from datetime import date
 from math import fsum
-from os import environ
 from pathlib import Path
 from statistics import median
 from typing import Annotated, Literal
@@ -53,7 +52,6 @@ from field_shift.modules.rotations.soil_indicators import (
 
 PACKAGE = Path(__file__).resolve().parents[3]
 IOWA_BUILTIN_FIELDS = frozenset({"marsden_demo", "sutherland_nw", "crawfordsville_se"})
-MODEL_ENV = "FIELDSHIFT_RUSLAN_DIR"
 CLIMATE_PRIORITIES = (
     "water_deficit", "drought_stress", "water_stress", "water_saving", "yield", "revenue", "revenue_after_seed", "soil_cover",
 )
@@ -71,8 +69,16 @@ class ClimateModelUnavailable(RuntimeError):
 
 
 def model_is_configured() -> bool:
-    raw_path = environ.get(MODEL_ENV)
-    return bool(raw_path and (Path(raw_path).expanduser() / "fstasks/balance.py").is_file())
+    return (climate_balance.engine_directory() / "fstasks/balance.py").is_file()
+
+
+def require_engine_directory() -> Path:
+    directory = climate_balance.engine_directory()
+    if not (directory / "fstasks/balance.py").is_file():
+        raise ClimateModelUnavailable(
+            f"Ruslan engine unavailable. Check the bundled files or {climate_balance.MODEL_ENV}."
+        )
+    return directory
 
 
 class Input(BaseModel):
@@ -304,9 +310,7 @@ class FieldInputs:
 
 def resolve_inputs(request: ClimateContext, planting_date: date, selected) -> FieldInputs:
     start, end = climate_balance.required_weather_dates(planting_date, [s.engine_input() for s in selected])
-    raw_path = environ.get(MODEL_ENV)
-    if not model_is_configured():
-        raise ClimateModelUnavailable(f"Set {MODEL_ENV} to Ruslan's research/fieldshift_tasks folder.")
+    ruslan_dir = require_engine_directory()
     config = load_fields().get(request.field_id) if request.field_id else None
     if request.field_id and config is None:
         raise UnknownClimateField("Unknown field_id. Check the climate catalog.")
@@ -340,7 +344,7 @@ def resolve_inputs(request: ClimateContext, planting_date: date, selected) -> Fi
     }
     calendar = load_thermal_reference(latitude, longitude)
     weather = climate_weather.load_climate_weather(latitude, longitude, start, end, request.models, request.scenarios)
-    return FieldInputs(details, layers, soil_source, calendar, weather, Path(raw_path).expanduser())
+    return FieldInputs(details, layers, soil_source, calendar, weather, ruslan_dir)
 
 
 def run_balance(inputs, planting_date, selected, candidates):

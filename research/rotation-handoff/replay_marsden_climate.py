@@ -15,13 +15,13 @@ from math import isfinite, log
 from pathlib import Path
 from statistics import mean, median
 
+from field_shift.modules.rotations.climate_balance import engine_directory
 from field_shift.modules.rotations.supplied_balance import (
     BalanceDay,
     CompareSuppliedBalance,
     compare,
     summarize_days,
 )
-
 
 HERE = Path(__file__).resolve().parent
 SOIL_EXAMPLE = HERE / "examples/marsden-ssurgo-water-stress.json"
@@ -434,7 +434,10 @@ def run(args, balance, crops, meteo, soil, weather):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--ruslan-dir", type=Path, required=True, help="Directory containing Ruslan's fstasks package.")
+    parser.add_argument(
+        "--ruslan-dir", type=Path, default=engine_directory(),
+        help="Override the bundled Ruslan engine directory.",
+    )
     parser.add_argument("--weather", type=Path, required=True, help="Normalized NASA NEX-GDDP-CMIP6 weather JSON.")
     parser.add_argument("--calendar-weather", type=Path, required=True, help="Compact historical Marsden NASA POWER daily JSON.")
     parser.add_argument("--output", type=Path, required=True)
