@@ -136,11 +136,11 @@ seven-package wheel acceptance and combined integration checks belong to the
 parent's final frozen-tree verification. No accuracy gate passed here, no live
 provider calls occurred, and no model was published or promoted.
 
-The repository packaging guard currently reports two inherited path overrides in
+At the original leaf checkpoint the repository packaging guard reported two inherited path overrides in
 `packages/field-shift-ml/tests/test_accuracy_benchmark.py` and
 `test_audit_public_crop_data.py`, introduced by the prerequisite accuracy branch.
 They are outside this lane's ownership and were reported to the parent for repair;
-this checkpoint does not claim that repository-wide guard passed.
+that leaf checkpoint did not claim a repository-wide pass. The parent subsequently removed both overrides in 9ab2f8 and verified the installed artifact path correction in 8374ee9; the combined guard and clean-wheel suites pass at d07f5ca.
 
 ### Depth metadata correction
 

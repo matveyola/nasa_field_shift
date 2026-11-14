@@ -90,3 +90,5 @@ pinned profile. These are generic baseline additions, not locally validated hybr
 The separate `ruslan` extra is experimental historical moisture reconstruction;
 default crop-model serving does not load it. Development tests require LightGBM
 through the locked dev group; production default installation remains unchanged.
+
+Current executed results and scope: [global model results](../../docs/planning/global-model-results.md).
