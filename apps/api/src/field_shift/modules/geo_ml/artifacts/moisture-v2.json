@@ -1,0 +1,1007 @@
+{
+  "artifact_schema": 2,
+  "coverage": {
+    "bounds": [
+      36.0,
+      -102.0,
+      50.0,
+      -80.0
+    ],
+    "max_station_distance_km": 180.0,
+    "station_locations": [
+      [
+        36.78773,
+        -89.93937
+      ],
+      [
+        36.99024,
+        -91.30943
+      ],
+      [
+        36.9973,
+        -92.2594
+      ],
+      [
+        37.073,
+        -93.88158
+      ],
+      [
+        37.1313,
+        -97.0859
+      ],
+      [
+        37.18167,
+        -91.11778
+      ],
+      [
+        37.50147,
+        -91.25926
+      ],
+      [
+        37.63,
+        -91.72
+      ],
+      [
+        38.47902,
+        -90.80641
+      ],
+      [
+        38.868,
+        -94.03564
+      ],
+      [
+        38.88,
+        -86.57
+      ],
+      [
+        39.05141,
+        -95.19128
+      ],
+      [
+        39.1,
+        -96.6
+      ],
+      [
+        39.15321,
+        -90.78279
+      ],
+      [
+        39.51311,
+        -91.51401
+      ],
+      [
+        39.70045,
+        -96.1629
+      ],
+      [
+        39.78638,
+        -99.32953
+      ],
+      [
+        40.05,
+        -88.37
+      ],
+      [
+        40.2473,
+        -93.71605
+      ],
+      [
+        40.31314,
+        -89.90187
+      ],
+      [
+        40.37092,
+        -101.72007
+      ],
+      [
+        41.55,
+        -93.28
+      ],
+      [
+        41.84,
+        -88.85
+      ],
+      [
+        45.41519,
+        -93.94786
+      ],
+      [
+        45.47351,
+        -88.58584
+      ],
+      [
+        47.71593,
+        -96.26823
+      ],
+      [
+        48.3,
+        -95.87
+      ]
+    ],
+    "validated_months": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ]
+  },
+  "feature_names": [
+    "surface_moisture",
+    "subsurface_moisture",
+    "deep_moisture",
+    "surface_mean_3d",
+    "surface_mean_7d",
+    "shallow_soil_temperature",
+    "air_temperature",
+    "season_sin",
+    "season_cos",
+    "sand",
+    "silt",
+    "clay",
+    "organic_matter",
+    "bulk_density",
+    "field_capacity",
+    "wilting_point",
+    "sand_missing",
+    "silt_missing",
+    "clay_missing",
+    "organic_matter_missing",
+    "bulk_density_missing",
+    "field_capacity_missing",
+    "wilting_point_missing",
+    "surface_by_clay",
+    "surface_by_sand",
+    "surface_by_field_capacity"
+  ],
+  "fit": {
+    "coefficients": [
+      -0.6890652897896632,
+      0.24393781472665502,
+      0.01584616615107613,
+      -0.12041379475711436,
+      -0.02511583135524434,
+      -0.0046800402179566145,
+      0.0014064109890955555,
+      0.00548952703564781,
+      -0.030434526382849478,
+      0.00044500977252064084,
+      -0.0008857120625430589,
+      0.0009854029437362175,
+      0.008725643867232147,
+      0.07446508031871212,
+      0.4760450752837925,
+      -0.032430177488133594,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.005408015141368742,
+      -0.0037401862928017524,
+      0.7513052896571261
+    ],
+    "intercept": -0.14387201097351754,
+    "kind": "linear"
+  },
+  "interval_half_width": 0.11935416063393497,
+  "interval_level": 0.9,
+  "promoted": false,
+  "soil_medians": [
+    11.0,
+    67.0,
+    19.0,
+    2.0,
+    1.35,
+    0.27699999999999997,
+    0.12300000000000001
+  ],
+  "validation": {
+    "blocked_cv_baseline_normalized_mae_rmse": {
+      "boosted": 0.6439590394038965,
+      "boosted_half": 0.7457859895978465,
+      "ridge": 0.6206677870496712,
+      "ridge_half": 0.727056575376037
+    },
+    "candidate": "ridge",
+    "evaluation_year": 2025,
+    "fit_end": "2024-12-31",
+    "independent_farms": {
+      "farms": {
+        "IFC:CCO02": {
+          "days": 261,
+          "era5_land": {
+            "bias": 0.012574678160919539,
+            "mae": 0.04403473180076629,
+            "rmse": 0.0597427047069764
+          },
+          "group_count": 1,
+          "interval_coverage": 0.9386973180076629,
+          "model": {
+            "bias": -0.00127435961546043,
+            "mae": 0.04731890819070423,
+            "rmse": 0.062261099247118604
+          },
+          "site_count": 1,
+          "v1": {
+            "bias": -0.05658218569998227,
+            "mae": 0.07139202962720245,
+            "rmse": 0.08499683696627627
+          }
+        },
+        "IFC:HS0002": {
+          "days": 263,
+          "era5_land": {
+            "bias": -0.027764186311787075,
+            "mae": 0.057455045627376425,
+            "rmse": 0.07103021893947219
+          },
+          "group_count": 1,
+          "interval_coverage": 0.9429657794676806,
+          "model": {
+            "bias": -0.016594303779031035,
+            "mae": 0.05172801121201039,
+            "rmse": 0.06453275110830001
+          },
+          "site_count": 1,
+          "v1": {
+            "bias": -0.09533704876026075,
+            "mae": 0.09641476204434736,
+            "rmse": 0.11577708784003815
+          }
+        },
+        "IFC:HS0011": {
+          "days": 262,
+          "era5_land": {
+            "bias": 0.026479503816793894,
+            "mae": 0.04282360305343512,
+            "rmse": 0.055826412219055495
+          },
+          "group_count": 1,
+          "interval_coverage": 0.8625954198473282,
+          "model": {
+            "bias": 0.03971958202242314,
+            "mae": 0.0521870262452874,
+            "rmse": 0.06898524288972653
+          },
+          "site_count": 1,
+          "v1": {
+            "bias": -0.04751063039137113,
+            "mae": 0.06300498142518494,
+            "rmse": 0.07520124589126052
+          }
+        },
+        "IFC:MDDLCDR01": {
+          "days": 258,
+          "era5_land": {
+            "bias": -0.02667403100775194,
+            "mae": 0.06699420930232558,
+            "rmse": 0.07737483644610835
+          },
+          "group_count": 1,
+          "interval_coverage": 0.7906976744186046,
+          "model": {
+            "bias": -0.040863448157062915,
+            "mae": 0.08000471641014216,
+            "rmse": 0.0915402006513089
+          },
+          "site_count": 1,
+          "v1": {
+            "bias": -0.10286319072049874,
+            "mae": 0.11175386873661212,
+            "rmse": 0.1326898047979555
+          }
+        },
+        "IFC:NSHNBTNA04": {
+          "days": 24,
+          "era5_land": {
+            "bias": 0.006789166666666666,
+            "mae": 0.01914675,
+            "rmse": 0.02250159795066416
+          },
+          "group_count": 1,
+          "interval_coverage": 1.0,
+          "model": {
+            "bias": 0.039130028992369,
+            "mae": 0.04119013232173315,
+            "rmse": 0.046034366961476815
+          },
+          "site_count": 1,
+          "v1": {
+            "bias": -0.04615524363403043,
+            "mae": 0.04615524363403043,
+            "rmse": 0.05095807390215369
+          }
+        },
+        "IFC:RACCOON03": {
+          "days": 250,
+          "era5_land": {
+            "bias": 0.004282852,
+            "mae": 0.038151372,
+            "rmse": 0.04938616848175205
+          },
+          "group_count": 1,
+          "interval_coverage": 0.968,
+          "model": {
+            "bias": -0.02767558161492297,
+            "mae": 0.04360867082964357,
+            "rmse": 0.056462843200684544
+          },
+          "site_count": 1,
+          "v1": {
+            "bias": -0.06959279505818339,
+            "mae": 0.0735477837250665,
+            "rmse": 0.0915679826391014
+          }
+        },
+        "IFC:RACCOON04": {
+          "days": 248,
+          "era5_land": {
+            "bias": 0.09061972580645161,
+            "mae": 0.0966989435483871,
+            "rmse": 0.11404903085119476
+          },
+          "group_count": 1,
+          "interval_coverage": 0.8991935483870968,
+          "model": {
+            "bias": 0.019829337092087135,
+            "mae": 0.05992996059111739,
+            "rmse": 0.0728219164346472
+          },
+          "site_count": 1,
+          "v1": {
+            "bias": 0.007363614240756705,
+            "mae": 0.05955603794777266,
+            "rmse": 0.07642241842030303
+          }
+        },
+        "IFC:UPPRIOWA01": {
+          "days": 138,
+          "era5_land": {
+            "bias": 0.03339411594202899,
+            "mae": 0.05090508695652173,
+            "rmse": 0.06933096663797875
+          },
+          "group_count": 1,
+          "interval_coverage": 0.9710144927536232,
+          "model": {
+            "bias": -0.04464083012374226,
+            "mae": 0.06287705497326138,
+            "rmse": 0.07051194701238593
+          },
+          "site_count": 1,
+          "v1": {
+            "bias": -0.06783657303854067,
+            "mae": 0.07888318717516618,
+            "rmse": 0.08801424735456291
+          }
+        }
+      },
+      "frozen_artifact_sha256": "7d9f1f534d308d97d6966d00da967570e2c88305e9db333ee33276b2aad28901",
+      "frozen_version": "fieldshift-vwc-d275752a77c0",
+      "insufficient_pair_counts": {
+        "IFC:NSHNBTNA04": 24
+      },
+      "interval_coverage": 0.9104520332688566,
+      "matched_stations": [
+        {
+          "block": "20:-46",
+          "days": 261,
+          "from": "2025-03-12",
+          "latitude": 41.741627,
+          "location": "CCO02",
+          "longitude": -91.9433,
+          "network": "IFC",
+          "station_id": "IFC:CCO02",
+          "to": "2025-12-28"
+        },
+        {
+          "block": "20:-46",
+          "days": 263,
+          "from": "2025-02-26",
+          "latitude": 41.28859,
+          "location": "HS0002",
+          "longitude": -91.571754,
+          "network": "IFC",
+          "station_id": "IFC:HS0002",
+          "to": "2025-12-28"
+        },
+        {
+          "block": "21:-47",
+          "days": 262,
+          "from": "2025-02-28",
+          "latitude": 42.209293,
+          "location": "HS0011",
+          "longitude": -93.275505,
+          "network": "IFC",
+          "station_id": "IFC:HS0011",
+          "to": "2025-12-28"
+        },
+        {
+          "block": "21:-47",
+          "days": 258,
+          "from": "2025-03-14",
+          "latitude": 42.3088,
+          "location": "MDDLCDR01",
+          "longitude": -92.7717,
+          "network": "IFC",
+          "station_id": "IFC:MDDLCDR01",
+          "to": "2025-12-28"
+        },
+        {
+          "block": "20:-48",
+          "days": 24,
+          "from": "2025-03-13",
+          "latitude": 41.6374,
+          "location": "NSHNBTNA04",
+          "longitude": -95.286,
+          "network": "IFC",
+          "station_id": "IFC:NSHNBTNA04",
+          "to": "2025-04-09"
+        },
+        {
+          "block": "21:-48",
+          "days": 250,
+          "from": "2025-03-14",
+          "latitude": 42.649,
+          "location": "RACCOON03",
+          "longitude": -95.1096,
+          "network": "IFC",
+          "station_id": "IFC:RACCOON03",
+          "to": "2025-12-27"
+        },
+        {
+          "block": "21:-48",
+          "days": 248,
+          "from": "2025-03-04",
+          "latitude": 42.902664,
+          "location": "RACCOON04",
+          "longitude": -94.884415,
+          "network": "IFC",
+          "station_id": "IFC:RACCOON04",
+          "to": "2025-11-26"
+        },
+        {
+          "block": "21:-46",
+          "days": 138,
+          "from": "2025-07-08",
+          "latitude": 43.3279,
+          "location": "UPPRIOWA01",
+          "longitude": -91.9569,
+          "network": "IFC",
+          "station_id": "IFC:UPPRIOWA01",
+          "to": "2025-11-25"
+        }
+      ],
+      "observations_sha256": "7b454419c0bd58b42c266ada1412dc158ce0fe10666033a5d56d209d74952d41",
+      "operational_scope_diagnostic": {
+        "days": 1026,
+        "era5_land": {
+          "bias": -0.003826241353985978,
+          "mae": 0.05323107874160456,
+          "rmse": 0.06690287635496804
+        },
+        "group_count": 4,
+        "interval_coverage": 0.8829314550126108,
+        "model": {
+          "bias": -0.004563378948411535,
+          "mae": 0.05796753017042838,
+          "rmse": 0.07290126131287987
+        },
+        "site_count": 4,
+        "v1": {
+          "bias": -0.07576022690101915,
+          "mae": 0.08578879035895733,
+          "rmse": 0.10513532107987336
+        }
+      },
+      "promotion_checks": {
+        "aggregate_gain": false,
+        "enough_farms": false,
+        "interval_coverage": true,
+        "no_material_farm_degradation": false,
+        "regional_sanity": false,
+        "wins_most_farms": false
+      },
+      "soils_sha256": "860dbf3e2198dc67e46ebcb7be3c07e24cf66483485049b4d7c6148f8dbbce87",
+      "summary": {
+        "days": 1680,
+        "era5_land": {
+          "bias": 0.016130379772379286,
+          "mae": 0.05672328461268745,
+          "rmse": 0.0736506176823769
+        },
+        "group_count": 7,
+        "interval_coverage": 0.9104520332688566,
+        "model": {
+          "bias": -0.010214229167958472,
+          "mae": 0.056807764064595215,
+          "rmse": 0.07034863321232855
+        },
+        "site_count": 7,
+        "v1": {
+          "bias": -0.06176554420401145,
+          "mae": 0.07922180724019318,
+          "rmse": 0.0969994088811899
+        }
+      }
+    },
+    "inputs": {
+      "fitting_observations_sha256": "29212179c9a4b9e85f6b729a7a446a840752aec0cab1009ec42a1ed7e966b573",
+      "fitting_soils_sha256": "4c120fa91a6bae12815f5467299d2030286ec2f8664407f16f3c9eae658d327f",
+      "holdout_manifest_sha256": "d59a6552cb316f22098fc3a5fc27c521b36d5f7ae7558e92abce9cf15be78b37",
+      "v1_artifact_sha256": "0f2267953682365478bc90e3f07651b40c9421a175839385ddb3557be79ff6b5"
+    },
+    "paired_station_days": {
+      "calibration": 6181,
+      "regional": 1209,
+      "train": 26453
+    },
+    "regional": {
+      "days": 1209,
+      "era5_land": {
+        "bias": 0.10818270503823779,
+        "mae": 0.11151903760528759,
+        "rmse": 0.12343641701040287
+      },
+      "group_count": 5,
+      "interval_coverage": 0.6998444386829142,
+      "model": {
+        "bias": 0.06625714715992502,
+        "mae": 0.10494252961506097,
+        "rmse": 0.1431981170544576
+      },
+      "site_count": 5,
+      "v1": {
+        "bias": 0.02996037705697616,
+        "mae": 0.052706654075117064,
+        "rmse": 0.062412612241412466
+      }
+    },
+    "sklearn_version": "1.5.2",
+    "station_splits": {
+      "calibration": [
+        {
+          "block": "21:-49",
+          "days": 959,
+          "from": "2021-03-07",
+          "latitude": 43.73835,
+          "location": "Eros Data Center",
+          "longitude": -96.61455,
+          "network": "SCAN",
+          "station_id": "SCAN:2072:SD:SCAN",
+          "to": "2024-11-24"
+        },
+        {
+          "block": "18:-48",
+          "days": 776,
+          "from": "2021-07-28",
+          "latitude": 37.98721,
+          "location": "Schell-Osage",
+          "longitude": -94.03646,
+          "network": "SCAN",
+          "station_id": "SCAN:2193:MO:SCAN",
+          "to": "2024-09-24"
+        },
+        {
+          "block": "19:-51",
+          "days": 518,
+          "from": "2023-03-12",
+          "latitude": 38.87,
+          "location": "Oakley 19 SSW The Nature Conservancy Kansas (Smoky Valley Ranch)",
+          "longitude": -100.96,
+          "network": "USCRN",
+          "station_id": "USCRN:03067",
+          "to": "2024-12-31"
+        },
+        {
+          "block": "21:-49",
+          "days": 951,
+          "from": "2021-03-09",
+          "latitude": 43.73,
+          "location": "Sioux Falls 14 NNE EROS Data Center",
+          "longitude": -96.62,
+          "network": "USCRN",
+          "station_id": "USCRN:04990",
+          "to": "2024-11-24"
+        },
+        {
+          "block": "18:-48",
+          "days": 1303,
+          "from": "2021-01-07",
+          "latitude": 37.42,
+          "location": "Joplin 24 N Shawnee Trail Conservation Area",
+          "longitude": -94.58,
+          "network": "USCRN",
+          "station_id": "USCRN:23908",
+          "to": "2024-12-31"
+        },
+        {
+          "block": "23:-44",
+          "days": 809,
+          "from": "2021-03-24",
+          "latitude": 46.33,
+          "location": "Chatham 1 SE Michigan State University (Upper Peninsula Experiment Station)",
+          "longitude": -86.92,
+          "network": "USCRN",
+          "station_id": "USCRN:54810",
+          "to": "2024-11-24"
+        },
+        {
+          "block": "22:-50",
+          "days": 865,
+          "from": "2021-03-09",
+          "latitude": 45.71,
+          "location": "Aberdeen 35 WNW The Nature Conservancy (Samuel H. Ordway Prairie, Hdq. Site)",
+          "longitude": -99.12,
+          "network": "USCRN",
+          "station_id": "USCRN:54933",
+          "to": "2024-11-19"
+        }
+      ],
+      "regional": [
+        {
+          "block": "22:-43",
+          "days": 209,
+          "from": "2025-04-14",
+          "latitude": 44.9,
+          "location": "Gaylord 9 SSW National Weather Service, Gaylord",
+          "longitude": -84.72,
+          "network": "USCRN",
+          "station_id": "USCRN:54854",
+          "to": "2025-11-26"
+        },
+        {
+          "block": "20:-41",
+          "days": 261,
+          "from": "2025-03-05",
+          "latitude": 40.76,
+          "location": "Wooster 3 SSE OSU, Ohio Agricultural Research & Development Center (Snyder Farm Site)",
+          "longitude": -81.91,
+          "network": "USCRN",
+          "station_id": "USCRN:54856",
+          "to": "2025-12-29"
+        },
+        {
+          "block": "23:-47",
+          "days": 218,
+          "from": "2025-04-13",
+          "latitude": 46.11,
+          "location": "Sandstone 6 W Audubon Center of  the North Woods",
+          "longitude": -92.99,
+          "network": "USCRN",
+          "station_id": "USCRN:54932",
+          "to": "2025-11-25"
+        },
+        {
+          "block": "21:-51",
+          "days": 266,
+          "from": "2025-03-03",
+          "latitude": 42.06,
+          "location": "Whitman 5 ENE Gudmundsen Sandhills Laboratory (Site 1)",
+          "longitude": -101.44,
+          "network": "USCRN",
+          "station_id": "USCRN:94079",
+          "to": "2025-12-28"
+        },
+        {
+          "block": "22:-51",
+          "days": 255,
+          "from": "2025-03-04",
+          "latitude": 44.01,
+          "location": "Pierre 24 S Fort Pierre National Grassland (Chester West)",
+          "longitude": -100.35,
+          "network": "USCRN",
+          "station_id": "USCRN:94085",
+          "to": "2025-12-27"
+        }
+      ],
+      "train": [
+        {
+          "block": "22:-47",
+          "days": 880,
+          "from": "2021-03-09",
+          "latitude": 45.41519,
+          "location": "Crescent Lake #1",
+          "longitude": -93.94786,
+          "network": "SCAN",
+          "station_id": "SCAN:2002:MN:SCAN",
+          "to": "2024-11-20"
+        },
+        {
+          "block": "22:-45",
+          "days": 737,
+          "from": "2021-03-22",
+          "latitude": 45.47351,
+          "location": "Wabeno #1",
+          "longitude": -88.58584,
+          "network": "SCAN",
+          "station_id": "SCAN:2003:WI:SCAN",
+          "to": "2024-11-20"
+        },
+        {
+          "block": "20:-45",
+          "days": 1187,
+          "from": "2021-02-27",
+          "latitude": 40.31314,
+          "location": "Mason #1",
+          "longitude": -89.90187,
+          "network": "SCAN",
+          "station_id": "SCAN:2004:IL:SCAN",
+          "to": "2024-12-31"
+        },
+        {
+          "block": "20:-47",
+          "days": 1164,
+          "from": "2021-02-28",
+          "latitude": 40.2473,
+          "location": "Spickard",
+          "longitude": -93.71605,
+          "network": "SCAN",
+          "station_id": "SCAN:2047:MO:SCAN",
+          "to": "2024-12-30"
+        },
+        {
+          "block": "18:-45",
+          "days": 1109,
+          "from": "2021-10-06",
+          "latitude": 36.78773,
+          "location": "Dexter",
+          "longitude": -89.93937,
+          "network": "SCAN",
+          "station_id": "SCAN:2048:MO:SCAN",
+          "to": "2024-12-31"
+        },
+        {
+          "block": "23:-49",
+          "days": 514,
+          "from": "2021-03-07",
+          "latitude": 47.71593,
+          "location": "Glacial Ridge",
+          "longitude": -96.26823,
+          "network": "SCAN",
+          "station_id": "SCAN:2050:MN:SCAN",
+          "to": "2024-11-19"
+        },
+        {
+          "block": "18:-47",
+          "days": 743,
+          "from": "2021-07-23",
+          "latitude": 37.073,
+          "location": "Mt Vernon",
+          "longitude": -93.88158,
+          "network": "SCAN",
+          "station_id": "SCAN:2060:MO:SCAN",
+          "to": "2024-12-31"
+        },
+        {
+          "block": "19:-48",
+          "days": 1216,
+          "from": "2021-01-14",
+          "latitude": 38.868,
+          "location": "Powell Gardens",
+          "longitude": -94.03564,
+          "network": "SCAN",
+          "station_id": "SCAN:2061:MO:SCAN",
+          "to": "2024-12-31"
+        },
+        {
+          "block": "18:-49",
+          "days": 1268,
+          "from": "2021-01-07",
+          "latitude": 37.1313,
+          "location": "Abrams",
+          "longitude": -97.0859,
+          "network": "SCAN",
+          "station_id": "SCAN:2092:KS:SCAN",
+          "to": "2024-12-31"
+        },
+        {
+          "block": "19:-50",
+          "days": 1188,
+          "from": "2021-01-06",
+          "latitude": 39.78638,
+          "location": "Phillipsburg",
+          "longitude": -99.32953,
+          "network": "SCAN",
+          "station_id": "SCAN:2093:KS:SCAN",
+          "to": "2024-12-31"
+        },
+        {
+          "block": "19:-49",
+          "days": 1164,
+          "from": "2021-01-06",
+          "latitude": 39.70045,
+          "location": "Centralia Lake",
+          "longitude": -96.1629,
+          "network": "SCAN",
+          "station_id": "SCAN:2094:KS:SCAN",
+          "to": "2024-12-31"
+        },
+        {
+          "block": "20:-51",
+          "days": 981,
+          "from": "2021-01-13",
+          "latitude": 40.37092,
+          "location": "Johnson Farm",
+          "longitude": -101.72007,
+          "network": "SCAN",
+          "station_id": "SCAN:2111:NE:SCAN",
+          "to": "2024-09-24"
+        },
+        {
+          "block": "19:-48",
+          "days": 649,
+          "from": "2022-08-20",
+          "latitude": 39.05141,
+          "location": "Ku-Nesa",
+          "longitude": -95.19128,
+          "network": "SCAN",
+          "station_id": "SCAN:2147:KS:SCAN",
+          "to": "2024-09-24"
+        },
+        {
+          "block": "18:-47",
+          "days": 806,
+          "from": "2021-01-22",
+          "latitude": 36.9973,
+          "location": "Journagan Ranch",
+          "longitude": -92.2594,
+          "network": "SCAN",
+          "station_id": "SCAN:2194:MO:SCAN",
+          "to": "2024-09-24"
+        },
+        {
+          "block": "19:-46",
+          "days": 1131,
+          "from": "2021-01-15",
+          "latitude": 39.15321,
+          "location": "Elsberry PMC",
+          "longitude": -90.78279,
+          "network": "SCAN",
+          "station_id": "SCAN:2220:MO:SCAN",
+          "to": "2024-09-24"
+        },
+        {
+          "block": "19:-46",
+          "days": 921,
+          "from": "2021-02-27",
+          "latitude": 39.51311,
+          "location": "Mark Twain HS",
+          "longitude": -91.51401,
+          "network": "SCAN",
+          "station_id": "SCAN:2225:MO:SCAN",
+          "to": "2024-09-24"
+        },
+        {
+          "block": "18:-46",
+          "days": 1210,
+          "from": "2021-01-21",
+          "latitude": 36.99024,
+          "location": "Twin Pines Conservation Area",
+          "longitude": -91.30943,
+          "network": "SCAN",
+          "station_id": "SCAN:2226:MO:SCAN",
+          "to": "2024-09-24"
+        },
+        {
+          "block": "19:-46",
+          "days": 801,
+          "from": "2021-01-14",
+          "latitude": 38.47902,
+          "location": "Shaw Nature Reserve",
+          "longitude": -90.80641,
+          "network": "SCAN",
+          "station_id": "SCAN:2227:MO:SCAN",
+          "to": "2024-09-24"
+        },
+        {
+          "block": "18:-46",
+          "days": 1003,
+          "from": "2021-07-21",
+          "latitude": 37.18167,
+          "location": "LTSP",
+          "longitude": -91.11778,
+          "network": "SCAN",
+          "station_id": "SCAN:2230:MO:SCAN",
+          "to": "2024-09-24"
+        },
+        {
+          "block": "18:-46",
+          "days": 986,
+          "from": "2021-07-21",
+          "latitude": 37.50147,
+          "location": "Sinkin Forest",
+          "longitude": -91.25926,
+          "network": "SCAN",
+          "station_id": "SCAN:2231:MO:SCAN",
+          "to": "2024-09-24"
+        },
+        {
+          "block": "24:-48",
+          "days": 770,
+          "from": "2021-04-27",
+          "latitude": 48.3,
+          "location": "Goodridge 12 NNW Agassiz National Wildlife Refuge (Maintenance Shop Site)",
+          "longitude": -95.87,
+          "network": "USCRN",
+          "station_id": "USCRN:04994",
+          "to": "2024-11-19"
+        },
+        {
+          "block": "18:-46",
+          "days": 1248,
+          "from": "2021-01-25",
+          "latitude": 37.63,
+          "location": "Salem 10 W White River Trace Conservation Area (Stand 4, Compartment 7)",
+          "longitude": -91.72,
+          "network": "USCRN",
+          "station_id": "USCRN:23909",
+          "to": "2024-12-31"
+        },
+        {
+          "block": "19:-49",
+          "days": 1191,
+          "from": "2021-01-06",
+          "latitude": 39.1,
+          "location": "Manhattan 6 SSW Kansas State University (Konza Prairie Biological Station)",
+          "longitude": -96.6,
+          "network": "USCRN",
+          "station_id": "USCRN:53974",
+          "to": "2024-12-31"
+        },
+        {
+          "block": "20:-45",
+          "days": 1059,
+          "from": "2021-01-15",
+          "latitude": 40.05,
+          "location": "Champaign 9 SW Univ. of Illinois (Bondville Environ. & Atmos. Resrch. Stn.)",
+          "longitude": -88.37,
+          "network": "USCRN",
+          "station_id": "USCRN:54808",
+          "to": "2024-07-31"
+        },
+        {
+          "block": "20:-45",
+          "days": 863,
+          "from": "2021-03-09",
+          "latitude": 41.84,
+          "location": "Shabbona 5 NNE Northern Illinois Agronomy Research Center",
+          "longitude": -88.85,
+          "network": "USCRN",
+          "station_id": "USCRN:54811",
+          "to": "2024-12-31"
+        },
+        {
+          "block": "20:-47",
+          "days": 674,
+          "from": "2021-03-03",
+          "latitude": 41.55,
+          "location": "Des Moines 17 E Neal Smith NWR (NOAA Station Site)",
+          "longitude": -93.28,
+          "network": "USCRN",
+          "station_id": "USCRN:54902",
+          "to": "2024-09-30"
+        },
+        {
+          "block": "19:-44",
+          "days": 990,
+          "from": "2021-01-05",
+          "latitude": 38.88,
+          "location": "Bedford 5 WNW Feldun-Purdue Agricultural Center, (Pasture 17 Site)",
+          "longitude": -86.57,
+          "network": "USCRN",
+          "station_id": "USCRN:63898",
+          "to": "2024-04-01"
+        }
+      ]
+    }
+  },
+  "version": "fieldshift-vwc-a91e5897a6c2"
+}
