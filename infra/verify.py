@@ -52,11 +52,14 @@ def build_plan(root: Path, mode: str = "fast", build: bool = False) -> list[Chec
     add("web TypeScript", "apps/web", "npm", "run", "typecheck")
     add("widget TypeScript", "services/agent/frontend", "npm", "run", "typecheck")
 
-    python_packages = (
+    python_packages = [
         ("API", "apps/api"),
         ("ML", "packages/field-shift-ml"),
-        ("models", "packages/field-shift-models"),
-    )
+    ]
+    # The crop-model package is currently delivered on the planning branch.
+    # If present (even incompletely), include its checks so failures stay visible.
+    if (root / "packages/field-shift-models").exists():
+        python_packages.append(("models", "packages/field-shift-models"))
     for name, directory in python_packages:
         add(f"{name} lint", directory, "uv", "run", "--no-sync", "ruff", "check", ".")
         add(f"{name} format", directory, "uv", "run", "--no-sync", "ruff", "format", "--check", ".")
@@ -116,8 +119,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         else "Scope: agent tooling validation and unit tests; application suites are not run.",
         flush=True,
     )
+    root = Path(__file__).resolve().parents[1]
+    if args.mode == "fast" and not (root / "packages/field-shift-models").exists():
+        print("Inventory: field-shift-models is absent from this checkout.", flush=True)
     result = execute(
-        build_plan(Path(__file__).resolve().parents[1], args.mode, args.build),
+        build_plan(root, args.mode, args.build),
         list_only=args.list,
     )
     if result == 0:

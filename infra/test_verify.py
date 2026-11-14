@@ -97,6 +97,7 @@ class VerifyTests(unittest.TestCase):
         self.assertTrue(all(check.cwd.is_absolute() for check in plan))
 
     def test_fast_covers_all_unit_environments_without_implicit_sync(self) -> None:
+        (self.root / "packages/field-shift-models").mkdir(parents=True)
         plan = verify.build_plan(self.root)
         unit = {
             check.cwd.relative_to(self.root).as_posix(): check.argv
@@ -119,6 +120,30 @@ class VerifyTests(unittest.TestCase):
             if check.argv[0] == "uv":
                 self.assertEqual(check.argv[1:3], ("run", "--no-sync"))
         self.assertFalse(any(check.argv == ("npm", "run", "build") for check in plan))
+
+    def test_main_without_planning_package_keeps_all_existing_suites(self) -> None:
+        plan = verify.build_plan(self.root)
+        unit_paths = {
+            check.cwd.relative_to(self.root).as_posix()
+            for check in plan
+            if "unit tests" in check.name
+        }
+        self.assertEqual(
+            unit_paths,
+            {
+                "apps/api",
+                "packages/field-shift-ml",
+                "services/agent",
+                "apps/web",
+                "services/agent/frontend",
+            },
+        )
+
+    def test_incomplete_models_package_still_gets_checked(self) -> None:
+        (self.root / "packages/field-shift-models").mkdir(parents=True)
+        plan = verify.build_plan(self.root)
+        model_checks = [check for check in plan if check.name.startswith("models ")]
+        self.assertEqual(len(model_checks), 3)
 
     def test_tooling_validates_configuration_before_unit_tests(self) -> None:
         plan = verify.build_plan(self.root, mode="tooling")

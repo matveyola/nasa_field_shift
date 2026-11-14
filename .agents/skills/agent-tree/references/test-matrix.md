@@ -1,6 +1,6 @@
 # Test execution for Field Shift
 
-Read current `.github/workflows/ci.yml`, package manifests and test configuration before execution. This matrix is a starting inventory, not permission to skip newly added suites. `packages/field-shift-models` has tests outside the current CI jobs.
+Read current `.github/workflows/ci.yml`, package manifests and test configuration before execution. This matrix is a starting inventory, not permission to skip newly added suites. The planning branch adds `packages/field-shift-models` with tests outside the current CI jobs; include it whenever present in the checkout. The runner explicitly reports when the package is absent from the branch and still checks an existing but incomplete package.
 
 ## Modes
 
@@ -16,7 +16,7 @@ The executable entrypoint is `python3 infra/verify.py --mode fast --build` from 
 | --- | --- | --- |
 | `apps/api` | `uv sync --locked --extra dev` | `uv run --no-sync ruff check .`; `uv run --no-sync ruff format --check .`; `uv run --no-sync pytest -q -m "not integration"` |
 | `packages/field-shift-ml` | `uv sync --locked` | `uv run --no-sync ruff check .`; `uv run --no-sync ruff format --check .`; `uv run --no-sync pytest -q` |
-| `packages/field-shift-models` | `uv sync --locked` with Python `>=3.12,<3.13` | `uv run --no-sync ruff check .`; `uv run --no-sync ruff format --check .`; `uv run --no-sync pytest -q` |
+| `packages/field-shift-models` (when present) | `uv sync --locked` with Python `>=3.12,<3.13` | `uv run --no-sync ruff check .`; `uv run --no-sync ruff format --check .`; `uv run --no-sync pytest -q` |
 | `services/agent` | `uv sync --locked` | `uv run --no-sync pytest -q` |
 | `apps/web` | `npm ci` | `npm test`; `npm run typecheck`; `npm run build` |
 | `services/agent` | `npm ci --ignore-scripts` | `npm run check:ts` |
