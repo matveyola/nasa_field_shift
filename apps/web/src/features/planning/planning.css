@@ -1,0 +1,41 @@
+.planning-workspace { max-width: 1280px; margin: auto; padding: 28px; display: grid; gap: 24px; min-width: 0; color: var(--ink, #111); }
+.planning-workspace *, .pl-dialog * { box-sizing: border-box; }
+.pl-heading, .pl-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: end; }
+.pl-heading { justify-content: space-between; align-items: center; }
+.pl-eyebrow { letter-spacing: .18em; font-size: 11px; margin-bottom: 10px; }
+.pl-card { background: var(--card, white); padding: 24px; border: 1px solid var(--line, #ddd); border-radius: 20px; display: grid; gap: 18px; min-width: 0; }
+.pl-subcard { background: var(--screen, #f5f5f5); border: 1px solid var(--line, #ddd); border-radius: 14px; padding: 16px; display: grid; gap: 10px; min-width: 0; margin-top: 10px; }
+.pl-subcard[data-selected=true] { border-color: var(--ink, #111); }
+.pl-form { border: 0; padding: 0; margin: 0; display: grid; gap: 20px; min-width: 0; }
+.pl-form > fieldset { border: 1px solid #ddd; padding: 14px; border-radius: 12px; }
+.pl-control { display: grid; gap: 6px; font-size: 13px; flex: 1 1 170px; min-width: 0; }
+.pl-control input, .pl-control select { width: 100%; min-width: 0; min-height: 44px; border: 1px solid var(--line-strong, #ccc); border-radius: 10px; padding: 8px 12px; background: white; }
+.pl-check { display: flex; align-items: center; gap: 10px; min-height: 44px; }
+.pl-check input { width: 18px; height: 18px; flex: 0 0 auto; accent-color: #111; }
+.pl-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr)); gap: 14px; }
+.pl-card p, .pl-subcard p, .pl-reasons, .pl-wrap, .pl-card li { overflow-wrap: anywhere; }
+.pl-banner { padding: 12px 16px; background: #e7e7e7; border-radius: 12px; }
+.pl-error { padding: 14px; border: 1px solid var(--danger, #b42318); background: var(--danger-soft, #fbeae8); color: var(--danger, #b42318); border-radius: 12px; overflow-wrap: anywhere; }
+.pl-table-scroll { overflow-x: auto; max-width: 100%; }
+.pl-matrix { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.pl-matrix th, .pl-matrix td { padding: 6px; border-bottom: 1px solid #ddd; overflow-wrap: anywhere; }
+.pl-matrix button { width: 100%; min-height: 52px; padding: 8px; border: 1px solid #ddd; border-radius: 10px; background: white; overflow-wrap: anywhere; }
+.pl-matrix button[aria-pressed=true] { background: #111; color: white; }
+.pl-matrix caption { text-align: left; font-weight: 600; padding-bottom: 10px; }
+.pl-reasons { padding-left: 20px; font-size: 13px; }
+.pl-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; }
+.pl-metrics dt { color: #666; font-size: 13px; }
+.pl-metrics dd { margin: 4px 0; }
+.planning-workspace summary { cursor: pointer; padding: 12px 0; font-weight: 600; }
+.pl-dialog { border: 1px solid #ccc; border-radius: 20px; padding: 24px; max-width: min(640px, calc(100vw - 28px)); max-height: 85dvh; overflow-y: auto; }
+.pl-dialog::backdrop { background: rgb(0 0 0 / .4); }
+.pl-dialog .pl-row { margin-top: 18px; }
+.planning-workspace :focus-visible, .pl-dialog :focus-visible { outline: 2px solid #111; outline-offset: 3px; }
+@media (max-width: 600px) {
+  .planning-workspace { padding: 14px; gap: 16px; }
+  .pl-card { padding: 14px; gap: 14px; }
+  .pl-subcard { padding: 12px; }
+  .pl-control { flex-basis: 100%; }
+  .pl-matrix th, .pl-matrix td { font-size: 12px; padding: 3px; }
+  .pl-matrix button { font-size: 12px; padding: 4px; }
+}
