@@ -42,7 +42,7 @@ type Props = {
   initialAnalysis?: boolean
   showNdviLayer?: boolean
   chooseField: (id: string) => void
-  onCreate: (id: string) => void
+  onCreate: (field: Field) => void
   onUpdate: (field: Field) => void
   reloadFields: () => void
   openForecast: (fieldId: string, day?: string) => void
@@ -484,9 +484,9 @@ export function FieldsPage({ fields, selected, season, initialDrawing = false, i
           <MoistureForecastPanel key={selected.id} state={forecastState} />
         </div>}
         {canEdit && drawing && <NewFieldForm season={season} points={points} onImport={setPoints} undoPoint={() => setPoints((value) => value.slice(0, -1))}
-          onCreate={(id) => { setDrawing(false); setPoints([]); onCreate(id) }} />}
+          onSaving={setSaving} onCreate={(field) => { setDrawing(false); setPoints([]); onCreate(field) }} />}
         {canEdit && newBoundary && edit && <NewFieldForm season={season} points={edit.points} assisted onSaving={setSaving}
-          onCreate={(id) => { setDraft(undefined); onCreate(id) }} />}
+          onCreate={(field) => { setDraft(undefined); onCreate(field) }} />}
       </div>
     </div>
   )
@@ -597,7 +597,7 @@ function MoistureLegend({ layer, stale }: { layer: MoistureLayer; stale: boolean
 }
 
 function NewFieldForm({ season, points, undoPoint, onCreate, assisted, onSaving, onImport }: {
-  season: number; points: Position[]; undoPoint?: () => void; onCreate: (id: string) => void
+  season: number; points: Position[]; undoPoint?: () => void; onCreate: (field: Field) => void
   assisted?: boolean; onSaving?: (saving: boolean) => void; onImport?: (vertices: Position[]) => void
 }) {
   const { t } = useLocale()
@@ -643,7 +643,7 @@ function NewFieldForm({ season, points, undoPoint, onCreate, assisted, onSaving,
         geometry,
         season,
       })
-      onCreate(field.id)
+      onCreate(field)
     } catch (failure) {
       setError(errorText(failure))
     } finally {

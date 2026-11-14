@@ -1,7 +1,8 @@
-export const pages = ['fields', 'water', 'agent', 'rotations', 'farm'] as const
+export const pages = ['rotations', 'fields', 'agent', 'water', 'farm'] as const
 export type Page = (typeof pages)[number]
 export type Route = {
   page: Page
+  home?: boolean
   setupId?: string
   fieldId?: string
   scenario?: string
@@ -22,7 +23,8 @@ function isForecastDay(value: string | null | undefined): value is string {
 export function parseRoute(address: string): Route {
   const url = new URL(address, 'https://field-shift.local')
   const path = url.pathname.replace(/^\/+|\/+$/g, '')
-  const page = pages.find((item) => item === path) ?? 'fields'
+  const explicitPage = path === 'onboarding' ? 'fields' : pages.find((item) => item === path)
+  const page = explicitPage ?? pages[0]
   const setup = path === 'onboarding' ? url.searchParams.get('setup') : null
   const setupId = setup && /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(setup) ? setup : undefined
   const fieldId = url.searchParams.get('field') || undefined
@@ -33,6 +35,7 @@ export function parseRoute(address: string): Route {
   const signal = url.searchParams.get('signal')
   return {
     page, fieldId, scenario, jobId,
+    ...(!explicitPage ? { home: true } : {}),
     ...(setupId ? { setupId } : {}),
     ...(page === 'fields' && url.searchParams.get('add') === '1' ? { addField: true } : {}),
     ...(analysis ? { analysis: true } : {}),
@@ -40,6 +43,10 @@ export function parseRoute(address: string): Route {
     ...(page === 'water' && !jobId && isForecastDay(forecastDay) ? { forecastDay } : {}),
     ...(page === 'agent' && (signal === 'water' || signal === 'vegetation') ? { signal } : {}),
   }
+}
+
+export function resolveHomeRoute(route: Route, hasFields: boolean): Route {
+  return route.home && !hasFields ? { ...route, page: 'fields' } : route
 }
 
 export function routeAddress(route: Route): string {
@@ -56,5 +63,5 @@ export function routeAddress(route: Route): string {
     if (route.layer === 'ndvi_variability') params.set('layer', route.layer)
   }
   const search = params.toString()
-  return '/' + (route.setupId ? 'onboarding' : route.page) + (search ? '?' + search : '')
+  return '/' + (route.setupId ? 'onboarding' : route.home ? '' : route.page) + (search ? '?' + search : '')
 }
