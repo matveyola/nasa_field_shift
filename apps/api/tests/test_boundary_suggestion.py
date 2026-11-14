@@ -358,7 +358,8 @@ def test_cloudless_wider_window_retries_no_contour_but_not_model_outage(
     monkeypatch.setattr(suggestion, "predict_masks", predict)
     body = TestClient(create_app()).post(URL, json={"position": position}).json()
     assert windows == (
-        [suggestion.EOX_WINDOW_METERS] if outcome == "timeout"
+        [suggestion.EOX_WINDOW_METERS]
+        if outcome == "timeout"
         else [suggestion.EOX_WINDOW_METERS, suggestion.EOX_WIDE_WINDOW_METERS]
     )
     assert body["failure_reason"] == expected

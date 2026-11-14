@@ -122,9 +122,7 @@ def _valid_prediction_url(value: str) -> bool:
     )
 
 
-def read_chip(
-    scene: SatelliteImage, longitude: float, latitude: float
-) -> Chip:
+def read_chip(scene: SatelliteImage, longitude: float, latitude: float) -> Chip:
     crs = f"EPSG:{scene.epsg}"
     xs, ys = transform("EPSG:4326", crs, [longitude], [latitude])
     # The clicked position sits at the center of pixel (128, 128).
@@ -160,9 +158,7 @@ def read_chip(
     return np.moveaxis(rgb, 0, -1), valid, grid
 
 
-def read_demo_chip(
-    path: Path, longitude: float, latitude: float, span: int
-) -> Chip | None:
+def read_demo_chip(path: Path, longitude: float, latitude: float, span: int) -> Chip | None:
     west, south, east, north = DEMO_BOUNDS
     if not (west < longitude < east and south < latitude < north) or not path.is_file():
         return None
@@ -193,9 +189,7 @@ def read_demo_chip(
     return np.moveaxis(rgb, 0, -1), np.any(rgb != 0, axis=0), chip_grid
 
 
-def read_usgs_chip(
-    longitude: float, latitude: float
-) -> Chip | None:
+def read_usgs_chip(longitude: float, latitude: float) -> Chip | None:
     coverage = ((-125, 24, -66, 50), (-161, 18, -154, 23), (-179, 51, -129, 72))
     if not any(w <= longitude <= e and s <= latitude <= n for w, s, e, n in coverage):
         return None
@@ -249,9 +243,7 @@ def read_wms_chip(
     return read_image_chip(f"{endpoint}?{query}", grid, EOX_IMAGE_TIMEOUT_SECONDS)
 
 
-def read_image_chip(
-    url: str, grid: Affine, timeout: int
-) -> Chip | None:
+def read_image_chip(url: str, grid: Affine, timeout: int) -> Chip | None:
     drivers = {"image/png": "PNG", "image/jpeg": "JPEG"}
     request = Request(url, headers={"Accept": "image/png, image/jpeg"})
     with build_opener(_NoRedirect()).open(request, timeout=timeout) as response:
@@ -318,7 +310,7 @@ def contour_at(
             continue
         # Remove raster stair steps while preserving the area and location of the outline.
         pixel = max(grid.a, -grid.e)
-        for tolerance in (2 * pixel, pixel, .5 * pixel, 0):
+        for tolerance in (2 * pixel, pixel, 0.5 * pixel, 0):
             reduced = shell.simplify(tolerance, preserve_topology=True)
             if len(reduced.exterior.coords) > 128 or not reduced.contains(seed):
                 continue
@@ -336,7 +328,10 @@ def contour_at(
 
 
 def _mask_contour(
-    masks: list[np.ndarray], valid: np.ndarray, grid: Affine, epsg: int,
+    masks: list[np.ndarray],
+    valid: np.ndarray,
+    grid: Affine,
+    epsg: int,
     position: tuple[float, float],
 ) -> Polygon | None:
     # A mask ending next to missing pixels may have been cut by the source image.
@@ -356,7 +351,9 @@ def _mask_contour(
 
 
 def _chips_at(
-    longitude: float, latitude: float, deadline: float,
+    longitude: float,
+    latitude: float,
+    deadline: float,
 ) -> Iterator[tuple[Chip, int, str, date | None]]:
     demo_image = getenv("FIELD_SHIFT_BOUNDARY_DEMO_IMAGE", "").strip()
     if demo_image:
