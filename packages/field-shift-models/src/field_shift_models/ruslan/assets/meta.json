@@ -1,0 +1,177 @@
+{
+ "model_version": "fieldshift-sm05-024c35a39470",
+ "candidate": "anomaly_lgbm_era5_level",
+ "features": [
+  "z_e0",
+  "z_e1",
+  "z_e0_mean3",
+  "z_e0_mean7",
+  "e0_drydown_sd",
+  "z_l4",
+  "z_l4_mean3",
+  "z_l4rz",
+  "z_l3_latest",
+  "l3_age_days",
+  "season_sin",
+  "season_cos",
+  "stemp",
+  "tair",
+  "sand",
+  "clay",
+  "om"
+ ],
+ "cqr_half_width_m3m3": 0.11161474143932201,
+ "era5_half_width_m3m3": 0.15645799999999999,
+ "trained_on": {
+  "stations": 53,
+  "station_days": 44705,
+  "years": [
+   2021,
+   2022,
+   2023,
+   2024,
+   2025
+  ]
+ },
+ "inputs": {
+  "era5_land": "Open-Meteo archive, models=era5_land, daily 0-7 / 7-28 / 28-100 cm",
+  "smap_l3": "NASA SPL3SMP_E v6 9 km, recommended-quality retrievals (AM first), latest within 3 days",
+  "soil": "USDA SSURGO horizon at 5 cm"
+ },
+ "climatology": "product mean/sd at the field from seasons BEFORE the estimate's year (>= 30 days)",
+ "label_uk": "Регіональна оцінка на сітці ERA5-Land (~10 км), шар 0-5 см; не карта поля",
+ "label_en": "Regional estimate on the ERA5-Land grid (~10 km), 0-5 cm; not a field map",
+ "validation": {
+  "release": {
+   "chosen_on_2024_selection": "anomaly_lgbm_era5_level",
+   "checks": {
+    "1_rmse_ci90_below_zero_2025": true,
+    "2_coverage_ge_0_75": true,
+    "3_farms_rmse_not_worse": true,
+    "4_network_out_not_worse": true
+   },
+   "publish": true,
+   "decision": "publish anomaly_lgbm_era5_level with its 10-90% interval"
+  },
+  "rmse_m3m3": {
+   "test_new_place_2025": {
+    "raw_era5_land": 0.1012,
+    "anomaly_lgbm_era5_level": 0.0978
+   },
+   "independent_farms": {
+    "raw_era5_land": 0.074,
+    "anomaly_lgbm_era5_level": 0.0711
+   }
+  },
+  "coverage_10_90": {
+   "test_new_place_2025": 0.8742,
+   "independent_farms": 0.9934
+  },
+  "local_sensor_rmse_m3m3": {
+   "test_new_place_2025": {
+    "no_sensor": {
+     "rmse": 0.0983,
+     "stations": 35,
+     "stations_better_than_no_sensor": null
+    },
+    "live_estimate_plus_rolling_offset": {
+     "rmse": 0.0412,
+     "stations": 35,
+     "stations_better_than_no_sensor": 34
+    },
+    "live_probe_yesterday": {
+     "rmse": 0.0242,
+     "stations": 35,
+     "stations_better_than_no_sensor": 35
+    },
+    "offset_14d": {
+     "rmse": 0.0692,
+     "stations": 35,
+     "stations_better_than_no_sensor": 23
+    },
+    "offset_30d": {
+     "rmse": 0.069,
+     "stations": 35,
+     "stations_better_than_no_sensor": 25
+    },
+    "offset_3d": {
+     "rmse": 0.0712,
+     "stations": 35,
+     "stations_better_than_no_sensor": 23
+    },
+    "offset_7d": {
+     "rmse": 0.0716,
+     "stations": 35,
+     "stations_better_than_no_sensor": 23
+    },
+    "offset_scale_30d": {
+     "rmse": 0.0731,
+     "stations": 35,
+     "stations_better_than_no_sensor": 22
+    },
+    "probe_last_value_30d": {
+     "rmse": 0.104,
+     "stations": 35,
+     "stations_better_than_no_sensor": 16
+    },
+    "probe_last_value_7d": {
+     "rmse": 0.1126,
+     "stations": 35,
+     "stations_better_than_no_sensor": 14
+    }
+   },
+   "independent_farms": {
+    "no_sensor": {
+     "rmse": 0.074,
+     "stations": 9,
+     "stations_better_than_no_sensor": null
+    },
+    "live_estimate_plus_rolling_offset": {
+     "rmse": 0.0464,
+     "stations": 9,
+     "stations_better_than_no_sensor": 9
+    },
+    "live_probe_yesterday": {
+     "rmse": 0.026,
+     "stations": 9,
+     "stations_better_than_no_sensor": 9
+    },
+    "offset_14d": {
+     "rmse": 0.0702,
+     "stations": 9,
+     "stations_better_than_no_sensor": 5
+    },
+    "offset_30d": {
+     "rmse": 0.0664,
+     "stations": 9,
+     "stations_better_than_no_sensor": 6
+    },
+    "offset_3d": {
+     "rmse": 0.0737,
+     "stations": 9,
+     "stations_better_than_no_sensor": 4
+    },
+    "offset_7d": {
+     "rmse": 0.074,
+     "stations": 9,
+     "stations_better_than_no_sensor": 5
+    },
+    "offset_scale_30d": {
+     "rmse": 0.0661,
+     "stations": 9,
+     "stations_better_than_no_sensor": 6
+    },
+    "probe_last_value_30d": {
+     "rmse": 0.0929,
+     "stations": 9,
+     "stations_better_than_no_sensor": 2
+    },
+    "probe_last_value_7d": {
+     "rmse": 0.0924,
+     "stations": 9,
+     "stations_better_than_no_sensor": 4
+    }
+   }
+  }
+ }
+}
