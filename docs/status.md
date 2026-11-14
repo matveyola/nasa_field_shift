@@ -143,3 +143,17 @@ Runner `--mode fast --build` задає 18 послідовних команд �
 ### Виправлення збірки спільного образу API
 
 `build` у спільному Compose anchor створював кілька паралельних exporters для `field-shift-api:local`. На Docker 29 / BuildKit це відтворило помилку `image already exists`. Визначення `build` тепер належить лише сервісу `api`; migrate, dispatcher, refresh і workers використовують той самий готовий образ. Регресійний тест перевіряє унікальність image tags у реальному Compose build plan, падає на попередній конфігурації та проходить після виправлення.
+
+### Офлайн-аудит точності та покриття культур
+
+У локальній гілці `nazar-model-accuracy` додано [звіт і стратегію оцінювання](planning/accuracy-and-model-strategy.md), відтворюваний аудит наявних метрик, матрицю восьми культур і перевірку парних прогнозів із замороженим manifest. Це повторний аналіз відкритих звітів, а не нова незалежна валідація моделей. Production-артефакти, release gates та інтерфейс не змінювалися.
+
+Історична surface V2: MAE на семи фермах гірше на 0,15%, RMSE краще на 4,48%; обидва farm-bootstrap інтервали включають нуль. На serving footprint обидві помилки приблизно на 9% гірші. Rotation-effect candidate має MAE на 10,86% гірше за baseline. Доказів універсальної переваги або локального SOTA немає.
+
+CY-Bench: опубліковані адміністративні дані кукурудзи для 38 країн, пшениці для 29, разом 43; архів не завантажено, точність на полях із цього не випливає. Окремо отримано безкоштовні USDA/ARDN дані: 3 797 plot-year записів зерна, вісім штатів США, 29 кодів дослідних ділянок без доведеної незалежності ферм. Перевірено dry kg/ha проти parent workbook. Для нового crop-engine benchmark бракує повного погодного forcing, погоджених crosswalk та заморожених припущень; статус `insufficient_data`, метрики не вигадані.
+
+На `cc19320` незалежно пройшли 38 evaluator-тестів, 63 тести чотирьох нових модулів з вимкненим pytest `pythonpath`, увесь ML suite — **115 тестів без пропусків**, Ruff і форматування 49 файлів. Аудит USDA відтворюється побайтно: SHA256 `9879d7471a3b45d4a89c1c15c8533bc1748d9dfbe8a16e239d89bbdaa89aa8c3`. Checksum матриці виправлено після Git-нормалізації CRLF→LF. Незалежне рев’ю знайшло й після виправлення повторно перевірило два дефекти evaluator: oracle/historical результати не можуть пройти operational release review, а регіони без labels більше не зникають із coverage gates.
+
+Після встановлення locked-залежностей ізольованого worktree всі 23 кроки fast runner завершилися з кодом 0 на `8fb7a84`; подальший evaluator-only fix перевірений окремо на `cc19320`. API: 500 passed / 22 integration deselected; models: 55 passed; agent: 572 passed / 64 skipped; web: 89 passed; widget: 99 passed; обидві production-збірки, контракти й TypeScript пройшли. У agent пропущено 24 тести без FAO-корпусу та 40 без knowledge index (17 evaluation, 3 readiness, 20 RAG); пропуски не зараховані як успіх. Tooling: 18 passed. Docker, application integration, дороге навчання та live providers у цьому checkpoint не запускалися.
+
+Гілка ще не інтегрована й не опублікована. Вона стартувала від `9580638`; паралельні packaging-зміни інтегратора не зачіпалися. Після об’єднання з ними потрібні перевірки combined tree та актуальні шляхи scientific artifacts. Перед production застосуванням потрібні нові незалежні empirical holdouts; цей checkpoint їх не підміняє.

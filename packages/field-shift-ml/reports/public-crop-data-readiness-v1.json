@@ -1,0 +1,229 @@
+{
+  "schema_version": "public-crop-data-audit-v1",
+  "purpose": "Raw ARDN/CSCAP source schema/readiness audit, not a predictive accuracy benchmark",
+  "input_sha256": {
+    "ardn-agro.csv": "8ad1c3224f84cc715fe73a11d475fb5acd0c0f51319b86173aff4a923036519f",
+    "ardn-ops_plant.csv": "5a866c19379b5f02a35464baa050690243d603f6a1d9c0273dba077b776df4cd",
+    "ardn-ops_harv.csv": "e94fd10babbc27490dbb560b720232d5ea8df06d53f7e01b5addbee18b7ee220",
+    "ardn-weather_onsite.csv": "9a925cb450baf2bd017f7b51b055011e8a537e57deb87cbc5e0fcac4b052ecbe",
+    "ardn-sitemeta.csv": "c591b7e72a1e4e80af9cfdca58ccd6f2cfe8777016d74377cea55fd5730b2291",
+    "ardn-soil.csv": "5c1ad115d482336f0dac97d289c9804699e2b8b46ee8278e9034cf873848c192",
+    "ardn-plotid.csv": "ac93834e434eafd2847cc882b7b395522ea158c7db13b701665efd837161808c",
+    "cscap.xlsx": "b9e40bf74554c32849dcb6e6a613d6b7a60b4b8a2f8cbed33073d7c7732f95b6"
+  },
+  "grain_records_by_crop": {
+    "corn": {
+      "grain_records": 2300,
+      "unambiguous_sow_harvest": 2280,
+      "same_year_ordered_calendar": 2268,
+      "calendar_with_named_hybrid": 2280,
+      "calendar_complete_temp_rain": 2280,
+      "calendar_complete_temp_rain_srad_wind": 290
+    },
+    "soybean": {
+      "grain_records": 1362,
+      "unambiguous_sow_harvest": 1356,
+      "same_year_ordered_calendar": 1356,
+      "calendar_with_named_hybrid": 1356,
+      "calendar_complete_temp_rain": 1356,
+      "calendar_complete_temp_rain_srad_wind": 263
+    },
+    "wheat": {
+      "grain_records": 135,
+      "unambiguous_sow_harvest": 127,
+      "same_year_ordered_calendar": 0,
+      "calendar_with_named_hybrid": 127,
+      "calendar_complete_temp_rain": 104,
+      "calendar_complete_temp_rain_srad_wind": 40
+    }
+  },
+  "years": [
+    2011,
+    2012,
+    2013,
+    2014,
+    2015
+  ],
+  "yield_site_codes": [
+    "ARL",
+    "BRADFORD.A",
+    "BRADFORD.B1",
+    "BRADFORD.B2",
+    "BRADFORD.C",
+    "DPAC",
+    "FREEMAN",
+    "GILMORE",
+    "HICKS.B",
+    "HICKS.G",
+    "HOYTVILLE.LTR",
+    "ISUAG",
+    "ISUAG.USB",
+    "KELLOGG",
+    "LAN",
+    "MAR",
+    "MASON",
+    "NAEW.WS109",
+    "NAEW.WS111",
+    "NAEW.WS113",
+    "NAEW.WS118",
+    "NWREC",
+    "ORR",
+    "SEPAC",
+    "SERF",
+    "STJOHNS",
+    "WATERMAN",
+    "WOOSTER.COV",
+    "WOOSTER.LTR"
+  ],
+  "yield_sites": 29,
+  "known_state_codes": [
+    "IA",
+    "IL",
+    "IN",
+    "MI",
+    "MN",
+    "MO",
+    "OH",
+    "WI"
+  ],
+  "unknown_state_rows": 0,
+  "metadata_annotation_rows_excluded": 2,
+  "annotation_rows_excluded_by_file": {
+    "ardn-agro.csv": 0,
+    "ardn-ops_plant.csv": 2,
+    "ardn-ops_harv.csv": 2,
+    "ardn-weather_onsite.csv": 0,
+    "ardn-sitemeta.csv": 2,
+    "ardn-soil.csv": 0,
+    "ardn-plotid.csv": 0
+  },
+  "independence_status": "Experiment/site codes, NOT necessarily independent farms; no untouched-holdout claim",
+  "potential_shared_farm_groups_requiring_crosswalk": [
+    [
+      "ISUAG",
+      "ISUAG.USB"
+    ],
+    [
+      "WOOSTER.COV",
+      "WOOSTER.LTR"
+    ]
+  ],
+  "dry_basis_crosscheck_against_parent_standard_moisture": {
+    "matched_rows": {
+      "corn": 2300,
+      "soybean": 1362,
+      "wheat": 135
+    },
+    "differences_over_0_11kg_ha": 0,
+    "examples": [],
+    "source_standard_moisture_fractions": {
+      "corn": 0.155,
+      "soybean": 0.13,
+      "wheat": 0.135
+    },
+    "unit": "kg/ha",
+    "method": "parent standard yield * (1 - source standard moisture fraction)"
+  },
+  "soil_measured_max_depth_cm": 120.0,
+  "soil_hydraulic_complete_rows": 4211,
+  "soil_hydraulic_completeness_method": "Finite source SOIL02/SOIL31/SOIL32 cells, not validated engine parameterization",
+  "weather_columns": [
+    "station",
+    "day",
+    "highc",
+    "lowc",
+    "precipmm",
+    "merra_srad",
+    "highc_onsite",
+    "lowc_onsite",
+    "precipmm_onsite",
+    "srad_onsite",
+    "windspeed_onsite",
+    "winddirect_onsite"
+  ],
+  "soil_columns": [
+    "",
+    "uniqueid",
+    "plotid",
+    "upperbound",
+    "lowerbound",
+    "year",
+    "sampledate",
+    "SOIL01",
+    "SOIL03",
+    "SOIL06",
+    "SOIL07",
+    "SOIL11",
+    "SOIL12",
+    "SOIL13",
+    "SOIL14",
+    "SOIL15",
+    "SOIL19.1",
+    "SOIL19.10",
+    "SOIL19.11",
+    "SOIL19.12",
+    "SOIL19.13",
+    "SOIL19.2",
+    "SOIL19.5",
+    "SOIL19.6",
+    "SOIL19.7",
+    "SOIL19.8",
+    "SOIL22",
+    "SOIL26",
+    "SOIL27",
+    "SOIL28",
+    "SOIL02",
+    "SOIL39",
+    "SOIL41",
+    "SOIL34",
+    "SOIL29",
+    "SOIL30",
+    "SOIL31",
+    "SOIL35",
+    "SOIL33",
+    "SOIL42",
+    "SOIL32"
+  ],
+  "full_strict_engine_ready_records": 0,
+  "readiness_scope": "Current Field Shift strict wrapper/default profiles only, NOT an intrinsic native-engine requirement",
+  "readiness_count_method": "No engine validations executed. Current wrapper inputs lack explicit field opening water, hydraulic/management/availability provenance and cultivar mapping. Source headers and measured depth are structural diagnostics, not proof that native AquaCrop/WOFOST cannot use other parameterizations.",
+  "missing_required_inputs": [
+    "measured initial root/full-profile water for current wrapper",
+    "Ksat and penetrability parameterization for current wrapper",
+    "Deeper or reviewed root-profile parameterization for current Maize/Wheat wrapper defaults",
+    "ET0 or humidity/vapor pressure to compute reference ET for current wrapper",
+    "snow/frozen-soil state for current wrapper",
+    "input availability/forecast issue-cycle-lead history",
+    "validated ready-engine cultivar mapping",
+    "plot geometry crosswalk (site corners are not plot polygons)"
+  ],
+  "sample_calendar_keys": {
+    "corn": {
+      "uniqueid": "ARL",
+      "plotid": "101",
+      "year": "2013",
+      "grain_yield": "11606.1",
+      "grain_moisture": "249",
+      "sow": "2013-05-21",
+      "harvest": "2013-10-29"
+    },
+    "soybean": {
+      "uniqueid": "ARL",
+      "plotid": "101",
+      "year": "2011",
+      "grain_yield": "3720.1",
+      "grain_moisture": "106",
+      "sow": "2011-05-04",
+      "harvest": "2011-10-06"
+    },
+    "wheat": {
+      "uniqueid": "ARL",
+      "plotid": "101",
+      "year": "2012",
+      "grain_yield": "5056.8",
+      "grain_moisture": "131",
+      "sow": "2011-10-04",
+      "harvest": "2012-07-02"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+crop,years,states_covered,county_years,unique_pixels,states_attempted_but_dropped,drop_reason
+corn,2017-2024,"IA,IL,IN,MI,MN,MO,OH,WI",1713,313598,none,n/a
+soybeans,2017-2024,"IA,IL,IN,KS,LA,MI,MN,MO,MS,NE,WI",2092,344812,OH,zero valid CDL pixels for crop class in county-years
+wheat,2017-2024,"CO,IN,KS,MT,NE,OH,OK,OR,SD,TX,WA",776,126534,MI,zero valid CDL pixels for crop class in county-years
+cotton,2017-2024,"AL,GA,MS,NC,TX",431,67830,"AZ,AR",zero valid CDL pixels for crop class in county-years
+sorghum,2017-2024,"OK,TX",95,14246,"KS,MO,NE",zero valid CDL pixels for crop class in county-years

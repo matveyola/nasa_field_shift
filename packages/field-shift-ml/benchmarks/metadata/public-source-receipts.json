@@ -1,0 +1,162 @@
+[
+  {
+    "name": "ifc-resource.html",
+    "url": "https://www.hydroshare.org/resource/50c4ad3248864a03845c671ff8da968b/",
+    "retrieved_at": "2026-11-14T18:23:04.887526+00:00",
+    "permission": "CC BY 4.0 stated on public resource page; cite Marcela Rojas (2026); aggregation changes must be marked",
+    "content_type": "text/html; charset=utf-8",
+    "status": "retrieved",
+    "bytes": 141742,
+    "sha256": "c3c3e07adc7253324b50b56a079e60b59222f368dbbec632b49156e2b8995614"
+  },
+  {
+    "name": "ifc-stations.csv",
+    "url": "https://www.hydroshare.org/resource/50c4ad3248864a03845c671ff8da968b/data/contents/list_hydrostations.csv",
+    "retrieved_at": "2026-11-14T18:23:06.574907+00:00",
+    "permission": "Resource CC BY 4.0; metadata only",
+    "content_type": "binary/octet-stream",
+    "status": "retrieved",
+    "bytes": 1845,
+    "sha256": "a9625c0fea90100ebfd0e5bb309f802311ed3a521f0def58be57f6589a92f0d4"
+  },
+  {
+    "name": "usda-article.json",
+    "url": "https://api.figshare.com/v2/articles/24851877",
+    "retrieved_at": "2026-11-14T18:23:10.146265+00:00",
+    "permission": "Inspect metadata license before downloading data",
+    "content_type": "application/json",
+    "status": "retrieved",
+    "bytes": 48283,
+    "sha256": "622256ac379d9e87f3cc6b1983f17e700e917e95d1895a7107d6745ec559bb81"
+  },
+  {
+    "name": "zenodo-13901372.json",
+    "url": "https://zenodo.org/api/records/13901372",
+    "retrieved_at": "2026-11-14T18:23:10.664263+00:00",
+    "permission": "Inspect metadata rights before data acquisition",
+    "content_type": "application/json",
+    "status": "retrieved",
+    "bytes": 7087,
+    "sha256": "a533da54a7ecf83a6050a8e8297a01463b83bee792c319ac73269693111b9d0e"
+  },
+  {
+    "name": "cscap.xlsx",
+    "url": "https://ndownloader.figshare.com/files/44334239",
+    "retrieved_at": "2026-11-14T18:24:16.434784+00:00",
+    "permission": "CC0: USDA Figshare article24851877 metadata license; DOI10.15482/USDA.ADC/1411953",
+    "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "status": "retrieved",
+    "bytes": 12129286,
+    "sha256": "b9e40bf74554c32849dcb6e6a613d6b7a60b4b8a2f8cbed33073d7c7732f95b6"
+  },
+  {
+    "name": "cscap-dictionary.csv",
+    "url": "https://ndownloader.figshare.com/files/44334242",
+    "retrieved_at": "2026-11-14T18:25:39.076010+00:00",
+    "permission": "CC0: same USDA Figshare metadata license",
+    "content_type": "text/csv",
+    "status": "retrieved",
+    "bytes": 86214,
+    "sha256": "ea74b93bd227d40b15dd5893077e3e71df404eb5dc0459bee046970a3d47af9d"
+  },
+  {
+    "name": "zhou-corn-experimental.csv",
+    "url": "https://zenodo.org/records/13901372/files/Corn_ExperimentalCalibrationDataWithSoil.csv?download=1",
+    "retrieved_at": "2026-11-14T18:25:42.785699+00:00",
+    "permission": "CC BY4.0: Zenodo record13901372 metadata; cite Zhou et al.2024",
+    "content_type": "text/plain; charset=utf-8",
+    "status": "retrieved",
+    "bytes": 57920,
+    "sha256": "9df07c56ec6d80786bb9be2df28d9b2ce90d8c9bce81b21a84e99d4f9b4a373f"
+  },
+  {
+    "name": "ifc-HS0002.csv",
+    "url": "https://www.hydroshare.org/resource/50c4ad3248864a03845c671ff8da968b/data/contents/raw_data/HS0002.csv",
+    "retrieved_at": "2026-11-14T18:25:43.643775+00:00",
+    "permission": "CC BY4.0: IFC HydroShare resource; original v2 holdout already opened, diagnostic only",
+    "content_type": "binary/octet-stream",
+    "status": "retrieved",
+    "bytes": 3661090,
+    "sha256": "f40c3ecac2ce1c9ead252308b3926a45b164c01e432b7ed3b6a8580bf8f7a895"
+  },
+  {
+    "name": "ardn-sitemeta.csv",
+    "url": "https://ndownloader.figshare.com/files/43368207",
+    "retrieved_at": "2026-11-14T18:26:24.482215+00:00",
+    "permission": "CC0 per USDA Figshare child24665640 metadata; fertilizer-rate assignment warning Feb2026 retained",
+    "status": "retrieved",
+    "bytes": 9868,
+    "sha256": "c591b7e72a1e4e80af9cfdca58ccd6f2cfe8777016d74377cea55fd5730b2291"
+  },
+  {
+    "name": "ardn-plotid.csv",
+    "url": "https://ndownloader.figshare.com/files/43368210",
+    "retrieved_at": "2026-11-14T18:26:24.482924+00:00",
+    "permission": "CC0 per USDA Figshare child24665640 metadata; fertilizer-rate assignment warning Feb2026 retained",
+    "status": "retrieved",
+    "bytes": 3422299,
+    "sha256": "ac93834e434eafd2847cc882b7b395522ea158c7db13b701665efd837161808c"
+  },
+  {
+    "name": "ardn-weather_onsite.csv",
+    "url": "https://ndownloader.figshare.com/files/43368213",
+    "retrieved_at": "2026-11-14T18:26:24.483371+00:00",
+    "permission": "CC0 per USDA Figshare child24665640 metadata; fertilizer-rate assignment warning Feb2026 retained",
+    "status": "retrieved",
+    "bytes": 3691266,
+    "sha256": "9a925cb450baf2bd017f7b51b055011e8a537e57deb87cbc5e0fcac4b052ecbe"
+  },
+  {
+    "name": "ardn-agro.csv",
+    "url": "https://ndownloader.figshare.com/files/43368216",
+    "retrieved_at": "2026-11-14T18:26:25.449606+00:00",
+    "permission": "CC0 per USDA Figshare child24665640 metadata; fertilizer-rate assignment warning Feb2026 retained",
+    "status": "retrieved",
+    "bytes": 605838,
+    "sha256": "8ad1c3224f84cc715fe73a11d475fb5acd0c0f51319b86173aff4a923036519f"
+  },
+  {
+    "name": "ardn-soil.csv",
+    "url": "https://ndownloader.figshare.com/files/43368222",
+    "retrieved_at": "2026-11-14T18:26:26.995146+00:00",
+    "permission": "CC0 per USDA Figshare child24665640 metadata; fertilizer-rate assignment warning Feb2026 retained",
+    "status": "retrieved",
+    "bytes": 3412056,
+    "sha256": "5c1ad115d482336f0dac97d289c9804699e2b8b46ee8278e9034cf873848c192"
+  },
+  {
+    "name": "ardn-ops_plant.csv",
+    "url": "https://ndownloader.figshare.com/files/43368237",
+    "retrieved_at": "2026-11-14T18:26:28.815033+00:00",
+    "permission": "CC0 per USDA Figshare child24665640 metadata; fertilizer-rate assignment warning Feb2026 retained",
+    "status": "retrieved",
+    "bytes": 901585,
+    "sha256": "5a866c19379b5f02a35464baa050690243d603f6a1d9c0273dba077b776df4cd"
+  },
+  {
+    "name": "ardn-ops_harv.csv",
+    "url": "https://ndownloader.figshare.com/files/43368240",
+    "retrieved_at": "2026-11-14T18:27:07.032382+00:00",
+    "permission": "CC0 per USDA Figshare child24665640 metadata; fertilizer-rate assignment warning Feb2026 retained",
+    "status": "retrieved",
+    "bytes": 677069,
+    "sha256": "e94fd10babbc27490dbb560b720232d5ea8df06d53f7e01b5addbee18b7ee220"
+  },
+  {
+    "name": "ardn-master-sc2.json",
+    "url": "https://ndownloader.figshare.com/files/43368252",
+    "retrieved_at": "2026-11-14T18:27:08.616574+00:00",
+    "permission": "CC0 per USDA Figshare child24665640 metadata; fertilizer-rate assignment warning Feb2026 retained",
+    "status": "retrieved",
+    "bytes": 92016,
+    "sha256": "aba0278bc81173938c2573a66474d9fe38b018b6dbfec9155b1ebbb02d0a01ab"
+  },
+  {
+    "url": "https://api.figshare.com/v2/articles/24665640",
+    "retrieved_at": "2026-11-14T18:25:03.157025+00:00",
+    "purpose": "ARDN child metadata/permissions only",
+    "status": "retrieved",
+    "bytes": 31726,
+    "sha256": "91c0a27e70c293c6d58752fe760b256ac2167cbef4be7b3eccd9e079a2c260c2"
+  }
+]
