@@ -1,7 +1,6 @@
 name: field-shift
 
 x-api-image: &api-image
-  build: ./apps/api
   image: ${API_IMAGE:-field-shift-api:local}
   environment: &api-environment
     POSTGRES_HOST: postgres
@@ -56,6 +55,7 @@ services:
 
   api:
     <<: *api-image
+    build: ./apps/api
     environment:
       <<: *api-environment
       FIELD_SHIFT_AGENT_URL: ${FIELD_SHIFT_AGENT_URL:-}

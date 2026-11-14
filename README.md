@@ -10,7 +10,7 @@ The Assistant can connect to the private agent service in `services/agent` throu
 
 ## Start
 
-Install Docker with Compose, then run from the repository root.
+Install Docker with Compose and Buildx, then run from the repository root. On Ubuntu the packages are `docker.io`, `docker-compose-v2` and `docker-buildx`.
 
 ```sh
 docker compose up --build -d
