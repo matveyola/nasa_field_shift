@@ -1,5 +1,6 @@
 import { ArrowDownTrayIcon, ArrowPathIcon, MapIcon } from '@heroicons/react/24/outline'
 import type { Field } from '../../api/contracts'
+import { ContextHelp } from '../../shared/ContextHelp'
 import { useLocale } from '../../shared/locale'
 import { ErrorBox } from '../../shared/ui'
 import type { useFieldAnalytics } from './useFieldAnalytics'
@@ -9,6 +10,7 @@ import { NdviHistoryPanel } from './precision/NdviHistoryPanel'
 import { PrecisionFieldPanel } from './precision/PrecisionFieldPanel'
 import { vegetationCsv } from './vegetationInsights'
 import { SpectralIndexPanel } from './SpectralIndexPanel'
+import { fieldHelp, sceneHelpMetadata, spectralHelp } from './fieldHelp'
 import { useAccess } from '../access/AccessProvider'
 import './fieldAnalytics.css'
 
@@ -34,6 +36,7 @@ export function FieldAnalysisPanel({ state, field, season, onSeason, heterogenei
   const pending = result?.months.some((month) => month.status === 'pending')
   const layer = selectedScene.data?.heterogeneity
   const todayYear = new Date().getUTCFullYear()
+  const help = fieldHelp[language]
 
   function downloadObservations() {
     const url = URL.createObjectURL(new Blob([vegetationCsv(observations)], { type: 'text/csv;charset=utf-8' }))
@@ -46,7 +49,10 @@ export function FieldAnalysisPanel({ state, field, season, onSeason, heterogenei
 
   return <div className="field-analysis-panel">
     <section aria-label={t('Seasonal NDVI')}>
-      <header className="field-analysis-heading"><h3>{t('Seasonal NDVI')}</h3>
+      <header className="field-analysis-heading">
+        <div className="field-help-row"><h3>{t('Seasonal NDVI')}</h3>
+          <ContextHelp label={t('Seasonal NDVI')}><p>{spectralHelp.ndvi[language]}</p></ContextHelp>
+        </div>
         <label className="ndvi-season"><span className="sr-only">{t('Season')}</span><select value={season} onChange={(event) => onSeason(Number(event.target.value))}>
           {Array.from({ length: todayYear - 2016 }, (_, index) => todayYear - index).map((year) => <option key={year}>{year}</option>)}
         </select></label>
@@ -58,7 +64,20 @@ export function FieldAnalysisPanel({ state, field, season, onSeason, heterogenei
       {vegetation.error && <ErrorBox message={vegetation.error} retry={vegetation.reload} />}
       {selected ? <>
         <div className="ndvi-current"><strong>{number(selected.mean_ndvi, 2)}<small>NDVI</small></strong>
-          <div><time dateTime={selected.date}>{date(selected.date)}</time><span>{number(selected.valid_percent, 0)}% {t('clear coverage')}</span></div>
+          <div className="ndvi-observation-meta">
+            <div><time dateTime={selected.date}>{date(selected.date)}</time><span>{number(selected.valid_percent, 0)}% {t('clear coverage')}</span></div>
+            <ContextHelp label={help.scene.title}>
+              <p>{help.scene.description}</p>
+              <dl className="scene-help-metadata">
+                {sceneHelpMetadata(language, {
+                  source: selected.catalog_url ? 'Sentinel-2 L2A' : undefined,
+                  date: selected.date,
+                  coveragePercent: selected.valid_percent,
+                  analysisResolutionMetres: result?.resolution_m,
+                }).map(({ label, value }) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}
+              </dl>
+            </ContextHelp>
+          </div>
         </div>
         <SeasonalNdviChart observations={observations} season={season} selected={selected.date}
           onSelect={(day) => { state.selectObservation(day); onSelectObservation() }} />
@@ -105,7 +124,11 @@ export function FieldAnalysisPanel({ state, field, season, onSeason, heterogenei
       onSelect={(day) => { state.selectObservation(day); onSelectObservation() }}
       onMap={(index) => { state.showIndex(index); onShowIndex() }} />
     <section className="field-heterogeneity" aria-label={t('Within-field variation')}>
-      <header className="field-analysis-heading"><h3>{t('Within-field variation')}</h3><MapIcon aria-hidden="true" /></header>
+      <header className="field-analysis-heading">
+        <div className="field-help-row"><h3>{t('Within-field variation')}</h3>
+          <ContextHelp label={help.variation.title}><p>{help.variation.description}</p></ContextHelp>
+        </div>
+      </header>
       {selectedScene.error && <ErrorBox message={selectedScene.error} retry={selectedScene.reload} />}
       {layer ? <>
         <p className="analysis-description">{t('Selected observation')} · <time dateTime={layer.date}>{date(layer.date)}</time> · {layer.resolution_m} {t('m')}</p>
@@ -121,7 +144,11 @@ export function FieldAnalysisPanel({ state, field, season, onSeason, heterogenei
     <PrecisionFieldPanel field={field} season={season} layer={layer} sceneId={selectedScene.data?.observation.scene_id}
       fingerprint={selectedScene.data?.geometry_fingerprint} />
     <section className="field-terrain-analysis" aria-label={t('Terrain directions')}>
-      <header className="field-analysis-heading"><h3>{t('Terrain directions')}</h3></header>
+      <header className="field-analysis-heading">
+        <div className="field-help-row"><h3>{t('Terrain directions')}</h3>
+          <ContextHelp label={help.terrain.title}><p>{help.terrain.description}</p></ContextHelp>
+        </div>
+      </header>
       <p className="analysis-description">{t('Potential downhill directions from the land surface.')}</p>
       {terrain.error && <ErrorBox message={terrain.error} retry={terrain.reload} />}
       {terrain.data?.status === 'ready' ? <>

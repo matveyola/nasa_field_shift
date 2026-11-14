@@ -1,7 +1,9 @@
 import { useId, useState } from 'react'
 import { ArrowDownTrayIcon, MapIcon } from '@heroicons/react/24/outline'
 import type { SpectralIndex, VegetationObservation } from '../../api/analytics'
+import { ContextHelp } from '../../shared/ContextHelp'
 import { useLocale } from '../../shared/locale'
+import { spectralHelp } from './fieldHelp'
 import { spectralDefinitions, spectralMean } from './spectralIndices'
 
 export function SpectralIndexPanel({ observations, selected, onSelect, onMap }: {
@@ -30,9 +32,12 @@ export function SpectralIndexPanel({ observations, selected, onSelect, onMap }: 
   }
   return <section className="spectral-panel" aria-label={uk ? 'Супутникові індекси' : 'Satellite indices'}>
     <header className="field-analysis-heading"><h3>{uk ? 'Супутникові індекси' : 'Satellite indices'}</h3></header>
-    <label className="control"><span>{uk ? 'Індекс' : 'Index'}</span><select value={index} onChange={(event) => setIndex(event.target.value as SpectralIndex)}>
-      {(Object.keys(spectralDefinitions) as SpectralIndex[]).map((key) => <option key={key} value={key}>{key.toUpperCase()} · {spectralDefinitions[key][uk ? 'uk' : 'en']}</option>)}
-    </select></label>
+    <div className="field-help-row">
+      <label className="control"><span>{uk ? 'Індекс' : 'Index'}</span><select value={index} onChange={(event) => setIndex(event.target.value as SpectralIndex)}>
+        {(Object.keys(spectralDefinitions) as SpectralIndex[]).map((key) => <option key={key} value={key}>{key.toUpperCase()} · {spectralDefinitions[key][language]}</option>)}
+      </select></label>
+      <ContextHelp label={index.toUpperCase()}><p>{spectralHelp[index][language]}</p></ContextHelp>
+    </div>
     <p className="analysis-description">{definition[uk ? 'uk' : 'en']}</p>
     <div className="ndvi-current"><strong>{value == null ? '—' : number(value, 3)}<small>{index.toUpperCase()}</small></strong>
       <div>{selected && <time dateTime={selected.date}>{shortDate(selected.date)}</time>}</div></div>

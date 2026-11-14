@@ -1,6 +1,7 @@
 import { ArrowPathIcon, CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '../../api/client'
+import { ContextHelp } from '../../shared/ContextHelp'
 import { useLocale } from '../../shared/locale'
 import { useJob, useStartJob } from '../../shared/jobs'
 import { JobStatus } from '../../shared/JobStatus'
@@ -10,6 +11,7 @@ import { selectWaterForecast } from './waterForecast'
 import { getCurrentWaterOutlook } from './waterOutlook'
 import { WaterForecastChart } from './WaterForecastChart'
 import { WaterBudgetPanel } from './WaterBudgetPanel'
+import { waterHelp } from './waterHelp'
 
 const refreshIntervalMs = 5 * 60 * 1000
 
@@ -18,7 +20,8 @@ export function WaterForecastPanel({ fieldId, boundaryRevision, forecastDay }: {
   boundaryRevision: number
   forecastDay?: string
 }) {
-  const { t, number, crop, date, shortDate } = useLocale()
+  const { t, number, crop, date, shortDate, language } = useLocale()
+  const initialHelp = waterHelp[language].initialReserve
   const heading = useRef<HTMLHeadingElement>(null)
   const load = useCallback((signal: AbortSignal) => api.waterForecast(fieldId, signal), [fieldId, boundaryRevision])
   const saved = useResource(load, refreshIntervalMs)
@@ -85,7 +88,8 @@ export function WaterForecastPanel({ fieldId, boundaryRevision, forecastDay }: {
             <p className="analysis-day-source" role="status">{t('The linked day is no longer in the current forecast.')}</p>
           )}
           <WaterForecastChart key={forecastDay} initialDate={forecastDay ?? (outlook.kind === 'shortage' ? outlook.firstShortage.date : undefined)}
-            threshold={outlook.thresholdMm} days={days} showModelEstimate={hasModelEstimate} />
+            threshold={outlook.thresholdMm} days={days} showModelEstimate={hasModelEstimate}
+            rootDepthMetres={forecast.root_depth_m} provider={forecast.provider} />
           <footer className="water-forecast-footer">
             <p className="water-source-summary">{sourceSummary}</p>
             <details className="analysis-details water-source-details">
@@ -97,7 +101,9 @@ export function WaterForecastPanel({ fieldId, boundaryRevision, forecastDay }: {
                 {hasModelEstimate && <p>{t('Validated ML estimate')} · {forecast.model_version}</p>}
                 <dl className="data-strip analysis-source-grid">
                   <div><dt>{t('Root depth')}</dt><dd>{number(forecast.root_depth_m, 2)} {t('m')}</dd></div>
-                  <div><dt>{t('Initial reserve')}</dt><dd>{number(forecast.initial_reserve_mm)} {t('mm')}</dd></div>
+                  <div><dt>{t('Initial reserve')}{' '}
+                    <ContextHelp label={initialHelp.title}><p>{initialHelp.description}</p></ContextHelp>
+                  </dt><dd>{number(forecast.initial_reserve_mm)} {t('mm')}</dd></div>
                   <div><dt>{t('Soil capacity')}</dt><dd>{number(forecast.capacity_mm)} {t('mm')}</dd></div>
                   <div><dt>{t('Stress threshold')}</dt><dd>{number(forecast.threshold_mm)} {t('mm')}</dd></div>
                 </dl>
