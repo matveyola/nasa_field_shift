@@ -9,11 +9,17 @@ description = "Isolated crop engine adapters and offline evaluation for planning
 requires-python = ">=3.12,<3.13"
 dependencies = ["field-shift-contracts==0.1.0", "field-shift-science==0.1.0", "aquacrop==3.1.0", "pcse==6.0.13", "pydantic==2.12.5", "scikit-learn==1.8.0"]
 
+[project.optional-dependencies]
+ruslan = ["lightgbm==4.6.0"]
+
+[tool.setuptools.package-data]
+"field_shift_models.ruslan" = ["assets/*.json", "assets/*.txt", "NOTICE.md"]
+
 [project.scripts]
 field-shift-models = "field_shift_models.cli:main"
 
 [dependency-groups]
-dev = ["pytest==9.2.0", "ruff==0.17.4"]
+dev = ["pytest==9.2.0", "ruff==0.17.4", "lightgbm==4.6.0"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

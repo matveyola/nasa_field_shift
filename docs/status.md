@@ -1,5 +1,22 @@
 # Стан проєкту
 
+## Глобальні моделі та відкриті дані — 2026-11-15
+
+Додано [зведення результатів і меж застосування](planning/global-model-results.md), [порівняння сімейств моделей](planning/global-model-selection.md), [джерела даних](planning/global-data-sources.md) і [аудит моделі Руслана](planning/ruslan-model-audit.md). Використано публічні NASA POWER, USDA/ARDN та дозволені вихідні дані Франції/США з CY-Bench. Сирі дані й кеші залишаються поза Git; джерела, версії та checksums зафіксовані.
+
+Native AquaCrop-OSPy baseline виконує Maize, Wheat, Barley, Soy та Sunflower з точними upstream профілями. Окремий експериментальний водний баланс підтримує явні регіональні календарі, зміну культур, зимовий спокій, сніг і обидві півкулі. Він не оцінює врожай або прибуток. Rice/paddy залишається unsupported без відповідного management-контракту й перевірки. Модель Руслана відтворює історичну вологість, а не майбутню врожайність; її числову відповідність оригіналу перевірено, первинну точність без raw observations — ні.
+
+На реальних CY-Bench даних виконано 72 fits із часовими та просторовими перевірками. Окремий [пошук параметрів США](planning/cybench-search.md) зафіксував 22 конфігурації, 176 inner та 36 outer fits. Вибір моделі записано до оцінки 2021–2023 років. Chronological Extra Trees: RMSE **1,7109 т/га**, MAE **1,3814**, R² **0,5185**, 4 338 записів; trend RMSE **2,5354**. На нових штатах preselected HGB: RMSE **2,0101**, R² **−0,0372**, 626 записів; trend **2,0866**. Негативний R² збережено; модель не замінювали після перегляду тесту. Глобальна точність, field-level SOTA, калібровані інтервали й успішна агрономічна рекомендація з цих чисел не випливають; promotion не виконано.
+
+Технічна перевірка `d07f5ca`: усі 26 fast/build кроків; API 500 + 22 PostgreSQL/Redis integration; ML 171; models 137; agent 645; web 89; widget 99; tooling 38; сім clean non-editable wheel інсталяцій; CPU-v5; 120 planning-browser і 33 widget-browser — passed. У свіжому ізольованому Docker-стенді пройшли desktop/mobile, реальний bounded CPU flow на явно synthetic fixtures, apply/replan, restart, restore в нову БД, downgrade/upgrade та outage. Ці fixtures не зараховано як емпіричну точність. Один embeddings-тест та сім opt-in widget-сценаріїв пропущено й не зараховано як pass. Тимчасові контейнери, volumes, networks і порти прибрано.
+
+Виправлений search checkpoint `f7a4825` пройшов незалежне рев’ю та перевірку 263 ML-тестів, 65 додаткових path-сценаріїв у двох середовищах і clean installed-wheel source proof. Повний незалежний 212-fit replay початкової версії відтворив вибір, membership та метрики в межах 10⁻¹⁰; його застосування до виправлення підтверджено незмінними numerical AST. На виправленому коді окремо реально виконано всі 212 fits у v2; точні hash запусків відрізняються через ідентичність коду й останні розряди parallel forest arithmetic, без округлення результатів. Злиття й повторні combined checks виконуються через repository-wide lock.
+
+Рев’ю пошуку знайшло й відтворило перезапис frozen selection через однакові або alias-шляхи результатів. Виправлення відхиляє колізії й наявні вихідні файли до обчислень, включно з CSV/metadata та raw inputs. Додано 70 регресійних перевірок. Початковий звіт збережено, виправлений запуск має окремий v2 зі сталою схемою підбору параметрів.
+
+Правила перевірки даних, часових зрізів, одиниць, відкладених тестів і release gates додано до AGENTS.md. Main і deployment не входять до цього checkpoint.
+
+
 ## Встановлювані Python-пакети — 2026-11-14
 
 Ручне налаштування import-шляхів усунуто: немає production `PYTHONPATH`,
@@ -143,3 +160,17 @@ Runner `--mode fast --build` задає 18 послідовних команд �
 ### Виправлення збірки спільного образу API
 
 `build` у спільному Compose anchor створював кілька паралельних exporters для `field-shift-api:local`. На Docker 29 / BuildKit це відтворило помилку `image already exists`. Визначення `build` тепер належить лише сервісу `api`; migrate, dispatcher, refresh і workers використовують той самий готовий образ. Регресійний тест перевіряє унікальність image tags у реальному Compose build plan, падає на попередній конфігурації та проходить після виправлення.
+
+### Офлайн-аудит точності та покриття культур
+
+У локальній гілці `nazar-model-accuracy` додано [звіт і стратегію оцінювання](planning/accuracy-and-model-strategy.md), відтворюваний аудит наявних метрик, матрицю восьми культур і перевірку парних прогнозів із замороженим manifest. Це повторний аналіз відкритих звітів, а не нова незалежна валідація моделей. Production-артефакти, release gates та інтерфейс не змінювалися.
+
+Історична surface V2: MAE на семи фермах гірше на 0,15%, RMSE краще на 4,48%; обидва farm-bootstrap інтервали включають нуль. На serving footprint обидві помилки приблизно на 9% гірші. Rotation-effect candidate має MAE на 10,86% гірше за baseline. Доказів універсальної переваги або локального SOTA немає.
+
+CY-Bench: опубліковані адміністративні дані кукурудзи для 38 країн, пшениці для 29, разом 43; архів не завантажено, точність на полях із цього не випливає. Окремо отримано безкоштовні USDA/ARDN дані: 3 797 plot-year записів зерна, вісім штатів США, 29 кодів дослідних ділянок без доведеної незалежності ферм. Перевірено dry kg/ha проти parent workbook. Для нового crop-engine benchmark бракує повного погодного forcing, погоджених crosswalk та заморожених припущень; статус `insufficient_data`, метрики не вигадані.
+
+На `cc19320` незалежно пройшли 38 evaluator-тестів, 63 тести чотирьох нових модулів з вимкненим pytest `pythonpath`, увесь ML suite — **115 тестів без пропусків**, Ruff і форматування 49 файлів. Аудит USDA відтворюється побайтно: SHA256 `9879d7471a3b45d4a89c1c15c8533bc1748d9dfbe8a16e239d89bbdaa89aa8c3`. Checksum матриці виправлено після Git-нормалізації CRLF→LF. Незалежне рев’ю знайшло й після виправлення повторно перевірило два дефекти evaluator: oracle/historical результати не можуть пройти operational release review, а регіони без labels більше не зникають із coverage gates.
+
+Після встановлення locked-залежностей ізольованого worktree всі 23 кроки fast runner завершилися з кодом 0 на `8fb7a84`; подальший evaluator-only fix перевірений окремо на `cc19320`. API: 500 passed / 22 integration deselected; models: 55 passed; agent: 572 passed / 64 skipped; web: 89 passed; widget: 99 passed; обидві production-збірки, контракти й TypeScript пройшли. У agent пропущено 24 тести без FAO-корпусу та 40 без knowledge index (17 evaluation, 3 readiness, 20 RAG); пропуски не зараховані як успіх. Tooling: 18 passed. Docker, application integration, дороге навчання та live providers у цьому checkpoint не запускалися.
+
+Гілка ще не інтегрована й не опублікована. Вона стартувала від `9580638`; паралельні packaging-зміни інтегратора не зачіпалися. Після об’єднання з ними потрібні перевірки combined tree та актуальні шляхи scientific artifacts. Перед production застосуванням потрібні нові незалежні empirical holdouts; цей checkpoint їх не підміняє.

@@ -13,7 +13,7 @@ uv sync --locked --python 3.12
 .venv/bin/ruff check src tests
 .venv/bin/ruff format --check src tests
 .venv/bin/python -m pytest -q
-.venv/bin/python -m field_shift_models.cli benchmark --check reports/cpu-v3.json
+.venv/bin/python -m field_shift_models.cli benchmark --check reports/cpu-v5.json
 ```
 
 `benchmark --output /tmp/crop-cpu.json` measures CPU/wall time and peak RSS in
@@ -44,8 +44,7 @@ field_shift_models.cli evaluate`, with one JSON object on stdin:
 - optional `footprint`: `[west, south, east, north]` for a generic baseline gate.
 
 The response is `{result: {evaluation: SequenceEvaluation, model_card: ModelCard},
-resources: {...}}`. Exact crop identity is required: crop species Maize, Wheat or
-Barley, `cultivar_id=ospy-generic`, `profile_version=3.1.0`. This is a generic
+resources: {...}}`. Exact crop identity is required: crop species Maize, Wheat, Barley, Soy or Sunflower, `cultivar_id=ospy-generic`, `profile_version=3.1.0`. This is a generic
 physical baseline, never a locally validated cultivar. Dry yield is t/ha at zero
 moisture, reserve is plant-available mm over modeled root depth, and surface VWC
 is m³/m³ over the first explicitly modeled compartment. Root/surface metrics are
@@ -82,3 +81,14 @@ requires an explicit net uniform-sprinkler schedule within the contract ceiling;
 its ceiling is never automatically applied. Missing soil, opening water,
 forcing or hydraulic parameters stays missing. No calibrated predictive yield
 interval exists without independent field/year calibration data.
+
+
+Global research extension: see [model comparison](../../docs/planning/global-model-selection.md)
+and [season/water experiments](../../docs/planning/global-water-experiments.md).
+Soy maps exactly to the upstream Soybean coefficients; Sunflower uses its own
+pinned profile. These are generic baseline additions, not locally validated hybrids.
+The separate `ruslan` extra is experimental historical moisture reconstruction;
+default crop-model serving does not load it. Development tests require LightGBM
+through the locked dev group; production default installation remains unchanged.
+
+Current executed results and scope: [global model results](../../docs/planning/global-model-results.md).

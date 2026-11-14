@@ -58,3 +58,13 @@ Keep temporary work notes outside the delivered source tree or remove them after
 - Keep each checkpoint reviewable and reversible. Use `git revert` for shared history; do not rewrite published history or use destructive resets. Database rollback requires a tested restore to a fresh database, not merely a code revert.
 - Do not publish, deploy or push without explicit authorization. Do not commit secrets, environments, dependency caches or generated runtime data.
 - Update `docs/status.md` when readiness, verification or material limitations change. Keep it a concise status report rather than a transcript of individual file edits. Never claim an unrun check passed.
+
+## Model evidence and public data
+
+- Follow [global evaluation and applicability](docs/planning/global-model-results.md). Record crop, region, management, target, unit/depth, lead and model/data/parameter identities separately; execution support is not empirical validation.
+- Use open data with recorded provider, source version, checksums and constituent reuse terms. Keep raw data, mutable features and fit caches outside source; do not turn an archive-wide license into permission for restricted contributors.
+- Separate forecasts issued at decision time, retrospective reconstructions, historical analogue scenarios and synthetic tests. Check observation completion and source/label availability against the decision cutoff; disclose revised historical vintages and assumed publication lags.
+- Freeze protocols before fitting and freeze validation-selected parameters before opening new test errors. Fit transforms on training rows only; retain chronological and disjoint geographic groups, valid zero labels, missing-data counts, negative skill and abstentions. Public labels and local timestamps do not prove an externally sealed holdout.
+- Compare models on identical targets, leads, eligible rows and aggregation. Never infer local yield/profit accuracy from weather scores, coarse administrative correlations, physical mass balance or passing geography tests. Report actual metrics, uncertainty limits and failed gates.
+- Keep protocol, prepared data/metadata, frozen selections, predictions and reports at distinct paths. Reject canonical or inode aliases and existing output destinations before writing; never overwrite raw inputs or provenance artifacts.
+- Keep offline experiment winners outside serving until independent validation and the owning release gates permit promotion. Missing crop/system/soil/calendar support stays explicit; never substitute an unrelated crop or invent a calibrated global fallback.

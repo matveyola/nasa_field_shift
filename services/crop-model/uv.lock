@@ -1,5 +1,5 @@
 version = 1
-revision = 5
+revision = 3
 requires-python = "==3.12.*"
 resolution-markers = [
     "sys_platform == 'win32'",
@@ -202,13 +202,16 @@ requires-dist = [
     { name = "aquacrop", specifier = "==3.1.0" },
     { name = "field-shift-contracts", editable = "../../packages/field-shift-contracts" },
     { name = "field-shift-science", editable = "../../packages/field-shift-science" },
+    { name = "lightgbm", marker = "extra == 'ruslan'", specifier = "==4.6.0" },
     { name = "pcse", specifier = "==6.0.13" },
     { name = "pydantic", specifier = "==2.12.5" },
     { name = "scikit-learn", specifier = "==1.8.0" },
 ]
+provides-extras = ["ruslan"]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "lightgbm", specifier = "==4.6.0" },
     { name = "pytest", specifier = "==9.2.0" },
     { name = "ruff", specifier = "==0.17.4" },
 ]
