@@ -189,6 +189,8 @@ except ImportError:
             "env = dict(PYTHONHOME='/python')",
             "import os\nos.environ.update(PYTHONPATH='src')",
             "import os\nos.putenv('PYTHONPATH', 'src')",
+            "def fixture(monkeypatch):\n    monkeypatch.setenv('PYTHONPATH', 'apps/api/src')",
+            "def fixture(monkeypatch):\n    monkeypatch.setenv('PYTHONHOME', '/python')",
             "import subprocess\nsubprocess.run(['env', 'PYTHONPATH=src', 'python'])",
         ]
         for code in cases:
@@ -209,6 +211,7 @@ os.environ.pop('PYTHONPATH', None)
 os.unsetenv('PYTHONHOME')
 def clean(monkeypatch):
     monkeypatch.delenv('PYTHONPATH', raising=False)
+    monkeypatch.setenv('FIELD_SHIFT_ACCESS_MODE', 'team')
 """,
         )
         self.assertEqual(validate(self.root), [])
@@ -243,6 +246,10 @@ def clean(monkeypatch):
             "apps/api/tests/conftest.py": "import sys\nsys.path.insert(0, '../src')",
             "services/agent/tests/helpers.py": "from site import addsitedir\naddsitedir('..')",
             "infra/test_helper.py": "import os\nos.environ['PYTHONPATH'] = 'apps/api/src'",
+            "packages/field-shift-models/tests/test_worker.py": (
+                "def test_worker(monkeypatch):\n"
+                "    monkeypatch.setenv('PYTHONPATH', 'apps/api/src')"
+            ),
             "packages/field-shift-ml/tests/test_imports.py": "import sys\nsys.path += ['src']",
         }
         for relative, content in cases.items():

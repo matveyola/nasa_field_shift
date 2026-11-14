@@ -122,7 +122,11 @@ def python_violations(tree: ast.AST) -> list[tuple[int, str]]:
                 )
             }:
                 flag(node, "import-path mutation is forbidden")
-            if name in {"os.putenv", "os.environ.__setitem__", "os.environ.setdefault"}:
+            if name in {
+                "os.putenv",
+                "os.environ.__setitem__",
+                "os.environ.setdefault",
+            } or name.endswith(".setenv"):
                 if node.args and isinstance(node.args[0], ast.Constant):
                     if node.args[0].value in PATH_VARIABLES:
                         flag(node, "import-path environment override is forbidden")
