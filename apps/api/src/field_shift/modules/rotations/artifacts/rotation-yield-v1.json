@@ -1,0 +1,258 @@
+{
+  "schema_version": 1,
+  "version": "fieldshift-rotation-aa977d6f5072",
+  "feature_names": [
+    "wheat_predecessor",
+    "latitude",
+    "longitude",
+    "wheat_latitude",
+    "wheat_longitude"
+  ],
+  "intercept": 1.4820439111456742,
+  "weights": [
+    0.33347630196823114,
+    -0.37623744723809355,
+    -0.5102417517199395,
+    -0.06185841979107722,
+    -0.11021332544172735
+  ],
+  "interval_half_width": 2.9889854293379425,
+  "sites_by_predecessor": {
+    "Soy": [
+      [
+        38.581325,
+        -92.10565
+      ],
+      [
+        39.801075,
+        -90.821075
+      ],
+      [
+        40.7636,
+        -81.90635
+      ],
+      [
+        40.7813,
+        -81.84335
+      ],
+      [
+        40.930825,
+        -90.72727499999999
+      ],
+      [
+        41.193374999999996,
+        -91.4832
+      ],
+      [
+        41.222225,
+        -83.76185000000001
+      ],
+      [
+        42.02135,
+        -93.7593
+      ],
+      [
+        42.83135,
+        -90.79554999999999
+      ],
+      [
+        43.29925,
+        -89.35245
+      ],
+      [
+        44.761125,
+        -90.098175
+      ]
+    ],
+    "Wheat": [
+      [
+        39.801075,
+        -90.821075
+      ],
+      [
+        40.930825,
+        -90.72727499999999
+      ],
+      [
+        42.83135,
+        -90.79554999999999
+      ],
+      [
+        43.29925,
+        -89.35245
+      ],
+      [
+        44.761125,
+        -90.098175
+      ]
+    ]
+  },
+  "promoted": false,
+  "validation": {
+    "source_url": "https://doi.org/10.15482/USDA.ADC/1411953",
+    "source_sha256": "b9e40bf74554c32849dcb6e6a613d6b7a60b4b8a2f8cbed33073d7c7732f95b6",
+    "matched_site_years": 59,
+    "matched_management_pairs": 101,
+    "training_sites": 4,
+    "calibration_sites": 2,
+    "test_sites": 4,
+    "minimum_split_distance_km": 69.77779213627088,
+    "fitting_farms": [
+      "ARL",
+      "ISUAG.USB",
+      "NWREC",
+      "WOOSTER"
+    ],
+    "calibration_farms": [
+      "FREEMAN",
+      "LAN"
+    ],
+    "test_farms": [
+      "HOYTVILLE.LTR",
+      "MAR",
+      "ORR",
+      "SERF"
+    ],
+    "baseline_t_ha": {
+      "Soy": 1.3790581597222222,
+      "Wheat": 2.29959375
+    },
+    "evaluation": {
+      "candidate": {
+        "mae": 1.1884085266742812,
+        "rmse": 1.6055553200456998,
+        "bias": 0.2039169998762206
+      },
+      "baseline": {
+        "mae": 1.0719760199652777,
+        "rmse": 1.584108869900127,
+        "bias": 0.18650195312500006
+      },
+      "farm_years": 24,
+      "farms": [
+        "HOYTVILLE.LTR",
+        "MAR",
+        "ORR",
+        "SERF"
+      ],
+      "interval_coverage": 0.90625
+    },
+    "by_predecessor": {
+      "Soy": {
+        "candidate": {
+          "mae": 1.0828619914165596,
+          "rmse": 1.448713366819126,
+          "bias": 0.07087542512116249
+        },
+        "baseline": {
+          "mae": 0.8846994357638887,
+          "rmse": 1.3361682655514142,
+          "bias": -0.08542361111111113
+        },
+        "farm_years": 16,
+        "farms": [
+          "HOYTVILLE.LTR",
+          "MAR",
+          "ORR",
+          "SERF"
+        ],
+        "interval_coverage": 0.9375
+      },
+      "Wheat": {
+        "candidate": {
+          "mae": 1.4638788738640054,
+          "rmse": 1.9093786596686324,
+          "bias": 1.075233982836813
+        },
+        "baseline": {
+          "mae": 1.3944739583333334,
+          "rmse": 1.902564407605379,
+          "bias": 1.3944739583333334
+        },
+        "farm_years": 8,
+        "farms": [
+          "MAR",
+          "ORR"
+        ],
+        "interval_coverage": 0.875
+      }
+    },
+    "by_farm": {
+      "HOYTVILLE.LTR": {
+        "candidate": {
+          "mae": 0.7859999999999998,
+          "rmse": 0.9091779306291329,
+          "bias": -0.3337394232011378
+        },
+        "baseline": {
+          "mae": 0.7859999999999998,
+          "rmse": 0.8499832826498256,
+          "bias": 0.08514149305555546
+        },
+        "farm_years": 4,
+        "farms": [
+          "HOYTVILLE.LTR"
+        ],
+        "interval_coverage": 1.0
+      },
+      "MAR": {
+        "candidate": {
+          "mae": 0.6860208578416029,
+          "rmse": 0.8482369802703882,
+          "bias": -0.2012490822021285
+        },
+        "baseline": {
+          "mae": 0.7296864149305554,
+          "rmse": 1.063042912631032,
+          "bias": 0.39620095486111095
+        },
+        "farm_years": 8,
+        "farms": [
+          "MAR"
+        ],
+        "interval_coverage": 1.0
+      },
+      "ORR": {
+        "candidate": {
+          "mae": 1.8195507488555216,
+          "rmse": 2.157729800320506,
+          "bias": 1.8195507488555216
+        },
+        "baseline": {
+          "mae": 1.3101551649305556,
+          "rmse": 1.7925460397881599,
+          "bias": 1.3050447048611113
+        },
+        "farm_years": 8,
+        "farms": [
+          "ORR"
+        ],
+        "interval_coverage": 0.875
+      },
+      "SERF": {
+        "candidate": {
+          "mae": 1.4620624999999998,
+          "rmse": 2.027146557966574,
+          "bias": -0.46889424394737284
+        },
+        "baseline": {
+          "mae": 1.4620624999999998,
+          "rmse": 2.2297646797690494,
+          "bias": -1.0403793402777775
+        },
+        "farm_years": 4,
+        "farms": [
+          "SERF"
+        ],
+        "interval_coverage": 0.75
+      }
+    },
+    "gate": {
+      "site_coverage": true,
+      "mae_improvement": false,
+      "rmse_improvement": false,
+      "transition_stability": true,
+      "coverage": true
+    }
+  }
+}
