@@ -1,0 +1,202 @@
+name: field-shift
+
+x-api-image: &api-image
+  build: ./apps/api
+  image: ${API_IMAGE:-field-shift-api:local}
+  environment: &api-environment
+    POSTGRES_HOST: postgres
+    POSTGRES_USER: ${POSTGRES_USER:-field_shift}
+    POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-field_shift_local}
+    POSTGRES_DB: ${POSTGRES_DB:-field_shift}
+    REDIS_URL: redis://redis:6379/0
+    OPEN_METEO_API_KEY: ${OPEN_METEO_API_KEY:-}
+    IFS_FORECAST_CACHE: ${IFS_FORECAST_CACHE:-1}
+    MOISTURE_ENABLE_EXPERIMENTAL: ${MOISTURE_ENABLE_EXPERIMENTAL:-0}
+    MOISTURE_MODEL_PREVIEW: ${MOISTURE_MODEL_PREVIEW:-v1}
+    ROTATION_YIELD_ENABLE_EXPERIMENTAL: ${ROTATION_YIELD_ENABLE_EXPERIMENTAL:-0}
+    JOB_TASK_TIME_LIMIT_SECONDS: ${JOB_TASK_TIME_LIMIT_SECONDS:-120}
+    JOB_LEASE_GRACE_SECONDS: ${JOB_LEASE_GRACE_SECONDS:-15}
+    JOB_POLL_SECONDS: ${JOB_POLL_SECONDS:-2}
+    JOB_DISPATCH_RETRY_SECONDS: ${JOB_DISPATCH_RETRY_SECONDS:-15}
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-field_shift}
+      POSTGRES_DB: ${POSTGRES_DB:-field_shift}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-field_shift_local}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--appendonly", "yes", "--appendfsync", "everysec", "--maxmemory", "${REDIS_MAX_MEMORY:-256mb}", "--maxmemory-policy", "noeviction"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  migrate:
+    <<: *api-image
+    command: ["sh", "-ec", "alembic upgrade head && python -m field_shift.seed"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    <<: *api-image
+    environment:
+      <<: *api-environment
+      FIELD_SHIFT_AGENT_URL: ${FIELD_SHIFT_AGENT_URL:-}
+      FIELD_SHIFT_AGENT_API_KEY: ${FIELD_SHIFT_AGENT_API_KEY:-}
+      FIELD_SHIFT_AGENT_SIGNING_KEY: ${FIELD_SHIFT_AGENT_SIGNING_KEY:-}
+      FIELD_SHIFT_ENVIRONMENT: ${FIELD_SHIFT_ENVIRONMENT:-development}
+      FIELD_SHIFT_ACCESS_MODE: ${FIELD_SHIFT_ACCESS_MODE:-local}
+      FIELD_SHIFT_SECURE_COOKIE: ${FIELD_SHIFT_SECURE_COOKIE:-0}
+      FIELD_SHIFT_PUBLIC_ORIGIN: ${FIELD_SHIFT_PUBLIC_ORIGIN:-}
+      FIELD_SHIFT_BOOTSTRAP_TOKEN: ${FIELD_SHIFT_BOOTSTRAP_TOKEN:-}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://localhost:8000/api/health', timeout=3).close()"]
+      interval: 5s
+      timeout: 4s
+      retries: 12
+    restart: unless-stopped
+
+  agent:
+    profiles: [agent]
+    build: ./services/agent
+    image: ${AGENT_IMAGE:-field-shift-agent:local}
+    environment:
+      AGENT_ENVIRONMENT: production
+      AGENT_HOST: 0.0.0.0
+      AGENT_PORT: 8000
+      AGENT_CORS_ORIGINS: " "
+      AGENT_AGENT: ${FIELD_SHIFT_AGENT_MODE:-scripted-llm}
+      AGENT_API_KEY: ${FIELD_SHIFT_AGENT_API_KEY:-}
+      AGENT_CONTEXT_SIGNING_KEY: ${FIELD_SHIFT_AGENT_SIGNING_KEY:-}
+      AGENT_REQUIRE_CONTEXT_ATTESTATION: "true"
+      AGENT_TURN_TIMEOUT_S: 90  # a widget turn streams its steps; several tools may run in one turn
+      AGENT_LLM_REQUEST_TIMEOUT_S: 35
+      AGENT_GEMINI_MODEL: ${FIELD_SHIFT_AGENT_GEMINI_MODEL:-gemini-3.8-flash}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      AGENT_OPENAI_BASE_URL: ${OPENAI_BASE_URL:-}
+      AGENT_OPENAI_MODEL: ${OPENAI_MODEL:-}
+      AGENT_OPENAI_TOKEN_LIMIT_FIELD: ${OPENAI_TOKEN_LIMIT_FIELD:-max_completion_tokens}
+      AGENT_OPENAI_REASONING_EFFORT: ${OPENAI_REASONING_EFFORT:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      AGENT_RAG_MODE: lexical             # FAO-56 and NAAS recommendations, indexed into the image
+      AGENT_WEATHER_PROVIDER: open-meteo  # forecast, season water balance, soil temperature for sowing
+      AGENT_LLM_PRICE_INPUT_USD_PER_MTOK: ${FIELD_SHIFT_AGENT_PRICE_INPUT:-}
+      AGENT_LLM_PRICE_OUTPUT_USD_PER_MTOK: ${FIELD_SHIFT_AGENT_PRICE_OUTPUT:-}
+      AGENT_LLM_PRICE_CACHED_INPUT_USD_PER_MTOK: ${FIELD_SHIFT_AGENT_PRICE_CACHED_INPUT:-}
+      AGENT_GEO_PROVIDER: "off"
+      AGENT_SIM_PROVIDER: "off"
+    healthcheck:
+      test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://localhost:8000/health/ready', timeout=3).close()"]
+      interval: 10s
+      timeout: 4s
+      retries: 6
+      start_period: 10s
+    init: true
+    restart: unless-stopped
+
+  dispatcher:
+    <<: *api-image
+    command: ["python", "-m", "field_shift.jobs.dispatcher"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  worker-simulation:
+    <<: *api-image
+    command: ["celery", "-A", "field_shift.jobs.celery_app:app", "worker", "-Q", "simulation", "-n", "simulation@%h", "--concurrency=2", "--loglevel=INFO"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    init: true
+    stop_grace_period: ${WORKER_STOP_GRACE_PERIOD:-150s}
+    restart: unless-stopped
+
+  worker-geo-ml:
+    <<: *api-image
+    command: ["celery", "-A", "field_shift.jobs.celery_app:app", "worker", "-Q", "geo_ml", "-n", "geo-ml@%h", "--concurrency=1", "--loglevel=INFO"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    init: true
+    stop_grace_period: ${WORKER_STOP_GRACE_PERIOD:-150s}
+    restart: unless-stopped
+
+  moisture-refresh:
+    <<: *api-image
+    command: ["python", "-m", "field_shift.modules.geo_ml.refresh"]
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_USER: ${POSTGRES_USER:-field_shift}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-field_shift_local}
+      POSTGRES_DB: ${POSTGRES_DB:-field_shift}
+      MOISTURE_REFRESH_INTERVAL_SECONDS: ${MOISTURE_REFRESH_INTERVAL_SECONDS:-3600}
+      MOISTURE_FORECAST_REFRESH: ${MOISTURE_FORECAST_REFRESH:-1}
+      WATER_FORECAST_REFRESH: ${WATER_FORECAST_REFRESH:-1}
+      VEGETATION_REFRESH: ${VEGETATION_REFRESH:-1}
+      MOISTURE_ENABLE_EXPERIMENTAL: ${MOISTURE_ENABLE_EXPERIMENTAL:-0}
+      MOISTURE_MODEL_PREVIEW: ${MOISTURE_MODEL_PREVIEW:-v1}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  backup:
+    image: postgres:17-alpine
+    entrypoint: ["sh", "/opt/field-shift/backup.sh"]
+    environment:
+      PGHOST: postgres
+      PGUSER: ${POSTGRES_USER:-field_shift}
+      PGDATABASE: ${POSTGRES_DB:-field_shift}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-field_shift_local}
+      PGCONNECT_TIMEOUT: 5
+      BACKUP_INTERVAL_SECONDS: ${BACKUP_INTERVAL_SECONDS:-3600}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-7}
+    volumes:
+      - ./infra/backup.sh:/opt/field-shift/backup.sh:ro
+      - ${FIELD_SHIFT_BACKUP_DIR:-./backups}:/backups
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./apps/web
+      additional_contexts:
+        agent-widget: ./services/agent/frontend/src/widget  # «Польовий помічник», built into the web app
+    image: ${WEB_IMAGE:-field-shift-web:local}
+    ports:
+      - "127.0.0.1:${WEB_PORT:-8080}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  redis-data:

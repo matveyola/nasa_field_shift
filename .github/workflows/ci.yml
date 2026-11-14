@@ -1,0 +1,263 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      api: ${{ steps.detect.outputs.api }}
+      agent: ${{ steps.detect.outputs.agent }}
+      agent_reference: ${{ steps.detect.outputs.agent_reference }}
+      web: ${{ steps.detect.outputs.web }}
+      integration: ${{ steps.detect.outputs.integration }}
+      ml: ${{ steps.detect.outputs.ml }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: detect
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [[ -n "$BASE" ]] && git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+            git diff --no-renames --name-only "$BASE" HEAD > "$RUNNER_TEMP/changes"
+          else
+            git ls-files > "$RUNNER_TEMP/changes"
+          fi
+          awk '
+            /^(apps\/api\/|\.github\/workflows\/ci\.yml)/ { api = 1 }
+            /^services\/agent\/(agent_service|contracts|tests|integration_stub)\// { agent = 1 }
+            /^services\/agent\/evals\// && !/^services\/agent\/evals\/reports\// { agent = 1 }
+            /^(services\/agent\/(Dockerfile|\.dockerignore|pyproject\.toml|uv\.lock)$|compose\.yaml$|infra\/configure-agent\.py$|\.github\/workflows\/ci\.yml$)/ { agent = 1 }
+            /^services\/agent\/frontend\// && !/^services\/agent\/frontend\/docs\// { agent_reference = 1 }
+            /^(services\/agent\/(contracts\/|package(-lock)?\.json$|tsconfig\.json$|examples\/client\.ts$)|\.github\/workflows\/ci\.yml$)/ { agent_reference = 1 }
+            /^(apps\/web\/|services\/agent\/frontend\/src\/widget\/|\.github\/workflows\/ci\.yml)/ { web = 1 }
+            /^(apps\/api\/(src\/|tests\/integration\/|migrations\/|alembic\.ini|pyproject\.toml|uv\.lock|Dockerfile)|compose\.yaml|infra\/|\.github\/workflows\/ci\.yml)/ { integration = 1 }
+            /^(packages\/field-shift-ml\/|apps\/api\/src\/field_shift\/modules\/(crops|fields|geo_ml|rotations|simulation|weather)\/|\.github\/workflows\/ci\.yml$)/ { ml = 1 }
+            END {
+              print "api=" (api ? "true" : "false")
+              print "agent=" (agent ? "true" : "false")
+              print "agent_reference=" (agent_reference ? "true" : "false")
+              print "web=" (web ? "true" : "false")
+              print "integration=" (integration ? "true" : "false")
+              print "ml=" (ml ? "true" : "false")
+            }' "$RUNNER_TEMP/changes" >> "$GITHUB_OUTPUT"
+
+  api:
+    needs: changes
+    if: needs.changes.outputs.api == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: '0.11.0'
+          python-version: '3.12'
+          enable-cache: true
+          cache-dependency-glob: apps/api/uv.lock
+      - run: uv sync --locked --extra dev
+      - run: uv run --no-sync ruff check .
+      - run: uv run --no-sync ruff format --check .
+      - run: uv run --no-sync pytest -q -m "not integration"
+
+  ml:
+    needs: changes
+    if: needs.changes.outputs.ml == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    defaults:
+      run:
+        working-directory: packages/field-shift-ml
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: '0.11.0'
+          python-version: '3.12'
+          enable-cache: true
+          cache-dependency-glob: packages/field-shift-ml/uv.lock
+      - run: uv sync --locked
+      - run: uv run --no-sync ruff check .
+      - run: uv run --no-sync ruff format --check .
+      - run: uv run --no-sync pytest -q
+
+  agent:
+    needs: changes
+    if: needs.changes.outputs.agent == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    defaults:
+      run:
+        working-directory: services/agent
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: '0.11.0'
+          python-version: '3.12'
+          enable-cache: true
+          cache-dependency-glob: services/agent/uv.lock
+      - run: docker compose --profile agent config --quiet
+        working-directory: .
+      - run: uv sync --locked
+      - run: uv run --no-sync pytest -q
+
+  web:
+    needs: changes
+    if: needs.changes.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+
+  agent_reference:
+    needs: changes
+    if: needs.changes.outputs.agent_reference == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    defaults:
+      run:
+        working-directory: services/agent
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: |
+            services/agent/package-lock.json
+            services/agent/frontend/package-lock.json
+      - run: npm ci --ignore-scripts
+      - run: npm run check:ts
+      - run: npm ci --ignore-scripts
+        working-directory: services/agent/frontend
+      - run: npm run check:validators
+        working-directory: services/agent/frontend
+      - run: npm test
+        working-directory: services/agent/frontend
+      - run: npm run build
+        working-directory: services/agent/frontend
+
+  integration:
+    needs: changes
+    if: needs.changes.outputs.integration == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: apps/api
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: field_shift
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: field_shift
+        ports:
+          - 5432/tcp
+        options: >-
+          --health-cmd "pg_isready -h 127.0.0.1 -U field_shift -d field_shift"
+          --health-interval 2s --health-timeout 3s --health-retries 15
+      redis:
+        image: redis:7.4-alpine
+        ports:
+          - 6379/tcp
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 2s --health-timeout 3s --health-retries 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: '0.11.0'
+          python-version: '3.12'
+          enable-cache: true
+          cache-dependency-glob: apps/api/uv.lock
+      - run: uv sync --locked --extra dev
+      - run: docker compose config --quiet
+        working-directory: .
+      - run: uv run --no-sync pytest -q -m integration
+        env:
+          FIELD_SHIFT_TEST_DATABASE_URL: postgresql+psycopg://field_shift:ci@localhost:${{ job.services.postgres.ports['5432'] }}/field_shift
+          FIELD_SHIFT_TEST_REDIS_URL: redis://localhost:${{ job.services.redis.ports['6379'] }}/15
+      - name: Restore a PostgreSQL archive
+        env:
+          POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+          DATABASE_URL: postgresql+psycopg://field_shift:ci@localhost:${{ job.services.postgres.ports['5432'] }}/field_shift
+        run: |
+          uv run --no-sync alembic upgrade head
+          uv run --no-sync python -m field_shift.seed
+          uv run --no-sync python - <<'PY'
+          from fastapi.testclient import TestClient
+          from field_shift.api import app
+
+          with TestClient(app) as client:
+              response = client.post("/api/jobs", json={
+                  "kind": "simulation", "field_id": "F-03", "inputs": {"season": 2026}
+              })
+              assert response.status_code == 202, response.text
+          PY
+          docker exec -i -e PGHOST=127.0.0.1 -e PGUSER=field_shift -e PGDATABASE=field_shift \
+            -e PGPASSWORD=ci -e BACKUP_DIRECTORY=/tmp/field-shift-backup \
+            "$POSTGRES_CONTAINER" sh -s -- --once < ../../infra/backup.sh
+          docker exec "$POSTGRES_CONTAINER" sh -ec '
+            createdb -U field_shift field_shift_restore
+            pg_restore --exit-on-error -U field_shift -d field_shift_restore /tmp/field-shift-backup/*.dump
+            [ "$(psql -U field_shift -d field_shift_restore -Atc "SELECT count(*) FROM fields")" = 3 ]
+            [ "$(psql -U field_shift -d field_shift_restore -Atc "SELECT count(*) FROM jobs")" = 1 ]
+          '
+
+  required:
+    name: Required checks
+    if: always()
+    needs: [changes, api, ml, agent, agent_reference, web, integration]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    env:
+      RESULTS: ${{ join(needs.*.result, ' ') }}
+    steps:
+      - run: |
+          for result in $RESULTS; do
+            case "$result" in success|skipped) ;; *) exit 1 ;; esac
+          done

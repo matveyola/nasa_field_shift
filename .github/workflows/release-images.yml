@@ -1,0 +1,56 @@
+name: Package release images
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        app: [api, web]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: apps/${{ matrix.app }}
+          build-contexts: ${{ matrix.app == 'web' && 'agent-widget=services/agent/frontend/src/widget' || '' }}
+          tags: field-shift-${{ matrix.app }}:${{ github.sha }}
+          outputs: type=docker,dest=${{ runner.temp }}/field-shift-${{ matrix.app }}.tar
+          cache-from: type=gha,scope=${{ matrix.app }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.app }}
+      - name: Verify packaged model artifacts
+        if: matrix.app == 'api'
+        env:
+          API_ARCHIVE: ${{ runner.temp }}/field-shift-api.tar
+          API_TAG: field-shift-api:${{ github.sha }}
+        run: |
+          docker load --input "$API_ARCHIVE"
+          docker run --rm "$API_TAG" python -c '
+          from field_shift.modules.geo_ml.forecast_model import get_forecast_correction
+          from field_shift.modules.geo_ml.moisture_model import get_moisture_model, get_moisture_model_v2
+          from field_shift.modules.rotations.yield_model import get_rotation_yield_model
+          from field_shift.modules.simulation.root_zone_model import get_root_zone_correction
+          models = (
+              get_moisture_model(), get_moisture_model_v2(), get_forecast_correction(),
+              get_rotation_yield_model(), get_root_zone_correction(),
+          )
+          for model in models:
+              assert model is not None, "A release artifact is missing"
+              print(model.version, "promoted:", model.promoted)
+          '
+      - uses: actions/upload-artifact@v6
+        with:
+          name: field-shift-${{ matrix.app }}
+          path: ${{ runner.temp }}/field-shift-${{ matrix.app }}.tar
+          retention-days: 7
+          if-no-files-found: error

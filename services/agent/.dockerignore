@@ -1,0 +1,17 @@
+.env*
+.venv/
+**/__pycache__/
+.pytest_cache/
+.ruff_cache/
+frontend/
+node_modules/
+scripts/
+package.json
+package-lock.json
+tsconfig.json
+data/
+docs/
+evals/
+examples/
+integration_stub/
+tests/
