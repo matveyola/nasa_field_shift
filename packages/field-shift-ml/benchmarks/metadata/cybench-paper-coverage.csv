@@ -1,0 +1,87 @@
+country_code,country,crop,min_year,max_year,admin_regions,labels,exact_years,truth_level,source_table,source_country_code,admin_level
+AT,Austria,Maize,2003,2020,9,159,unknown,administrative,3,AT,NUTS2
+AT,Austria,Wheat,2004,2020,9,133,unknown,administrative,3,AT,NUTS2
+BE,Belgium,Maize,2011,2020,10,85,unknown,administrative,3,BE,NUTS2
+BE,Belgium,Wheat,2004,2020,11,174,unknown,administrative,3,BE,NUTS2
+BG,Bulgaria,Maize,2003,2020,6,106,unknown,administrative,3,BG,NUTS2
+BG,Bulgaria,Wheat,2010,2020,6,45,unknown,administrative,3,BG,NUTS2
+CZ,Czechia,Maize,2005,2020,14,212,unknown,administrative,3,CZ,NUTS3
+CZ,Czechia,Wheat,2004,2020,14,238,unknown,administrative,3,CZ,NUTS3
+DE,Germany,Maize,2004,2021,215,3159,unknown,administrative,3,DE,NUTS3
+DE,Germany,Wheat,2004,2021,358,5888,unknown,administrative,3,DE,NUTS3
+DK,Denmark,Maize,2011,2020,3,22,unknown,administrative,3,DK,NUTS3
+DK,Denmark,Wheat,2006,2020,10,150,unknown,administrative,3,DK,NUTS3
+EE,Estonia,Maize,,,0,0,unknown,administrative,3,EE,NUTS3
+EE,Estonia,Wheat,2004,2020,5,85,unknown,administrative,3,EE,NUTS3
+GR,Greece,Maize,2009,2019,40,440,unknown,administrative,3,EL,NUTS3
+GR,Greece,Wheat,2004,2019,42,640,unknown,administrative,3,EL,NUTS3
+ES,Spain,Maize,2003,2020,50,853,unknown,administrative,3,ES,NUTS3
+ES,Spain,Wheat,2004,2020,45,555,unknown,administrative,3,ES,NUTS3
+FI,Finland,Maize,,,0,0,unknown,administrative,3,FI,NUTS3
+FI,Finland,Wheat,2004,2020,18,176,unknown,administrative,3,FI,NUTS3
+FR,France,Maize,2004,2020,92,1539,unknown,administrative,3,FR,NUTS3
+FR,France,Wheat,2004,2020,94,1581,unknown,administrative,3,FR,NUTS3
+HR,Croatia,Maize,2005,2020,2,32,unknown,administrative,3,HR,NUTS2
+HR,Croatia,Wheat,2008,2020,2,25,unknown,administrative,3,HR,NUTS2
+HU,Hungary,Maize,2003,2020,20,352,unknown,administrative,3,HU,NUTS3
+HU,Hungary,Wheat,2004,2020,20,278,unknown,administrative,3,HU,NUTS3
+IE,Ireland,Maize,,,0,0,unknown,administrative,3,IE,NUTS2
+IE,Ireland,Wheat,2010,2020,3,11,unknown,administrative,3,IE,NUTS2
+IT,Italy,Maize,2003,2020,101,1603,unknown,administrative,3,IT,NUTS3
+IT,Italy,Wheat,2004,2020,86,1242,unknown,administrative,3,IT,NUTS3
+LT,Lithuania,Maize,2003,2020,10,146,unknown,administrative,3,LT,NUTS3
+LT,Lithuania,Wheat,2004,2020,10,169,unknown,administrative,3,LT,NUTS3
+LV,Latvia,Maize,,,0,0,unknown,administrative,3,LV,NUTS3
+LV,Latvia,Wheat,2004,2018,5,75,unknown,administrative,3,LV,NUTS3
+NL,Netherlands,Maize,2008,2020,12,126,unknown,administrative,3,NL,NUTS2
+NL,Netherlands,Wheat,2004,2020,12,195,unknown,administrative,3,NL,NUTS2
+PL,Poland,Maize,2003,2020,17,291,unknown,administrative,3,PL,NUTS2
+PL,Poland,Wheat,2004,2020,17,284,unknown,administrative,3,PL,NUTS2
+PT,Portugal,Maize,2003,2020,5,88,unknown,administrative,3,PT,NUTS2
+PT,Portugal,Wheat,2004,2020,5,85,unknown,administrative,3,PT,NUTS2
+RO,Romania,Maize,2003,2020,42,736,unknown,administrative,3,RO,NUTS3
+RO,Romania,Wheat,2004,2020,34,379,unknown,administrative,3,RO,NUTS3
+SE,Sweden,Maize,2007,2020,1,10,unknown,administrative,3,SE,NUTS3
+SE,Sweden,Wheat,2004,2020,17,271,unknown,administrative,3,SE,NUTS3
+SK,Slovakia,Maize,2007,2018,8,94,unknown,administrative,3,SK,NUTS3
+SK,Slovakia,Wheat,2017,2018,5,10,unknown,administrative,3,SK,NUTS3
+AU,Australia,Maize,,,0,0,unknown,administrative,4,AU,ABARES sub-state region
+AU,Australia,Wheat,2003,2023,23,442,unknown,administrative,4,AU,ABARES sub-state region
+CN,China,Maize,2003,2022,31,602,unknown,administrative,4,CN,province
+CN,China,Wheat,2004,2022,25,475,unknown,administrative,4,CN,province
+IN,India,Maize,2003,2017,506,6597,unknown,administrative,4,IN,district
+IN,India,Wheat,2004,2017,476,6289,unknown,administrative,4,IN,district
+AO,Angola,Maize,2004,2017,18,252,unknown,administrative,4,AO,ADM1
+AO,Angola,Wheat,,,0,0,unknown,administrative,4,AO,ADM1
+BF,Burkina Faso,Maize,2003,2019,45,540,unknown,administrative,4,BF,ADM2
+BF,Burkina Faso,Wheat,,,0,0,unknown,administrative,4,BF,ADM2
+ET,Ethiopia,Maize,2003,2020,65,778,unknown,administrative,4,ET,ADM2
+ET,Ethiopia,Wheat,,,0,0,unknown,administrative,4,ET,ADM2
+LS,Lesotho,Maize,2004,2021,10,163,unknown,administrative,4,LS,ADM1
+LS,Lesotho,Wheat,,,0,0,unknown,administrative,4,LS,ADM1
+MG,Madagascar,Maize,2005,2010,22,132,unknown,administrative,4,MG,ADM2
+MG,Madagascar,Wheat,,,0,0,unknown,administrative,4,MG,ADM2
+ML,Mali,Maize,2003,2017,24,360,unknown,administrative,4,ML,municipality
+ML,Mali,Wheat,,,0,0,unknown,administrative,4,ML,municipality
+MW,Malawi,Maize,2018,2023,4,16,unknown,administrative,4,MW,ADM2
+MW,Malawi,Wheat,,,0,0,unknown,administrative,4,MW,ADM2
+MZ,Mozambique,Maize,2004,2022,10,159,unknown,administrative,4,MZ,ADM1
+MZ,Mozambique,Wheat,,,0,0,unknown,administrative,4,MZ,ADM1
+NE,Niger,Maize,2003,2021,25,264,unknown,administrative,4,NE,ADM2
+NE,Niger,Wheat,,,0,0,unknown,administrative,4,NE,ADM2
+SN,Senegal,Maize,2003,2015,40,401,unknown,administrative,4,SN,ADM2
+SN,Senegal,Wheat,,,0,0,unknown,administrative,4,SN,ADM2
+TD,Chad,Maize,2003,2017,17,231,unknown,administrative,4,TD,ADM1
+TD,Chad,Wheat,,,0,0,unknown,administrative,4,TD,ADM1
+ZA,South Africa,Maize,2004,2022,9,167,unknown,administrative,4,ZA,ADM1
+ZA,South Africa,Wheat,,,0,0,unknown,administrative,4,ZA,ADM1
+ZM,Zambia,Maize,2004,2017,71,994,unknown,administrative,4,ZM,ADM2
+ZM,Zambia,Wheat,,,0,0,unknown,administrative,4,ZM,ADM2
+MX,Mexico,Maize,2014,2022,64,133,unknown,administrative,4,MX,state
+MX,Mexico,Wheat,,,0,0,unknown,administrative,4,MX,state
+US,United States,Maize,2003,2023,1930,33193,unknown,administrative,4,US,county
+US,United States,Wheat,2004,2023,1638,22834,unknown,administrative,4,US,county
+AR,Argentina,Maize,2004,2023,299,5599,unknown,administrative,4,AR,department
+AR,Argentina,Wheat,2003,2023,240,4661,unknown,administrative,4,AR,department
+BR,Brazil,Maize,2003,2023,4567,88759,unknown,administrative,4,BR,municipality
+BR,Brazil,Wheat,2003,2022,1015,18472,unknown,administrative,4,BR,municipality
