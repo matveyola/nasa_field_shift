@@ -17,7 +17,10 @@ a model URL still support browser segmentation.
 
 From the repository root, run `docker compose up --build -d`. The boundary
 service downloads the pinned [official weights][weights] once, verifies the
-checksum and keeps them in a Docker volume. To reuse a local copy, run:
+checksum and keeps them in a Docker volume. Its private `/health/ready` endpoint
+responds once the model has loaded and completed a warmup inference. Field
+entry remains available while the model starts, including manual drawing.
+To reuse a local copy, run:
 
 ```powershell
 $env:WEB_PORT = '8081'
@@ -26,6 +29,10 @@ docker compose -f compose.yaml -f compose.boundary-model.yaml -p field-shift-onb
 ```
 
 This starts a CPU model service with a read-only checkpoint mount.
+
+CI builds and starts the CPU service when its inputs change and checks packed
+masks through the private HTTP endpoint using the bundled Bondurant image. The
+test needs the pinned weight download on first startup and reads local imagery.
 
 The map overlays place names from [EOxMaps][eox] on its global satellite background
 at navigation zooms. It uses more detailed imagery where available and can load

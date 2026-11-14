@@ -52,6 +52,7 @@ def load_predictor(weights: Path, device: str):
     verify_weights(weights)
     import cv2
     import numpy as np
+
     from ultralytics import YOLO
 
     model = YOLO(str(weights.resolve()), task="segment")
@@ -91,10 +92,20 @@ def load_predictor(weights: Path, device: str):
 
 def run(host: str, port: int, weights: Path, device: str) -> None:
     predict = load_predictor(weights, device)
+    # Initialise the inference device before reporting the service ready.
+    predict(bytes(RGB_BYTES))
     slot = Lock()
 
     class Handler(BaseHTTPRequestHandler):
         timeout = 5
+
+        def do_GET(self) -> None:
+            if self.path != "/health/ready":
+                self.send_error(404)
+                return
+            self.send_response(200)
+            self.send_header("Content-Length", "0")
+            self.end_headers()
 
         def do_POST(self) -> None:
             if self.path != "/predict":

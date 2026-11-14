@@ -58,7 +58,7 @@ services:
     volumes:
       - boundary-weights:/models
     healthcheck:
-      test: ["CMD", "python", "-c", "import socket; socket.create_connection(('127.0.0.1', 8091), timeout=2).close()"]
+      test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://127.0.0.1:8091/health/ready', timeout=2).close()"]
       interval: 5s
       timeout: 3s
       retries: 18
@@ -87,6 +87,7 @@ services:
         condition: service_completed_successfully
       boundary-model:
         condition: service_started
+        required: false
     healthcheck:
       test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://localhost:8000/api/health', timeout=3).close()"]
       interval: 5s

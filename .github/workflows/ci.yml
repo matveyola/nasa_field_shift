@@ -20,6 +20,7 @@ jobs:
     outputs:
       api: ${{ steps.detect.outputs.api }}
       agent: ${{ steps.detect.outputs.agent }}
+      boundary_model: ${{ steps.detect.outputs.boundary_model }}
       agent_reference: ${{ steps.detect.outputs.agent_reference }}
       web: ${{ steps.detect.outputs.web }}
       integration: ${{ steps.detect.outputs.integration }}
@@ -40,6 +41,7 @@ jobs:
           fi
           awk '
             /^(apps\/api\/|\.github\/workflows\/ci\.yml)/ { api = 1 }
+            /^(services\/boundary-model\/|compose(\.boundary-model)?\.yaml$|apps\/web\/public\/bondurant-usgs-aerial\.webp$|\.github\/workflows\/ci\.yml$)/ { boundary_model = 1 }
             /^services\/agent\/(agent_service|contracts|tests|integration_stub)\// { agent = 1 }
             /^services\/agent\/evals\// && !/^services\/agent\/evals\/reports\// { agent = 1 }
             /^(services\/agent\/(Dockerfile|\.dockerignore|pyproject\.toml|uv\.lock)$|compose\.yaml$|infra\/configure-agent\.py$|\.github\/workflows\/ci\.yml$)/ { agent = 1 }
@@ -51,6 +53,7 @@ jobs:
             END {
               print "api=" (api ? "true" : "false")
               print "agent=" (agent ? "true" : "false")
+              print "boundary_model=" (boundary_model ? "true" : "false")
               print "agent_reference=" (agent_reference ? "true" : "false")
               print "web=" (web ? "true" : "false")
               print "integration=" (integration ? "true" : "false")
@@ -146,6 +149,30 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
+
+  boundary_model:
+    needs: changes
+    if: needs.changes.outputs.boundary_model == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      COMPOSE_PROJECT_NAME: field-shift-boundary-ci
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Build and wait for the real CPU boundary model
+        run: docker compose up --build --wait --wait-timeout 300 boundary-model
+      - name: Check field masks over the private HTTP interface
+        run: |
+          docker compose cp apps/web/public/bondurant-usgs-aerial.webp boundary-model:/tmp/bondurant.webp
+          docker compose exec -T boundary-model python - /tmp/bondurant.webp < services/boundary-model/smoke_test.py
+      - name: Show model logs
+        if: failure()
+        run: docker compose logs --no-color boundary-model
+      - name: Remove test containers and model volume
+        if: always()
+        run: docker compose down --volumes
 
   agent_reference:
     needs: changes
@@ -251,7 +278,7 @@ jobs:
   required:
     name: Required checks
     if: always()
-    needs: [changes, api, ml, agent, agent_reference, web, integration]
+    needs: [changes, api, ml, agent, boundary_model, agent_reference, web, integration]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     env:

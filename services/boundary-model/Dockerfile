@@ -11,5 +11,5 @@ RUN useradd --create-home --uid 10001 fieldshift && install -d -o fieldshift -g 
 WORKDIR /app
 COPY serve.py .
 USER fieldshift
-ENV PYTHONUNBUFFERED=1 YOLO_AUTOINSTALL=false
+ENV PYTHONUNBUFFERED=1 YOLO_AUTOINSTALL=false OMP_NUM_THREADS=2 MKL_NUM_THREADS=2
 CMD ["python", "serve.py", "--host", "0.0.0.0", "--weights", "/models/DelineateAnythingv2.pt", "--download-weights"]
