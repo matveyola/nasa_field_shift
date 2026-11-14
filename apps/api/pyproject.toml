@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "field-shift-api"
+version = "0.1.0"
+description = "Field Shift agricultural planning API and workers"
+requires-python = ">=3.11"
+dependencies = [
+    "alembic>=1.15,<2",
+    "celery[redis]>=5.5,<6",
+    "fastapi>=0.115,<1",
+    "numpy>=2,<3",
+    "psycopg[binary]>=3.2,<4",
+    "pydantic>=2.10,<3",
+    "pyshp>=2.3,<4",
+    "rasterio>=1.4,<2",
+    "shapely>=2,<3",
+    "sqlalchemy>=2.0.38,<2.1",
+    "uvicorn>=0.34,<1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "httpx>=0.28,<1",
+    "pytest>=8.3,<10",
+    "ruff>=0.11,<1",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"field_shift.modules.geo_ml" = ["artifacts/*.json"]
+"field_shift.modules.rotations" = ["artifacts/*.json"]
+"field_shift.modules.simulation" = ["artifacts/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+markers = ["integration: requires real PostgreSQL or Redis infrastructure"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["field_shift"]
+
+[tool.ruff.lint.per-file-ignores]
+"migrations/versions/*.py" = ["E501"]
