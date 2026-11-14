@@ -23,6 +23,15 @@
 
 Keep temporary work notes outside the delivered source tree or remove them after verification.
 
+## Development agent tree
+
+- For multi-component implementation or explicitly delegated work, use [.agents/skills/agent-tree/SKILL.md](.agents/skills/agent-tree/SKILL.md) and spawn bounded subagents when available. Small edits can stay with one implementer and appropriate checks.
+- Roles live in `.codex/agents`: `task_lead`, `implementer`, `researcher`, `verifier`, `test_runner`, and `integrator`. The root coordinates the whole tree; task leads may delegate within its shared capacity and ownership allocation.
+- Each implementation leaf in delegated work needs independent verification and test evidence for the same frozen revision. An author cannot approve their own change. Missing mandatory checks block acceptance; later edits invalidate affected evidence.
+- Use separate worktrees for concurrent writers. Freeze a checkout during review/testing. Assign one owner to shared files such as `docs/status.md`; worktrees do not isolate databases, Redis, ports or Docker resources.
+- Respect the effective runtime slot limit. Use staged execution and agent reuse when capacity is limited; do not recursively spawn reviewers of reviewers. The workflow depth budget is three edges from the root.
+- These are development roles, separate from the product agent in `services/agent`. Role instructions do not grant new permissions or publishing authority. Existing issue integration rules still apply.
+
 ## GitHub issue execution
 
 - For issue implementation, read and follow [.agents/skills/issue-worktree/SKILL.md](.agents/skills/issue-worktree/SKILL.md).
