@@ -1,0 +1,575 @@
+{
+  "version": "fieldshift-root-79283eb91fa5",
+  "schema_version": 1,
+  "source_cycle": "50R1",
+  "reference_depth_m": 1,
+  "feature_names": [
+    "physical_reserve_mm",
+    "raw_ifs_available_mm",
+    "initial_storage_mm",
+    "ifs_deep_moisture",
+    "soil_temperature_c",
+    "air_temperature_c",
+    "rain_to_lead_mm",
+    "et0_to_lead_mm",
+    "lead",
+    "season_sin",
+    "season_cos"
+  ],
+  "intercept": 74.56476999150111,
+  "weights": [
+    -0.14590804178591696,
+    -0.06526621897381943,
+    -0.0002878224975638892,
+    -288.7245167561257,
+    2.602736287590165,
+    -0.3449910179105441,
+    0.2883739627791532,
+    -0.7307167903364101,
+    3.8742865324533624,
+    14.179099925764186,
+    23.924562550009853
+  ],
+  "interval_half_width_mm": [
+    103.61441605356433,
+    100.9876385481206,
+    102.40978266552902,
+    105.37417735596199,
+    102.2249697867978
+  ],
+  "fit_locations": [
+    [
+      36.78773,
+      -89.93937
+    ],
+    [
+      37.10237,
+      -87.84105
+    ],
+    [
+      37.1313,
+      -97.0859
+    ],
+    [
+      39.70045,
+      -96.1629
+    ],
+    [
+      40.2473,
+      -93.71605
+    ],
+    [
+      40.84617,
+      -96.46625
+    ],
+    [
+      42.0136,
+      -93.72977
+    ],
+    [
+      42.44481,
+      -95.76793
+    ],
+    [
+      47.71593,
+      -96.26823
+    ]
+  ],
+  "validated_months": [
+    8,
+    9,
+    10
+  ],
+  "promoted": false,
+  "validation": {
+    "observations_sha256": "337c396a57da43ba76c4ef9862ac38f4c7d5dd00c769a3e8bbb06f473e533f9a",
+    "site_protocol_sha256": "6963b3244a56ee97eea39793034cd23b479b58989eac4dc9dfe5805271e1bc2b",
+    "baseline_version": "fao56-single-kc-bucket-v1",
+    "target": "0\u20131 m reference available reserve (mm) under fixed loam and maize inputs",
+    "fit_pairs": 521,
+    "fit_sites": 9,
+    "calibration_pairs": 195,
+    "calibration_sites": 3,
+    "observation_sites": [
+      {
+        "days": 89,
+        "latitude": 40.84617,
+        "longitude": -96.46625,
+        "name": "Rogers Farm #1",
+        "role": "fit",
+        "station_id": "2001:NE:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 0,
+        "latitude": 45.41519,
+        "longitude": -93.94786,
+        "name": "Crescent Lake #1",
+        "role": "calibration",
+        "station_id": "2002:MN:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 89,
+        "latitude": 40.31314,
+        "longitude": -89.90187,
+        "name": "Mason #1",
+        "role": "calibration",
+        "station_id": "2004:IL:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 89,
+        "latitude": 37.10237,
+        "longitude": -87.84105,
+        "name": "Princeton #1",
+        "role": "fit",
+        "station_id": "2005:KY:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 0,
+        "latitude": 42.8765,
+        "longitude": -77.0307,
+        "name": "Geneva #1",
+        "role": "fit",
+        "station_id": "2011:NY:SCAN",
+        "utc_offset": -5.0
+      },
+      {
+        "days": 0,
+        "latitude": 34.84886,
+        "longitude": -91.87826,
+        "name": "Uapb-Lonoke Farm",
+        "role": "test",
+        "station_id": "2030:AR:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 85,
+        "latitude": 42.0136,
+        "longitude": -93.72977,
+        "name": "Ames",
+        "role": "fit",
+        "station_id": "2031:IA:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 0,
+        "latitude": 40.72044,
+        "longitude": -77.93294,
+        "name": "Rock Springs Pa",
+        "role": "test",
+        "station_id": "2036:PA:SCAN",
+        "utc_offset": -5.0
+      },
+      {
+        "days": 13,
+        "latitude": 40.2473,
+        "longitude": -93.71605,
+        "name": "Spickard",
+        "role": "fit",
+        "station_id": "2047:MO:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 89,
+        "latitude": 36.78773,
+        "longitude": -89.93937,
+        "name": "Dexter",
+        "role": "fit",
+        "station_id": "2048:MO:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 84,
+        "latitude": 47.71593,
+        "longitude": -96.26823,
+        "name": "Glacial Ridge",
+        "role": "fit",
+        "station_id": "2050:MN:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 73,
+        "latitude": 34.43935,
+        "longitude": -86.68734,
+        "name": "Stanley Farm",
+        "role": "test",
+        "station_id": "2056:AL:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 0,
+        "latitude": 38.868,
+        "longitude": -94.03564,
+        "name": "Powell Gardens",
+        "role": "fit",
+        "station_id": "2061:MO:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 89,
+        "latitude": 42.44481,
+        "longitude": -95.76793,
+        "name": "Shagbark Hills",
+        "role": "fit",
+        "station_id": "2068:IA:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 89,
+        "latitude": 43.73835,
+        "longitude": -96.61455,
+        "name": "Eros Data Center",
+        "role": "calibration",
+        "station_id": "2072:SD:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 75,
+        "latitude": 35.13916,
+        "longitude": -86.19109,
+        "name": "Eastview Farm",
+        "role": "test",
+        "station_id": "2077:TN:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 85,
+        "latitude": 37.1313,
+        "longitude": -97.0859,
+        "name": "Abrams",
+        "role": "fit",
+        "station_id": "2092:KS:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 89,
+        "latitude": 39.78638,
+        "longitude": -99.32953,
+        "name": "Phillipsburg",
+        "role": "calibration",
+        "station_id": "2093:KS:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 89,
+        "latitude": 39.70045,
+        "longitude": -96.1629,
+        "name": "Centralia Lake",
+        "role": "fit",
+        "station_id": "2094:KS:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 0,
+        "latitude": 40.37092,
+        "longitude": -101.72007,
+        "name": "Johnson Farm",
+        "role": "test",
+        "station_id": "2111:NE:SCAN",
+        "utc_offset": -7.0
+      },
+      {
+        "days": 0,
+        "latitude": 39.05141,
+        "longitude": -95.19128,
+        "name": "Ku-Nesa",
+        "role": "fit",
+        "station_id": "2147:KS:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 0,
+        "latitude": 34.81982,
+        "longitude": -87.98685,
+        "name": "Isbell Farms",
+        "role": "test",
+        "station_id": "2173:AL:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 0,
+        "latitude": 37.98721,
+        "longitude": -94.03646,
+        "name": "Schell-Osage",
+        "role": "fit",
+        "station_id": "2193:MO:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 0,
+        "latitude": 36.9973,
+        "longitude": -92.2594,
+        "name": "Journagan Ranch",
+        "role": "fit",
+        "station_id": "2194:MO:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 0,
+        "latitude": 39.2285,
+        "longitude": -92.11942,
+        "name": "CMRB LTAR-MO",
+        "role": "fit",
+        "station_id": "2195:MO:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 0,
+        "latitude": 42.70785,
+        "longitude": -90.3899,
+        "name": "UW Platteville",
+        "role": "fit",
+        "station_id": "2196:WI:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 0,
+        "latitude": 39.15321,
+        "longitude": -90.78279,
+        "name": "Elsberry PMC",
+        "role": "fit",
+        "station_id": "2220:MO:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 0,
+        "latitude": 38.52563,
+        "longitude": -92.13465,
+        "name": "Carver Farm",
+        "role": "fit",
+        "station_id": "2223:MO:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 0,
+        "latitude": 39.51311,
+        "longitude": -91.51401,
+        "name": "Mark Twain HS",
+        "role": "fit",
+        "station_id": "2225:MO:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 0,
+        "latitude": 36.99024,
+        "longitude": -91.30943,
+        "name": "Twin Pines Conservation Area",
+        "role": "fit",
+        "station_id": "2226:MO:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 0,
+        "latitude": 38.47902,
+        "longitude": -90.80641,
+        "name": "Shaw Nature Reserve",
+        "role": "fit",
+        "station_id": "2227:MO:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 0,
+        "latitude": 37.18167,
+        "longitude": -91.11778,
+        "name": "LTSP",
+        "role": "fit",
+        "station_id": "2230:MO:SCAN",
+        "utc_offset": -6.0
+      },
+      {
+        "days": 0,
+        "latitude": 37.50147,
+        "longitude": -91.25926,
+        "name": "Sinkin Forest",
+        "role": "fit",
+        "station_id": "2231:MO:SCAN",
+        "utc_offset": -6.0
+      }
+    ],
+    "excluded_sites": [],
+    "qualified_farms": {
+      "pairs": 109,
+      "sites": 2,
+      "physical": {
+        "mae": 27.769642138047153,
+        "rmse": 31.59788004839755,
+        "bias": -27.33167750841752
+      },
+      "raw_ifs": {
+        "mae": 16.61399525252526,
+        "rmse": 19.030234838566766,
+        "bias": -13.611770437710438
+      },
+      "learned": {
+        "mae": 18.031115217944517,
+        "rmse": 20.702864281040352,
+        "bias": -15.278834083285105
+      },
+      "interval_coverage": 1.0
+    },
+    "leads": {
+      "1": {
+        "pairs": 22,
+        "sites": 2,
+        "physical": {
+          "mae": 19.69167363636364,
+          "rmse": 22.548771830253358,
+          "bias": -18.562837272727275
+        },
+        "raw_ifs": {
+          "mae": 15.922037272727279,
+          "rmse": 18.400388254799754,
+          "bias": -13.761382727272728
+        },
+        "learned": {
+          "mae": 14.35522481271247,
+          "rmse": 15.656433759772373,
+          "bias": -11.088944085331175
+        },
+        "interval_coverage": 1.0
+      },
+      "2": {
+        "pairs": 22,
+        "sites": 2,
+        "physical": {
+          "mae": 23.938910909090904,
+          "rmse": 27.076939342206444,
+          "bias": -23.33660545454546
+        },
+        "raw_ifs": {
+          "mae": 16.57436363636363,
+          "rmse": 19.05012866383845,
+          "bias": -14.03442363636362
+        },
+        "learned": {
+          "mae": 15.863874919454895,
+          "rmse": 17.891264102146902,
+          "bias": -13.19602934469098
+        },
+        "interval_coverage": 1.0
+      },
+      "3": {
+        "pairs": 22,
+        "sites": 2,
+        "physical": {
+          "mae": 27.65580818181818,
+          "rmse": 30.794165414025787,
+          "bias": -27.30994272727273
+        },
+        "raw_ifs": {
+          "mae": 16.75234545454545,
+          "rmse": 18.98961810954558,
+          "bias": -13.552851818181807
+        },
+        "learned": {
+          "mae": 17.38602814218932,
+          "rmse": 19.765939190357063,
+          "bias": -14.641505090723166
+        },
+        "interval_coverage": 1.0
+      },
+      "4": {
+        "pairs": 22,
+        "sites": 2,
+        "physical": {
+          "mae": 31.435048181818185,
+          "rmse": 35.096100987501835,
+          "bias": -31.435048181818185
+        },
+        "raw_ifs": {
+          "mae": 17.23818636363637,
+          "rmse": 19.643420258087342,
+          "bias": -13.255048181818175
+        },
+        "learned": {
+          "mae": 19.29970465373645,
+          "rmse": 22.174996457442308,
+          "bias": -16.61957908033872
+        },
+        "interval_coverage": 1.0
+      },
+      "5": {
+        "pairs": 21,
+        "sites": 2,
+        "physical": {
+          "mae": 36.516292727272734,
+          "rmse": 39.970365474730315,
+          "bias": -36.43599172727273
+        },
+        "raw_ifs": {
+          "mae": 16.56224763636363,
+          "rmse": 19.041817877137095,
+          "bias": -13.42178263636363
+        },
+        "learned": {
+          "mae": 23.49715616948284,
+          "rmse": 26.622484572242687,
+          "bias": -21.12949046203201
+        },
+        "interval_coverage": 1.0
+      }
+    },
+    "farms": {
+      "2056:AL:SCAN": {
+        "pairs": 54,
+        "sites": 1,
+        "physical": {
+          "mae": 25.643785185185177,
+          "rmse": 30.210456594766125,
+          "bias": -24.76785592592592
+        },
+        "raw_ifs": {
+          "mae": 16.59852777777778,
+          "rmse": 19.273661383689838,
+          "bias": -10.594078148148137
+        },
+        "learned": {
+          "mae": 17.142295750608685,
+          "rmse": 20.313201467071508,
+          "bias": -11.637733481289862
+        },
+        "interval_coverage": 1.0
+      },
+      "2077:TN:SCAN": {
+        "pairs": 55,
+        "sites": 1,
+        "physical": {
+          "mae": 29.895499090909095,
+          "rmse": 32.92689416634358,
+          "bias": -29.895499090909095
+        },
+        "raw_ifs": {
+          "mae": 16.629462727272724,
+          "rmse": 18.783653874815286,
+          "bias": -16.629462727272724
+        },
+        "learned": {
+          "mae": 18.919934685280328,
+          "rmse": 21.085327245184423,
+          "bias": -18.919934685280328
+        },
+        "interval_coverage": 1.0
+      }
+    },
+    "predeclared_farm_pairs": {
+      "2030:AR:SCAN": 0,
+      "2036:PA:SCAN": 0,
+      "2056:AL:SCAN": 54,
+      "2077:TN:SCAN": 55,
+      "2111:NE:SCAN": 0,
+      "2173:AL:SCAN": 0
+    },
+    "gates": {
+      "adequate_farms": false,
+      "improves_physical_mae_and_rmse": true,
+      "improves_raw_ifs_rmse": false,
+      "interval_coverage": true,
+      "farm_and_lead_stability": true,
+      "serving_cycle_validated": true,
+      "crop_depth_and_irrigation_verified": false
+    }
+  }
+}
