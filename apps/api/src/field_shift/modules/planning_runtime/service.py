@@ -36,6 +36,11 @@ class RuntimeService(RunService):
             "evaluations": data.get("evaluations", []),
             "model_card": data.get("model_card"),
             "sha256": data.get("sha256"),
+            **(
+                {"candidate_coverage": data["candidate_coverage"]}
+                if "candidate_coverage" in data
+                else {}
+            ),
         }
 
     def bootstrap(self, session, principal):

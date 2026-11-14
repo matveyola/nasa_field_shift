@@ -318,3 +318,30 @@ def test_boundary_refresh_requires_explicit_action_and_archives_old_profile(
     with factory.begin() as session:
         assert ProfileRepository(session).get_snapshot("1", "F-01", old.snapshot_id) == old
         assert service.initialize_profile(session, ADMIN, "F-01", refresh_boundary=True) == fresh
+
+
+def test_evidence_includes_versioned_coverage_without_changing_legacy_hashes(
+    factory, installed_inputs
+):
+    from field_shift.modules.rotations.scenario_planning.common import digest
+
+    bundle, card = installed_inputs
+    install(factory, bundle)
+    run = submit(factory, bundle)
+    for include_coverage in (False, True):
+        artifacts = {
+            "candidates": [],
+            "evaluations": [],
+            "model_card": card.model_dump(mode="json"),
+        }
+        if include_coverage:
+            artifacts["candidate_coverage"] = {
+                "F-01": {"combinations": 8, "limit": 2, "complete": False}
+            }
+        artifacts["sha256"] = digest(artifacts)
+        with factory.begin() as session:
+            session.get(PlanningRunRow, run.run_id).artifacts = artifacts
+        with factory() as session:
+            exposed = service.evidence(session, ADMIN, "1", run.run_id)
+        assert exposed == artifacts
+        assert digest({k: v for k, v in exposed.items() if k != "sha256"}) == exposed["sha256"]

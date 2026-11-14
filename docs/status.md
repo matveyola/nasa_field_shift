@@ -17,23 +17,23 @@
 
 | Перевірка цього checkpoint | Фактичний результат |
 | --- | --- |
-| API fast | 491 tests; включно з admission, outbox, lease recovery, fencing, календарями та узгодженням часу погодного issue |
+| API fast | 500 tests; включно з admission, outbox, lease recovery, fencing, календарями та узгодженням часу погодного issue |
 | PostgreSQL/Redis | 22 integration tests, без пропусків; реальні конкурентні транзакції та відновлення доставки |
 | Web | 89 unit tests; TypeScript; production Docker build |
-| UI lane D | 111 browser tests: desktop/mobile/phone preview, G01–G24 та помилки/підтвердження |
-| Crop package B | 53 tests; frozen CPU benchmark відтворено; метрики точності залишаються null |
+| UI lane D | 120 browser tests: desktop/mobile/phone preview, G01–G24 та помилки/підтвердження |
+| Crop package B | 55 tests; frozen CPU benchmark відтворено; метрики точності залишаються null |
 | Контракти | Generated export, JSON shapes/invalid payloads, TypeScript boundaries; frozen файли не змінено |
 | Docker | API, web і crop-model зібрано з окремими tags; default/agent/crop-model Compose config перевірено |
 | Наскрізний реальний runtime | Team session + CSRF → 2 поля × 3 сезони → реальний OSPy → альтернативи/докази → підтвердження → replan; desktop/mobile без JS errors |
 | Перезапуск і restore | Збережений план переживає restart; PostgreSQL dump відновлено в нову БД; downgrade до 0010 та upgrade до 0014 зберігають baseline fields |
 | Відмова сервісу | Після зупинки приватної моделі API повертає unavailable без підставних результатів |
 | Попередній ML package | 52 tests passed; історичні empirical evaluations заново не запускалися |
-| Приватний асистент | 572 passed; 64 skipped через відсутній локальний knowledge index/optional embeddings у цьому worktree; цей компонент не змінювався |
+| Приватний асистент | 635 passed; 1 optional embeddings test skipped; локальний lexical index зібрано з дозволеного cache |
 
 Наскрізні входи **явно синтетичні**. Початковий двопольовий розрахунок на
-ізольованому CPU стенді тривав 34,45 с; це одиничний acceptance run, не SLA.
+ізольованому CPU стенді тривав 33,73 с; це одиничний acceptance run, не SLA.
 Вхідний SHA-256:
-`c82fc5f5e47418c779cc3bbd8bd01e03cde87287ccd18d21ef664b65944f1b6d`.
+`2c319f8363be9adb1d1aee536319a514ed77ac4f48779dc0dc13d8cae5d645a1`.
 Повторити перевірку: `python3 infra/verify-planning.py`; вона створює власні
 порти, credentials, volumes, образи й бази та прибирає свій стенд.
 
@@ -49,6 +49,16 @@ issue, а не часом натискання кнопки; після apply п
 операційний стан лишається у PostgreSQL, offline observations — окремими
 версійованими файлами. Нові сирі дані та погодні архіви потрібно надати або
 отримати з перевірених джерел для наукового acceptance.
+
+Незалежні runtime та web/harness reviewers перевірили виправлення обмеженого
+перебору, terminal worker failures, дат профілю/погоди, нових ручних commitments,
+очікування post-apply refresh, retry, контексту помічника та boundary recovery.
+Реальний touch-mobile flow тепер проходить усі дії, а не тільки зміну viewport.
+Додатково: 18 tooling tests, 99 widget unit tests, 33 deterministic widget browser
+tests; 7 opt-in live/offline browser checks не виконувалися. Ролі нового harness
+реально з'являються в Codex role discovery. Поточний CPU-v2 report зберігає
+числові результати v1; змінені лише source-bound identities і ресурси запуску.
+Старий frozen report не переписано.
 
 ## Попередній базовий зріз — 2026-11-14
 
