@@ -4,6 +4,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 Crop = Literal["Wheat", "Maize", "Soy", "Barley", "Sunflower", "Rapeseed", "Peas"]
+PlanningPriority = Literal["water", "soil", "low_change"]
 PlannerSeason = Annotated[int, Field(ge=2001, le=2098)]
 Hectares = Annotated[float, Field(ge=0, le=3_000_000, allow_inf_nan=False)]
 
@@ -81,6 +82,8 @@ class PlanningField(BaseModel):
     crop: str
     crop_season: int
     history: list[CropDecision]
+    allowed_crops: list[Crop] | None = None
+    priority: PlanningPriority | None = None
 
 
 class PlanningContext(BaseModel):

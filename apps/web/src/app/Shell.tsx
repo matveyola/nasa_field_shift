@@ -29,19 +29,19 @@ export function Shell({
     <div className={'app-shell page-' + route.page}>
       <a className="skip-link" href="#content">{t('Skip to content')}</a>
       <header className="mobile-header">
-        <a className="mobile-brand" href={routeAddress({ ...route, page: 'fields' })} onClick={(event) => follow(event, 'fields')}>
+        <a className="mobile-brand" href={routeAddress({ ...route, page: 'fields', setupId: undefined })} onClick={(event) => follow(event, 'fields')}>
           <BrandLogo />
           <span>Field Shift<small>AGRITECH</small></span>
         </a>
         <div className="mobile-header-actions">
           <LanguageSelect />
           <HeaderActions />
-          <a className="mobile-farm" aria-label={t('Your farm')} href={routeAddress({ ...route, page: 'farm' })}
+          <a className="mobile-farm" aria-label={t('Your farm')} href={routeAddress({ ...route, page: 'farm', setupId: undefined })}
             onClick={(event) => follow(event, 'farm')}><UserIcon aria-hidden="true" /></a>
         </div>
       </header>
       <aside className="sidebar">
-        <a className="brand" href={routeAddress({ ...route, page: 'fields' })} onClick={(event) => follow(event, 'fields')}>
+        <a className="brand" href={routeAddress({ ...route, page: 'fields', setupId: undefined })} onClick={(event) => follow(event, 'fields')}>
           <BrandLogo />
           <span>Field Shift</span>
           <small>AGRITECH</small>
@@ -51,6 +51,7 @@ export function Shell({
             // «Польовий помічник»: its round mark in Agent's place (the middle of the phone's bar) opens it.
             if (page === 'agent') return (
               <button key={page} type="button" className="nav-link nav-assistant" aria-haspopup="dialog" aria-expanded={assistantOpen}
+                disabled={Boolean(route.setupId)}
                 onClick={openAssistant}>
                 <span className="nav-assistant-mark" aria-hidden="true"><FieldMark /></span>
                 <span>{t('Assistant')}</span>
@@ -59,7 +60,7 @@ export function Shell({
             const { label, icon: Icon } = destinations[page]
             return (
               <a key={page} className={'nav-link nav-' + page} aria-current={route.page === page ? 'page' : undefined}
-                href={routeAddress({ ...route, page })}
+                href={routeAddress({ ...route, page, setupId: undefined })}
                 onClick={(event) => follow(event, page)}>
                 <Icon aria-hidden="true" />
                 {page === 'farm' ? <><span className="nav-label-desktop">{t('Farm management')}</span><span className="nav-label-mobile">{t(label)}</span></> : <span>{t(label)}</span>}
@@ -67,7 +68,7 @@ export function Shell({
             )
           })}
         </nav>
-        <a className="farm-link" href={routeAddress({ ...route, page: 'farm' })} onClick={(event) => follow(event, 'farm')}>
+        <a className="farm-link" href={routeAddress({ ...route, page: 'farm', setupId: undefined })} onClick={(event) => follow(event, 'farm')}>
           <BuildingOffice2Icon aria-hidden="true" />
           <span>{farmName ?? t('Your farm')}</span>
         </a>

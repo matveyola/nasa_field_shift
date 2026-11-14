@@ -2,6 +2,17 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { parseRoute, routeAddress } from '../src/app/routing.ts'
 
+test('onboarding links keep the setup and its return field after a refresh', () => {
+  const setupId = 'fe1d4840-3928-4d02-8a09-67f883e0245b'
+  const address = '/onboarding?setup=' + setupId + '&field=F-03'
+  const route = parseRoute(address)
+  assert.equal(route.setupId, setupId)
+  assert.equal(route.fieldId, 'F-03')
+  assert.equal(routeAddress(route), address)
+  assert.equal(parseRoute('/fields?setup=' + setupId).setupId, undefined)
+  assert.equal(parseRoute('/onboarding?setup=invalid').setupId, undefined)
+})
+
 test('notification links preserve exact field and signal intent only on the assistant route', () => {
   const route = { page: 'agent' as const, fieldId: 'F-02', scenario: 'baseline', signal: 'water' as const }
   assert.equal(routeAddress(route), '/agent?field=F-02&scenario=baseline&signal=water')

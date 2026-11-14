@@ -33,6 +33,12 @@ def test_rotation_migration_preserves_fields_and_existing_preferences(tmp_path: 
             )
             session.commit()
         command.upgrade(config, "0009_rotation_planning")
+        assert "farm_rotation_drafts" in inspect(engine).get_table_names()
+        with Session(engine) as session:
+            assert session.get(Field, "F-01").name == "West Field"
+            assert session.get(RotationPreference, ("F-01", 2026)).main_plan_id == "plan-b"
+        # Run the current planner only after its onboarding data source also exists.
+        command.upgrade(config, "head")
         with Session(engine) as session:
             plan = create_draft(
                 session,

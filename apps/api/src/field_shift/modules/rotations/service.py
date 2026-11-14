@@ -3,9 +3,14 @@ from typing import cast
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from field_shift.errors import ConflictError
 from field_shift.modules.fields.models import Field
 from field_shift.modules.fields.service import require_field
+from field_shift.modules.onboarding.demo_plan import build_demo_plan
+from field_shift.modules.onboarding.profiles import completed_setup_inputs
+from field_shift.modules.onboarding.schemas import SetupInputs
 from field_shift.modules.rotations.models import RotationPreference
+from field_shift.modules.rotations.planning_catalog import known_crop
 from field_shift.modules.rotations.schemas import (
     MainPlanUpdate,
     PlanId,
@@ -20,17 +25,43 @@ from field_shift.modules.simulation.water_balance import WaterInputs, stress_sum
 from field_shift.modules.weather.scenarios import Scenario
 
 
+def crop_for_season(field: Field, season: int, setup: SetupInputs | None) -> str | None:
+    if field.season == season and field.crop.casefold() != "unknown":
+        return field.crop
+    return (
+        next((entry.crop for entry in setup.history or [] if entry.season == season), None)
+        if setup
+        else None
+    )
+
+
 def get_plan_snapshot(
     session: Session, field: Field, season: int
 ) -> tuple[list[RotationPlanSchedule], PlanId]:
     preference = session.get(RotationPreference, (field.id, season))
-    fallbacks = [
-        crop for crop in ("Maize", "Soy", "Wheat") if crop.casefold() != field.crop.casefold()
-    ]
-    first = preference.plan_a_crops if preference and preference.plan_a_crops else None
-    second = preference.plan_b_crops if preference and preference.plan_b_crops else None
-    crops_a = first or [field.crop, *fallbacks[:2]]
-    crops_b = second or [*fallbacks[:2], field.crop]
+    setup = completed_setup_inputs(session, (field.id,)).get(field.id)
+    if setup and len(setup.allowed_crops or []) >= 2 and setup.priority:
+        preceding = crop_for_season(field, season, setup)
+        example = build_demo_plan(
+            setup.allowed_crops,
+            setup.priority,
+            season + 1,
+            known_crop(preceding) if preceding else None,
+        )
+        defaults = [[item.crop for item in plan] for plan in [example.crops, *example.alternatives]]
+    else:
+        fallbacks = [
+            crop for crop in ("Maize", "Soy", "Wheat") if crop.casefold() != field.crop.casefold()
+        ]
+        defaults = [[field.crop, *fallbacks[:2]], [*fallbacks[:2], field.crop]]
+    first = preference.plan_a_crops if preference and preference.plan_a_crops else defaults[0]
+    second = (
+        preference.plan_b_crops
+        if preference and preference.plan_b_crops
+        else defaults[1]
+        if len(defaults) > 1
+        else None
+    )
     ids: tuple[PlanId, PlanId] = ("plan-a", "plan-b")
     schedules = [
         RotationPlanSchedule(
@@ -41,9 +72,13 @@ def get_plan_snapshot(
                 for offset, crop in enumerate(crops, 1)
             ],
         )
-        for plan_id, name, crops in zip(ids, ("Plan A", "Plan B"), (crops_a, crops_b), strict=True)
+        for plan_id, name, crops in zip(ids, ("Plan A", "Plan B"), (first, second), strict=True)
+        if crops is not None
     ]
-    return schedules, cast(PlanId, preference.main_plan_id) if preference else "plan-a"
+    main_plan_id = cast(PlanId, preference.main_plan_id) if preference else "plan-a"
+    if all(plan.id != main_plan_id for plan in schedules):
+        main_plan_id = "plan-a"
+    return schedules, main_plan_id
 
 
 def get_rotations(session: Session, field_id: str, season: int, scenario: Scenario) -> RotationRead:
@@ -87,6 +122,10 @@ def _lock_preferences(session: Session, field_id: str, season: int) -> RotationP
 
 def set_main(session: Session, payload: MainPlanUpdate) -> MainPlanUpdate:
     preference = _lock_preferences(session, payload.field_id, payload.season)
+    field = require_field(session, payload.field_id)
+    schedules, _ = get_plan_snapshot(session, field, payload.season)
+    if not any(plan.id == payload.plan_id for plan in schedules):
+        raise ConflictError("This crop sequence is unavailable for the selected field and season.")
     preference.main_plan_id = payload.plan_id
     session.commit()
     return payload

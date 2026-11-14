@@ -2,6 +2,7 @@ export const pages = ['fields', 'water', 'agent', 'rotations', 'farm'] as const
 export type Page = (typeof pages)[number]
 export type Route = {
   page: Page
+  setupId?: string
   fieldId?: string
   scenario?: string
   jobId?: string
@@ -22,6 +23,8 @@ export function parseRoute(address: string): Route {
   const url = new URL(address, 'https://field-shift.local')
   const path = url.pathname.replace(/^\/+|\/+$/g, '')
   const page = pages.find((item) => item === path) ?? 'fields'
+  const setup = path === 'onboarding' ? url.searchParams.get('setup') : null
+  const setupId = setup && /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(setup) ? setup : undefined
   const fieldId = url.searchParams.get('field') || undefined
   const scenario = url.searchParams.get('scenario') || undefined
   const jobId = page === 'water' || page === 'agent' ? url.searchParams.get('job') || undefined : undefined
@@ -30,6 +33,7 @@ export function parseRoute(address: string): Route {
   const signal = url.searchParams.get('signal')
   return {
     page, fieldId, scenario, jobId,
+    ...(setupId ? { setupId } : {}),
     ...(page === 'fields' && url.searchParams.get('add') === '1' ? { addField: true } : {}),
     ...(analysis ? { analysis: true } : {}),
     ...(analysis && url.searchParams.get('layer') === 'ndvi_variability' ? { layer: 'ndvi_variability' } : {}),
@@ -40,6 +44,7 @@ export function parseRoute(address: string): Route {
 
 export function routeAddress(route: Route): string {
   const params = new URLSearchParams()
+  if (route.setupId) params.set('setup', route.setupId)
   if (route.fieldId) params.set('field', route.fieldId)
   if (route.scenario) params.set('scenario', route.scenario)
   if (route.jobId && (route.page === 'water' || route.page === 'agent')) params.set('job', route.jobId)
@@ -51,5 +56,5 @@ export function routeAddress(route: Route): string {
     if (route.layer === 'ndvi_variability') params.set('layer', route.layer)
   }
   const search = params.toString()
-  return '/' + route.page + (search ? '?' + search : '')
+  return '/' + (route.setupId ? 'onboarding' : route.page) + (search ? '?' + search : '')
 }
