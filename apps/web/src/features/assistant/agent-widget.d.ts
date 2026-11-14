@@ -27,7 +27,7 @@ export interface ActionRequest {
 export type ActionResult =
   | { status: 'applied'; revision?: number }
   | { status: 'rejected'; reason: 'field_changed' | 'stale_context' | 'module_unavailable' | 'unknown_reference'
-      | 'not_permitted' | 'expired' | 'invalid' | 'failed' }
+      | 'not_permitted' | 'expired' | 'invalid' | 'failed' | 'cancelled' }
 
 export interface FieldShiftAssistantProps {
   transport: { baseUrl: string; headers?: () => Record<string, string> }
@@ -37,6 +37,8 @@ export interface FieldShiftAssistantProps {
   capabilities: HostCapabilities
   onAction: (request: ActionRequest) => ActionResult | Promise<ActionResult>
   trustedSourceHosts?: readonly string[]
+  /** The crops this app plans with, as contract crop ids with their names: the only crops an edit may choose. */
+  planningCrops?: readonly { id: string; label: string }[]
   open?: boolean
   onOpenChange?: (open: boolean) => void
   launcher?: boolean
@@ -45,4 +47,8 @@ export interface FieldShiftAssistantProps {
 }
 
 export function FieldShiftAssistant(props: FieldShiftAssistantProps): JSX.Element
+/** The widget's canonical action check (field, revision, declared capability, known ids); null when allowed. */
+export function actionProblem(
+  envelope: unknown, ctx: FieldContext | null, caps: HostCapabilities, fieldId: string,
+): Extract<ActionResult, { status: 'rejected' }>['reason'] | null
 export function FieldMark(props: SVGProps<SVGSVGElement>): JSX.Element
