@@ -164,7 +164,7 @@ def test_errors_compare_exact_common_support_and_count_abstentions():
     assert report["row_weighted_common_support_metrics"]["reference"]["mae"] == 2.0
     assert report["model_support"]["reference"]["own_available_support_metrics"]["mae"] == 26.0
     assert (
-        report["cohort_coverage_on_eligible_labels"]["farm_group_id:F1"]["candidate_coverage"]
+        report["cohort_coverage_on_registered_rows"]["farm_group_id:F1"]["candidate_coverage"]
         == 0.5
     )
     assert (
@@ -178,7 +178,7 @@ def test_whole_hard_farm_cannot_disappear_from_coverage_or_ids():
         if row["farm_group_id"] == "F1":
             unavailable(row["candidate"])
     report = evaluate(rows, manifest)
-    assert report["cohort_coverage_on_eligible_labels"]["farm_group_id:F1"]["common_pairs"] == 0
+    assert report["cohort_coverage_on_registered_rows"]["farm_group_id:F1"]["common_pairs"] == 0
     assert not report["gates"]["cohort_support_coverage"]
     with pytest.raises(ValueError, match="exactly cover predeclared"):
         evaluate(rows[1:], manifest)
@@ -318,14 +318,18 @@ def test_oracle_and_historical_reconstruction_are_explicit_modes():
     for row in rows:
         row["target"]["mode"] = "perfect_weather"
         row["predictor_available_at"] = f"{row['year']}-06-02T00:00:00Z"
-    assert evaluate(rows, manifest)["target"]["mode"] == "perfect_weather"
+    oracle = evaluate(rows, manifest)
+    assert oracle["target"]["mode"] == "perfect_weather"
+    assert not oracle["eligible_for_release_review"]
     manifest["target"].update(mode="historical_reconstruction", lead_days=0)
     for row in rows:
         row["target"] = copy.deepcopy(manifest["target"])
         row["issue_at"] = f"{row['year']}-06-03T00:00:00Z"
         for name in ["candidate", "reference"]:
             row[name].update(issue_at=row["issue_at"], lead_days=0)
-    assert evaluate(rows, manifest)["target"]["mode"] == "historical_reconstruction"
+    historical = evaluate(rows, manifest)
+    assert historical["target"]["mode"] == "historical_reconstruction"
+    assert not historical["eligible_for_release_review"]
 
 
 def test_duplicate_ids_or_changed_model_selection_are_rejected():
@@ -486,3 +490,40 @@ def test_partially_declared_training_lineage_cannot_look_independent():
         evaluate(rows, manifest)
     manifest["purpose"] = "diagnostic_reuse"
     assert not evaluate(rows, manifest)["eligible_for_release_review"]
+
+
+def test_perfect_weather_oracle_cannot_qualify_for_operational_release_review():
+    rows, manifest = inputs()
+    manifest["target"]["mode"] = "perfect_weather"
+    for row in rows:
+        row["target"]["mode"] = "perfect_weather"
+        row["predictor_available_at"] = f"{row['year']}-06-02T00:00:00Z"
+    report = evaluate(rows, manifest)
+    assert report["gates"]["mae_improvement"] and report["gates"]["rmse_improvement"]
+    assert report["row_weighted_common_support_metrics"]["candidate"]["mae"] == 1.0
+    assert not report["gates"]["operational_forecast_evidence"]
+    assert not report["eligible_for_release_review"]
+    assert "operational_forecast_evidence" in report["failed_gates"]
+
+
+def test_missing_label_region_is_retained_and_fails_its_predeclared_coverage_floor():
+    rows, manifest = inputs()
+    manifest["gates"]["min_label_coverage"] = 0.8
+    missing = copy.deepcopy(rows[0])
+    missing.update(
+        observation_id="missing-region",
+        region_id="fully-missing-region",
+        observed={"status": "missing", "value": None},
+    )
+    rows.append(missing)
+    manifest["observation_ids"].append("missing-region")
+    report = evaluate(rows, manifest)
+    assert report["counts"]["label_coverage"] == 0.8 and report["gates"]["label_coverage"]
+    cohort = report["cohort_coverage_on_registered_rows"]["region_id:fully-missing-region"]
+    assert cohort["registered_rows"] == 1 and cohort["missing_labels"] == 1
+    assert cohort["eligible_labels"] == 0 and cohort["label_coverage"] == 0
+    assert cohort["common_pairs"] == 0
+    assert (
+        not report["gates"]["cohort_label_coverage"] and not report["eligible_for_release_review"]
+    )
+    assert report["row_weighted_common_support_metrics"]["candidate"]["mae"] == 1.0

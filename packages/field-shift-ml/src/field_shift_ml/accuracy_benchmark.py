@@ -32,9 +32,12 @@ are conditional on those clusters, not proof of geographic independence or
 universal coverage. Files/hashes/timestamps cannot prove externally sealed test
 access. The operator must provide that audit evidence. Even passing policy only
 establishes eligible_for_release_review; this module never promotes an artifact.
-Coverage floors apply globally and to each eligible farm/region/crop/year/lead
-cohort. Missing labels count against min_label_coverage; the complete observation
-ID list prevents silently omitting difficult registered cases.
+Coverage floors apply globally and to each registered nonsynthetic
+farm/region/crop/year/lead cohort, including cohorts with no observed labels.
+Missing/rejected labels count against min_label_coverage; the complete observation
+ID list prevents silently omitting difficult registered cases. Perfect-weather
+and historical-reconstruction results are diagnostic, never eligible for
+operational-forecast release review.
 """
 
 from __future__ import annotations
@@ -466,18 +469,25 @@ def _cohort_keys(row):
 
 
 def _support(rows):
-    count = len(rows)
-    candidate = sum(r["candidate"]["status"] == "available" for r in rows)
-    reference = sum(r["reference"]["status"] == "available" for r in rows)
-    common = sum(r["candidate"]["status"] == r["reference"]["status"] == "available" for r in rows)
+    eligible = [r for r in rows if r["observed"]["status"] == "observed"]
+    count = len(eligible)
+    candidate = sum(r["candidate"]["status"] == "available" for r in eligible)
+    reference = sum(r["reference"]["status"] == "available" for r in eligible)
+    common = sum(
+        r["candidate"]["status"] == r["reference"]["status"] == "available" for r in eligible
+    )
     return {
+        "registered_rows": len(rows),
         "eligible_labels": count,
+        "missing_labels": sum(r["observed"]["status"] == "missing" for r in rows),
+        "rejected_labels": sum(r["observed"]["status"] == "rejected" for r in rows),
+        "label_coverage": count / len(rows),
         "candidate_available": candidate,
         "reference_available": reference,
         "common_pairs": common,
-        "candidate_coverage": candidate / count,
-        "reference_coverage": reference / count,
-        "common_support_fraction": common / count,
+        "candidate_coverage": candidate / count if count else 0.0,
+        "reference_coverage": reference / count if count else 0.0,
+        "common_support_fraction": common / count if count else 0.0,
     }
 
 
@@ -599,7 +609,7 @@ def evaluate(rows, manifest):
     metrics = {n: _scores(common, n) for n in available} if common else None
     balanced = {n: _farm_scores(common, n) for n in available} if common else None
     cohort_rows, coverage_rows = defaultdict(list), defaultdict(list)
-    for row in eligible:
+    for row in real:
         for key in _cohort_keys(row):
             coverage_rows[key].append(row)
     cohort_coverage = {k: _support(v) for k, v in sorted(coverage_rows.items())}
@@ -616,10 +626,16 @@ def evaluate(rows, manifest):
     checks = {
         "known_lineage": manifest["lineage_known"],
         "independent_holdout": manifest["purpose"] == "independent_holdout" and not violations,
+        "operational_forecast_evidence": manifest["target"]["mode"] == "operational_forecast",
         "minimum_pairs": len(common) >= gates["min_pairs"],
         "minimum_farms": counts["common_support_farms"] >= gates["min_farms"],
         "minimum_years": counts["common_support_years"] >= gates["min_years"],
         "label_coverage": counts["label_coverage"] >= gates["min_label_coverage"],
+        "cohort_label_coverage": all(
+            c["label_coverage"] >= gates["min_label_coverage"] for c in cohort_coverage.values()
+        )
+        if cohort_coverage
+        else False,
         "candidate_coverage": models["candidate"]["coverage"] >= gates["min_candidate_coverage"],
         "reference_coverage": models["reference"]["coverage"] >= gates["min_reference_coverage"],
         "common_support_coverage": counts["common_support_fraction"]
@@ -679,7 +695,10 @@ def evaluate(rows, manifest):
         "row_weighted_common_support_metrics": metrics,
         "equal_farm_common_support_metrics": balanced,
         "cohorts_on_common_support": cohorts,
-        "cohort_coverage_on_eligible_labels": cohort_coverage,
+        "cohort_coverage_on_registered_rows": cohort_coverage,
+        "cohort_coverage_denominator": "All registered nonsynthetic rows per cohort; "
+        "label coverage includes missing/rejected labels. Prediction/common support coverage "
+        "uses observed labels.",
         "candidate_intervals_on_common_support": intervals,
         "paired_farm_bootstrap": bootstrap,
         "policy": gates,
@@ -688,6 +707,9 @@ def evaluate(rows, manifest):
         "not_run_gates": [k for k, v in checks.items() if v is None],
         "declared_lineage_violations": violations,
         "eligible_for_release_review": all(v is True for v in checks.values()),
+        "release_review_scope": "Operational forecast evidence only. Perfect-weather "
+        "and historical reconstruction metrics are diagnostic regardless of numerical "
+        "gate outcomes.",
         "promotion": "not_performed",
         "serving_changed": False,
         "predictions_sha256": canonical_sha(rows),
