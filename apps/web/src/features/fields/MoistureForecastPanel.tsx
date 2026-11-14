@@ -1,12 +1,14 @@
 import { ArrowPathIcon } from '@heroicons/react/24/outline'
 import { useCallback, useState } from 'react'
 import { api } from '../../api/client'
+import { ContextHelp } from '../../shared/ContextHelp'
 import { chartColors, ForecastTrend } from '../../shared/DataCharts'
 import { useLocale } from '../../shared/locale'
 import { useJob, useStartJob } from '../../shared/jobs'
 import { JobStatus } from '../../shared/JobStatus'
 import { ErrorBox } from '../../shared/ui'
 import { useResource } from '../../shared/useResource'
+import { waterHelp, waterHelpMetadata } from '../water/waterHelp'
 
 export function useMoistureForecast(fieldId: string | undefined, boundaryRevision: number) {
   const load = useCallback(async (signal: AbortSignal) => fieldId
@@ -39,13 +41,24 @@ export function useMoistureForecast(fieldId: string | undefined, boundaryRevisio
 }
 
 export function MoistureForecastPanel({ state }: { state: ReturnType<typeof useMoistureForecast> }) {
-  const { t, date } = useLocale()
+  const { t, date, language } = useLocale()
   const { forecast, saved, days, ageDays, updateForecast, launch, pending, jobId, job, error } = state
+  const help = waterHelp[language].surfaceMoisture
+  const usesModel = forecast?.days.some(({ interval }) => interval != null)
+  const depth = forecast
+    ? 'IFS 0–7 ' + t('cm') + (usesModel ? ' · ML 5 ' + t('cm') : '')
+    : undefined
+  const source = [forecast?.provider, usesModel ? forecast?.model_version : undefined].filter(Boolean).join(' · ')
 
   return (
     <section className="panel forecast-panel" aria-labelledby="soil-forecast-heading">
       <div className="section-heading">
-        <div><h2 id="soil-forecast-heading">{t('Soil moisture forecast')}</h2>
+        <div><div className="context-help-row">
+          <h2 id="soil-forecast-heading">{t('Soil moisture forecast')}</h2>
+          <ContextHelp label={help.title}><p>{help.description}</p>
+            <p>{waterHelpMetadata(language, { depth, source })}</p>
+          </ContextHelp>
+        </div>
           <p>{t('Surface moisture for today and the next four UTC days.')}</p></div>
         <button type="button" className="button subtle" onClick={() => void updateForecast()}
           disabled={launch.submitting || Boolean(pending)}>

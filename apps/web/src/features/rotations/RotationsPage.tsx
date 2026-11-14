@@ -3,6 +3,7 @@ import { ArrowPathIcon, ArrowRightIcon, CheckCircleIcon, PencilSquareIcon, PlusI
 import { api } from '../../api/client'
 import type { Field, FieldContext, HistoricalRotationComparison, Job, Rotations, Scenario } from '../../api/contracts'
 import { onboardingApi } from '../../api/onboarding'
+import { ContextHelp } from '../../shared/ContextHelp'
 import { CropIcon } from '../../shared/CropIcon'
 import { FieldWorkspaceBar } from '../../shared/FieldWorkspaceBar'
 import { cropInput, useLocale } from '../../shared/locale'
@@ -15,6 +16,8 @@ import { RotationComparison } from './RotationComparison'
 import { FarmRotationPlanner } from './FarmRotationPlanner'
 import { useAccess } from '../access/AccessProvider'
 import { OnboardingPlan } from '../onboarding/OnboardingPlan'
+import { waterHelp } from '../water/waterHelp'
+import { rotationHelp } from './rotationHelp'
 import './rotations.css'
 
 type Props = {
@@ -30,7 +33,9 @@ type Props = {
 }
 
 export function RotationsPage({ field, fields, context: { field_id, season, scenario }, irrigationAvailable, chooseScenario, openWater, chooseField, openFields, onAddField }: Props) {
-  const { t, crop, date } = useLocale()
+  const { t, crop, date, language } = useLocale()
+  const scenarioHelp = rotationHelp[language].scenario
+  const { stressDays, irrigation } = waterHelp[language]
   const { canEdit } = useAccess()
   const load = useCallback((signal: AbortSignal) => api.rotations({ field_id, season, scenario }, signal), [field_id, season, scenario])
   const rotations = useResource(load)
@@ -115,8 +120,14 @@ export function RotationsPage({ field, fields, context: { field_id, season, scen
           <PlusIcon aria-hidden="true" />{t('Add field')}
         </button>}
         <fieldset className="rotation-context-options" disabled={saving}>
-          <ScenarioSelect value={scenario} onChange={chooseScenario} />
-          <span className="rotation-irrigation">{irrigationAvailable ? t('Irrigation available') : t('No irrigation')}</span>
+          <div className="context-help-row">
+            <ScenarioSelect value={scenario} onChange={chooseScenario} />
+            <ContextHelp label={scenarioHelp.title}><p>{scenarioHelp.description}</p></ContextHelp>
+          </div>
+          <div className="context-help-row">
+            <span className="rotation-irrigation">{irrigationAvailable ? t('Irrigation available') : t('No irrigation')}</span>
+            <ContextHelp label={irrigation.title}><p>{irrigation.description}</p></ContextHelp>
+          </div>
         </fieldset>
       </FieldWorkspaceBar>
       <div className="rotations-workspace">
@@ -188,7 +199,10 @@ export function RotationsPage({ field, fields, context: { field_id, season, scen
             </section>
             <section className="rotation-water-comparison" aria-labelledby="rotation-water-heading">
               <div className="section-heading">
-                <div><h2 id="rotation-water-heading">{t('Water stress · Year 1')}</h2><p>{t('Fewer stress days means less water pressure on the crop.')}</p></div>
+                <div><div className="context-help-row">
+                  <h2 id="rotation-water-heading">{t('Water stress · Year 1')}</h2>
+                  <ContextHelp label={stressDays.title}><p>{stressDays.description}</p></ContextHelp>
+                </div><p>{t('Fewer stress days means less water pressure on the crop.')}</p></div>
                 <button className="button" type="button" disabled={!canEdit || !data || saving || create.submitting || active}
                   onClick={() => void runHistoricalComparison()}>
                   <ArrowPathIcon className={active ? 'spin' : undefined} aria-hidden="true" />
