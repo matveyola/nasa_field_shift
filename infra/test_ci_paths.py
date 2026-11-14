@@ -9,6 +9,8 @@ class CIPathChecks(unittest.TestCase):
     def test_every_consumed_change_output_is_forwarded(self):
         workflow = (Path(__file__).resolve().parents[1] / ".github/workflows/ci.yml").read_text()
         changes = workflow.split("  changes:\n", 1)[1].split("    steps:", 1)[0]
+        output_names = re.findall(r"^      (\w+):", changes, re.M)
+        self.assertEqual(len(output_names), len(set(output_names)), "Duplicate CI output keys")
         forwarded = set(
             re.findall(r"^      (\w+): \$\{\{ steps.detect.outputs.\1 \}\}", changes, re.M)
         )
