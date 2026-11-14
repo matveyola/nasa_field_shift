@@ -229,13 +229,41 @@ def clean(monkeypatch):
                 path.unlink()
 
     def test_documentation_tests_caches_and_tool_imports_are_not_dependencies(self):
-        for directory in ["tests", ".venv", "node_modules", "dist"]:
+        for directory in [".venv", "node_modules", "dist"]:
             self.write(f"apps/api/{directory}/example.py", "import sys\nsys.path.append('src')")
-        self.write("apps/api/tests/test_example.py", "env = {'PYTHONPATH': 'fixture'}")
+        self.write("apps/api/tests/test_example.py", "import field_shift_ml")
+        self.write("apps/api/src/field_shift/tests/helpers.py", "import field_shift_ml")
         self.write("docs/setup.md", "PYTHONPATH=src pytest")
         self.write("apps/api/src/tools/example.py", "import field_shift_ml")
         self.write("apps/api/package.json", '{"description":"PYTHONPATH=src","scripts":{}}')
         self.assertEqual(validate(self.root), [])
+
+    def test_conftest_and_test_helpers_cannot_mutate_import_paths(self):
+        cases = {
+            "apps/api/tests/conftest.py": "import sys\nsys.path.insert(0, '../src')",
+            "services/agent/tests/helpers.py": "from site import addsitedir\naddsitedir('..')",
+            "infra/test_helper.py": "import os\nos.environ['PYTHONPATH'] = 'apps/api/src'",
+            "packages/field-shift-ml/tests/test_imports.py": "import sys\nsys.path += ['src']",
+        }
+        for relative, content in cases.items():
+            with self.subTest(path=relative):
+                path = self.write(relative, content)
+                self.assertViolation(relative)
+                path.unlink()
+
+    def test_only_guard_negative_fixture_file_is_exempt(self):
+        self.write("infra/test_python_packaging.py", "example = 'PYTHONPATH=src pytest'")
+        self.write(
+            "apps/api/tests/conftest.py",
+            """
+'''Do not set PYTHONPATH=src to make imports pass.'''
+def clean(monkeypatch):
+    monkeypatch.delenv('PYTHONPATH', raising=False)
+""",
+        )
+        self.assertEqual(validate(self.root), [])
+        self.write("apps/api/tests/test_python_packaging.py", "import sys\nsys.path.append('src')")
+        self.assertViolation("apps/api/tests/test_python_packaging.py")
 
     def test_syntax_errors_are_failures_instead_of_silently_skipped(self):
         self.write("apps/api/src/field_shift/main.py", "not valid python !")

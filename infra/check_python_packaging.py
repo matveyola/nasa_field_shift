@@ -32,7 +32,6 @@ EXCLUDED = {
     "__pycache__",
     "dist",
     "build",
-    "tests",
     "test-results",
     "playwright-report",
     ".cache",
@@ -42,15 +41,17 @@ ENV_ASSIGNMENT = re.compile(r"\b(?:PYTHONPATH|PYTHONHOME)[\"']?\s*[=:]")
 DOCKER_ENV = re.compile(r"\bENV\s+(?:PYTHONPATH|PYTHONHOME)\s+\S")
 
 
-def files(directory: Path):
-    """Walk only source trees, pruning environments, test fixtures and generated output."""
+def files(directory: Path, *, include_tests: bool = False):
+    """Prune environments/output; dependency checks can additionally exclude tests."""
     if not directory.is_dir():
         return
     for entry in sorted(directory.iterdir()):
-        if entry.is_symlink() or entry.name in EXCLUDED or entry.name.startswith("test_"):
+        if entry.is_symlink() or entry.name in EXCLUDED:
+            continue
+        if not include_tests and (entry.name == "tests" or entry.name.startswith("test_")):
             continue
         if entry.is_dir():
-            yield from files(entry)
+            yield from files(entry, include_tests=include_tests)
         elif entry.is_file():
             yield entry
 
@@ -226,11 +227,13 @@ def validate(root: Path) -> list[str]:
                             )
 
     for base in ("apps", "packages", "services", "infra", ".github/workflows"):
-        for path in files(root / base):
+        for path in files(root / base, include_tests=True):
             relative = path.relative_to(root)
+            # These controlled negative examples intentionally contain prohibited commands.
+            # Other test modules, conftests and helpers must obey the path policy.
+            if relative.as_posix() == "infra/test_python_packaging.py":
+                continue
             if path.suffix == ".py":
-                if path == Path(__file__).resolve():
-                    continue
                 try:
                     tree = ast.parse(path.read_text(), filename=str(path))
                     errors.extend(
