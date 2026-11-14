@@ -1,0 +1,6 @@
+interface:
+  display_name: "Issue worktree delivery"
+  short_description: "Implement issues through personal jobs branches"
+  default_prompt: "Use $issue-worktree to implement the assigned GitHub issue, verify it, and merge and push it to my jobs branch."
+policy:
+  allow_implicit_invocation: true
