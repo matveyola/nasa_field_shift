@@ -71,12 +71,63 @@ field context and recent chat history.
 - The agent can explain saved FAO-56 root-zone forecasts, historical water runs
   explicitly linked to the conversation, and sampled Sentinel-2 NDVI. Units, dates,
   source and calculated versus observed provenance accompany the supplied facts.
+- A saved historical run reaches the assistant only when the farmer selects it on Water and
+  clicks «Ask agent about this run». The widget's base URL then ends in
+  `/assistant/{field}/{season}/{scenario}/runs/{run_id}` (a path segment, because the widget
+  appends `/health/ready` and `/v1/agent/stream`). The API loads the run, checks the field is
+  the caller's, and that the run is a completed historical (not demo) water balance for the
+  current boundary, season and scenario with valid provenance. It then builds and signs the
+  context from that run, without the current forecast or NDVI. A missing, unfinished or stale
+  run is a 404/409 shown to the farmer, never replaced by another run. Without a selection,
+  the latest run is never attached. A new field, season, scenario or run starts a new conversation.
 - Map and chart chips point to the same selected field. The API allows only supported
   navigation actions from the signed context. The UI checks the boundary revision
   before opening a chip. Existing conversations are preserved by migration `0005`.
 - Rotation simulations remain available in the Rotations tab. The agent's
   proposed simulation contract and external geo connector are disabled in this
-  profile. The agent cannot start a comparison or save a farmer's constraints.
+  profile. The agent cannot start a comparison, and it cannot save a constraint.
+- Planning constraints the agent proposes (for example "no irrigation", "exclude
+  sunflower") are recorded only when the farmer confirms or rejects one in the assistant.
+  Each proposal offers three choices. «Confirm» saves it as a confirmed condition.
+  «Reject» saves the farmer's rejection (`status: "rejected"`), so it is not taken as
+  agreed. «Hide» only hides it in that conversation: nothing is sent or saved. A decision
+  shows as confirmed or rejected only once the field context the API rebuilt holds it.
+  The agent's own actions never confirm or reject for the farmer. «Edit» lets the farmer
+  change a proposal before deciding; it saves nothing, and an edited value is sent as the
+  farmer's own choice (`farmer_ui`, no quoted words). Crops can be edited only to
+  `maize`, `soybean` or `sunflower`, the planning crops whose identity the agent shares
+  (`apps/web/.../constraintCrops.ts`); a proposal naming other crops (e.g. `winter_wheat`)
+  can be decided as proposed but not edited. A canonical crop vocabulary across planning
+  and the agent is still to be agreed.
+  The widget sends that `compare.set_constraints` decision to
+  `POST /api/agent/constraints/{field}/{season}`. The API checks the field is the caller's,
+  that the action was made for this field and its current boundary revision, and every
+  constraint against the agent contract. A `proposed` constraint, including an agent
+  inference, and an `auto` envelope are refused (defence in depth: the signed-in browser
+  sends the request, so this does not prove a physical click). Decisions are stored per
+  field, planning season and constraint type in `field_planning_constraints` (migration
+  `0011`), each with an opaque token that is new with every write (a counter would
+  restart after a removal, so a stale tab could match a recreated decision). A decision
+  that would change an earlier current one is
+  refused with `409 replacement_needs_confirmation`, and nothing in the request is saved.
+  The assistant then shows the earlier and the new decision, and only the farmer's
+  «Replace» resends it, naming the exact earlier decision's token (`replaces`). An approval
+  of a decision that changed, or was removed and recreated, meanwhile is refused; the field
+  row lock serializes decisions. Removal (`DELETE …/{type}?boundary_revision=…&token=…`)
+  likewise deletes only the exact decision shown, for the current boundary. Closing the
+  assistant or moving to another field context cancels an open replacement question.
+  «Keep the earlier decision» or a cancellation reports `cancelled` to the widget, which
+  offers the choice again instead of showing a failure. They are planning preferences, not
+  measurements, and farm defaults are never changed. A boundary change makes earlier
+  decisions stale. The API adds the current ones to the field context it
+  builds and signs, so a browser's context or history cannot mark a constraint confirmed.
+  That context carries structured values only (source `farmer_ui`, or `agent_inferred`
+  with its confidence): the farmer's quoted words and the free-text machinery note stay
+  in the farm record, like scouting notes. The Rotations page lists the decisions, with
+  those words, for review and withdrawal.
+  No rotation comparison or simulation uses them yet. The browser offers
+  `compare.set_constraints` to the widget only; the signed agent capabilities
+  (`signing.py` `HOST_ACTIONS`) are unchanged.
 - The profile uses the existing single-farm local deployment. The process limits
   the remote adapter to two simultaneous turns and ten per minute. Before exposing
   the app to multiple farms, add farmer authentication and field authorization in
