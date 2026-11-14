@@ -1,0 +1,74 @@
+{
+  "schema_version": "ruslan-provenance-v1",
+  "source_repository": "private nasa_preparation",
+  "source_branch": "research/fieldshift-tasks-1-4",
+  "source_commit": "468a03d79e596e9daab4cfdb20e9e0c8e2b83a92",
+  "source_available_at": "2026-11-14T11:32:03+00:00",
+  "source_paths": {
+    "fstasks/moisture_map/serve.py": "1b076d7d6eaaebddc006e9c2064d164c36706885ffac9440b0bba3f2e302abbe",
+    "fstasks/moisture_map/real.py": "b566ba96e5e55a34f5dfdba75f616d34930a3c24963e9cf7f02348e6169317fc",
+    "fstasks/moisture_map/robust.py": "278b7e6d79883b559ddd43c3497a3e9984b526b124bdc3d024ae9aac1509fa7e",
+    "FROZEN.json": "8abdc10147e000cfe4aa221c7a6ddb64bf807f9c6817081613631d74fbe36be3",
+    "outputs/real/task1_moisture_v5.json": "13a40f69b4994211aa22cafcb14158c5b8d54278ebbde7b643a004dab0fa3749",
+    "outputs/real/fresh_tests.json": "088efd1927f91a2c6cf27a48fe762167405029daa8281a6b5db7558edd7188fe",
+    "README.md": "a441c6adfce11f1022d9cfe834d16ec6836c0849ae9f29c445a26a6bfeb477c2",
+    "pyproject.toml": "242a28eb3f29e9dab506c5a38efc27280c3351f35eb30a4bddc48e5de8e4c5e8"
+  },
+  "artifacts": {
+    "gbm.txt": {
+      "sha256": "5e55d5e120a3d3373706227df462dbb6d8b5edc6690fb1ad24e2f254df6793af",
+      "bytes": 616324
+    },
+    "q10.txt": {
+      "sha256": "b522b47bb577ede16ae53ed2451a3c6c5812b941eb21fafc97ef3950fc7ff393",
+      "bytes": 619682
+    },
+    "q90.txt": {
+      "sha256": "0c51498e194da8849ef9767df1092fb01fa11fff7ebacbdb1d36962ee62b7b50",
+      "bytes": 617868
+    },
+    "meta.json": {
+      "sha256": "242bf8cc33c4ccd4702193047250b5a357970d46a3a1d51edf9893b7d6eb081e",
+      "bytes": 4198
+    }
+  },
+  "model_combined_sha256": "024c35a39470c964c6863af8d73e624ee869d211e5a10f6b954d5d2122dbe914",
+  "frozen_mismatches": [
+    "fstasks/balance.py",
+    "fstasks/flowering.py",
+    "fstasks/moisture_map/robust.py",
+    "fstasks/run_all.py",
+    "fstasks/run_real.py"
+  ],
+  "frozen_task1_publish": false,
+  "latest_report_task1_publish": true,
+  "imported_promotion": false,
+  "raw_empirical_data_present": false,
+  "empirical_reproduction": "blocked_missing_original_data",
+  "execution_scope": {
+    "region_code": "US-IA",
+    "bbox_west_south_east_north": [
+      -96.7,
+      40.3,
+      -90.1,
+      43.6
+    ],
+    "months": [
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "meaning": "Conservative Iowa execution restriction corresponding to IFC research region, not a validated footprint or verified state boundary."
+  },
+  "limitations": [
+    "Historical reconstruction only; not a nowcast, forecast, root-zone reserve or yield model.",
+    "Final model trained through 2025; prior holdout reports do not validate this final artifact on its training rows.",
+    "Frozen source mismatch prevents treating fresh_tests.json as evidence for this source revision.",
+    "Original interval parameters are retained for research equivalence; calibrated coverage is not claimed.",
+    "No public source-code license found in the private team research checkout; source attribution retained, no new redistribution license asserted."
+  ]
+}
