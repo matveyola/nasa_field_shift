@@ -34,7 +34,11 @@ def _require_field_snapshot(session: Session, lease: Lease) -> Field:
 
 
 def simulation_handler(factory: sessionmaker[Session], lease: Lease) -> dict[str, Any]:
-    from field_shift.modules.fields.schemas import Polygon
+    from field_shift_science.fields.schemas import Polygon
+    from field_shift_science.simulation.schemas import WaterSource
+    from field_shift_science.simulation.water_balance import WaterInputs
+    from field_shift_science.weather.historical import WeatherUnavailableError
+
     from field_shift.modules.rotations.historical import compare_historical_plans
     from field_shift.modules.rotations.service import get_plan_snapshot
     from field_shift.modules.simulation.forecast import (
@@ -42,10 +46,7 @@ def simulation_handler(factory: sessionmaker[Session], lease: Lease) -> dict[str
         run_water_forecast,
     )
     from field_shift.modules.simulation.historical import HistoricalInputError
-    from field_shift.modules.simulation.schemas import WaterSource
     from field_shift.modules.simulation.service import calculate_water_balance
-    from field_shift.modules.simulation.water_balance import WaterInputs
-    from field_shift.modules.weather.historical import WeatherUnavailableError
 
     inputs = JobInputs.from_stored(lease.inputs)
     if inputs.analysis == "water_forecast":
@@ -93,8 +94,9 @@ def simulation_handler(factory: sessionmaker[Session], lease: Lease) -> dict[str
 
 
 def geo_handler(factory: sessionmaker[Session], lease: Lease) -> dict[str, Any]:
-    from field_shift.modules.fields.schemas import Polygon
-    from field_shift.modules.geo_ml.era5_land import MoistureSourceError
+    from field_shift_science.fields.schemas import Polygon
+    from field_shift_science.geo_ml.era5_land import MoistureSourceError
+
     from field_shift.modules.geo_ml.forecast import run_moisture_forecast
     from field_shift.modules.geo_ml.service import calculate_geo_ml
     from field_shift.modules.imagery.vegetation import run_vegetation_month, vegetation_footprint

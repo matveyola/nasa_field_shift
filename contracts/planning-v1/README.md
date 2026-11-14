@@ -255,7 +255,7 @@ do not isolate DB state. Do not publish credentials in terminal reports.
 With existing locked API, web and agent schema-tool dependencies installed:
 
 ```bash
-PYTHONPATH=apps/api/src apps/api/.venv/bin/python -m field_shift.contracts.planning_v1.export --check
+apps/api/.venv/bin/python -m field_shift_contracts.planning_v1.export --repo-root . --check
 apps/api/.venv/bin/python -m pytest -q apps/api/tests/planning_v1_contracts
 apps/api/.venv/bin/ruff check apps/api/src/field_shift/contracts apps/api/tests/planning_v1_contracts
 apps/api/.venv/bin/ruff format --check apps/api/src/field_shift/contracts apps/api/tests/planning_v1_contracts

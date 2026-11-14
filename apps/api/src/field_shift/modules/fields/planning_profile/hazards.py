@@ -2,7 +2,7 @@
 
 from datetime import timedelta
 
-from field_shift.contracts.planning_v1.field import HazardEvidence
+from field_shift_contracts.planning_v1.field import HazardEvidence
 
 from .evidence import reason
 

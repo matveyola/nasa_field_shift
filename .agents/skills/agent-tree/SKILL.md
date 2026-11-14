@@ -47,6 +47,8 @@ Do not require a commit solely for review. For an uncommitted target, record HEA
 
 Each implementation leaf moves through implementation → frozen handoff → test execution and independent review → acceptance or fixes. Review may start alongside tests on the same frozen state, but final acceptance consumes the test report. The implementer cannot verify its own change. Any subsequent source change invalidates affected evidence; rerun appropriate checks and obtain fresh review. Do not rerun unrelated suites without a reason.
 
+Python work also follows [package boundaries](../../../docs/python-packaging.md). A packaging leaf must provide clean non-editable wheel evidence from outside its checkout, not only editable tests.
+
 Test execution follows [the test matrix](references/test-matrix.md). Use `python3 infra/verify.py --mode tooling` for this setup and `python3 infra/verify.py --mode fast --build` for the prepared application's deterministic local checks. The runner stops on failure; it does not install dependencies or replace integration/E2E verification. Required failures, stale evidence and unrun mandatory checks block acceptance. Reports distinguish PASS, FAIL and BLOCKED and enumerate optional omissions. Parents inspect evidence and reconcile disagreement using original requirements and reproductions; do not vote or choose the most optimistic report.
 
 ## Integration and completion

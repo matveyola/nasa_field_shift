@@ -2,12 +2,12 @@ import json
 from datetime import timedelta
 
 import pytest
+from field_shift_science.fields.schemas import FieldRead
+from field_shift_science.simulation.schemas import HistoricalProvenance, WaterResult
+from field_shift_science.weather.scenarios import Scenario
 from test_agent_evidence import NOW, TODAY, forecast, vegetation
 
 from field_shift.modules.agent.field_context import build_field_context
-from field_shift.modules.fields.schemas import FieldRead
-from field_shift.modules.simulation.schemas import HistoricalProvenance, WaterResult
-from field_shift.modules.weather.scenarios import Scenario
 
 
 @pytest.fixture

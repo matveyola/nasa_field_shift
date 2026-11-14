@@ -1,6 +1,8 @@
 from datetime import UTC, date, datetime
 
 import pytest
+from field_shift_science.weather.historical import ReanalysisDay, ReanalysisSeries
+from field_shift_science.weather.scenarios import Scenario
 from pydantic import ValidationError
 
 from field_shift.db import build_session_factory
@@ -11,8 +13,6 @@ from field_shift.jobs.worker import simulation_handler
 from field_shift.models import metadata
 from field_shift.modules.rotations import historical, service
 from field_shift.modules.rotations.schemas import PlanUpdate
-from field_shift.modules.weather.historical import ReanalysisDay, ReanalysisSeries
-from field_shift.modules.weather.scenarios import Scenario
 from field_shift.seed import seed_demo
 
 

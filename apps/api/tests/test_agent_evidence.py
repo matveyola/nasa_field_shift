@@ -3,6 +3,7 @@ from datetime import UTC, date, datetime, timedelta
 from uuid import UUID
 
 import pytest
+from field_shift_science.simulation.schemas import WaterForecast, WaterForecastDay
 from pydantic import ValidationError
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -23,7 +24,6 @@ from field_shift.modules.imagery.vegetation_schemas import (
     VegetationObservation,
     VegetationSeason,
 )
-from field_shift.modules.simulation.schemas import WaterForecast, WaterForecastDay
 from field_shift.seed import seed_demo
 
 TODAY = date(2026, 11, 10)

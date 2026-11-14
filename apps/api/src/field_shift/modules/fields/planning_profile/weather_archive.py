@@ -2,10 +2,10 @@
 
 import json
 
+from field_shift_contracts.planning_v1 import WeatherScenarioSet
 from sqlalchemy import JSON, ForeignKey, String, UniqueConstraint, select
 from sqlalchemy.orm import Mapped, mapped_column
 
-from field_shift.contracts.planning_v1 import WeatherScenarioSet
 from field_shift.db import Base
 
 from .service import ProfileError, canonical_hash

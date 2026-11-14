@@ -3,7 +3,7 @@
 import hashlib
 import json
 
-from field_shift.contracts.planning_v1.common import EvidenceRef, Reason
+from field_shift_contracts.planning_v1.common import EvidenceRef, Reason
 
 
 def canonical(value):

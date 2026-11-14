@@ -1,9 +1,9 @@
 from typing import Literal
 
 from fastapi import APIRouter, HTTPException, Response
+from field_shift_science.fields.schemas import Season
 
 from field_shift.db import SessionDep
-from field_shift.modules.fields.schemas import Season
 from field_shift.modules.precision import exports, service
 from field_shift.modules.precision.schemas import (
     Approval,

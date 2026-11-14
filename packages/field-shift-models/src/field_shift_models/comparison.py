@@ -93,8 +93,8 @@ def wofost_synthetic(crop="Maize", dry=False):
 def reference_bucket(dry=False):
     from types import SimpleNamespace
 
-    from field_shift.modules.crops.catalog import demo_crop_profile
-    from field_shift.modules.simulation.water_balance import FAO56_BUCKET_VERSION, fao56_days
+    from field_shift_science.crops.catalog import demo_crop_profile
+    from field_shift_science.simulation.water_balance import FAO56_BUCKET_VERSION, fao56_days
 
     # Named existing reference, using its declared demo crop coefficients (not invented yield).
     profile = demo_crop_profile("Maize")

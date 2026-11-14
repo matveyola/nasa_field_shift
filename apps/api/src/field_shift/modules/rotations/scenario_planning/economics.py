@@ -5,8 +5,8 @@ irrigation cost must be supplied explicitly for already prepaid/free irrigation.
 Intervals are scenario ranges, never calibrated probability intervals.
 """
 
-from field_shift.contracts.planning_v1.common import Metric, Uncertainty
-from field_shift.contracts.planning_v1.planning import ScenarioEconomics
+from field_shift_contracts.planning_v1.common import Metric, Uncertainty
+from field_shift_contracts.planning_v1.planning import ScenarioEconomics
 
 from .common import reason
 

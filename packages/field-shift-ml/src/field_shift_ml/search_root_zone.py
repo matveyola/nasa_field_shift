@@ -9,6 +9,8 @@ from itertools import combinations, product
 from pathlib import Path
 
 import numpy as np
+from field_shift_science.crops.fao56 import crop_water_parameters
+from field_shift_science.simulation.root_zone_model import CAPACITY_MM
 from sklearn.ensemble import (
     ExtraTreesRegressor,
     HistGradientBoostingRegressor,
@@ -18,8 +20,6 @@ from sklearn.kernel_ridge import KernelRidge
 from sklearn.linear_model import ElasticNet, HuberRegressor, Ridge
 from threadpoolctl import threadpool_limits
 
-from field_shift.modules.crops.fao56 import crop_water_parameters
-from field_shift.modules.simulation.root_zone_model import CAPACITY_MM
 from field_shift_ml.fetch_root_zone_observations import PROTOCOL_PATH, RootZoneSite
 from field_shift_ml.research_root_zone import WILTING_MM, distance, measured_total, raw_total
 from field_shift_ml.root_zone_features import FEATURES, feature_matrices

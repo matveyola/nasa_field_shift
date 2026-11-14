@@ -4,9 +4,7 @@ from datetime import date
 from pathlib import Path
 
 import pytest
-from pydantic import TypeAdapter, ValidationError
-
-from field_shift.contracts.planning_v1 import (
+from field_shift_contracts.planning_v1 import (
     CandidateSequence,
     FarmPlanningRequest,
     FieldProfileSnapshot,
@@ -17,14 +15,15 @@ from field_shift.contracts.planning_v1 import (
     TrainingObservation,
     WeatherScenarioSet,
 )
-from field_shift.contracts.planning_v1.acceptance import (
+from field_shift_contracts.planning_v1.acceptance import (
     AcceptancePack,
     EmpiricalManifest,
     WeatherRecipe,
     expand_recipe,
 )
-from field_shift.contracts.planning_v1.common import DateWindow, Metric
-from field_shift.contracts.planning_v1.export import schema
+from field_shift_contracts.planning_v1.common import DateWindow, Metric
+from field_shift_contracts.planning_v1.export import schema
+from pydantic import TypeAdapter, ValidationError
 
 ROOT = Path(__file__).resolve().parents[4]
 PACK = ROOT / "contracts/planning-v1"
@@ -383,7 +382,7 @@ def test_rice_registry_does_not_change_legacy_crop_enum(example):
 def test_every_predicate_has_versioned_parameters_and_capability_bindings():
     from typing import get_args
 
-    from field_shift.contracts.planning_v1.common import Capability
+    from field_shift_contracts.planning_v1.common import Capability
 
     pack = read("cases.v1.json")
     bindings = read("case-bindings.v1.json")

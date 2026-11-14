@@ -35,6 +35,11 @@ def build_plan(root: Path, mode: str = "fast", build: bool = False) -> list[Chec
                 root,
                 (sys.executable, "-m", "unittest", "discover", "-s", "infra", "-p", "test_*.py"),
             ),
+            Check(
+                "Python package boundaries",
+                root,
+                (sys.executable, "infra/check_python_packaging.py"),
+            ),
         ]
     if mode != "fast":
         raise ValueError(f"Unknown verification mode: {mode}")
@@ -46,6 +51,21 @@ def build_plan(root: Path, mode: str = "fast", build: bool = False) -> list[Chec
 
     add("widget contract freshness", "services/agent/frontend", "npm", "run", "check:validators")
     add("agent contract TypeScript", "services/agent", "npm", "run", "check:ts")
+    add("Python package boundaries", ".", sys.executable, "infra/check_python_packaging.py")
+    for operation in ("check", "format"):
+        args = ("--check",) if operation == "format" else ()
+        add(
+            f"shared Python packages {operation}",
+            "apps/api",
+            "uv",
+            "run",
+            "--no-sync",
+            "ruff",
+            operation,
+            *args,
+            "../../packages/field-shift-contracts/src",
+            "../../packages/field-shift-science/src",
+        )
     add(
         "planning contract freshness",
         "apps/api",
@@ -54,7 +74,9 @@ def build_plan(root: Path, mode: str = "fast", build: bool = False) -> list[Chec
         "--no-sync",
         "python",
         "-m",
-        "field_shift.contracts.planning_v1.export",
+        "field_shift_contracts.planning_v1.export",
+        "--repo-root",
+        str(root),
         "--check",
     )
     add("planning JSON contracts", ".", "node", "contracts/planning-v1/check.mjs")

@@ -4,8 +4,7 @@ import json
 from pathlib import Path
 
 import pytest
-
-from field_shift.contracts.planning_v1 import FieldProfileSnapshot
+from field_shift_contracts.planning_v1 import FieldProfileSnapshot
 
 ROOT = Path(__file__).resolve().parents[4]
 

@@ -11,11 +11,10 @@ from pathlib import Path
 
 import numpy as np
 import rasterio
+from field_shift_contracts.planning_v1.common import SourceRecord
+from field_shift_contracts.planning_v1.field import SoilHorizon
 from rasterio.features import geometry_mask, geometry_window
 from rasterio.warp import transform_geom
-
-from field_shift.contracts.planning_v1.common import SourceRecord
-from field_shift.contracts.planning_v1.field import SoilHorizon
 
 from .evidence import reason
 from .providers import ProviderResult, check_source

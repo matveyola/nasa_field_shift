@@ -2,7 +2,7 @@
 
 from datetime import date
 
-from field_shift.contracts.planning_v1.common import (
+from field_shift_contracts.planning_v1.common import (
     Contract,
     CropRef,
     DateWindow,
@@ -11,6 +11,7 @@ from field_shift.contracts.planning_v1.common import (
     Text,
     Utc,
 )
+
 from field_shift.modules.rotations.scenario_planning.common import reason
 from field_shift.modules.rotations.suitability.engine import SuitabilityEngine
 

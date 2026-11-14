@@ -3,7 +3,7 @@
 import json
 from datetime import datetime
 
-from field_shift.contracts.planning_v1.models import TrainingObservation
+from field_shift_contracts.planning_v1.models import TrainingObservation
 
 from .learning import Gate, Row, residual_benchmark
 from .provenance import digest

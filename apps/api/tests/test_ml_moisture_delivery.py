@@ -5,6 +5,14 @@ from urllib.parse import parse_qs, urlsplit
 
 import pytest
 from fastapi.testclient import TestClient
+from field_shift_science.geo_ml.era5_land import (
+    UNIT,
+    VARIABLE,
+    ERA5LandMoistureModel,
+    MoistureSourceError,
+)
+from field_shift_science.geo_ml.moisture_features import MoistureFeatures, MoistureFeatureSeries
+from field_shift_science.geo_ml.moisture_model import MoisturePrediction
 from sqlalchemy import select
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -17,14 +25,6 @@ from field_shift.jobs.settings import JobRuntimeSettings
 from field_shift.jobs.worker import process_job
 from field_shift.models import metadata
 from field_shift.modules.geo_ml import ml_layer, refresh, service
-from field_shift.modules.geo_ml.era5_land import (
-    UNIT,
-    VARIABLE,
-    ERA5LandMoistureModel,
-    MoistureSourceError,
-)
-from field_shift.modules.geo_ml.moisture_features import MoistureFeatures, MoistureFeatureSeries
-from field_shift.modules.geo_ml.moisture_model import MoisturePrediction
 from field_shift.seed import seed_demo
 
 TODAY = datetime(2026, 8, 8, 1, tzinfo=UTC)

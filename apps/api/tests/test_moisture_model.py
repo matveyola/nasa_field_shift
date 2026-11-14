@@ -3,14 +3,13 @@ from datetime import date, timedelta
 from urllib.parse import parse_qs, urlparse
 
 import pytest
-
-from field_shift.modules.geo_ml.era5_land import UNIT, MoistureSourceError
-from field_shift.modules.geo_ml.moisture_features import (
+from field_shift_science.geo_ml.era5_land import UNIT, MoistureSourceError
+from field_shift_science.geo_ml.moisture_features import (
     FEATURE_NAMES,
     MoistureFeatures,
     fetch_moisture_features,
 )
-from field_shift.modules.geo_ml.moisture_model import (
+from field_shift_science.geo_ml.moisture_model import (
     SOIL_ATTRIBUTES,
     V2_FEATURE_NAMES,
     MoistureModel,
@@ -20,8 +19,8 @@ from field_shift.modules.geo_ml.moisture_model import (
     get_moisture_model_v2,
     station_distance_km,
 )
-from field_shift.modules.geo_ml.moisture_model import artifact_version as version_for
-from field_shift.modules.geo_ml.ssurgo import SoilProfile
+from field_shift_science.geo_ml.moisture_model import artifact_version as version_for
+from field_shift_science.geo_ml.ssurgo import SoilProfile
 
 
 def _series(day: date) -> dict:

@@ -219,8 +219,9 @@ def test_calendars_only_narrow_permitted_dates_and_preserve_commitments(example,
     from datetime import date
     from types import SimpleNamespace
 
-    from field_shift.contracts.planning_v1 import CandidateSequence
-    from field_shift.contracts.planning_v1.common import DateWindow
+    from field_shift_contracts.planning_v1 import CandidateSequence
+    from field_shift_contracts.planning_v1.common import DateWindow
+
     from field_shift.modules.planning_runtime.calendars import Calendar, CalendarSuitability
     from field_shift.modules.rotations.suitability.engine import SuitabilityEngine
 

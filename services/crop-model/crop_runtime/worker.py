@@ -14,14 +14,13 @@ resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
 def run(operation, payload):
     from datetime import date
 
-    from field_shift_models.engine import Parameters
-    from field_shift_models.provider import AquaCropProvider
-
-    from field_shift.contracts.planning_v1 import (
+    from field_shift_contracts.planning_v1 import (
         CandidateSequence,
         FieldProfileSnapshot,
         WeatherScenarioSet,
     )
+    from field_shift_models.engine import Parameters
+    from field_shift_models.provider import AquaCropProvider
 
     parameters = {
         key: Parameters(

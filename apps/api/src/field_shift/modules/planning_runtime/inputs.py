@@ -3,12 +3,12 @@
 from datetime import UTC, datetime
 from uuid import uuid4
 
+from field_shift_contracts.planning_v1 import FarmPlanningRequest
+from field_shift_contracts.planning_v1.common import Contract
 from pydantic import Field as PydanticField
 from pydantic import model_validator
 from sqlalchemy import select
 
-from field_shift.contracts.planning_v1 import FarmPlanningRequest
-from field_shift.contracts.planning_v1.common import Contract
 from field_shift.modules.fields.models import Field
 from field_shift.modules.fields.planning_profile.service import ProfileError, ProfileRepository
 from field_shift.modules.fields.planning_profile.weather_archive import preserve_issue

@@ -6,7 +6,7 @@ suitability or resource data prevents a proof of infeasibility or optimality.
 
 from time import monotonic
 
-from field_shift.contracts.planning_v1.planning import (
+from field_shift_contracts.planning_v1.planning import (
     FarmPlanComparison,
     PlanAlternative,
     SnapshotRef,

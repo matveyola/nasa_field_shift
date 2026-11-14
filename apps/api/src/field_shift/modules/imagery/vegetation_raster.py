@@ -4,6 +4,7 @@ from math import ceil, floor, sqrt
 
 import numpy as np
 import rasterio
+from field_shift_science.fields.schemas import Polygon
 from rasterio.enums import Resampling
 from rasterio.features import geometry_mask
 from rasterio.transform import from_origin
@@ -11,7 +12,6 @@ from rasterio.vrt import WarpedVRT
 from rasterio.warp import transform_geom
 from shapely.geometry import box, mapping, shape
 
-from field_shift.modules.fields.schemas import Polygon
 from field_shift.modules.imagery.spectral import spectral_pixels, summaries
 from field_shift.modules.imagery.vegetation_catalog import (
     VegetationScene,

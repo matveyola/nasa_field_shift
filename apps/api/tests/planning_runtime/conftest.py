@@ -6,13 +6,13 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
+from field_shift_contracts.planning_v1 import ModelCard, ProfileWriteRequest
+from field_shift_science.fields.geometry import area_hectares
 
 from field_shift import models as models
-from field_shift.contracts.planning_v1 import ModelCard, ProfileWriteRequest
 from field_shift.db import Base, build_session_factory
 from field_shift.modules.access.service import Principal
 from field_shift.modules.farm.models import Farm
-from field_shift.modules.fields.geometry import area_hectares
 from field_shift.modules.fields.models import Field
 from field_shift.modules.fields.planning_profile.service import ProfileRepository
 from field_shift.modules.planning_runtime.inputs import InputBundle

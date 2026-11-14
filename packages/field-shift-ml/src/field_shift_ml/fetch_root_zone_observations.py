@@ -12,7 +12,8 @@ from io import StringIO
 from math import floor, fsum
 from pathlib import Path
 
-from field_shift.modules.geo_ml.moisture_model import station_distance_km
+from field_shift_science.geo_ml.moisture_model import station_distance_km
+
 from field_shift_ml.fetch_observations import DownloadCache, awdb_url, valid_moisture, write_atomic
 from field_shift_ml.resources import evaluation_resource
 

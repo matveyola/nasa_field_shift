@@ -3,22 +3,20 @@
 import copy
 import json
 from datetime import date, timedelta
-from pathlib import Path
+from importlib.resources import files
 
-from field_shift.contracts.planning_v1.field import CandidateSequence, FieldProfileSnapshot
-from field_shift.contracts.planning_v1.weather import WeatherScenarioSet
+from field_shift_contracts.planning_v1.field import CandidateSequence, FieldProfileSnapshot
+from field_shift_contracts.planning_v1.weather import WeatherScenarioSet
 
 from .engine import Parameters
 from .provenance import digest
 
 
-def repository_root():
-    return Path(__file__).resolve().parents[4]
-
-
 def synthetic_inputs(crop="Maize", years=1, dry=False):
     example = json.loads(
-        (repository_root() / "contracts/planning-v1/examples/planning-contracts.json").read_text()
+        files("field_shift_contracts.planning_v1")
+        .joinpath("data/planning-contracts.json")
+        .read_text()
     )
     p, c, w = (copy.deepcopy(example[k]) for k in ("field_profile", "candidate", "weather"))
     instant = "2027-04-01T00:00:00Z"

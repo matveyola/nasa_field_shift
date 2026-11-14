@@ -3,8 +3,8 @@
 import hashlib
 import itertools
 
-from field_shift.contracts.planning_v1 import CandidateSequence, SuitabilityAssessment
-from field_shift.contracts.planning_v1.field import CropAssignment
+from field_shift_contracts.planning_v1 import CandidateSequence, SuitabilityAssessment
+from field_shift_contracts.planning_v1.field import CropAssignment
 
 from .evidence import reason
 from .rules import dates_in

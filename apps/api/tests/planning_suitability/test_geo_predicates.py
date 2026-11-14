@@ -3,9 +3,10 @@
 import json
 from datetime import date
 
-from field_shift.contracts.planning_v1 import FarmPlanningRequest, WeatherScenarioSet
-from field_shift.contracts.planning_v1.common import CropRef
-from field_shift.contracts.planning_v1.field import CropAssignment
+from field_shift_contracts.planning_v1 import FarmPlanningRequest, WeatherScenarioSet
+from field_shift_contracts.planning_v1.common import CropRef
+from field_shift_contracts.planning_v1.field import CropAssignment
+
 from field_shift.modules.fields.planning_profile.providers import inundation_impact
 from field_shift.modules.rotations.suitability.engine import SuitabilityEngine
 from field_shift.modules.rotations.suitability.rules import CropRule, Rulebook
@@ -215,7 +216,7 @@ def test_candidates_respect_locks_and_bound(profile, examples):
 
 
 def test_return_history_unknown_and_confirmed(profile, examples, fixtures):
-    from field_shift.contracts.planning_v1.field import CropHistoryEntry
+    from field_shift_contracts.planning_v1.field import CropHistoryEntry
 
     p = prepared(profile)
     records = [{**d, "soil_frozen": False} for d in fixtures["records"]["temperate_growth"]]
@@ -268,7 +269,7 @@ def test_G01_cold_evidence_not_continent_rule(profile, examples):
 
 
 def test_G13_inputs_preserve_storage_and_irrigation_without_yield_claim(profile):
-    from field_shift.contracts.planning_v1 import FieldProfileSnapshot
+    from field_shift_contracts.planning_v1 import FieldProfileSnapshot
 
     # Domain stress ordering is owned by B. A preserves explicit differing inputs.
     doc = profile.model_dump(mode="json")

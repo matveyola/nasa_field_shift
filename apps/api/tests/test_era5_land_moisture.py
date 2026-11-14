@@ -2,20 +2,20 @@ from datetime import UTC, date, datetime, timedelta
 from urllib.parse import parse_qs, urlsplit
 
 import pytest
-
-from field_shift.db import build_session_factory
-from field_shift.jobs.models import JobKind
-from field_shift.jobs.repository import claim, submit, succeed
-from field_shift.models import metadata
-from field_shift.modules.fields.geometry import contains_point
-from field_shift.modules.fields.schemas import Polygon
-from field_shift.modules.geo_ml.era5_land import (
+from field_shift_science.fields.geometry import contains_point
+from field_shift_science.fields.schemas import Polygon
+from field_shift_science.geo_ml.era5_land import (
     VARIABLE,
     ERA5LandMoistureModel,
     MoistureRequestRejected,
     MoistureSourceError,
     field_location,
 )
+
+from field_shift.db import build_session_factory
+from field_shift.jobs.models import JobKind
+from field_shift.jobs.repository import claim, submit, succeed
+from field_shift.models import metadata
 from field_shift.modules.geo_ml.service import latest_surface_moisture
 from field_shift.seed import seed_demo
 

@@ -7,13 +7,12 @@ from time import monotonic
 import numpy as np
 import rasterio
 from affine import Affine
+from field_shift_science.fields.schemas import Polygon
 from rasterio.enums import Resampling
 from rasterio.errors import RasterioIOError
 from rasterio.transform import from_origin
 from rasterio.warp import reproject, transform_bounds
 from rasterio.windows import Window, from_bounds
-
-from field_shift.modules.fields.schemas import Polygon
 
 GRID_METERS = 30
 MAX_GRID_SIDE = 256

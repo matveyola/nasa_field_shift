@@ -5,6 +5,7 @@ from urllib.parse import parse_qs, urlsplit
 import numpy as np
 import pytest
 from fastapi.testclient import TestClient
+from field_shift_science.fields.schemas import Polygon
 from pydantic import ValidationError
 from rasterio.transform import from_origin
 from shapely.geometry import box, shape
@@ -18,7 +19,6 @@ from field_shift.jobs.schemas import JobSubmission
 from field_shift.jobs.worker import process_job
 from field_shift.models import metadata
 from field_shift.modules.fields.models import Field, FieldPlanting
-from field_shift.modules.fields.schemas import Polygon
 from field_shift.modules.imagery import vegetation, vegetation_catalog, vegetation_raster
 from field_shift.modules.imagery.vegetation_catalog import VegetationUnavailableError
 from field_shift.modules.imagery.vegetation_schemas import (

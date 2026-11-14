@@ -1,16 +1,16 @@
 from collections.abc import Sequence
 from functools import lru_cache
 
-from pydantic import BaseModel
-
-from field_shift.modules.rotations.schemas import PlanId, RotationCrop, RotationPlanSchedule
-from field_shift.modules.simulation.schemas import HistoricalProvenance
-from field_shift.modules.simulation.service import calculate_water_balance
-from field_shift.modules.simulation.water_balance import WaterInputs, stress_summary
-from field_shift.modules.weather.historical import (
+from field_shift_science.simulation.schemas import HistoricalProvenance
+from field_shift_science.simulation.water_balance import WaterInputs, stress_summary
+from field_shift_science.weather.historical import (
     HistoricalWeatherProvider,
     OpenMeteoHistoricalWeather,
 )
+from pydantic import BaseModel
+
+from field_shift.modules.rotations.schemas import PlanId, RotationCrop, RotationPlanSchedule
+from field_shift.modules.simulation.service import calculate_water_balance
 
 
 class HistoricalPlan(BaseModel):

@@ -2,9 +2,8 @@
 
 from typing import Annotated, Literal
 
+from field_shift_contracts.planning_v1.common import Capability, Contract, CropRef, DateWindow, Id
 from pydantic import Field, model_validator
-
-from field_shift.contracts.planning_v1.common import Capability, Contract, CropRef, DateWindow, Id
 
 
 class CropRule(Contract):

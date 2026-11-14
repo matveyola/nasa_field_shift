@@ -23,7 +23,11 @@ jobs:
       - uses: docker/build-push-action@v6
         with:
           context: apps/${{ matrix.app }}
-          build-contexts: ${{ matrix.app == 'web' && 'agent-widget=services/agent/frontend/src/widget' || '' }}
+          build-contexts: |
+            agent-widget=services/agent/frontend/src/widget
+            planning-contracts=contracts/planning-v1
+            shared-contracts=packages/field-shift-contracts
+            shared-science=packages/field-shift-science
           tags: field-shift-${{ matrix.app }}:${{ github.sha }}
           outputs: type=docker,dest=${{ runner.temp }}/field-shift-${{ matrix.app }}.tar
           cache-from: type=gha,scope=${{ matrix.app }}
@@ -36,10 +40,10 @@ jobs:
         run: |
           docker load --input "$API_ARCHIVE"
           docker run --rm "$API_TAG" python -c '
-          from field_shift.modules.geo_ml.forecast_model import get_forecast_correction
-          from field_shift.modules.geo_ml.moisture_model import get_moisture_model, get_moisture_model_v2
-          from field_shift.modules.rotations.yield_model import get_rotation_yield_model
-          from field_shift.modules.simulation.root_zone_model import get_root_zone_correction
+          from field_shift_science.geo_ml.forecast_model import get_forecast_correction
+          from field_shift_science.geo_ml.moisture_model import get_moisture_model, get_moisture_model_v2
+          from field_shift_science.rotations.yield_model import get_rotation_yield_model
+          from field_shift_science.simulation.root_zone_model import get_root_zone_correction
           models = (
               get_moisture_model(), get_moisture_model_v2(), get_forecast_correction(),
               get_rotation_yield_model(), get_root_zone_correction(),

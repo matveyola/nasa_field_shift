@@ -96,3 +96,5 @@ npm run build
 ```
 
 Run PostgreSQL and Redis integration checks with `uv run pytest -q -m integration` from `apps/api`. Set `FIELD_SHIFT_TEST_DATABASE_URL` to a PostgreSQL database where tests can create and drop their own temporary schemas. Set `FIELD_SHIFT_TEST_REDIS_URL` to a dedicated empty Redis database. CI provisions both. The release workflow builds downloadable Docker image archives on version tags or on manual dispatch. Load both archives with `docker load`, set `API_IMAGE` and `WEB_IMAGE` to the corresponding SHA-tagged images, and start Compose with `--no-build`.
+
+Python dependency boundaries and required installed-wheel verification: [packaging policy](docs/python-packaging.md).

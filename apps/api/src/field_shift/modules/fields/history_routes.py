@@ -2,13 +2,13 @@ from datetime import datetime
 from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Query
+from field_shift_science.fields.schemas import Polygon, Season
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy import func, select
 
 from field_shift.db import SessionDep
 from field_shift.modules.fields.history import boundary_for_season, versions
 from field_shift.modules.fields.models import PreparedContour
-from field_shift.modules.fields.schemas import Polygon, Season
 from field_shift.modules.fields.service import require_field
 
 router = APIRouter(prefix="/fields", tags=["field history and contours"])

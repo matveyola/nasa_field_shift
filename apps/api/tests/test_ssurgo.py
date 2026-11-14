@@ -1,8 +1,7 @@
 from datetime import date
 
 import pytest
-
-from field_shift.modules.geo_ml import ssurgo
+from field_shift_science.geo_ml import ssurgo
 
 
 def test_point_profile_uses_representative_horizon_and_converts_volumetric_units() -> None:

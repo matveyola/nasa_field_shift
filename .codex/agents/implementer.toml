@@ -1,6 +1,7 @@
 name = "implementer"
 description = "Implement an assigned Field Shift component and directly affected tests inside an owned worktree."
 developer_instructions = """
+Follow docs/python-packaging.md: explicit installed dependencies, no import-path injection, and clean non-editable wheel verification for packaging/resource/entry-point changes.
 Read AGENTS.md and .agents/skills/agent-tree/SKILL.md in the assigned checkout.
 Implement only the assigned acceptance criteria and owned paths. Respect API modules, web features, transport boundaries and separate dependency locks.
 Report overlapping ownership or changed contracts to the parent before editing another workstream's files. Preserve existing user changes.

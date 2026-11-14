@@ -3,13 +3,13 @@
 import json
 from dataclasses import replace
 from datetime import UTC, datetime, timedelta
+from importlib.resources import files
 
 import numpy as np
 import pytest
-from field_shift.contracts.planning_v1.models import TrainingObservation
+from field_shift_contracts.planning_v1.models import TrainingObservation
 
 from field_shift_models.experiments import compare_frozen_embeddings
-from field_shift_models.fixtures import repository_root
 from field_shift_models.learning import (
     Gate,
     Row,
@@ -22,7 +22,9 @@ from field_shift_models.learning import (
 
 def observation(year=2020, group="fit", index=0, synthetic=True):
     raw = json.loads(
-        (repository_root() / "contracts/planning-v1/examples/planning-contracts.json").read_text()
+        files("field_shift_contracts.planning_v1")
+        .joinpath("data/planning-contracts.json")
+        .read_text()
     )["observation"]
     raw.update(
         observation_id=f"{group}-{year}-{index}",

@@ -9,9 +9,9 @@ import tempfile
 from datetime import UTC, datetime, timedelta
 from time import monotonic
 
+from field_shift_contracts.planning_v1 import FarmPlanComparison, PlanningRun
 from sqlalchemy import or_, select
 
-from field_shift.contracts.planning_v1 import FarmPlanComparison, PlanningRun
 from field_shift.modules.planning_runtime.models import PlanningDelivery
 from field_shift.modules.planning_runtime.service import service
 from field_shift.modules.rotations.scenario_planning.common import canonical, reason

@@ -1,23 +1,23 @@
 import logging
 from os import getenv
 
+from field_shift_science.fields.schemas import Polygon
+from field_shift_science.geo_ml.era5_land import field_location
+from field_shift_science.rotations.yield_model import (
+    SOURCE_URL,
+    RotationYieldModelUnavailable,
+    get_rotation_yield_model,
+)
 from sqlalchemy.orm import Session
 
 from field_shift.modules.fields.history import boundary_for_season
-from field_shift.modules.fields.schemas import Polygon
 from field_shift.modules.fields.service import require_field
-from field_shift.modules.geo_ml.era5_land import field_location
 from field_shift.modules.rotations.schemas import (
     RotationYieldPlan,
     RotationYieldRead,
     RotationYieldYear,
 )
 from field_shift.modules.rotations.service import get_plan_snapshot
-from field_shift.modules.rotations.yield_model import (
-    SOURCE_URL,
-    RotationYieldModelUnavailable,
-    get_rotation_yield_model,
-)
 
 logger = logging.getLogger(__name__)
 

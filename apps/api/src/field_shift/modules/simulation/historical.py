@@ -1,28 +1,26 @@
 from datetime import UTC, date, datetime, timedelta
 from math import isfinite
 
-from pydantic import ValidationError
-
-from field_shift.modules.crops.fao56 import (
+from field_shift_science.crops.fao56 import (
     FAO56_CROP_COEFFICIENTS,
     FAO56_WATER_STRESS,
     crop_water_parameters,
 )
-from field_shift.modules.fields.schemas import Polygon
-from field_shift.modules.simulation.schemas import (
+from field_shift_science.fields.schemas import Polygon
+from field_shift_science.simulation.schemas import (
     HistoricalProvenance,
     SourceReference,
     WaterResult,
     WaterSource,
 )
-from field_shift.modules.simulation.water_balance import (
+from field_shift_science.simulation.water_balance import (
     FAO56_BUCKET_VERSION,
     REFERENCE_FIELD_CAPACITY,
     REFERENCE_WILTING_POINT,
     WaterInputs,
     fao56_days,
 )
-from field_shift.modules.weather.historical import (
+from field_shift_science.weather.historical import (
     ARCHIVE_LAG_DAYS,
     ERA5_DATASET,
     ERA5_SPATIAL_RESOLUTION_DEGREES,
@@ -30,7 +28,8 @@ from field_shift.modules.weather.historical import (
     HistoricalWeatherProvider,
     WeatherUnavailableError,
 )
-from field_shift.modules.weather.scenarios import Scenario
+from field_shift_science.weather.scenarios import Scenario
+from pydantic import ValidationError
 
 MAX_HISTORICAL_DAYS = 62
 _RAINFALL_MULTIPLIER = {

@@ -13,7 +13,7 @@ uv sync --locked --python 3.12
 .venv/bin/ruff check src tests
 .venv/bin/ruff format --check src tests
 .venv/bin/python -m pytest -q
-PYTHONPATH=../../apps/api/src .venv/bin/python -m field_shift_models.cli benchmark --check reports/cpu-v2.json
+.venv/bin/python -m field_shift_models.cli benchmark --check reports/cpu-v3.json
 ```
 
 `benchmark --output /tmp/crop-cpu.json` measures CPU/wall time and peak RSS in
@@ -32,7 +32,7 @@ An empty/insufficient real dataset yields `insufficient_training_data`, null
 metrics, and no changed serving artifact. Artificial labels used by unit tests
 are not written into empirical reports.
 
-Private process request: `PYTHONPATH=apps/api/src <private-python> -m
+Private process request: `<private-python> -m
 field_shift_models.cli evaluate`, with one JSON object on stdin:
 
 - `profile`: `FieldProfileSnapshot`; `candidate`: `CandidateSequence`;

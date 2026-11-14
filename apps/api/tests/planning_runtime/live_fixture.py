@@ -7,7 +7,8 @@ from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from uuid import uuid4
 
-from field_shift.contracts.planning_v1 import ProfileWriteRequest
+from field_shift_contracts.planning_v1 import ProfileWriteRequest
+
 from field_shift.db import build_session_factory
 from field_shift.modules.access.service import Principal
 from field_shift.modules.fields.models import Field

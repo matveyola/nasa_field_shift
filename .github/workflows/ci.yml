@@ -30,6 +30,27 @@ jobs:
       - run: uvx --from ruff==0.17.4 ruff check --config apps/api/pyproject.toml infra/check_agent_tree.py infra/test_agent_tree.py infra/verify.py infra/test_verify.py
       - run: uvx --from ruff==0.17.4 ruff format --check --config apps/api/pyproject.toml infra/check_agent_tree.py infra/test_agent_tree.py infra/verify.py infra/test_verify.py
 
+  python_packages:
+    name: Installed Python distributions
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+        with:
+          version: '0.11.0'
+          python-version: '3.12'
+          enable-cache: true
+          cache-dependency-glob: '**/uv.lock'
+      - run: python3 infra/verify_python_wheels.py --output /tmp/python-wheel-verification
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: python-wheel-verification
+          path: /tmp/python-wheel-verification
+
   changes:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -40,6 +61,7 @@ jobs:
       web: ${{ steps.detect.outputs.web }}
       integration: ${{ steps.detect.outputs.integration }}
       ml: ${{ steps.detect.outputs.ml }}
+      planning: ${{ steps.detect.outputs.planning }}
       planning: ${{ steps.detect.outputs.planning }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -66,6 +88,7 @@ jobs:
             /^(apps\/api\/(src\/|tests\/integration\/|migrations\/|alembic\.ini|pyproject\.toml|uv\.lock|Dockerfile)|compose\.yaml|infra\/|\.github\/workflows\/ci\.yml)/ { integration = 1 }
             /^(packages\/field-shift-ml\/|apps\/api\/src\/field_shift\/modules\/(crops|fields|geo_ml|rotations|simulation|weather)\/|\.github\/workflows\/ci\.yml$)/ { ml = 1 }
             /^(contracts\/planning-v1\/|packages\/field-shift-models\/|services\/crop-model\/|apps\/api\/|apps\/web\/|compose\.yaml|infra\/|\.github\/workflows\/ci\.yml)/ { planning = 1 }
+            /^packages\/field-shift-(contracts|science)\// { api = 1; ml = 1; planning = 1; integration = 1 }
             /^contracts\/planning-v1\// { api = 1; web = 1; integration = 1 }
             END {
               print "planning=" (planning ? "true" : "false")
@@ -297,9 +320,9 @@ jobs:
       - run: uv sync --project apps/api --locked --extra dev
       - run: uv sync --project packages/field-shift-models --locked --python 3.12
       - run: packages/field-shift-models/.venv/bin/python -m pytest -q packages/field-shift-models/tests
-      - run: PYTHONPATH=apps/api/src packages/field-shift-models/.venv/bin/python -m field_shift_models.cli benchmark --check packages/field-shift-models/reports/cpu-v2.json
+      - run: packages/field-shift-models/.venv/bin/python -m field_shift_models.cli benchmark --check packages/field-shift-models/reports/cpu-v3.json
       - run: npm ci --prefix apps/web && npm ci --prefix services/agent && npm ci --prefix services/agent/frontend
-      - run: PYTHONPATH=apps/api/src apps/api/.venv/bin/python -m field_shift.contracts.planning_v1.export --check
+      - run: apps/api/.venv/bin/python -m field_shift_contracts.planning_v1.export --repo-root . --check
       - run: node contracts/planning-v1/check.mjs && apps/web/node_modules/.bin/tsc -p contracts/planning-v1/tsconfig.json
       - run: node services/agent/frontend/node_modules/@playwright/test/cli.js install --with-deps chromium
       - run: npm run test:planning --prefix apps/web
@@ -319,7 +342,7 @@ jobs:
   required:
     name: Required checks
     if: always()
-    needs: [agent_tooling, changes, api, ml, agent, agent_reference, web, integration, planning]
+    needs: [agent_tooling, python_packages, changes, api, ml, agent, agent_reference, web, integration, planning]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     env:

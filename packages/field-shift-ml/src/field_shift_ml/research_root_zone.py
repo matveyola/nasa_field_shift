@@ -9,19 +9,19 @@ from hashlib import sha256
 from pathlib import Path
 
 import numpy as np
-from sklearn.linear_model import Ridge
-from sklearn.preprocessing import StandardScaler
-
-from field_shift.modules.geo_ml.ifs import HORIZON
-from field_shift.modules.geo_ml.moisture_model import station_distance_km
-from field_shift.modules.simulation.root_zone_inputs import root_zone_storage_mm
-from field_shift.modules.simulation.root_zone_model import (
+from field_shift_science.geo_ml.ifs import HORIZON
+from field_shift_science.geo_ml.moisture_model import station_distance_km
+from field_shift_science.simulation.root_zone_inputs import root_zone_storage_mm
+from field_shift_science.simulation.root_zone_model import (
     CAPACITY_MM,
     DEPTH_M,
     reference_reserve_mm,
     root_zone_features,
 )
-from field_shift.modules.simulation.water_balance import REFERENCE_WILTING_POINT
+from field_shift_science.simulation.water_balance import REFERENCE_WILTING_POINT
+from sklearn.linear_model import Ridge
+from sklearn.preprocessing import StandardScaler
+
 from field_shift_ml.fetch_observations import (
     USCRN,
     DownloadCache,

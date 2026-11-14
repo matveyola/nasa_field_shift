@@ -383,6 +383,8 @@ dependencies = [
     { name = "alembic" },
     { name = "celery", extra = ["redis"] },
     { name = "fastapi" },
+    { name = "field-shift-contracts" },
+    { name = "field-shift-science" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "psycopg", extra = ["binary"] },
@@ -408,6 +410,8 @@ requires-dist = [
     { name = "alembic", specifier = ">=1.15,<2" },
     { name = "celery", extras = ["redis"], specifier = ">=5.5,<6" },
     { name = "fastapi", specifier = ">=0.115,<1" },
+    { name = "field-shift-contracts", editable = "../../packages/field-shift-contracts" },
+    { name = "field-shift-science", editable = "../../packages/field-shift-science" },
     { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.28,<1" },
     { name = "numpy", specifier = ">=2,<3" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.2,<4" },
@@ -422,6 +426,32 @@ requires-dist = [
     { name = "uvicorn", specifier = ">=0.34,<1" },
 ]
 provides-extras = ["dev"]
+
+[[package]]
+name = "field-shift-contracts"
+version = "0.1.0"
+source = { editable = "../../packages/field-shift-contracts" }
+dependencies = [
+    { name = "pydantic" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "pydantic", specifier = ">=2.10,<3" }]
+
+[[package]]
+name = "field-shift-science"
+version = "0.1.0"
+source = { editable = "../../packages/field-shift-science" }
+dependencies = [
+    { name = "pydantic" },
+    { name = "redis" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "pydantic", specifier = ">=2.10,<3" },
+    { name = "redis", specifier = ">=5,<9" },
+]
 
 [[package]]
 name = "greenlet"

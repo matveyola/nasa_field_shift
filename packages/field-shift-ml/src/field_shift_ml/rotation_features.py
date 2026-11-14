@@ -12,8 +12,9 @@ from statistics import fmean, median
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-from field_shift.modules.geo_ml.ssurgo import SDA_ENDPOINT, SoilProfile
-from field_shift.modules.rotations.yield_model import effect_features
+from field_shift_science.geo_ml.ssurgo import SDA_ENDPOINT, SoilProfile
+from field_shift_science.rotations.yield_model import effect_features
+
 from field_shift_ml.fetch_observations import write_atomic
 from field_shift_ml.train_rotation_yield import Sample
 

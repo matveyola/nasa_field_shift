@@ -10,13 +10,13 @@ from pathlib import Path
 from statistics import fmean
 
 import numpy as np
+from field_shift_science.geo_ml.ssurgo import SDA_ENDPOINT, SoilProfile
+from field_shift_science.rotations.yield_model import SOURCE_URL, site_distance
 from sklearn.ensemble import ExtraTreesRegressor, GradientBoostingRegressor
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.linear_model import ElasticNet, HuberRegressor, Ridge
 from threadpoolctl import threadpool_limits
 
-from field_shift.modules.geo_ml.ssurgo import SDA_ENDPOINT, SoilProfile
-from field_shift.modules.rotations.yield_model import SOURCE_URL, site_distance
 from field_shift_ml.fetch_soil_profiles import fetch_snapshot
 from field_shift_ml.iterate_rotation_yield import (
     BASELINE,

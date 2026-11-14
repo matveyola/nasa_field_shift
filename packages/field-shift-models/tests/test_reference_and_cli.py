@@ -1,14 +1,15 @@
 """Named reference, controlled deficit counterfactuals and private process boundary."""
 
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
-from field_shift.modules.crops.catalog import demo_crop_profile
-from field_shift.modules.simulation.water_balance import fao56_days
+from field_shift_science.crops.catalog import demo_crop_profile
+from field_shift_science.simulation.water_balance import fao56_days
 
 from field_shift_models.cli import bounded_worker, stable_report
 from field_shift_models.comparison import wofost_synthetic
-from field_shift_models.fixtures import repository_root, synthetic_inputs
+from field_shift_models.fixtures import synthetic_inputs
 
 
 def reference(capacity, irrigation=0):
@@ -52,8 +53,9 @@ def test_real_pcse_engine_offline_benchmark_not_a_commercial_default():
     assert len(result["input_sha256"]) == 64
 
 
-def test_bounded_private_contract_inference(monkeypatch):
-    monkeypatch.setenv("PYTHONPATH", str(repository_root() / "apps/api/src"))
+def test_bounded_private_contract_inference(monkeypatch, tmp_path):
+    monkeypatch.delenv("PYTHONPATH", raising=False)
+    monkeypatch.chdir(tmp_path)
     p, c, w, h = synthetic_inputs()
     payload = {
         "profile": p.model_dump(mode="json"),
@@ -74,12 +76,15 @@ def test_private_payload_bound_precedes_execution():
         bounded_worker("evaluate", {"oversize": "x" * (16 * 1024 * 1024)})
 
 
-def test_chronology_revision_preserves_frozen_baseline_numerics():
+@pytest.mark.parametrize(
+    "previous,current", [("cpu-v1.json", "cpu-v2.json"), ("cpu-v2.json", "cpu-v3.json")]
+)
+def test_packaging_and_chronology_preserve_frozen_baseline_numerics(previous, current):
     import json
 
-    reports = repository_root() / "packages/field-shift-models/reports"
-    old = json.loads((reports / "cpu-v1.json").read_text())
-    new = json.loads((reports / "cpu-v2.json").read_text())
+    reports = Path(__file__).resolve().parents[1] / "reports"
+    old = json.loads((reports / previous).read_text())
+    new = json.loads((reports / current).read_text())
     assert old["accuracy_metrics"] is new["accuracy_metrics"] is None
     assert old["promotion"] == new["promotion"] == "baseline_only"
     for key, previous in old["runs"].items():

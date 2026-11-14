@@ -7,11 +7,12 @@ from urllib.request import Request
 
 import pytest
 from fastapi.testclient import TestClient
+from field_shift_science.weather import historical
 
 from field_shift.api import create_app
 from field_shift.db import build_session_factory
 from field_shift.models import metadata
-from field_shift.modules.weather import historical, routes, seasonal
+from field_shift.modules.weather import routes, seasonal
 from field_shift.seed import seed_demo
 
 

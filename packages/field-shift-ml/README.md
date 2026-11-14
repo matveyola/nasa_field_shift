@@ -5,11 +5,12 @@ forecasts and rotation effects. `src/field_shift_ml/evaluations` contains frozen
 protocols and reports. New downloads, caches and candidate artifacts belong in
 the ignored `data` directory.
 
-Use the package from this repository checkout. The `run.py` launcher makes the
-API source available to offline workflows so they use the same feature and
-forecast helpers as the runtime. The ML environment has its own lockfile and
-preserves the original numerical dependencies. Only validated artifacts and
-inference code ship with the API and workers.
+Install this package with its own lockfile (`uv sync --locked`). The installed
+`field-shift-ml` command works from any directory and uses the declared
+`field-shift-science` dependency for shared features and inference helpers.
+Pass input/output paths explicitly; the optional `run.py` wrapper calls the same
+installed entry point. The ML NumPy 1.26 environment remains separate from API
+and crop-model NumPy 2 environments. Training dependencies never ship with API workers.
 
 ## Soil moisture model
 
@@ -49,12 +50,12 @@ uv run --locked python run.py fetch_observations --output data/observations.csv 
 uv run --locked python run.py train_moisture --observations data/observations.csv --cache data/archive --output data/moisture-v1.json
 ```
 
-Compare the observation and joined sample hashes, metrics, and eligibility in the candidate JSON before replacing the bundled artifact under `apps/api/src/field_shift/modules/geo_ml/artifacts`. The production worker runs the portable, content-versioned JSON using the application runtime. The training dependencies stay outside the worker. For commercial archive requests, set `OPEN_METEO_API_KEY` in the environment. [Open-Meteo terms](https://open-meteo.com/en/terms)
+Compare the observation and joined sample hashes, metrics, and eligibility in the candidate JSON before replacing the bundled artifact under `packages/field-shift-science/src/field_shift_science/geo_ml/artifacts`. The production worker runs the portable, content-versioned JSON using the application runtime. The training dependencies stay outside the worker. For commercial archive requests, set `OPEN_METEO_API_KEY` in the environment. [Open-Meteo terms](https://open-meteo.com/en/terms)
 
 Prepare the independent Iowa CSV using the acquisition command in the observations document, then evaluate the frozen artifact separately. [Field data acquisition](../../docs/moisture-observations.md)
 
 ```sh
-uv run --locked python run.py evaluate_moisture --model ../../apps/api/src/field_shift/modules/geo_ml/artifacts/moisture-v1.json --observations data/observations-ifc.csv --cache data/archive --output data/iowa-fields-v1.json
+uv run --locked python run.py evaluate_moisture --model ../field-shift-science/src/field_shift_science/geo_ml/artifacts/moisture-v1.json --observations data/observations-ifc.csv --cache data/archive --output data/iowa-fields-v1.json
 ```
 
 ## Use and scope
