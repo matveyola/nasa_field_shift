@@ -1,0 +1,2068 @@
+{
+  "calibration_pairs": 6181,
+  "configuration_count": 248,
+  "development_fixed_recipe_ablation": {
+    "ridge:raw+land_history+soil+terrain+geography:3000/1": {
+      "bias": 0.005583787461932833,
+      "mae": 0.06426009439344453,
+      "rmse": 0.08149240725119922
+    },
+    "ridge:raw+land_history+weather+soil+geography:3000/1": {
+      "bias": 0.0014734324188400993,
+      "mae": 0.06508034826282395,
+      "rmse": 0.08229841425371998
+    },
+    "ridge:raw+land_history+weather+soil+terrain+geography:3000/1": {
+      "bias": 0.003131089033801049,
+      "mae": 0.062310426621427197,
+      "rmse": 0.07877652210382621
+    },
+    "ridge:raw+land_history+weather+soil+terrain:3000/1": {
+      "bias": 0.002795756553561382,
+      "mae": 0.07152886489819357,
+      "rmse": 0.08923045672115251
+    },
+    "ridge:raw+land_history+weather+terrain+geography:3000/1": {
+      "bias": -0.013101503999574203,
+      "mae": 0.09141196578108801,
+      "rmse": 0.11202754295284659
+    },
+    "ridge:raw+weather+soil+terrain+geography:3000/1": {
+      "bias": 0.003315198159789928,
+      "mae": 0.0635725190249261,
+      "rmse": 0.0803526628399877
+    }
+  },
+  "diagnostics": {
+    "interval_half_width": 0.1375508524543772,
+    "known_diagnostics": {
+      "iowa_2025_previously_seen": {
+        "by_site": {
+          "IFC:CCO02": {
+            "learned": {
+              "bias": 0.03393940544003596,
+              "mae": 0.04858541718135618,
+              "rmse": 0.06600581299337968
+            },
+            "pairs": 261,
+            "raw": {
+              "bias": 0.012574678160919544,
+              "mae": 0.04403473180076627,
+              "rmse": 0.059742704706976416
+            }
+          },
+          "IFC:HS0002": {
+            "learned": {
+              "bias": -0.021806832133015475,
+              "mae": 0.0541178689007948,
+              "rmse": 0.06673512825924016
+            },
+            "pairs": 263,
+            "raw": {
+              "bias": -0.027764186311787082,
+              "mae": 0.057455045627376446,
+              "rmse": 0.0710302189394722
+            }
+          },
+          "IFC:HS0011": {
+            "learned": {
+              "bias": 0.047197217762682715,
+              "mae": 0.054581313651074145,
+              "rmse": 0.06813111860450857
+            },
+            "pairs": 262,
+            "raw": {
+              "bias": 0.026479503816793898,
+              "mae": 0.04282360305343511,
+              "rmse": 0.05582641221905549
+            }
+          },
+          "IFC:MDDLCDR01": {
+            "learned": {
+              "bias": -0.0122218761963472,
+              "mae": 0.06522844788817946,
+              "rmse": 0.07355281084016757
+            },
+            "pairs": 258,
+            "raw": {
+              "bias": -0.026674031007751935,
+              "mae": 0.06699420930232558,
+              "rmse": 0.07737483644610835
+            }
+          },
+          "IFC:RACCOON03": {
+            "learned": {
+              "bias": -0.030344816431577912,
+              "mae": 0.04047719974809989,
+              "rmse": 0.05199992619240191
+            },
+            "pairs": 250,
+            "raw": {
+              "bias": 0.004282852000000001,
+              "mae": 0.038151371999999996,
+              "rmse": 0.04938616848175205
+            }
+          },
+          "IFC:RACCOON04": {
+            "learned": {
+              "bias": 0.036546513623294155,
+              "mae": 0.06067488642860924,
+              "rmse": 0.07333727325568506
+            },
+            "pairs": 248,
+            "raw": {
+              "bias": 0.09061972580645165,
+              "mae": 0.09669894354838714,
+              "rmse": 0.11404903085119479
+            }
+          },
+          "IFC:UPPRIOWA01": {
+            "learned": {
+              "bias": 0.003034830448274325,
+              "mae": 0.04168099160901487,
+              "rmse": 0.053917099992603135
+            },
+            "pairs": 138,
+            "raw": {
+              "bias": 0.03339411594202899,
+              "mae": 0.05090508695652173,
+              "rmse": 0.06933096663797875
+            }
+          }
+        },
+        "era5_land": {
+          "bias": 0.01613037977237929,
+          "mae": 0.05672328461268746,
+          "rmse": 0.07365061768237692
+        },
+        "interval_coverage": 0.9613300466106115,
+        "learned": {
+          "bias": 0.008049206073335221,
+          "mae": 0.052192303629589785,
+          "rmse": 0.06530326139491914
+        },
+        "pairs": 1680,
+        "sites": 7
+      },
+      "regional_2025": {
+        "by_site": {
+          "USCRN:54854": {
+            "learned": {
+              "bias": -0.02113356658265882,
+              "mae": 0.028170985031375877,
+              "rmse": 0.035230934975265804
+            },
+            "pairs": 209,
+            "raw": {
+              "bias": 0.10746516746411486,
+              "mae": 0.10746516746411486,
+              "rmse": 0.11036771514980077
+            }
+          },
+          "USCRN:54856": {
+            "learned": {
+              "bias": -0.07992557185832115,
+              "mae": 0.09248105679582767,
+              "rmse": 0.1114559863918441
+            },
+            "pairs": 261,
+            "raw": {
+              "bias": 0.06022654789272031,
+              "mae": 0.07690821072796936,
+              "rmse": 0.09423709653226493
+            }
+          },
+          "USCRN:54932": {
+            "learned": {
+              "bias": 0.06334002947308623,
+              "mae": 0.06334002947308623,
+              "rmse": 0.06647789578546104
+            },
+            "pairs": 218,
+            "raw": {
+              "bias": 0.14281140825688077,
+              "mae": 0.14281140825688077,
+              "rmse": 0.1454104959172291
+            }
+          },
+          "USCRN:94079": {
+            "learned": {
+              "bias": 0.07224164169636359,
+              "mae": 0.07224164169636359,
+              "rmse": 0.07372545647071896
+            },
+            "pairs": 266,
+            "raw": {
+              "bias": 0.07682232706766916,
+              "mae": 0.07682232706766916,
+              "rmse": 0.0910437677229982
+            }
+          },
+          "USCRN:94085": {
+            "learned": {
+              "bias": 0.2776568016350327,
+              "mae": 0.2776568016350327,
+              "rmse": 0.28112546727826915
+            },
+            "pairs": 255,
+            "raw": {
+              "bias": 0.15358807450980388,
+              "mae": 0.15358807450980388,
+              "rmse": 0.1602744594360488
+            }
+          }
+        },
+        "era5_land": {
+          "bias": 0.10818270503823782,
+          "mae": 0.11151903760528763,
+          "rmse": 0.12343641701040287
+        },
+        "interval_coverage": 0.7270699476669293,
+        "learned": {
+          "bias": 0.062435866872700495,
+          "mae": 0.10677810292633716,
+          "rmse": 0.14321308431432794
+        },
+        "pairs": 1209,
+        "sites": 5
+      }
+    }
+  },
+  "feature_columns": {
+    "geography": [
+      "latitude",
+      "longitude"
+    ],
+    "land_history": [
+      "subsurface_moisture",
+      "deep_moisture",
+      "surface_mean_3d",
+      "surface_mean_7d",
+      "shallow_soil_temperature",
+      "air_temperature",
+      "season_sin",
+      "season_cos",
+      "surface_delta_1d",
+      "surface_delta_3d",
+      "surface_minus_subsurface",
+      "subsurface_minus_deep",
+      "shallow_minus_air_temperature"
+    ],
+    "raw": [
+      "surface_moisture"
+    ],
+    "soil": [
+      "sand",
+      "silt",
+      "clay",
+      "organic_matter",
+      "bulk_density",
+      "field_capacity",
+      "wilting_point",
+      "horizon_bottom_cm",
+      "component_percent",
+      "available_water_capacity",
+      "drainage_rank",
+      "above_wilting_point",
+      "relative_available_water",
+      "surface_by_clay",
+      "surface_by_organic_matter"
+    ],
+    "soil_weather": [
+      "rain_7d_by_clay",
+      "drying_7d_by_water_capacity"
+    ],
+    "terrain": [
+      "elevation_m",
+      "slope_proxy",
+      "relative_elevation_m",
+      "local_relief_m"
+    ],
+    "weather": [
+      "rain_sum",
+      "et0_fao_evapotranspiration",
+      "relative_humidity_2m_mean",
+      "shortwave_radiation_sum",
+      "wind_speed_10m_mean",
+      "temperature_2m_max",
+      "temperature_2m_min",
+      "vapour_pressure_deficit_max",
+      "temperature_range",
+      "rain_3d",
+      "rain_7d",
+      "rain_14d",
+      "rain_30d",
+      "et0_3d",
+      "et0_7d",
+      "et0_14d",
+      "et0_30d",
+      "rain_minus_et0_3d",
+      "rain_minus_et0_7d",
+      "rain_minus_et0_14d",
+      "rain_minus_et0_30d",
+      "wet_days_14d",
+      "temperature_excess_14d"
+    ]
+  },
+  "fit_end": "2024-12-31",
+  "fresh_independent_farms": 0,
+  "input_hashes": {
+    "iowa": "7b454419c0bd58b42c266ada1412dc158ce0fe10666033a5d56d209d74952d41",
+    "iowa_soil": "860dbf3e2198dc67e46ebcb7be3c07e24cf66483485049b4d7c6148f8dbbce87",
+    "observations": "29212179c9a4b9e85f6b729a7a446a840752aec0cab1009ec42a1ed7e966b573",
+    "roles_artifact": "bebe2eb22f6b49dcfa0a1bdad5d5c4a04fafe728ad63b56ec33e813d1520faa0",
+    "soil": "4c120fa91a6bae12815f5467299d2030286ec2f8664407f16f3c9eae658d327f",
+    "stations": {
+      "IFC:CCO02": {
+        "era5": "70324284908aeb4c4f77a2de45450fb6dd7f2d32263b0517b43eb78691345157",
+        "era5_land": "62a9848ad9c75d3ad0a214a2f24a0194ab6260398b4b8afb4bd9813761848e32"
+      },
+      "IFC:HS0002": {
+        "era5": "ec4e166e6dcde7a6d116d7d33483901cebca7d96684f1b49cd43d2ccca9eb323",
+        "era5_land": "2435927405844befd4c5f48ddc968898f206f46be95fb0cdb4b45dae5e43b127"
+      },
+      "IFC:HS0011": {
+        "era5": "29cb3c0a10a624508032a897d862caf013553774195b4ad5851ed8b46adfe3d9",
+        "era5_land": "13c91816d9582ac0affd55d0f84e56c8a592620fb530ad180933a4a4fa39894a"
+      },
+      "IFC:MDDLCDR01": {
+        "era5": "6a5cded02ab950d2f96c1ef4e92f53c6324a192541a49c9b802a4e4f1014423c",
+        "era5_land": "e3b4babd79136cb55b7fb8548cb3388715a78351e1b08884118122dc35083754"
+      },
+      "IFC:NSHNBTNA04": {
+        "era5": "2659cc798d029cfec989ca4fc10221bc393b2c32bc058929bc5b2ba38e5d6103",
+        "era5_land": "ceff37910a2f3472dae90e600f1e7ffde3cff3f1781daf7691716061d2d22844"
+      },
+      "IFC:RACCOON03": {
+        "era5": "19d4ceb0e542a4c1a3b3a3bd151a4bf90f1b44375f7b6950f3b656de7f246072",
+        "era5_land": "20cab09379084506581a788890dc9c4b4384f1cfa7ab2c118a7d3299873195fd"
+      },
+      "IFC:RACCOON04": {
+        "era5": "761dbc49872fa5df77ead4b234946a006b035252544bf7a7c2463924102fecb2",
+        "era5_land": "79bd880c2c8c6cdb2e05caa84dbaa286117c6b4b0f48ab7faec9d0370a55d3f3"
+      },
+      "IFC:UPPRIOWA01": {
+        "era5": "cafeb46bb4c801988d9669fb408a3d5c010e8f793321c493c0dcf29470427ae6",
+        "era5_land": "6259332f183b38a907c0a7a5a434d473b152441cd323cb375e2a3c9fe25c938f"
+      },
+      "SCAN:2002:MN:SCAN": {
+        "era5": "8e1089486c04e57c6fd2aa60fcb562fd322b221f08b815f6bb5a2a50cd12adc3",
+        "era5_land": "f0faded13ffd15124c694ba0e0156e3fad0a18058eef9fad1c81209cbe3e4935"
+      },
+      "SCAN:2003:WI:SCAN": {
+        "era5": "5b22447859a29249b4d72aef380a02be0759728b10d4b5dc4a089ffe4630d448",
+        "era5_land": "db373cf5cfa62e99aa0c36a122673b3329ff9930317baf050d21e493bdc7fb19"
+      },
+      "SCAN:2004:IL:SCAN": {
+        "era5": "bbb7b6a28a7ce70976961a67135976053b1e159fc6599caae573bde644d5ed32",
+        "era5_land": "4fccd355e91e1994893d806cc7a4e14b33a750630377d69d222db8757801a7b3"
+      },
+      "SCAN:2047:MO:SCAN": {
+        "era5": "302798826b2ee4b1a9b6dcf635462b219ff9b0f30e3c63de4f7b4e7472d8e73b",
+        "era5_land": "048490ce893700e93a6482b044e80addce6f70a1afb2ac5980e43aba66d5a28e"
+      },
+      "SCAN:2048:MO:SCAN": {
+        "era5": "ec60daf18b9cecd8cb66250ddd25b58d0af2c2f95509e521646504ccb1071628",
+        "era5_land": "9e6e1324ea2bcb4a6bcc95caba4e8bb6516e763f4955fdf9bf9b603061f210c7"
+      },
+      "SCAN:2050:MN:SCAN": {
+        "era5": "7f91ff5296fc4c4b1443f391b35b5f2f5b9f810f036d967934934aba304b2dcb",
+        "era5_land": "b4923e637b3b0cf74bd2b1aaaba1448e70dcf20f3375e08277a8a6bff0fd79e0"
+      },
+      "SCAN:2060:MO:SCAN": {
+        "era5": "11b95abcb23d2daf64e78d3eef0375ef7b6b40d53d8ef42b35e4ddb0426d94f7",
+        "era5_land": "709070c2ecd25854f81f57ae4f57fc08af287c603ab6ad9612ee833eaf57f362"
+      },
+      "SCAN:2061:MO:SCAN": {
+        "era5": "4383437ce1ebb590d13ca31794d0d36d38e2199018f4d68cb4078469fc4162b8",
+        "era5_land": "9027a675a43172f8d01ca2e4e75762ff5602642dfdc9a9e3ba5501d1cb390649"
+      },
+      "SCAN:2072:SD:SCAN": {
+        "era5": "4e4f29143abf32ebcd331f48e82b6d88fe833d3eabf15eb21f40e82100bf870a",
+        "era5_land": "21f2ef97e790033f342b32deee4d91ec57844937e7904f9fe8b76a3330d79cb7"
+      },
+      "SCAN:2092:KS:SCAN": {
+        "era5": "f18f433c431279b615391c399604a0f128f6b125c3952148909cd4c8d38baa95",
+        "era5_land": "a488b83a32868818836f0d0ecf1b88c9aef764ccde696718f6da3cc15c51dd09"
+      },
+      "SCAN:2093:KS:SCAN": {
+        "era5": "c2fb7a96f8c592649fad59a70cdde1410200637836ed3b7b4e6c5fdebccbccc9",
+        "era5_land": "4e96e3a7da44acb5192fc0fd0a10ed56590638a2ea06b3f888d04f29f22c6d14"
+      },
+      "SCAN:2094:KS:SCAN": {
+        "era5": "10989298b5028d359965a0f3da6b171cbceff832dd226708fad84da121214f28",
+        "era5_land": "7e4a202c8cba0e44b1a03a9324804c0915fe80e9fc75e9cdc2ccc36d431a83c2"
+      },
+      "SCAN:2111:NE:SCAN": {
+        "era5": "49e100cdcf0324ca34910ff4492579959fc8250d4e6baa7f36c34c636a6c2d77",
+        "era5_land": "4bb33e6ddc67449f9db1089173eb5377a853c8d9fe8ca4f519afc6d1e9eafb63"
+      },
+      "SCAN:2147:KS:SCAN": {
+        "era5": "a92f8eba1123ab8089e8332748a913f47f77c00f066073a43b2a4150cfe38898",
+        "era5_land": "f3467fc8bd0daeaf7c40e0771df5e25c6ec9c56565eee35d77178250c4788bbd"
+      },
+      "SCAN:2193:MO:SCAN": {
+        "era5": "594d8034e78eeb3bea524f8cacbdce3bd3b59c308443fd9c3452d97e76e678aa",
+        "era5_land": "2350b8248883da0f26e510413de55b7640d490edb1e6401b863c20c631ed14d1"
+      },
+      "SCAN:2194:MO:SCAN": {
+        "era5": "46b1bb273e00aa5d7dc2f7b95b7ecdbee17eac9efe4912a5a71b064b01b39674",
+        "era5_land": "c7741f03a897e892a95d7aab6d235fe52102b21b9b141179a68b315ebf4f7f0e"
+      },
+      "SCAN:2220:MO:SCAN": {
+        "era5": "c1648d5ee9dc8485bf20d4afd2036c6e8b0186483ae4f64937d614912ce1da9a",
+        "era5_land": "e552e9eabfc1b0f927691a35e47fe0b928fd08c9c867d4472f8e055d56ef08be"
+      },
+      "SCAN:2225:MO:SCAN": {
+        "era5": "08a2418475f075b3debc2d3a2929de5cc18707a046a02c62e2f1d6496c44dbe6",
+        "era5_land": "ad2cf7b91cc01c87e46de2c94881cc3a04d8f303683456e2d7eb39423696258f"
+      },
+      "SCAN:2226:MO:SCAN": {
+        "era5": "cb5962f6e0cf54a38af6eed47a0b2fd98bd35c16ce6ca2a96a56a4fda175fea0",
+        "era5_land": "3f70768a40da0eca19f9d4b86f311dc6262efab93c52834495ffdde77216adea"
+      },
+      "SCAN:2227:MO:SCAN": {
+        "era5": "e0d088485f1d0e0f5e44a74691800e8d53562befacc5b284754fb26b8a6667a3",
+        "era5_land": "dd1dee2b34829ae8331bc4d111d1b3f97586bb46673c382970fbfedd486215e5"
+      },
+      "SCAN:2230:MO:SCAN": {
+        "era5": "69e7a5613b3e5ac47c758f4470ad7392bda8123dfd176a99177b70aa9064d95b",
+        "era5_land": "afa6631e31fc241f2130e8887c6dc9f70fa329d4d23648183679f74c1c4549ff"
+      },
+      "SCAN:2231:MO:SCAN": {
+        "era5": "aa6bd83b37d658e4014c611706346dc413d8cb6ea60c4626ff206f8088c1fa99",
+        "era5_land": "4ba447c293712da8382228a9c0e55da418fb8294f84cbb6e20e2a1740b4124b4"
+      },
+      "USCRN:03067": {
+        "era5": "4b60fb14b26a9094d805682a8e8e1deb98f5723a3f7639a03ccb2a05ace67869",
+        "era5_land": "e8305f0ce4a8db0eee3d8e61339a010bc16025aedc618d8fb270e436ec6dd6fb"
+      },
+      "USCRN:04990": {
+        "era5": "32a65ef788b1ebf76dcce85b48c726947df551c3652d576cde0163f5397d1c0a",
+        "era5_land": "6dd7de6cb333949ccd528e918315bb249367158fc474abeeeb0c57f4f74a92a1"
+      },
+      "USCRN:04994": {
+        "era5": "1dfb120c8bb1a3f756280a478e81aba8fd398d4bf31e3dd93ad2912edf835fc3",
+        "era5_land": "ac30618c134193c95676fe437506df16c1ddf103397a7bcb3686794f0bf13d84"
+      },
+      "USCRN:23908": {
+        "era5": "9bc7103e263f469ce48c416f04dd752bcb7afbcad39340c4248e9cafb115d516",
+        "era5_land": "dd9b181ba3ed4ec60e7507c7599f3d364b208d07ab4c0214288776ecc367c8a9"
+      },
+      "USCRN:23909": {
+        "era5": "b0bce833b0ccd3c9ce4c7c13fabd269fd4cc0dd75e6d0ab8b539ac2ce7f6249f",
+        "era5_land": "1a468dd7c6c28489fe7786fc20ba5db1d1e6ead2ae1e37da905efb53405d4f6f"
+      },
+      "USCRN:53974": {
+        "era5": "a4304c1908ca5f6c19261cda2c1e95c3562062c00534fef600f61d0386f03a6e",
+        "era5_land": "0d3922f4390768c18d078da4f16050457185046fc6c88afb316e772b6fdfb916"
+      },
+      "USCRN:54808": {
+        "era5": "3de982eeeb94f08d81781e8dd514ffa5ece85a387ab649b6dc60a3795e62f74b",
+        "era5_land": "e0bd9a07c14b4fedfff3a8b890fb71baeb7580c0dcd7bb7b0ac8d3a9026f2b52"
+      },
+      "USCRN:54810": {
+        "era5": "78bb4c37913fc1b991d9373e9c01e21ec850dc0985d136824ce74271f4bc59c4",
+        "era5_land": "4a87bb2716b32af4022c0a4a31e4feb64b4ffd76f60dfc8e10c70a46bdeede6c"
+      },
+      "USCRN:54811": {
+        "era5": "fbd9f3b25e7199565c4249bb7fa24f7650fc2b2fa4d550aa763f30c8ca563c3e",
+        "era5_land": "9e064d86db7bd7195e4544c09353060abfa10827cefc599b75372692a4ba2258"
+      },
+      "USCRN:54854": {
+        "era5": "not_cached",
+        "era5_land": "88436a670f75e2105fea72deed970593290fef4405555e735e402b3a31ad17c8"
+      },
+      "USCRN:54856": {
+        "era5": "not_cached",
+        "era5_land": "4b1a757a78585c65f044e481f8f7e1e06365f3ae1e9261086b6861cbc7324d01"
+      },
+      "USCRN:54902": {
+        "era5": "not_cached",
+        "era5_land": "75661a8e19957314306967eafd29aa24f716e459014a6a9dd5b2daa8fff6a518"
+      },
+      "USCRN:54932": {
+        "era5": "not_cached",
+        "era5_land": "d7dc84b954f5f67155fd1f410c2dbb7f930552bd2901659ade5e947fae5bacf8"
+      },
+      "USCRN:54933": {
+        "era5": "not_cached",
+        "era5_land": "2045cdcf40cf680bb0c089b7460e305259473eccc8ae1aca99ddaf65dfc9d8ad"
+      },
+      "USCRN:63898": {
+        "era5": "not_cached",
+        "era5_land": "6c7c404c4717a990eaaa3020932f7aa6121951ea538e2354bdc5c296831357cb"
+      },
+      "USCRN:94079": {
+        "era5": "not_cached",
+        "era5_land": "3027d1d2f413b962227498e3a6f0c791d552d1e70884a9c6bd57748d5fd4b632"
+      },
+      "USCRN:94085": {
+        "era5": "not_cached",
+        "era5_land": "c5fbf396c97f292886b40a0d91eba81c09b2e1be6f89b1f04bd938d1215f466a"
+      }
+    },
+    "terrain": [
+      "34887efdc4c6fa89ea611b595ce4b5276b6ea9fd71368b88ee46417c51ab20b3",
+      "8cab457739841d2a3137f4185d66639da483ab24bbc0f3880a82ce87ebbd18d7",
+      "d2df0db362e00004f4ff8f0376919c2f910707cd6d9cc50d879390bfbcdedb37"
+    ]
+  },
+  "missing_training_fraction": {
+    "geography": {
+      "latitude": 0.0,
+      "longitude": 0.0
+    },
+    "land_history": {
+      "air_temperature": 0.0,
+      "deep_moisture": 0.0,
+      "season_cos": 0.0,
+      "season_sin": 0.0,
+      "shallow_minus_air_temperature": 0.0,
+      "shallow_soil_temperature": 0.0,
+      "subsurface_minus_deep": 0.0,
+      "subsurface_moisture": 0.0,
+      "surface_delta_1d": 0.0,
+      "surface_delta_3d": 0.0,
+      "surface_mean_3d": 0.0,
+      "surface_mean_7d": 0.0,
+      "surface_minus_subsurface": 0.0
+    },
+    "raw": {
+      "surface_moisture": 0.0
+    },
+    "soil": {
+      "above_wilting_point": 0.0,
+      "available_water_capacity": 0.0,
+      "bulk_density": 0.0,
+      "clay": 0.0,
+      "component_percent": 0.0,
+      "drainage_rank": 0.0,
+      "field_capacity": 0.0,
+      "horizon_bottom_cm": 0.0,
+      "organic_matter": 0.0,
+      "relative_available_water": 0.0,
+      "sand": 0.0,
+      "silt": 0.0,
+      "surface_by_clay": 0.0,
+      "surface_by_organic_matter": 0.0,
+      "wilting_point": 0.0
+    },
+    "soil_weather": {
+      "drying_7d_by_water_capacity": 0.0629040184478131,
+      "rain_7d_by_clay": 0.0629040184478131
+    },
+    "terrain": {
+      "elevation_m": 0.0,
+      "local_relief_m": 0.0,
+      "relative_elevation_m": 0.0,
+      "slope_proxy": 0.0
+    },
+    "weather": {
+      "et0_14d": 0.0629040184478131,
+      "et0_30d": 0.0629040184478131,
+      "et0_3d": 0.0629040184478131,
+      "et0_7d": 0.0629040184478131,
+      "et0_fao_evapotranspiration": 0.0629040184478131,
+      "rain_14d": 0.0629040184478131,
+      "rain_30d": 0.0629040184478131,
+      "rain_3d": 0.0629040184478131,
+      "rain_7d": 0.0629040184478131,
+      "rain_minus_et0_14d": 0.0629040184478131,
+      "rain_minus_et0_30d": 0.0629040184478131,
+      "rain_minus_et0_3d": 0.0629040184478131,
+      "rain_minus_et0_7d": 0.0629040184478131,
+      "rain_sum": 0.0629040184478131,
+      "relative_humidity_2m_mean": 0.0629040184478131,
+      "shortwave_radiation_sum": 0.0629040184478131,
+      "temperature_2m_max": 0.0629040184478131,
+      "temperature_2m_min": 0.0629040184478131,
+      "temperature_excess_14d": 0.0629040184478131,
+      "temperature_range": 0.0629040184478131,
+      "vapour_pressure_deficit_max": 0.0629040184478131,
+      "wet_days_14d": 0.0629040184478131,
+      "wind_speed_10m_mean": 0.0629040184478131
+    }
+  },
+  "nested": {
+    "era5_land": {
+      "bias": 0.09239713578802612,
+      "mae": 0.11876570430416564,
+      "rmse": 0.1472908095027207
+    },
+    "selected": {
+      "bias": -0.016245224459011772,
+      "mae": 0.07961359640272109,
+      "rmse": 0.10184656315734518
+    }
+  },
+  "optional_weather_cache": true,
+  "outer_folds": [
+    {
+      "fit_sites": [
+        "SCAN:2003:WI:SCAN",
+        "SCAN:2004:IL:SCAN",
+        "SCAN:2047:MO:SCAN",
+        "SCAN:2048:MO:SCAN",
+        "SCAN:2050:MN:SCAN",
+        "SCAN:2060:MO:SCAN",
+        "SCAN:2061:MO:SCAN",
+        "SCAN:2092:KS:SCAN",
+        "SCAN:2094:KS:SCAN",
+        "SCAN:2111:NE:SCAN",
+        "SCAN:2147:KS:SCAN",
+        "SCAN:2194:MO:SCAN",
+        "SCAN:2220:MO:SCAN",
+        "SCAN:2225:MO:SCAN",
+        "SCAN:2227:MO:SCAN",
+        "USCRN:04994",
+        "USCRN:53974",
+        "USCRN:54808",
+        "USCRN:54811",
+        "USCRN:54902",
+        "USCRN:63898"
+      ],
+      "held_sites": [
+        "SCAN:2002:MN:SCAN",
+        "SCAN:2093:KS:SCAN",
+        "SCAN:2226:MO:SCAN",
+        "SCAN:2230:MO:SCAN",
+        "SCAN:2231:MO:SCAN",
+        "USCRN:23909"
+      ],
+      "pairs": 6515,
+      "raw": {
+        "bias": 0.17589826622763172,
+        "mae": 0.17684431406713788,
+        "rmse": 0.19738280512389875
+      },
+      "recipe": "trees:raw+land_history+weather+soil+terrain+geography:6/150/1",
+      "selected": {
+        "bias": 0.009778228816895574,
+        "mae": 0.05638522987572219,
+        "rmse": 0.07163259937460313
+      }
+    },
+    {
+      "fit_sites": [
+        "SCAN:2002:MN:SCAN",
+        "SCAN:2047:MO:SCAN",
+        "SCAN:2050:MN:SCAN",
+        "SCAN:2061:MO:SCAN",
+        "SCAN:2092:KS:SCAN",
+        "SCAN:2093:KS:SCAN",
+        "SCAN:2094:KS:SCAN",
+        "SCAN:2111:NE:SCAN",
+        "SCAN:2147:KS:SCAN",
+        "SCAN:2220:MO:SCAN",
+        "SCAN:2225:MO:SCAN",
+        "SCAN:2226:MO:SCAN",
+        "SCAN:2227:MO:SCAN",
+        "SCAN:2230:MO:SCAN",
+        "SCAN:2231:MO:SCAN",
+        "USCRN:04994",
+        "USCRN:23909",
+        "USCRN:53974",
+        "USCRN:54902",
+        "USCRN:63898"
+      ],
+      "held_sites": [
+        "SCAN:2003:WI:SCAN",
+        "SCAN:2004:IL:SCAN",
+        "SCAN:2048:MO:SCAN",
+        "SCAN:2060:MO:SCAN",
+        "SCAN:2194:MO:SCAN",
+        "USCRN:54808",
+        "USCRN:54811"
+      ],
+      "pairs": 6504,
+      "raw": {
+        "bias": 0.12066096474302,
+        "mae": 0.12972776113690473,
+        "rmse": 0.1622912262024116
+      },
+      "recipe": "boosting:raw+land_history+weather+soil+terrain+geography:90/15/12/1",
+      "selected": {
+        "bias": 0.018566815766844352,
+        "mae": 0.0603859175575598,
+        "rmse": 0.07557404270690841
+      }
+    },
+    {
+      "fit_sites": [
+        "SCAN:2002:MN:SCAN",
+        "SCAN:2003:WI:SCAN",
+        "SCAN:2004:IL:SCAN",
+        "SCAN:2048:MO:SCAN",
+        "SCAN:2060:MO:SCAN",
+        "SCAN:2061:MO:SCAN",
+        "SCAN:2092:KS:SCAN",
+        "SCAN:2093:KS:SCAN",
+        "SCAN:2094:KS:SCAN",
+        "SCAN:2111:NE:SCAN",
+        "SCAN:2147:KS:SCAN",
+        "SCAN:2194:MO:SCAN",
+        "SCAN:2226:MO:SCAN",
+        "SCAN:2230:MO:SCAN",
+        "SCAN:2231:MO:SCAN",
+        "USCRN:23909",
+        "USCRN:53974",
+        "USCRN:54808",
+        "USCRN:54811"
+      ],
+      "held_sites": [
+        "SCAN:2047:MO:SCAN",
+        "SCAN:2050:MN:SCAN",
+        "SCAN:2220:MO:SCAN",
+        "SCAN:2225:MO:SCAN",
+        "SCAN:2227:MO:SCAN",
+        "USCRN:04994",
+        "USCRN:54902",
+        "USCRN:63898"
+      ],
+      "pairs": 6965,
+      "raw": {
+        "bias": 0.062077019425234026,
+        "mae": 0.08931976996088166,
+        "rmse": 0.11099872011758018
+      },
+      "recipe": "robust_ridge:raw+land_history+weather+soil:1000/0.04/1",
+      "selected": {
+        "bias": -0.044962495654348456,
+        "mae": 0.07647023702558439,
+        "rmse": 0.09587734823736913
+      }
+    },
+    {
+      "fit_sites": [
+        "SCAN:2002:MN:SCAN",
+        "SCAN:2003:WI:SCAN",
+        "SCAN:2004:IL:SCAN",
+        "SCAN:2047:MO:SCAN",
+        "SCAN:2048:MO:SCAN",
+        "SCAN:2050:MN:SCAN",
+        "SCAN:2060:MO:SCAN",
+        "SCAN:2093:KS:SCAN",
+        "SCAN:2194:MO:SCAN",
+        "SCAN:2220:MO:SCAN",
+        "SCAN:2225:MO:SCAN",
+        "SCAN:2226:MO:SCAN",
+        "SCAN:2227:MO:SCAN",
+        "SCAN:2230:MO:SCAN",
+        "SCAN:2231:MO:SCAN",
+        "USCRN:04994",
+        "USCRN:23909",
+        "USCRN:54808",
+        "USCRN:54811",
+        "USCRN:54902",
+        "USCRN:63898"
+      ],
+      "held_sites": [
+        "SCAN:2061:MO:SCAN",
+        "SCAN:2092:KS:SCAN",
+        "SCAN:2094:KS:SCAN",
+        "SCAN:2111:NE:SCAN",
+        "SCAN:2147:KS:SCAN",
+        "USCRN:53974"
+      ],
+      "pairs": 6469,
+      "raw": {
+        "bias": 0.016348360051317193,
+        "mae": 0.08715927402737642,
+        "rmse": 0.10728395112793347
+      },
+      "recipe": "ridge:raw+land_history+soil+geography:30/1",
+      "selected": {
+        "bias": -0.04459302973796901,
+        "mae": 0.12946540075192373,
+        "rmse": 0.15041960810309501
+      }
+    }
+  ],
+  "promoted": false,
+  "selected_learned": {
+    "family": "ridge",
+    "groups": [
+      "raw",
+      "land_history",
+      "weather",
+      "soil",
+      "terrain",
+      "geography"
+    ],
+    "parameters": [
+      3000
+    ],
+    "strength": 1.0
+  },
+  "selection": {
+    "family": "ridge",
+    "groups": [
+      "raw",
+      "land_history",
+      "weather",
+      "soil",
+      "terrain",
+      "geography"
+    ],
+    "parameters": [
+      3000
+    ],
+    "strength": 1.0
+  },
+  "selection_scores": {
+    "bias:raw:0.5": {
+      "bias": 0.045826177669384044,
+      "mae": 0.10216090228037185,
+      "rmse": 0.12779119546984694
+    },
+    "boosting:raw+land_history+soil:50/7/4/0.5": {
+      "bias": 0.041442007987384025,
+      "mae": 0.08507749807782024,
+      "rmse": 0.10423446844052207
+    },
+    "boosting:raw+land_history+soil:50/7/4/1": {
+      "bias": -0.009136501644593432,
+      "mae": 0.0701232179650913,
+      "rmse": 0.08857787606996624
+    },
+    "boosting:raw+land_history+soil:90/15/12/0.5": {
+      "bias": 0.04117897690949229,
+      "mae": 0.08310931815105795,
+      "rmse": 0.10144255725666217
+    },
+    "boosting:raw+land_history+soil:90/15/12/1": {
+      "bias": -0.00966694266055095,
+      "mae": 0.06898382349104397,
+      "rmse": 0.0868214717978619
+    },
+    "boosting:raw+land_history+soil:90/7/4/0.5": {
+      "bias": 0.04161161340099112,
+      "mae": 0.08478060947970407,
+      "rmse": 0.1038274015644548
+    },
+    "boosting:raw+land_history+soil:90/7/4/1": {
+      "bias": -0.008786484749905314,
+      "mae": 0.070362062438794,
+      "rmse": 0.08872985058947297
+    },
+    "boosting:raw+land_history+weather+soil+terrain+geography:50/7/4/0.5": {
+      "bias": 0.04050384457043684,
+      "mae": 0.08247777024405607,
+      "rmse": 0.10242003478868791
+    },
+    "boosting:raw+land_history+weather+soil+terrain+geography:50/7/4/1": {
+      "bias": -0.010988192521602994,
+      "mae": 0.06783221024688961,
+      "rmse": 0.08589096745972617
+    },
+    "boosting:raw+land_history+weather+soil+terrain+geography:90/15/12/0.5": {
+      "bias": 0.03862824146593362,
+      "mae": 0.0803388023231375,
+      "rmse": 0.09943658296774727
+    },
+    "boosting:raw+land_history+weather+soil+terrain+geography:90/15/12/1": {
+      "bias": -0.014930862981830495,
+      "mae": 0.06781976394353686,
+      "rmse": 0.08567672927471827
+    },
+    "boosting:raw+land_history+weather+soil+terrain+geography:90/7/4/0.5": {
+      "bias": 0.03986736970239644,
+      "mae": 0.08132599079573488,
+      "rmse": 0.1009898081845758
+    },
+    "boosting:raw+land_history+weather+soil+terrain+geography:90/7/4/1": {
+      "bias": -0.012258825698633303,
+      "mae": 0.0670890459656767,
+      "rmse": 0.08512896453652688
+    },
+    "boosting:raw+land_history+weather+soil+terrain:50/7/4/0.5": {
+      "bias": 0.04104862793965519,
+      "mae": 0.08543082496394226,
+      "rmse": 0.105203706843276
+    },
+    "boosting:raw+land_history+weather+soil+terrain:50/7/4/1": {
+      "bias": -0.009770467778671061,
+      "mae": 0.07238262838568398,
+      "rmse": 0.0904735218332303
+    },
+    "boosting:raw+land_history+weather+soil+terrain:90/15/12/0.5": {
+      "bias": 0.039843601809067195,
+      "mae": 0.08306396774258921,
+      "rmse": 0.10206507162563798
+    },
+    "boosting:raw+land_history+weather+soil+terrain:90/15/12/1": {
+      "bias": -0.012464598811630399,
+      "mae": 0.07102465098266778,
+      "rmse": 0.08942380592904278
+    },
+    "boosting:raw+land_history+weather+soil+terrain:90/7/4/0.5": {
+      "bias": 0.0409237707688947,
+      "mae": 0.08504002774441288,
+      "rmse": 0.10468652473551725
+    },
+    "boosting:raw+land_history+weather+soil+terrain:90/7/4/1": {
+      "bias": -0.010045838764268004,
+      "mae": 0.07274332721875384,
+      "rmse": 0.09080828408354875
+    },
+    "boosting:raw+land_history+weather+soil:50/7/4/0.5": {
+      "bias": 0.04098209648075676,
+      "mae": 0.0847976637600817,
+      "rmse": 0.10383018708653231
+    },
+    "boosting:raw+land_history+weather+soil:50/7/4/1": {
+      "bias": -0.01009445972410021,
+      "mae": 0.0698881737600695,
+      "rmse": 0.08856393541577551
+    },
+    "boosting:raw+land_history+weather+soil:90/15/12/0.5": {
+      "bias": 0.040060007228028646,
+      "mae": 0.08258519783690374,
+      "rmse": 0.1010919703144227
+    },
+    "boosting:raw+land_history+weather+soil:90/15/12/1": {
+      "bias": -0.011997936943112106,
+      "mae": 0.06968423694393272,
+      "rmse": 0.08823002075099104
+    },
+    "boosting:raw+land_history+weather+soil:90/7/4/0.5": {
+      "bias": 0.04099897223970016,
+      "mae": 0.08424694299303546,
+      "rmse": 0.10313683468875713
+    },
+    "boosting:raw+land_history+weather+soil:90/7/4/1": {
+      "bias": -0.01007625878174603,
+      "mae": 0.06985330859130744,
+      "rmse": 0.08844325009825281
+    },
+    "boosting:raw+land_history+weather:50/7/4/0.5": {
+      "bias": 0.04429113185769505,
+      "mae": 0.0922233046326638,
+      "rmse": 0.11481506928931873
+    },
+    "boosting:raw+land_history+weather:50/7/4/1": {
+      "bias": -0.0038148720726360534,
+      "mae": 0.08446467106854005,
+      "rmse": 0.10544832790496016
+    },
+    "boosting:raw+land_history+weather:90/15/12/0.5": {
+      "bias": 0.0434922903061553,
+      "mae": 0.09029991198611051,
+      "rmse": 0.11250546392587915
+    },
+    "boosting:raw+land_history+weather:90/15/12/1": {
+      "bias": -0.0054125551757155405,
+      "mae": 0.08343120985285901,
+      "rmse": 0.10526905042939565
+    },
+    "boosting:raw+land_history+weather:90/7/4/0.5": {
+      "bias": 0.043849471473240795,
+      "mae": 0.09115699638578312,
+      "rmse": 0.11345091979423473
+    },
+    "boosting:raw+land_history+weather:90/7/4/1": {
+      "bias": -0.00469819284154454,
+      "mae": 0.08353746733259827,
+      "rmse": 0.1047397463412243
+    },
+    "boosting:raw+land_history:50/7/4/0.5": {
+      "bias": 0.04684800425002677,
+      "mae": 0.09386352594371694,
+      "rmse": 0.11695186617412565
+    },
+    "boosting:raw+land_history:50/7/4/1": {
+      "bias": 0.0012988727120273613,
+      "mae": 0.08564350654358187,
+      "rmse": 0.10681192446394897
+    },
+    "boosting:raw+land_history:90/15/12/0.5": {
+      "bias": 0.04670374308990544,
+      "mae": 0.09280186701912028,
+      "rmse": 0.11548804266002595
+    },
+    "boosting:raw+land_history:90/15/12/1": {
+      "bias": 0.0010103503917847337,
+      "mae": 0.08485276005544902,
+      "rmse": 0.10629444510325413
+    },
+    "boosting:raw+land_history:90/7/4/0.5": {
+      "bias": 0.0467871504104915,
+      "mae": 0.09317281621979306,
+      "rmse": 0.11603545855860511
+    },
+    "boosting:raw+land_history:90/7/4/1": {
+      "bias": 0.0011771650329568807,
+      "mae": 0.08495075104456766,
+      "rmse": 0.10615342821749105
+    },
+    "elastic_net:raw+land_history+soil:0.001/0.2/0.5": {
+      "bias": 0.04869476507270197,
+      "mae": 0.08792605103584758,
+      "rmse": 0.10836045274369943
+    },
+    "elastic_net:raw+land_history+soil:0.001/0.2/1": {
+      "bias": 0.004992394357377806,
+      "mae": 0.07517874323444361,
+      "rmse": 0.0942573088100893
+    },
+    "elastic_net:raw+land_history+soil:0.004/0.2/0.5": {
+      "bias": 0.0479199752504812,
+      "mae": 0.08613104284283178,
+      "rmse": 0.10648598723529329
+    },
+    "elastic_net:raw+land_history+soil:0.004/0.2/1": {
+      "bias": 0.003448129293182855,
+      "mae": 0.072059391581772,
+      "rmse": 0.09072298213435197
+    },
+    "elastic_net:raw+land_history+soil:0.004/0.8/0.5": {
+      "bias": 0.04692709683000297,
+      "mae": 0.08660444934523402,
+      "rmse": 0.1071929090832193
+    },
+    "elastic_net:raw+land_history+soil:0.004/0.8/1": {
+      "bias": 0.0015320301842959862,
+      "mae": 0.07230219739651754,
+      "rmse": 0.09044540300612908
+    },
+    "elastic_net:raw+land_history+weather+soil+terrain+geography:0.001/0.2/0.5": {
+      "bias": 0.05059147576228155,
+      "mae": 0.08589545777112305,
+      "rmse": 0.10587244396373534
+    },
+    "elastic_net:raw+land_history+weather+soil+terrain+geography:0.001/0.2/1": {
+      "bias": 0.009707838567381211,
+      "mae": 0.08270640557624066,
+      "rmse": 0.10154124836785056
+    },
+    "elastic_net:raw+land_history+weather+soil+terrain+geography:0.004/0.2/0.5": {
+      "bias": 0.04816762386619687,
+      "mae": 0.08251803784096332,
+      "rmse": 0.09970873628923059
+    },
+    "elastic_net:raw+land_history+weather+soil+terrain+geography:0.004/0.2/1": {
+      "bias": 0.004149516790640397,
+      "mae": 0.06497068756401388,
+      "rmse": 0.08184962291536958
+    },
+    "elastic_net:raw+land_history+weather+soil+terrain+geography:0.004/0.8/0.5": {
+      "bias": 0.046431504858951145,
+      "mae": 0.08398749940924899,
+      "rmse": 0.1028756505579928
+    },
+    "elastic_net:raw+land_history+weather+soil+terrain+geography:0.004/0.8/1": {
+      "bias": 0.0006389904805862485,
+      "mae": 0.0652536377771973,
+      "rmse": 0.08215406438218315
+    },
+    "elastic_net:raw+land_history+weather+soil+terrain:0.001/0.2/0.5": {
+      "bias": 0.048957107306458025,
+      "mae": 0.09061481479096047,
+      "rmse": 0.11493531865599785
+    },
+    "elastic_net:raw+land_history+weather+soil+terrain:0.001/0.2/1": {
+      "bias": 0.0065757164459825605,
+      "mae": 0.08901707513312329,
+      "rmse": 0.11605380416936734
+    },
+    "elastic_net:raw+land_history+weather+soil+terrain:0.004/0.2/0.5": {
+      "bias": 0.046997410538739,
+      "mae": 0.08511605796835238,
+      "rmse": 0.10506196639224018
+    },
+    "elastic_net:raw+land_history+weather+soil+terrain:0.004/0.2/1": {
+      "bias": 0.001993842796358711,
+      "mae": 0.07195879561599951,
+      "rmse": 0.09007315480018553
+    },
+    "elastic_net:raw+land_history+weather+soil+terrain:0.004/0.8/0.5": {
+      "bias": 0.04713135106990491,
+      "mae": 0.08608991692235389,
+      "rmse": 0.10646098249886216
+    },
+    "elastic_net:raw+land_history+weather+soil+terrain:0.004/0.8/1": {
+      "bias": 0.001987918357085842,
+      "mae": 0.0713300884261182,
+      "rmse": 0.08914746766594932
+    },
+    "elastic_net:raw+land_history+weather+soil:0.001/0.2/0.5": {
+      "bias": 0.048709224506260966,
+      "mae": 0.08723531381572354,
+      "rmse": 0.10694856543735494
+    },
+    "elastic_net:raw+land_history+weather+soil:0.001/0.2/1": {
+      "bias": 0.0050269842181855165,
+      "mae": 0.07465023657888328,
+      "rmse": 0.09328690434685773
+    },
+    "elastic_net:raw+land_history+weather+soil:0.004/0.2/0.5": {
+      "bias": 0.04690959649371574,
+      "mae": 0.08501165690324784,
+      "rmse": 0.10483672614778942
+    },
+    "elastic_net:raw+land_history+weather+soil:0.004/0.2/1": {
+      "bias": 0.0014530308779705766,
+      "mae": 0.07065045934202406,
+      "rmse": 0.08896372291691887
+    },
+    "elastic_net:raw+land_history+weather+soil:0.004/0.8/0.5": {
+      "bias": 0.0461816681986481,
+      "mae": 0.08534188082007131,
+      "rmse": 0.10559332902034192
+    },
+    "elastic_net:raw+land_history+weather+soil:0.004/0.8/1": {
+      "bias": 3.105241154649188e-05,
+      "mae": 0.07036865995873309,
+      "rmse": 0.08841412526735751
+    },
+    "elastic_net:raw+land_history+weather:0.001/0.2/0.5": {
+      "bias": 0.04251569682092448,
+      "mae": 0.09403278130575313,
+      "rmse": 0.1164911405667983
+    },
+    "elastic_net:raw+land_history+weather:0.001/0.2/1": {
+      "bias": -0.007365742146177167,
+      "mae": 0.08904450531941897,
+      "rmse": 0.11043893608245203
+    },
+    "elastic_net:raw+land_history+weather:0.004/0.2/0.5": {
+      "bias": 0.04328282332348702,
+      "mae": 0.09432994534190504,
+      "rmse": 0.11688623246721773
+    },
+    "elastic_net:raw+land_history+weather:0.004/0.2/1": {
+      "bias": -0.005831489141052109,
+      "mae": 0.08882880923101964,
+      "rmse": 0.1097967726485851
+    },
+    "elastic_net:raw+land_history+weather:0.004/0.8/0.5": {
+      "bias": 0.04402922847242651,
+      "mae": 0.09546653400692999,
+      "rmse": 0.1184066644811273
+    },
+    "elastic_net:raw+land_history+weather:0.004/0.8/1": {
+      "bias": -0.004338678843173133,
+      "mae": 0.08968948115049127,
+      "rmse": 0.11067510272713867
+    },
+    "elastic_net:raw+land_history:0.001/0.2/0.5": {
+      "bias": 0.04547882039701606,
+      "mae": 0.09554224107767734,
+      "rmse": 0.11868094130565741
+    },
+    "elastic_net:raw+land_history:0.001/0.2/1": {
+      "bias": -0.0014394949939940064,
+      "mae": 0.08989101112191858,
+      "rmse": 0.1108398242744671
+    },
+    "elastic_net:raw+land_history:0.004/0.2/0.5": {
+      "bias": 0.04562807144417443,
+      "mae": 0.09575566230425284,
+      "rmse": 0.11897900139979942
+    },
+    "elastic_net:raw+land_history:0.004/0.2/1": {
+      "bias": -0.0011409928996772864,
+      "mae": 0.09000210787963109,
+      "rmse": 0.11099091583087467
+    },
+    "elastic_net:raw+land_history:0.004/0.8/0.5": {
+      "bias": 0.04569400503618502,
+      "mae": 0.09639232908505145,
+      "rmse": 0.11984606879894284
+    },
+    "elastic_net:raw+land_history:0.004/0.8/1": {
+      "bias": -0.0010091257156561102,
+      "mae": 0.09065574722285957,
+      "rmse": 0.1117572524228507
+    },
+    "raw:raw:1": {
+      "bias": 0.09239713578802612,
+      "mae": 0.11876570430416564,
+      "rmse": 0.1472908095027207
+    },
+    "rbf:raw+land_history+soil:0.3/300/0.5": {
+      "bias": 0.045528818990996735,
+      "mae": 0.0866722438573296,
+      "rmse": 0.1074579038628682
+    },
+    "rbf:raw+land_history+soil:0.3/300/1": {
+      "bias": -0.0010785913987889568,
+      "mae": 0.07047307008447089,
+      "rmse": 0.08782258618568184
+    },
+    "rbf:raw+land_history+soil:1/300/0.5": {
+      "bias": 0.04722160563769773,
+      "mae": 0.09226051666575946,
+      "rmse": 0.11434874281964934
+    },
+    "rbf:raw+land_history+soil:1/300/1": {
+      "bias": 0.0022194375626325485,
+      "mae": 0.07985876714029472,
+      "rmse": 0.09933237246196855
+    },
+    "rbf:raw+land_history+weather+soil+terrain+geography:0.3/300/0.5": {
+      "bias": 0.04580769148185477,
+      "mae": 0.09311095532818517,
+      "rmse": 0.11579045434281543
+    },
+    "rbf:raw+land_history+weather+soil+terrain+geography:0.3/300/1": {
+      "bias": -0.0007813159295474375,
+      "mae": 0.08155615067871572,
+      "rmse": 0.10117843002882962
+    },
+    "rbf:raw+land_history+weather+soil+terrain+geography:1/300/0.5": {
+      "bias": 0.04635723600021405,
+      "mae": 0.09366594572787955,
+      "rmse": 0.11662045739323493
+    },
+    "rbf:raw+land_history+weather+soil+terrain+geography:1/300/1": {
+      "bias": 0.0003173362124019472,
+      "mae": 0.0831917565259877,
+      "rmse": 0.10373131317582644
+    },
+    "rbf:raw+land_history+weather+soil+terrain:0.3/300/0.5": {
+      "bias": 0.04354083264452223,
+      "mae": 0.09150173615655381,
+      "rmse": 0.1133903936734195
+    },
+    "rbf:raw+land_history+weather+soil+terrain:0.3/300/1": {
+      "bias": -0.005177002588229651,
+      "mae": 0.07946857643051469,
+      "rmse": 0.09898719802600241
+    },
+    "rbf:raw+land_history+weather+soil+terrain:1/300/0.5": {
+      "bias": 0.04398903000102233,
+      "mae": 0.09242010707654734,
+      "rmse": 0.1143664106093401
+    },
+    "rbf:raw+land_history+weather+soil+terrain:1/300/1": {
+      "bias": -0.004389621092270089,
+      "mae": 0.08122168004611628,
+      "rmse": 0.1014485066907279
+    },
+    "rbf:raw+land_history+weather+soil:0.3/300/0.5": {
+      "bias": 0.046109577525234695,
+      "mae": 0.09375340052863715,
+      "rmse": 0.11691469081724168
+    },
+    "rbf:raw+land_history+weather+soil:0.3/300/1": {
+      "bias": -0.00017798073755675786,
+      "mae": 0.08346916568600324,
+      "rmse": 0.10389546278104378
+    },
+    "rbf:raw+land_history+weather+soil:1/300/0.5": {
+      "bias": 0.045012424910432926,
+      "mae": 0.09456524026597492,
+      "rmse": 0.11762583699984133
+    },
+    "rbf:raw+land_history+weather+soil:1/300/1": {
+      "bias": -0.002365155263013713,
+      "mae": 0.08605456503793144,
+      "rmse": 0.10716067412345996
+    },
+    "rbf:raw+land_history+weather:0.3/300/0.5": {
+      "bias": 0.04467032295067633,
+      "mae": 0.09812780805554422,
+      "rmse": 0.12214535706253839
+    },
+    "rbf:raw+land_history+weather:0.3/300/1": {
+      "bias": -0.0030564898866734646,
+      "mae": 0.09325412663766616,
+      "rmse": 0.11514986905284477
+    },
+    "rbf:raw+land_history+weather:1/300/0.5": {
+      "bias": 0.04477096771620106,
+      "mae": 0.09757542795892588,
+      "rmse": 0.12134729208006918
+    },
+    "rbf:raw+land_history+weather:1/300/1": {
+      "bias": -0.0028552003556240406,
+      "mae": 0.09230226342058198,
+      "rmse": 0.11414937503283198
+    },
+    "rbf:raw+land_history:0.3/300/0.5": {
+      "bias": 0.045396483957774694,
+      "mae": 0.09693714679329794,
+      "rmse": 0.12071326166371438
+    },
+    "rbf:raw+land_history:0.3/300/1": {
+      "bias": -0.0016041678724767411,
+      "mae": 0.09104900043501238,
+      "rmse": 0.11270990048982417
+    },
+    "rbf:raw+land_history:1/300/0.5": {
+      "bias": 0.044797426053237964,
+      "mae": 0.09653265682310533,
+      "rmse": 0.12045839242862574
+    },
+    "rbf:raw+land_history:1/300/1": {
+      "bias": -0.00279253176665925,
+      "mae": 0.09078598812476645,
+      "rmse": 0.11286345868812132
+    },
+    "ridge:raw+land_history+geography:30/0.5": {
+      "bias": 0.044851809831135785,
+      "mae": 0.09639884223126173,
+      "rmse": 0.11899464232106328
+    },
+    "ridge:raw+land_history+geography:30/1": {
+      "bias": -0.0026935161257545534,
+      "mae": 0.09274723877918761,
+      "rmse": 0.11314251060994673
+    },
+    "ridge:raw+land_history+geography:300/0.5": {
+      "bias": 0.0447730699601244,
+      "mae": 0.096385098905556,
+      "rmse": 0.11902548080781795
+    },
+    "ridge:raw+land_history+geography:300/1": {
+      "bias": -0.002850995867777348,
+      "mae": 0.09259625030265767,
+      "rmse": 0.11297677095088027
+    },
+    "ridge:raw+land_history+geography:3000/0.5": {
+      "bias": 0.044504449528451215,
+      "mae": 0.09651151034278643,
+      "rmse": 0.11945665850170054
+    },
+    "ridge:raw+land_history+geography:3000/1": {
+      "bias": -0.003388236731123743,
+      "mae": 0.09182507913814938,
+      "rmse": 0.11248275029930796
+    },
+    "ridge:raw+land_history+soil+geography:30/0.5": {
+      "bias": 0.04996245641508167,
+      "mae": 0.09032331756646117,
+      "rmse": 0.10922620385031358
+    },
+    "ridge:raw+land_history+soil+geography:30/1": {
+      "bias": 0.007825801844347443,
+      "mae": 0.08418406934796539,
+      "rmse": 0.10564183413018641
+    },
+    "ridge:raw+land_history+soil+geography:300/0.5": {
+      "bias": 0.04863201831825279,
+      "mae": 0.08586719999950086,
+      "rmse": 0.10425798324219711
+    },
+    "ridge:raw+land_history+soil+geography:300/1": {
+      "bias": 0.005012050535583685,
+      "mae": 0.07313368472316227,
+      "rmse": 0.09145744375171094
+    },
+    "ridge:raw+land_history+soil+geography:3000/0.5": {
+      "bias": 0.04819253282301168,
+      "mae": 0.0843596720686578,
+      "rmse": 0.10317080890368044
+    },
+    "ridge:raw+land_history+soil+geography:3000/1": {
+      "bias": 0.004023394838895654,
+      "mae": 0.06515269486110414,
+      "rmse": 0.08293149038961181
+    },
+    "ridge:raw+land_history+soil+terrain+geography:30/0.5": {
+      "bias": 0.057913908095734545,
+      "mae": 0.09415254328050116,
+      "rmse": 0.11606505116813826
+    },
+    "ridge:raw+land_history+soil+terrain+geography:30/1": {
+      "bias": 0.02427308969320753,
+      "mae": 0.10435875020365903,
+      "rmse": 0.12969337154509034
+    },
+    "ridge:raw+land_history+soil+terrain+geography:300/0.5": {
+      "bias": 0.055276625996914484,
+      "mae": 0.0877392873801416,
+      "rmse": 0.1062363870791178
+    },
+    "ridge:raw+land_history+soil+terrain+geography:300/1": {
+      "bias": 0.01817820997833119,
+      "mae": 0.07696937773440221,
+      "rmse": 0.09720440722060789
+    },
+    "ridge:raw+land_history+soil+terrain+geography:3000/0.5": {
+      "bias": 0.04892645997403312,
+      "mae": 0.08448439662880335,
+      "rmse": 0.10309966412857616
+    },
+    "ridge:raw+land_history+soil+terrain+geography:3000/1": {
+      "bias": 0.005583787461932833,
+      "mae": 0.06426009439344453,
+      "rmse": 0.08149240725119922
+    },
+    "ridge:raw+land_history+soil+terrain:30/0.5": {
+      "bias": 0.04473837303667344,
+      "mae": 0.09043868417706624,
+      "rmse": 0.11388026875759281
+    },
+    "ridge:raw+land_history+soil+terrain:30/1": {
+      "bias": -0.0015500692031883854,
+      "mae": 0.09126966761656218,
+      "rmse": 0.11462718831733253
+    },
+    "ridge:raw+land_history+soil+terrain:300/0.5": {
+      "bias": 0.046357139490527915,
+      "mae": 0.08740947329161824,
+      "rmse": 0.10851466975651872
+    },
+    "ridge:raw+land_history+soil+terrain:300/1": {
+      "bias": 0.0008879744099047169,
+      "mae": 0.07818060038311699,
+      "rmse": 0.09767310661705017
+    },
+    "ridge:raw+land_history+soil+terrain:3000/0.5": {
+      "bias": 0.047862024295534926,
+      "mae": 0.08723321428491133,
+      "rmse": 0.10776917773886037
+    },
+    "ridge:raw+land_history+soil+terrain:3000/1": {
+      "bias": 0.0036042489653687524,
+      "mae": 0.07441618140474955,
+      "rmse": 0.09233834808094463
+    },
+    "ridge:raw+land_history+soil:30/0.5": {
+      "bias": 0.04950139471527725,
+      "mae": 0.08973537361340529,
+      "rmse": 0.11009741185562394
+    },
+    "ridge:raw+land_history+soil:30/1": {
+      "bias": 0.006689021509343769,
+      "mae": 0.07847714748778269,
+      "rmse": 0.09807403856654406
+    },
+    "ridge:raw+land_history+soil:300/0.5": {
+      "bias": 0.04881934075422395,
+      "mae": 0.08732569900610088,
+      "rmse": 0.1076762707065953
+    },
+    "ridge:raw+land_history+soil:300/1": {
+      "bias": 0.0052415457204217425,
+      "mae": 0.07396451811043649,
+      "rmse": 0.09264908603078811
+    },
+    "ridge:raw+land_history+soil:3000/0.5": {
+      "bias": 0.0478141875237605,
+      "mae": 0.08604253018040166,
+      "rmse": 0.10641177106125024
+    },
+    "ridge:raw+land_history+soil:3000/1": {
+      "bias": 0.0033451617127956937,
+      "mae": 0.0714832770772882,
+      "rmse": 0.08929068595316658
+    },
+    "ridge:raw+land_history+terrain+geography:30/0.5": {
+      "bias": 0.03685449326997866,
+      "mae": 0.09452947326377042,
+      "rmse": 0.11693660626765774
+    },
+    "ridge:raw+land_history+terrain+geography:30/1": {
+      "bias": -0.018333401340926054,
+      "mae": 0.09436452686401804,
+      "rmse": 0.11552018016892596
+    },
+    "ridge:raw+land_history+terrain+geography:300/0.5": {
+      "bias": 0.03836455579106926,
+      "mae": 0.09470252853761361,
+      "rmse": 0.1171961263528846
+    },
+    "ridge:raw+land_history+terrain+geography:300/1": {
+      "bias": -0.015333191584458398,
+      "mae": 0.09309894955891922,
+      "rmse": 0.11369458492062953
+    },
+    "ridge:raw+land_history+terrain+geography:3000/0.5": {
+      "bias": 0.04168361020291139,
+      "mae": 0.09589539964721235,
+      "rmse": 0.1187948757666672
+    },
+    "ridge:raw+land_history+terrain+geography:3000/1": {
+      "bias": -0.00886768300217131,
+      "mae": 0.09160035196870234,
+      "rmse": 0.11233530340164502
+    },
+    "ridge:raw+land_history+terrain:30/0.5": {
+      "bias": 0.04389725328313598,
+      "mae": 0.0953188125483238,
+      "rmse": 0.11801292940097581
+    },
+    "ridge:raw+land_history+terrain:30/1": {
+      "bias": -0.004472784383386108,
+      "mae": 0.08998450454198359,
+      "rmse": 0.11098885217962932
+    },
+    "ridge:raw+land_history+terrain:300/0.5": {
+      "bias": 0.04424053851725801,
+      "mae": 0.09556526939760655,
+      "rmse": 0.11834917413610667
+    },
+    "ridge:raw+land_history+terrain:300/1": {
+      "bias": -0.003810554116638603,
+      "mae": 0.08997731388992332,
+      "rmse": 0.1110298169201322
+    },
+    "ridge:raw+land_history+terrain:3000/0.5": {
+      "bias": 0.044997299587528135,
+      "mae": 0.09666094759990222,
+      "rmse": 0.11975532854818274
+    },
+    "ridge:raw+land_history+terrain:3000/1": {
+      "bias": -0.0023956214608163873,
+      "mae": 0.09080883093106128,
+      "rmse": 0.11207695490444963
+    },
+    "ridge:raw+land_history+weather+geography:30/0.5": {
+      "bias": 0.041741466977716704,
+      "mae": 0.09490673496892577,
+      "rmse": 0.11677083716990337
+    },
+    "ridge:raw+land_history+weather+geography:30/1": {
+      "bias": -0.008914201832592715,
+      "mae": 0.09057112710646195,
+      "rmse": 0.11235166146309623
+    },
+    "ridge:raw+land_history+weather+geography:300/0.5": {
+      "bias": 0.041658307332631546,
+      "mae": 0.09457556823551198,
+      "rmse": 0.11665745083316621
+    },
+    "ridge:raw+land_history+weather+geography:300/1": {
+      "bias": -0.009080521122763061,
+      "mae": 0.09027771797797357,
+      "rmse": 0.11159187606959364
+    },
+    "ridge:raw+land_history+weather+geography:3000/0.5": {
+      "bias": 0.04205131328534123,
+      "mae": 0.09497932393962143,
+      "rmse": 0.11739442202706134
+    },
+    "ridge:raw+land_history+weather+geography:3000/1": {
+      "bias": -0.008294509217343702,
+      "mae": 0.09012928670855963,
+      "rmse": 0.11094946312888035
+    },
+    "ridge:raw+land_history+weather+soil+geography:30/0.5": {
+      "bias": 0.04992378648676727,
+      "mae": 0.09089094435987999,
+      "rmse": 0.10878362035494142
+    },
+    "ridge:raw+land_history+weather+soil+geography:30/1": {
+      "bias": 0.007527938556212148,
+      "mae": 0.08524720567866802,
+      "rmse": 0.10608871418735961
+    },
+    "ridge:raw+land_history+weather+soil+geography:300/0.5": {
+      "bias": 0.04780294818709185,
+      "mae": 0.08575374974031827,
+      "rmse": 0.10332817833731943
+    },
+    "ridge:raw+land_history+weather+soil+geography:300/1": {
+      "bias": 0.0032359039062393375,
+      "mae": 0.07277424948619088,
+      "rmse": 0.09103439985011492
+    },
+    "ridge:raw+land_history+weather+soil+geography:3000/0.5": {
+      "bias": 0.04692098421892513,
+      "mae": 0.08367662413172942,
+      "rmse": 0.10205275246730636
+    },
+    "ridge:raw+land_history+weather+soil+geography:3000/1": {
+      "bias": 0.0014734324188400993,
+      "mae": 0.06508034826282395,
+      "rmse": 0.08229841425371998
+    },
+    "ridge:raw+land_history+weather+soil+terrain+geography:30/0.5": {
+      "bias": 0.05191478460977703,
+      "mae": 0.09314131650874344,
+      "rmse": 0.11573290523852368
+    },
+    "ridge:raw+land_history+weather+soil+terrain+geography:30/1": {
+      "bias": 0.013872447960137181,
+      "mae": 0.10198219843126179,
+      "rmse": 0.12460953719269065
+    },
+    "ridge:raw+land_history+weather+soil+terrain+geography:300/0.5": {
+      "bias": 0.05231081760763153,
+      "mae": 0.08470287860348462,
+      "rmse": 0.10227993438040595
+    },
+    "ridge:raw+land_history+weather+soil+terrain+geography:300/1": {
+      "bias": 0.012237625669932568,
+      "mae": 0.06984521245212347,
+      "rmse": 0.08828094953867026
+    },
+    "ridge:raw+land_history+weather+soil+terrain+geography:3000/0.5": {
+      "bias": 0.04771326139750028,
+      "mae": 0.08307709217147297,
+      "rmse": 0.10125722920862139
+    },
+    "ridge:raw+land_history+weather+soil+terrain+geography:3000/1": {
+      "bias": 0.003131089033801049,
+      "mae": 0.062310426621427197,
+      "rmse": 0.07877652210382621
+    },
+    "ridge:raw+land_history+weather+soil+terrain:30/0.5": {
+      "bias": 0.04976685835624926,
+      "mae": 0.09349565475985176,
+      "rmse": 0.12008522701776402
+    },
+    "ridge:raw+land_history+weather+soil+terrain:30/1": {
+      "bias": 0.00926904731962952,
+      "mae": 0.09881430820869426,
+      "rmse": 0.1305562386603681
+    },
+    "ridge:raw+land_history+weather+soil+terrain:300/0.5": {
+      "bias": 0.04853470226284853,
+      "mae": 0.08674740431020019,
+      "rmse": 0.10775199579778681
+    },
+    "ridge:raw+land_history+weather+soil+terrain:300/1": {
+      "bias": 0.005202432614402273,
+      "mae": 0.07670637129238911,
+      "rmse": 0.09665152409763869
+    },
+    "ridge:raw+land_history+weather+soil+terrain:3000/0.5": {
+      "bias": 0.047485974833244085,
+      "mae": 0.08567707820632349,
+      "rmse": 0.10580781307317921
+    },
+    "ridge:raw+land_history+weather+soil+terrain:3000/1": {
+      "bias": 0.002795756553561382,
+      "mae": 0.07152886489819357,
+      "rmse": 0.08923045672115251
+    },
+    "ridge:raw+land_history+weather+soil:30/0.5": {
+      "bias": 0.05043725151499804,
+      "mae": 0.08981721471771931,
+      "rmse": 0.10946646756961498
+    },
+    "ridge:raw+land_history+weather+soil:30/1": {
+      "bias": 0.008490382845873388,
+      "mae": 0.07986007644138499,
+      "rmse": 0.09911084642794916
+    },
+    "ridge:raw+land_history+weather+soil:300/0.5": {
+      "bias": 0.048364726365610455,
+      "mae": 0.08656462170068206,
+      "rmse": 0.10625581169550108
+    },
+    "ridge:raw+land_history+weather+soil:300/1": {
+      "bias": 0.004336951799056972,
+      "mae": 0.0732390580343739,
+      "rmse": 0.09183574719411317
+    },
+    "ridge:raw+land_history+weather+soil:3000/0.5": {
+      "bias": 0.046439765925548306,
+      "mae": 0.08486791299574287,
+      "rmse": 0.10477176045804115
+    },
+    "ridge:raw+land_history+weather+soil:3000/1": {
+      "bias": 0.0005795849071980659,
+      "mae": 0.06980775509753931,
+      "rmse": 0.0876542090595443
+    },
+    "ridge:raw+land_history+weather+terrain+geography:30/0.5": {
+      "bias": 0.033778951761785796,
+      "mae": 0.0944142241106123,
+      "rmse": 0.11631060272313308
+    },
+    "ridge:raw+land_history+weather+terrain+geography:30/1": {
+      "bias": -0.024769765928579615,
+      "mae": 0.09697663367159569,
+      "rmse": 0.1183377645939801
+    },
+    "ridge:raw+land_history+weather+terrain+geography:300/0.5": {
+      "bias": 0.03521626266902748,
+      "mae": 0.09407956159210273,
+      "rmse": 0.11608435718644726
+    },
+    "ridge:raw+land_history+weather+terrain+geography:300/1": {
+      "bias": -0.0219135109773231,
+      "mae": 0.09461342944066725,
+      "rmse": 0.11531898333709412
+    },
+    "ridge:raw+land_history+weather+terrain+geography:3000/0.5": {
+      "bias": 0.03963927412109746,
+      "mae": 0.09493522822317615,
+      "rmse": 0.11750754583872473
+    },
+    "ridge:raw+land_history+weather+terrain+geography:3000/1": {
+      "bias": -0.013101503999574203,
+      "mae": 0.09141196578108801,
+      "rmse": 0.11202754295284659
+    },
+    "ridge:raw+land_history+weather+terrain:30/0.5": {
+      "bias": 0.04211868993813006,
+      "mae": 0.09538401127091772,
+      "rmse": 0.11804526486254237
+    },
+    "ridge:raw+land_history+weather+terrain:30/1": {
+      "bias": -0.008137025903233282,
+      "mae": 0.09340353742076904,
+      "rmse": 0.11469191534262382
+    },
+    "ridge:raw+land_history+weather+terrain:300/0.5": {
+      "bias": 0.042490623379769596,
+      "mae": 0.09512041464531551,
+      "rmse": 0.11783398811317589
+    },
+    "ridge:raw+land_history+weather+terrain:300/1": {
+      "bias": -0.007400349260677191,
+      "mae": 0.09154186200255508,
+      "rmse": 0.11284705982837666
+    },
+    "ridge:raw+land_history+weather+terrain:3000/0.5": {
+      "bias": 0.04341578485329385,
+      "mae": 0.09585339722738857,
+      "rmse": 0.11873972873044528
+    },
+    "ridge:raw+land_history+weather+terrain:3000/1": {
+      "bias": -0.0055647242205369655,
+      "mae": 0.09050291166015136,
+      "rmse": 0.1119128629616166
+    },
+    "ridge:raw+land_history+weather:30/0.5": {
+      "bias": 0.042229934132848965,
+      "mae": 0.09427774914520654,
+      "rmse": 0.11655687196188491
+    },
+    "ridge:raw+land_history+weather:30/1": {
+      "bias": -0.00793726752232818,
+      "mae": 0.08946613524183372,
+      "rmse": 0.1113069378056497
+    },
+    "ridge:raw+land_history+weather:300/0.5": {
+      "bias": 0.0425104676333787,
+      "mae": 0.09409719267866397,
+      "rmse": 0.11649330692485277
+    },
+    "ridge:raw+land_history+weather:300/1": {
+      "bias": -0.007376200521268729,
+      "mae": 0.08905150031356056,
+      "rmse": 0.11039946959774198
+    },
+    "ridge:raw+land_history+weather:3000/0.5": {
+      "bias": 0.04324710491740357,
+      "mae": 0.0946530243041195,
+      "rmse": 0.11723378752913963
+    },
+    "ridge:raw+land_history+weather:3000/1": {
+      "bias": -0.005902925953219028,
+      "mae": 0.08894557749274958,
+      "rmse": 0.10981114422330367
+    },
+    "ridge:raw+land_history:30/0.5": {
+      "bias": 0.04544648690276406,
+      "mae": 0.09548206665287601,
+      "rmse": 0.11859265453426923
+    },
+    "ridge:raw+land_history:30/1": {
+      "bias": -0.0015041619824980373,
+      "mae": 0.08986790486405098,
+      "rmse": 0.11078651181873424
+    },
+    "ridge:raw+land_history:300/0.5": {
+      "bias": 0.04546642374327839,
+      "mae": 0.0955317454285855,
+      "rmse": 0.1186543108082211
+    },
+    "ridge:raw+land_history:300/1": {
+      "bias": -0.001464288301469373,
+      "mae": 0.08986983367574489,
+      "rmse": 0.11078602767930258
+    },
+    "ridge:raw+land_history:3000/0.5": {
+      "bias": 0.045554022675225556,
+      "mae": 0.09597749058049472,
+      "rmse": 0.11920644190702107
+    },
+    "ridge:raw+land_history:3000/1": {
+      "bias": -0.0012890904375750265,
+      "mae": 0.09005020613003521,
+      "rmse": 0.11102664008136914
+    },
+    "ridge:raw:30/0.5": {
+      "bias": 0.04573394211849274,
+      "mae": 0.09811894251783931,
+      "rmse": 0.12138720121640025
+    },
+    "ridge:raw:30/1": {
+      "bias": -0.0009292515510406753,
+      "mae": 0.09281668152687461,
+      "rmse": 0.11472131079880005
+    },
+    "ridge:raw:300/0.5": {
+      "bias": 0.04573593830807315,
+      "mae": 0.09813836700105616,
+      "rmse": 0.12144497676559786
+    },
+    "ridge:raw:300/1": {
+      "bias": -0.0009252591718798121,
+      "mae": 0.09281680806287268,
+      "rmse": 0.11472722972805528
+    },
+    "ridge:raw:3000/0.5": {
+      "bias": 0.04575242648159592,
+      "mae": 0.09835240238276192,
+      "rmse": 0.12198115593072976
+    },
+    "ridge:raw:3000/1": {
+      "bias": -0.0008922828248343032,
+      "mae": 0.09296621058625601,
+      "rmse": 0.11492597789293102
+    },
+    "robust_ridge:raw+land_history+soil:100/0.04/0.5": {
+      "bias": 0.04668275121785271,
+      "mae": 0.08692772061765022,
+      "rmse": 0.10656828943934521
+    },
+    "robust_ridge:raw+land_history+soil:100/0.04/1": {
+      "bias": 0.0009683666476792989,
+      "mae": 0.07428026770529728,
+      "rmse": 0.09211478464712684
+    },
+    "robust_ridge:raw+land_history+soil:1000/0.04/0.5": {
+      "bias": 0.045801424129249924,
+      "mae": 0.08529613465483851,
+      "rmse": 0.10514422862268065
+    },
+    "robust_ridge:raw+land_history+soil:1000/0.04/1": {
+      "bias": -0.0007346607676302874,
+      "mae": 0.07102415070828993,
+      "rmse": 0.08845690819763918
+    },
+    "robust_ridge:raw+land_history+weather+soil+terrain+geography:100/0.04/0.5": {
+      "bias": 0.05021941961614598,
+      "mae": 0.08472055158364691,
+      "rmse": 0.10263987234369334
+    },
+    "robust_ridge:raw+land_history+weather+soil+terrain+geography:100/0.04/1": {
+      "bias": 0.008114490046339242,
+      "mae": 0.07444000164948138,
+      "rmse": 0.09309801682648582
+    },
+    "robust_ridge:raw+land_history+weather+soil+terrain+geography:1000/0.04/0.5": {
+      "bias": 0.04556783303622297,
+      "mae": 0.08192488272864623,
+      "rmse": 0.09981486709270689
+    },
+    "robust_ridge:raw+land_history+weather+soil+terrain+geography:1000/0.04/1": {
+      "bias": -0.0011264223081304166,
+      "mae": 0.06240599176309717,
+      "rmse": 0.07925342104416049
+    },
+    "robust_ridge:raw+land_history+weather+soil+terrain:100/0.04/0.5": {
+      "bias": 0.04637079147763724,
+      "mae": 0.08741731593339341,
+      "rmse": 0.10845974719955834
+    },
+    "robust_ridge:raw+land_history+weather+soil+terrain:100/0.04/1": {
+      "bias": 0.0007612125875410418,
+      "mae": 0.08061195256487547,
+      "rmse": 0.10112524405801854
+    },
+    "robust_ridge:raw+land_history+weather+soil+terrain:1000/0.04/0.5": {
+      "bias": 0.044740123626087494,
+      "mae": 0.08490469682180181,
+      "rmse": 0.10468032747113523
+    },
+    "robust_ridge:raw+land_history+weather+soil+terrain:1000/0.04/1": {
+      "bias": -0.0027106540642734436,
+      "mae": 0.07235317838327439,
+      "rmse": 0.08997996693919019
+    },
+    "robust_ridge:raw+land_history+weather+soil:100/0.04/0.5": {
+      "bias": 0.04719040690494835,
+      "mae": 0.08679575549281665,
+      "rmse": 0.10594268836548731
+    },
+    "robust_ridge:raw+land_history+weather+soil:100/0.04/1": {
+      "bias": 0.001984959720841608,
+      "mae": 0.07466289671679092,
+      "rmse": 0.0924291969092494
+    },
+    "robust_ridge:raw+land_history+weather+soil:1000/0.04/0.5": {
+      "bias": 0.044670186611244195,
+      "mae": 0.0842091983543189,
+      "rmse": 0.10365541222605147
+    },
+    "robust_ridge:raw+land_history+weather+soil:1000/0.04/1": {
+      "bias": -0.0030091093171947837,
+      "mae": 0.06971251604162265,
+      "rmse": 0.08719750360477481
+    },
+    "robust_ridge:raw+land_history+weather:100/0.04/0.5": {
+      "bias": 0.04040087620894051,
+      "mae": 0.0944245391173863,
+      "rmse": 0.1169562704519182
+    },
+    "robust_ridge:raw+land_history+weather:100/0.04/1": {
+      "bias": -0.011595383370145125,
+      "mae": 0.09143024452052853,
+      "rmse": 0.1129917465795363
+    },
+    "robust_ridge:raw+land_history+weather:1000/0.04/0.5": {
+      "bias": 0.040581421701019256,
+      "mae": 0.09470533697087084,
+      "rmse": 0.11735360270826889
+    },
+    "robust_ridge:raw+land_history+weather:1000/0.04/1": {
+      "bias": -0.011234292385987625,
+      "mae": 0.09132018011480801,
+      "rmse": 0.11257403978081379
+    },
+    "robust_ridge:raw+land_history:100/0.04/0.5": {
+      "bias": 0.04367614703123972,
+      "mae": 0.09590551307702443,
+      "rmse": 0.11920087262577249
+    },
+    "robust_ridge:raw+land_history:100/0.04/1": {
+      "bias": -0.005044841725546725,
+      "mae": 0.09261564810557896,
+      "rmse": 0.11379818849871844
+    },
+    "robust_ridge:raw+land_history:1000/0.04/0.5": {
+      "bias": 0.04360343286022065,
+      "mae": 0.09627716739628432,
+      "rmse": 0.11963770018650977
+    },
+    "robust_ridge:raw+land_history:1000/0.04/1": {
+      "bias": -0.005190270067584867,
+      "mae": 0.0927529941166001,
+      "rmse": 0.11399872676933463
+    },
+    "trees:raw+land_history+soil:3/100/0.5": {
+      "bias": 0.04260114001222552,
+      "mae": 0.08490694256063937,
+      "rmse": 0.10451676541601196
+    },
+    "trees:raw+land_history+soil:3/100/1": {
+      "bias": -0.006620276675285735,
+      "mae": 0.0691134339127606,
+      "rmse": 0.0868638383223009
+    },
+    "trees:raw+land_history+soil:6/150/0.5": {
+      "bias": 0.0416360531313711,
+      "mae": 0.08479091946560946,
+      "rmse": 0.10430453794168648
+    },
+    "trees:raw+land_history+soil:6/150/1": {
+      "bias": -0.008706346022069003,
+      "mae": 0.07119446159953301,
+      "rmse": 0.08899939450640884
+    },
+    "trees:raw+land_history+weather+soil+terrain+geography:3/100/0.5": {
+      "bias": 0.04234378850169055,
+      "mae": 0.08503897643440125,
+      "rmse": 0.10454137372481577
+    },
+    "trees:raw+land_history+weather+soil+terrain+geography:3/100/1": {
+      "bias": -0.007207929523303184,
+      "mae": 0.06878719690267066,
+      "rmse": 0.08643707778385312
+    },
+    "trees:raw+land_history+weather+soil+terrain+geography:6/150/0.5": {
+      "bias": 0.042025147548613785,
+      "mae": 0.08389329246066464,
+      "rmse": 0.1030528658321065
+    },
+    "trees:raw+land_history+weather+soil+terrain+geography:6/150/1": {
+      "bias": -0.007937070797512536,
+      "mae": 0.06691703481138642,
+      "rmse": 0.0840341695723586
+    },
+    "trees:raw+land_history+weather+soil+terrain:3/100/0.5": {
+      "bias": 0.04298478081428016,
+      "mae": 0.08619385921892174,
+      "rmse": 0.10593030787929525
+    },
+    "trees:raw+land_history+weather+soil+terrain:3/100/1": {
+      "bias": -0.00578169927574883,
+      "mae": 0.07108750580129578,
+      "rmse": 0.08889987338039264
+    },
+    "trees:raw+land_history+weather+soil+terrain:6/150/0.5": {
+      "bias": 0.03977640463219258,
+      "mae": 0.08434971634086724,
+      "rmse": 0.10385226565622027
+    },
+    "trees:raw+land_history+weather+soil+terrain:6/150/1": {
+      "bias": -0.012449334804127654,
+      "mae": 0.07076099423887526,
+      "rmse": 0.089222873022957
+    },
+    "trees:raw+land_history+weather+soil:3/100/0.5": {
+      "bias": 0.04340682946525924,
+      "mae": 0.08721325805676539,
+      "rmse": 0.1073718388104876
+    },
+    "trees:raw+land_history+weather+soil:3/100/1": {
+      "bias": -0.004848760196916068,
+      "mae": 0.07431291085263858,
+      "rmse": 0.09202100222923286
+    },
+    "trees:raw+land_history+weather+soil:6/150/0.5": {
+      "bias": 0.04349592736161961,
+      "mae": 0.0859529314635618,
+      "rmse": 0.10583126182373999
+    },
+    "trees:raw+land_history+weather+soil:6/150/1": {
+      "bias": -0.004884935329718443,
+      "mae": 0.07262908874552705,
+      "rmse": 0.0901313910545304
+    },
+    "trees:raw+land_history+weather:3/100/0.5": {
+      "bias": 0.044152359769714815,
+      "mae": 0.09560566272075827,
+      "rmse": 0.11895479521574624
+    },
+    "trees:raw+land_history+weather:3/100/1": {
+      "bias": -0.004092416248596497,
+      "mae": 0.08959673774171062,
+      "rmse": 0.11105443359691351
+    },
+    "trees:raw+land_history+weather:6/150/0.5": {
+      "bias": 0.04411534071523025,
+      "mae": 0.09238998054347795,
+      "rmse": 0.11502463155180173
+    },
+    "trees:raw+land_history+weather:6/150/1": {
+      "bias": -0.004166454357565661,
+      "mae": 0.08454049928311501,
+      "rmse": 0.1054437854916907
+    },
+    "trees:raw+land_history:3/100/0.5": {
+      "bias": 0.045751196857627935,
+      "mae": 0.09676774798306316,
+      "rmse": 0.12031695398630447
+    },
+    "trees:raw+land_history:3/100/1": {
+      "bias": -0.0008947420727703081,
+      "mae": 0.09048469765341897,
+      "rmse": 0.11176787763604507
+    },
+    "trees:raw+land_history:6/150/0.5": {
+      "bias": 0.04622013472429682,
+      "mae": 0.09438790317130273,
+      "rmse": 0.11750827249695506
+    },
+    "trees:raw+land_history:6/150/1": {
+      "bias": 4.313366056748932e-05,
+      "mae": 0.08656539598791853,
+      "rmse": 0.10754422451084057
+    }
+  },
+  "sklearn_version": "1.5.2",
+  "stations_missing_optional_weather": [
+    "USCRN:54854",
+    "USCRN:54856",
+    "USCRN:54902",
+    "USCRN:54932",
+    "USCRN:54933",
+    "USCRN:63898",
+    "USCRN:94079",
+    "USCRN:94085"
+  ],
+  "training_pairs": 26453,
+  "training_sites": 27
+}

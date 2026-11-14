@@ -1,0 +1,160 @@
+{
+  "excluded": {
+    "SCAN:2195:MO:SCAN": "no quality-controlled days in the source snapshot",
+    "USCRN:13301": "historically exposed or inside the geographic buffer"
+  },
+  "fresh_independent_managed_farms": 0,
+  "frozen_recipe": "ridge:raw+land_history+weather+soil+terrain+geography:3000/1",
+  "frozen_report_sha256": "15b0cbdeacd4375ec43723aaa279d1a6d835e032fa4c75f85624b16d617c5ddb",
+  "geographic_support_diagnostic": {
+    "development_folds": [
+      {
+        "held_sites": [
+          "SCAN:2002:MN:SCAN",
+          "SCAN:2093:KS:SCAN",
+          "SCAN:2226:MO:SCAN",
+          "SCAN:2230:MO:SCAN",
+          "SCAN:2231:MO:SCAN",
+          "USCRN:23909"
+        ],
+        "rule": {
+          "radius_km": 300,
+          "strength": 1
+        }
+      },
+      {
+        "held_sites": [
+          "SCAN:2003:WI:SCAN",
+          "SCAN:2004:IL:SCAN",
+          "SCAN:2048:MO:SCAN",
+          "SCAN:2060:MO:SCAN",
+          "SCAN:2194:MO:SCAN",
+          "USCRN:54808",
+          "USCRN:54811"
+        ],
+        "rule": {
+          "radius_km": 450,
+          "strength": 0.75
+        }
+      },
+      {
+        "held_sites": [
+          "SCAN:2047:MO:SCAN",
+          "SCAN:2050:MN:SCAN",
+          "SCAN:2220:MO:SCAN",
+          "SCAN:2225:MO:SCAN",
+          "SCAN:2227:MO:SCAN",
+          "USCRN:04994",
+          "USCRN:54902",
+          "USCRN:63898"
+        ],
+        "rule": {
+          "radius_km": 450,
+          "strength": 1
+        }
+      },
+      {
+        "held_sites": [
+          "SCAN:2061:MO:SCAN",
+          "SCAN:2092:KS:SCAN",
+          "SCAN:2094:KS:SCAN",
+          "SCAN:2111:NE:SCAN",
+          "SCAN:2147:KS:SCAN",
+          "USCRN:53974"
+        ],
+        "rule": {
+          "radius_km": 450,
+          "strength": 0.5
+        }
+      }
+    ],
+    "known_diagnostics": {
+      "iowa_2025_previously_seen": {
+        "era5_land": {
+          "bias": 0.01613037977237929,
+          "mae": 0.05672328461268746,
+          "rmse": 0.07365061768237692
+        },
+        "original": {
+          "bias": 0.008049206073335221,
+          "mae": 0.052192303629589785,
+          "rmse": 0.06530326139491914
+        },
+        "pairs": 1680,
+        "support_limited": {
+          "bias": 0.020166120438943898,
+          "mae": 0.05702746628593474,
+          "rmse": 0.07385426641571237
+        }
+      },
+      "regional_2025": {
+        "era5_land": {
+          "bias": 0.10818270503823782,
+          "mae": 0.11151903760528763,
+          "rmse": 0.12343641701040287
+        },
+        "original": {
+          "bias": 0.062435866872700495,
+          "mae": 0.10677810292633716,
+          "rmse": 0.14321308431432794
+        },
+        "pairs": 1209,
+        "support_limited": {
+          "bias": 0.10175350903615546,
+          "mae": 0.10508984160320527,
+          "rmse": 0.11646043591645024
+        }
+      }
+    },
+    "nested": {
+      "era5_land": {
+        "bias": 0.09239713578802612,
+        "mae": 0.11876570430416564,
+        "rmse": 0.1472908095027207
+      },
+      "original": {
+        "bias": -0.016245224459011772,
+        "mae": 0.07961359640272109,
+        "rmse": 0.10184656315734518
+      },
+      "support_limited": {
+        "bias": 0.040316313521856405,
+        "mae": 0.08371139180013801,
+        "rmse": 0.10230258268864556
+      }
+    },
+    "rule_count": 16,
+    "selected_rule": {
+      "radius_km": 180,
+      "strength": 1
+    }
+  },
+  "matched_weather_diagnostic": {
+    "era5_land": {
+      "bias": 0.0955065998729008,
+      "mae": 0.12303503570937471,
+      "rmse": 0.15145212783144707
+    },
+    "pairs": 24789,
+    "sites": 25,
+    "with_weather": {
+      "bias": -0.008076811078552452,
+      "mae": 0.07467114319737451,
+      "rmse": 0.09350076510270804
+    },
+    "without_weather": {
+      "bias": -0.007769599725264049,
+      "mae": 0.07984796642614002,
+      "rmse": 0.09916130936275466
+    }
+  },
+  "observations_sha256": "2f1c0745b57e3b31780a0af6b1b3852394d6d8e9267e58d9768f3e7d0d88dda3",
+  "promoted": false,
+  "site_manifest_sha256": "478639f1df64d297b54d39c26c0b14c38b3ba035735fe8af5bc81245013ebefe",
+  "source_availability": "incomplete_era5_or_terrain_cache",
+  "unscored_sites": [
+    "USCRN:54937",
+    "USCRN:63838",
+    "USCRN:63849"
+  ]
+}

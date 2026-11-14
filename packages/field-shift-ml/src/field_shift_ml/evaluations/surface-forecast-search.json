@@ -1,0 +1,3435 @@
+{
+  "calibration": {
+    "interval_half_width": {
+      "ridge:all_without_fluxes:residual:1:400": [
+        0.13133785888274999,
+        0.12985488585874308,
+        0.1314490298274864,
+        0.13580021107548768,
+        0.1349610475642085
+      ],
+      "ridge:v1:residual:0.5:40": [
+        0.11885004509764574,
+        0.11737358848394805,
+        0.12458690677390155,
+        0.11793978446108522,
+        0.133159550226156
+      ]
+    },
+    "pairs": 1104,
+    "stations": 7
+  },
+  "candidate_count": 149,
+  "feature_groups": {
+    "fluxes": [
+      "log_daily_precipitation",
+      "daily_et0",
+      "recent_precipitation",
+      "recent_et0",
+      "cumulative_water_balance",
+      "number_of_wet_days",
+      "days_since_precipitation_in_run",
+      "soil_minus_air_temperature",
+      "precipitation_times_initial_dryness"
+    ],
+    "layers": [
+      "surface_minus_subsurface",
+      "surface_change_since_issue",
+      "surface_day_change",
+      "subsurface_change_since_first_lead",
+      "prior_lead_surface_mean",
+      "prior_lead_surface_range"
+    ],
+    "soil": [
+      "sand_pct",
+      "silt_pct",
+      "clay_pct",
+      "organic_matter_pct",
+      "bulk_density",
+      "field_capacity",
+      "wilting_point",
+      "available_water_capacity",
+      "drainage_class",
+      "surface_minus_field_capacity",
+      "initial_relative_available_water",
+      "precipitation_times_sand_fraction"
+    ],
+    "v1": [
+      "surface_moisture",
+      "subsurface_moisture",
+      "run_initial_day_moisture",
+      "soil_temperature_c",
+      "air_temperature_c",
+      "cumulative_precipitation_mm",
+      "cumulative_et0_mm",
+      "lead_days",
+      "season_sin",
+      "season_cos"
+    ]
+  },
+  "feature_sets": {
+    "all": [
+      "v1",
+      "layers",
+      "fluxes",
+      "soil"
+    ],
+    "all_without_fluxes": [
+      "v1",
+      "layers",
+      "soil"
+    ],
+    "all_without_layers": [
+      "v1",
+      "fluxes",
+      "soil"
+    ],
+    "dynamic": [
+      "v1",
+      "layers",
+      "fluxes"
+    ],
+    "fluxes": [
+      "v1",
+      "fluxes"
+    ],
+    "layers": [
+      "v1",
+      "layers"
+    ],
+    "soil": [
+      "v1",
+      "soil"
+    ],
+    "v1": [
+      "v1"
+    ]
+  },
+  "fold_buffer_km": 40,
+  "full_development_search": {
+    "bias:v1:residual:0.5": {
+      "family": "bias",
+      "features": "v1",
+      "metrics": {
+        "bias": 0.013533132514745798,
+        "mae": 0.10786581846882265,
+        "rmse": 0.13314107036623035
+      },
+      "parameters": [],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "bias:v1:residual:1": {
+      "family": "bias",
+      "features": "v1",
+      "metrics": {
+        "bias": 0.0003946380627007924,
+        "mae": 0.11009185209287306,
+        "rmse": 0.1348435928414422
+      },
+      "parameters": [],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "boosted_trees:all:direct:1:7/25/2.0": {
+      "family": "boosted_trees",
+      "features": "all",
+      "metrics": {
+        "bias": -0.006238824586040255,
+        "mae": 0.07450657650447198,
+        "rmse": 0.09460399113471923
+      },
+      "parameters": [
+        7,
+        25,
+        2.0
+      ],
+      "strength": 1.0,
+      "target": "direct"
+    },
+    "boosted_trees:all:residual:0.75:15/50/1.0": {
+      "family": "boosted_trees",
+      "features": "all",
+      "metrics": {
+        "bias": 0.006404656713954975,
+        "mae": 0.07325939876910668,
+        "rmse": 0.09092889452683449
+      },
+      "parameters": [
+        15,
+        50,
+        1.0
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "boosted_trees:all:residual:0.75:7/25/2.0": {
+      "family": "boosted_trees",
+      "features": "all",
+      "metrics": {
+        "bias": 0.0038176347692850756,
+        "mae": 0.0742509237613282,
+        "rmse": 0.09191180760692112
+      },
+      "parameters": [
+        7,
+        25,
+        2.0
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "boosted_trees:all_without_fluxes:residual:0.75:15/50/1.0": {
+      "family": "boosted_trees",
+      "features": "all_without_fluxes",
+      "metrics": {
+        "bias": 0.007061004367142971,
+        "mae": 0.07435675736272726,
+        "rmse": 0.09178259127646894
+      },
+      "parameters": [
+        15,
+        50,
+        1.0
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "boosted_trees:all_without_fluxes:residual:0.75:7/25/2.0": {
+      "family": "boosted_trees",
+      "features": "all_without_fluxes",
+      "metrics": {
+        "bias": 0.004950276513138904,
+        "mae": 0.07450030859430504,
+        "rmse": 0.0920677468047788
+      },
+      "parameters": [
+        7,
+        25,
+        2.0
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "boosted_trees:all_without_layers:residual:0.75:15/50/1.0": {
+      "family": "boosted_trees",
+      "features": "all_without_layers",
+      "metrics": {
+        "bias": 0.006704768073337928,
+        "mae": 0.0745641991759089,
+        "rmse": 0.09199260103203148
+      },
+      "parameters": [
+        15,
+        50,
+        1.0
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "boosted_trees:all_without_layers:residual:0.75:7/25/2.0": {
+      "family": "boosted_trees",
+      "features": "all_without_layers",
+      "metrics": {
+        "bias": 0.004669130051843655,
+        "mae": 0.07464521326014972,
+        "rmse": 0.09211397383923813
+      },
+      "parameters": [
+        7,
+        25,
+        2.0
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "boosted_trees:dynamic:direct:1:7/25/2.0": {
+      "family": "boosted_trees",
+      "features": "dynamic",
+      "metrics": {
+        "bias": 0.0027443382072358806,
+        "mae": 0.08853084239210599,
+        "rmse": 0.10925974749816172
+      },
+      "parameters": [
+        7,
+        25,
+        2.0
+      ],
+      "strength": 1.0,
+      "target": "direct"
+    },
+    "boosted_trees:dynamic:residual:0.75:15/50/1.0": {
+      "family": "boosted_trees",
+      "features": "dynamic",
+      "metrics": {
+        "bias": 0.00979079172060452,
+        "mae": 0.09055750608315966,
+        "rmse": 0.11288779924874294
+      },
+      "parameters": [
+        15,
+        50,
+        1.0
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "boosted_trees:dynamic:residual:0.75:7/25/2.0": {
+      "family": "boosted_trees",
+      "features": "dynamic",
+      "metrics": {
+        "bias": 0.009752658241279114,
+        "mae": 0.08978234556259615,
+        "rmse": 0.11193591301004116
+      },
+      "parameters": [
+        7,
+        25,
+        2.0
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "boosted_trees:fluxes:residual:0.75:15/50/1.0": {
+      "family": "boosted_trees",
+      "features": "fluxes",
+      "metrics": {
+        "bias": 0.009620774466398089,
+        "mae": 0.09059308906700043,
+        "rmse": 0.11302270733100711
+      },
+      "parameters": [
+        15,
+        50,
+        1.0
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "boosted_trees:fluxes:residual:0.75:7/25/2.0": {
+      "family": "boosted_trees",
+      "features": "fluxes",
+      "metrics": {
+        "bias": 0.009782577287337535,
+        "mae": 0.08989816717586044,
+        "rmse": 0.11187574383465719
+      },
+      "parameters": [
+        7,
+        25,
+        2.0
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "boosted_trees:layers:residual:0.75:15/50/1.0": {
+      "family": "boosted_trees",
+      "features": "layers",
+      "metrics": {
+        "bias": 0.009641703809078025,
+        "mae": 0.08989918052409962,
+        "rmse": 0.11227146481569365
+      },
+      "parameters": [
+        15,
+        50,
+        1.0
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "boosted_trees:layers:residual:0.75:7/25/2.0": {
+      "family": "boosted_trees",
+      "features": "layers",
+      "metrics": {
+        "bias": 0.010232281138187737,
+        "mae": 0.08992109372633127,
+        "rmse": 0.11232304437471359
+      },
+      "parameters": [
+        7,
+        25,
+        2.0
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "boosted_trees:soil:residual:0.75:15/50/1.0": {
+      "family": "boosted_trees",
+      "features": "soil",
+      "metrics": {
+        "bias": 0.005581127470610961,
+        "mae": 0.07441932432042853,
+        "rmse": 0.09217653591570532
+      },
+      "parameters": [
+        15,
+        50,
+        1.0
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "boosted_trees:soil:residual:0.75:7/25/2.0": {
+      "family": "boosted_trees",
+      "features": "soil",
+      "metrics": {
+        "bias": 0.004094758934595601,
+        "mae": 0.07485643278908788,
+        "rmse": 0.09234934573277687
+      },
+      "parameters": [
+        7,
+        25,
+        2.0
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "boosted_trees:v1:direct:1:7/25/2.0": {
+      "family": "boosted_trees",
+      "features": "v1",
+      "metrics": {
+        "bias": 0.0034969088724116004,
+        "mae": 0.08843943454623446,
+        "rmse": 0.1096522641198036
+      },
+      "parameters": [
+        7,
+        25,
+        2.0
+      ],
+      "strength": 1.0,
+      "target": "direct"
+    },
+    "boosted_trees:v1:residual:0.75:15/50/1.0": {
+      "family": "boosted_trees",
+      "features": "v1",
+      "metrics": {
+        "bias": 0.009847298051340452,
+        "mae": 0.09054710434290343,
+        "rmse": 0.11312815295538951
+      },
+      "parameters": [
+        15,
+        50,
+        1.0
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "boosted_trees:v1:residual:0.75:7/25/2.0": {
+      "family": "boosted_trees",
+      "features": "v1",
+      "metrics": {
+        "bias": 0.01005871291008626,
+        "mae": 0.09017297577460728,
+        "rmse": 0.11246937783301042
+      },
+      "parameters": [
+        7,
+        25,
+        2.0
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "elastic_net:all:residual:0.75:0.001/0.25": {
+      "family": "elastic_net",
+      "features": "all",
+      "metrics": {
+        "bias": 0.006592794659990666,
+        "mae": 0.0703902997685853,
+        "rmse": 0.08624592868293218
+      },
+      "parameters": [
+        0.001,
+        0.25
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "elastic_net:all:residual:0.75:0.004/0.75": {
+      "family": "elastic_net",
+      "features": "all",
+      "metrics": {
+        "bias": 0.008417011883553767,
+        "mae": 0.07234376605463647,
+        "rmse": 0.08860900313065852
+      },
+      "parameters": [
+        0.004,
+        0.75
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "elastic_net:all_without_fluxes:residual:0.75:0.001/0.25": {
+      "family": "elastic_net",
+      "features": "all_without_fluxes",
+      "metrics": {
+        "bias": 0.0065650560416014555,
+        "mae": 0.0707424905659688,
+        "rmse": 0.08646036353895051
+      },
+      "parameters": [
+        0.001,
+        0.25
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "elastic_net:all_without_fluxes:residual:0.75:0.004/0.75": {
+      "family": "elastic_net",
+      "features": "all_without_fluxes",
+      "metrics": {
+        "bias": 0.008096435468787338,
+        "mae": 0.07274040987482129,
+        "rmse": 0.08899447957205872
+      },
+      "parameters": [
+        0.004,
+        0.75
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "elastic_net:all_without_layers:residual:0.75:0.001/0.25": {
+      "family": "elastic_net",
+      "features": "all_without_layers",
+      "metrics": {
+        "bias": 0.006753704269278586,
+        "mae": 0.07040653276368518,
+        "rmse": 0.08628499480349196
+      },
+      "parameters": [
+        0.001,
+        0.25
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "elastic_net:all_without_layers:residual:0.75:0.004/0.75": {
+      "family": "elastic_net",
+      "features": "all_without_layers",
+      "metrics": {
+        "bias": 0.007896135492104928,
+        "mae": 0.07210090652529236,
+        "rmse": 0.08860720188531739
+      },
+      "parameters": [
+        0.004,
+        0.75
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "elastic_net:dynamic:residual:0.75:0.001/0.25": {
+      "family": "elastic_net",
+      "features": "dynamic",
+      "metrics": {
+        "bias": 0.009098850325257833,
+        "mae": 0.09496513663492669,
+        "rmse": 0.11601456473683261
+      },
+      "parameters": [
+        0.001,
+        0.25
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "elastic_net:dynamic:residual:0.75:0.004/0.75": {
+      "family": "elastic_net",
+      "features": "dynamic",
+      "metrics": {
+        "bias": 0.009287650581689257,
+        "mae": 0.09554326451886266,
+        "rmse": 0.11709906024600115
+      },
+      "parameters": [
+        0.004,
+        0.75
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "elastic_net:fluxes:residual:0.75:0.001/0.25": {
+      "family": "elastic_net",
+      "features": "fluxes",
+      "metrics": {
+        "bias": 0.009111301120816926,
+        "mae": 0.09500250150981589,
+        "rmse": 0.1159571827397091
+      },
+      "parameters": [
+        0.001,
+        0.25
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "elastic_net:fluxes:residual:0.75:0.004/0.75": {
+      "family": "elastic_net",
+      "features": "fluxes",
+      "metrics": {
+        "bias": 0.009051203574403267,
+        "mae": 0.09536378873098772,
+        "rmse": 0.11695713002351737
+      },
+      "parameters": [
+        0.004,
+        0.75
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "elastic_net:layers:residual:0.75:0.001/0.25": {
+      "family": "elastic_net",
+      "features": "layers",
+      "metrics": {
+        "bias": 0.009163043893635392,
+        "mae": 0.09488298947338078,
+        "rmse": 0.11585013401931983
+      },
+      "parameters": [
+        0.001,
+        0.25
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "elastic_net:layers:residual:0.75:0.004/0.75": {
+      "family": "elastic_net",
+      "features": "layers",
+      "metrics": {
+        "bias": 0.00949739061987875,
+        "mae": 0.0956126833758614,
+        "rmse": 0.11717428871616851
+      },
+      "parameters": [
+        0.004,
+        0.75
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "elastic_net:soil:residual:0.75:0.001/0.25": {
+      "family": "elastic_net",
+      "features": "soil",
+      "metrics": {
+        "bias": 0.0067172503631369625,
+        "mae": 0.07073190733647858,
+        "rmse": 0.08648422891662105
+      },
+      "parameters": [
+        0.001,
+        0.25
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "elastic_net:soil:residual:0.75:0.004/0.75": {
+      "family": "elastic_net",
+      "features": "soil",
+      "metrics": {
+        "bias": 0.00781576045609479,
+        "mae": 0.07251661935832673,
+        "rmse": 0.08904405071583614
+      },
+      "parameters": [
+        0.004,
+        0.75
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "elastic_net:v1:residual:0.75:0.001/0.25": {
+      "family": "elastic_net",
+      "features": "v1",
+      "metrics": {
+        "bias": 0.009175847000032693,
+        "mae": 0.09485471872329239,
+        "rmse": 0.11570581400815673
+      },
+      "parameters": [
+        0.001,
+        0.25
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "elastic_net:v1:residual:0.75:0.004/0.75": {
+      "family": "elastic_net",
+      "features": "v1",
+      "metrics": {
+        "bias": 0.009174802356096324,
+        "mae": 0.09545129086923945,
+        "rmse": 0.11702999504283611
+      },
+      "parameters": [
+        0.004,
+        0.75
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "extra_trees:all:residual:0.75:5/30": {
+      "family": "extra_trees",
+      "features": "all",
+      "metrics": {
+        "bias": 0.00045179557118793024,
+        "mae": 0.07656268208720235,
+        "rmse": 0.09418720870239822
+      },
+      "parameters": [
+        5,
+        30
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "extra_trees:all:residual:0.75:8/12": {
+      "family": "extra_trees",
+      "features": "all",
+      "metrics": {
+        "bias": 0.0019774942052558126,
+        "mae": 0.07682709637748947,
+        "rmse": 0.09418816426798023
+      },
+      "parameters": [
+        8,
+        12
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "extra_trees:all_without_fluxes:residual:0.75:5/30": {
+      "family": "extra_trees",
+      "features": "all_without_fluxes",
+      "metrics": {
+        "bias": 0.002900271489162325,
+        "mae": 0.07713204923079098,
+        "rmse": 0.09461306671267451
+      },
+      "parameters": [
+        5,
+        30
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "extra_trees:all_without_layers:residual:0.75:5/30": {
+      "family": "extra_trees",
+      "features": "all_without_layers",
+      "metrics": {
+        "bias": 0.002857538122317577,
+        "mae": 0.07778188513008814,
+        "rmse": 0.09509042892684506
+      },
+      "parameters": [
+        5,
+        30
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "extra_trees:dynamic:residual:0.75:5/30": {
+      "family": "extra_trees",
+      "features": "dynamic",
+      "metrics": {
+        "bias": 0.010465195024237749,
+        "mae": 0.09300288210630996,
+        "rmse": 0.11461188838182146
+      },
+      "parameters": [
+        5,
+        30
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "extra_trees:dynamic:residual:0.75:8/12": {
+      "family": "extra_trees",
+      "features": "dynamic",
+      "metrics": {
+        "bias": 0.010744855637284365,
+        "mae": 0.09028016856729991,
+        "rmse": 0.11192623055337197
+      },
+      "parameters": [
+        8,
+        12
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "extra_trees:fluxes:residual:0.75:5/30": {
+      "family": "extra_trees",
+      "features": "fluxes",
+      "metrics": {
+        "bias": 0.010420422741650991,
+        "mae": 0.09318692356126888,
+        "rmse": 0.11506064876892172
+      },
+      "parameters": [
+        5,
+        30
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "extra_trees:layers:residual:0.75:5/30": {
+      "family": "extra_trees",
+      "features": "layers",
+      "metrics": {
+        "bias": 0.010097557185794982,
+        "mae": 0.09331055855350082,
+        "rmse": 0.1149829672255316
+      },
+      "parameters": [
+        5,
+        30
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "extra_trees:soil:residual:0.75:5/30": {
+      "family": "extra_trees",
+      "features": "soil",
+      "metrics": {
+        "bias": 0.000178100727604604,
+        "mae": 0.07576038044692295,
+        "rmse": 0.09362813838521773
+      },
+      "parameters": [
+        5,
+        30
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "extra_trees:v1:residual:0.75:5/30": {
+      "family": "extra_trees",
+      "features": "v1",
+      "metrics": {
+        "bias": 0.010345538674660006,
+        "mae": 0.0932901821453473,
+        "rmse": 0.11518154486450104
+      },
+      "parameters": [
+        5,
+        30
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "extra_trees:v1:residual:0.75:8/12": {
+      "family": "extra_trees",
+      "features": "v1",
+      "metrics": {
+        "bias": 0.010825486867328848,
+        "mae": 0.09092781793671603,
+        "rmse": 0.11251045599326784
+      },
+      "parameters": [
+        8,
+        12
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "huber:all:residual:0.75:1.25": {
+      "family": "huber",
+      "features": "all",
+      "metrics": {
+        "bias": 0.006947562047645785,
+        "mae": 0.07008028945702165,
+        "rmse": 0.0865686540744978
+      },
+      "parameters": [
+        1.25
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "huber:all:residual:0.75:1.75": {
+      "family": "huber",
+      "features": "all",
+      "metrics": {
+        "bias": 0.008143925051457784,
+        "mae": 0.0704186837083035,
+        "rmse": 0.08670897840743454
+      },
+      "parameters": [
+        1.75
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "huber:all_without_fluxes:residual:0.75:1.25": {
+      "family": "huber",
+      "features": "all_without_fluxes",
+      "metrics": {
+        "bias": 0.007008381686199569,
+        "mae": 0.07041487430987448,
+        "rmse": 0.08684101772713841
+      },
+      "parameters": [
+        1.25
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "huber:all_without_fluxes:residual:0.75:1.75": {
+      "family": "huber",
+      "features": "all_without_fluxes",
+      "metrics": {
+        "bias": 0.008151120252030585,
+        "mae": 0.0707424219052475,
+        "rmse": 0.08696312763673128
+      },
+      "parameters": [
+        1.75
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "huber:all_without_layers:residual:0.75:1.25": {
+      "family": "huber",
+      "features": "all_without_layers",
+      "metrics": {
+        "bias": 0.006770768311431358,
+        "mae": 0.06985474201469791,
+        "rmse": 0.08623206382498733
+      },
+      "parameters": [
+        1.25
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "huber:all_without_layers:residual:0.75:1.75": {
+      "family": "huber",
+      "features": "all_without_layers",
+      "metrics": {
+        "bias": 0.0079056182120722,
+        "mae": 0.0701530893805304,
+        "rmse": 0.08638536344282273
+      },
+      "parameters": [
+        1.75
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "huber:dynamic:residual:0.75:1.25": {
+      "family": "huber",
+      "features": "dynamic",
+      "metrics": {
+        "bias": 0.006456040632142955,
+        "mae": 0.09536731004603952,
+        "rmse": 0.11657620221691284
+      },
+      "parameters": [
+        1.25
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "huber:dynamic:residual:0.75:1.75": {
+      "family": "huber",
+      "features": "dynamic",
+      "metrics": {
+        "bias": 0.008777662855832107,
+        "mae": 0.09496689871367235,
+        "rmse": 0.11610504088816795
+      },
+      "parameters": [
+        1.75
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "huber:fluxes:residual:0.75:1.25": {
+      "family": "huber",
+      "features": "fluxes",
+      "metrics": {
+        "bias": 0.006418911422201564,
+        "mae": 0.09531356226723449,
+        "rmse": 0.11636983447382344
+      },
+      "parameters": [
+        1.25
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "huber:fluxes:residual:0.75:1.75": {
+      "family": "huber",
+      "features": "fluxes",
+      "metrics": {
+        "bias": 0.008678008917262522,
+        "mae": 0.09506194960118917,
+        "rmse": 0.11607808291986378
+      },
+      "parameters": [
+        1.75
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "huber:layers:residual:0.75:1.25": {
+      "family": "huber",
+      "features": "layers",
+      "metrics": {
+        "bias": 0.006378833767360763,
+        "mae": 0.0954573759406737,
+        "rmse": 0.11659355928543247
+      },
+      "parameters": [
+        1.25
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "huber:layers:residual:0.75:1.75": {
+      "family": "huber",
+      "features": "layers",
+      "metrics": {
+        "bias": 0.00881052552505275,
+        "mae": 0.09508791042999669,
+        "rmse": 0.11616509960050374
+      },
+      "parameters": [
+        1.75
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "huber:soil:residual:0.75:1.25": {
+      "family": "huber",
+      "features": "soil",
+      "metrics": {
+        "bias": 0.006727623796730793,
+        "mae": 0.06999169696978173,
+        "rmse": 0.08632360110353847
+      },
+      "parameters": [
+        1.25
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "huber:soil:residual:0.75:1.75": {
+      "family": "huber",
+      "features": "soil",
+      "metrics": {
+        "bias": 0.00795491096468095,
+        "mae": 0.07039153640510272,
+        "rmse": 0.08655194073872004
+      },
+      "parameters": [
+        1.75
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "huber:v1:residual:0.75:1.25": {
+      "family": "huber",
+      "features": "v1",
+      "metrics": {
+        "bias": 0.006225215002434638,
+        "mae": 0.0952609928747253,
+        "rmse": 0.1162433944315535
+      },
+      "parameters": [
+        1.25
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "huber:v1:residual:0.75:1.75": {
+      "family": "huber",
+      "features": "v1",
+      "metrics": {
+        "bias": 0.008721991638021016,
+        "mae": 0.09502060536186432,
+        "rmse": 0.11596883904252522
+      },
+      "parameters": [
+        1.75
+      ],
+      "strength": 0.75,
+      "target": "residual"
+    },
+    "ifs:v1:residual:1": {
+      "family": "ifs",
+      "features": "v1",
+      "metrics": {
+        "bias": 0.02667602284527806,
+        "mae": 0.10694545513902033,
+        "rmse": 0.13297890259957262
+      },
+      "parameters": [],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "persistence:v1:residual:1": {
+      "family": "persistence",
+      "features": "v1",
+      "metrics": {
+        "bias": 0.022033069742461775,
+        "mae": 0.10805193049948128,
+        "rmse": 0.13421757402061765
+      },
+      "parameters": [],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "polynomial_ridge:all:residual:0.5:40": {
+      "family": "polynomial_ridge",
+      "features": "all",
+      "metrics": {
+        "bias": 0.029142010695442103,
+        "mae": 0.08751945119574608,
+        "rmse": 0.10926935185838903
+      },
+      "parameters": [
+        40
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "polynomial_ridge:all:residual:0.5:400": {
+      "family": "polynomial_ridge",
+      "features": "all",
+      "metrics": {
+        "bias": 0.012479763736236783,
+        "mae": 0.0810718612518462,
+        "rmse": 0.10098992011850763
+      },
+      "parameters": [
+        400
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "polynomial_ridge:all_without_fluxes:residual:0.5:40": {
+      "family": "polynomial_ridge",
+      "features": "all_without_fluxes",
+      "metrics": {
+        "bias": 0.03014469713052049,
+        "mae": 0.08892445908683473,
+        "rmse": 0.11097836957793394
+      },
+      "parameters": [
+        40
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "polynomial_ridge:all_without_fluxes:residual:0.5:400": {
+      "family": "polynomial_ridge",
+      "features": "all_without_fluxes",
+      "metrics": {
+        "bias": 0.012522588603421215,
+        "mae": 0.08138614061208736,
+        "rmse": 0.10129438256090931
+      },
+      "parameters": [
+        400
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "polynomial_ridge:all_without_layers:residual:0.5:40": {
+      "family": "polynomial_ridge",
+      "features": "all_without_layers",
+      "metrics": {
+        "bias": 0.029988417784019658,
+        "mae": 0.08741751338880252,
+        "rmse": 0.10940092688660917
+      },
+      "parameters": [
+        40
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "polynomial_ridge:all_without_layers:residual:0.5:400": {
+      "family": "polynomial_ridge",
+      "features": "all_without_layers",
+      "metrics": {
+        "bias": 0.012180897113272195,
+        "mae": 0.08086058842816604,
+        "rmse": 0.10061310605329499
+      },
+      "parameters": [
+        400
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "polynomial_ridge:dynamic:residual:0.5:40": {
+      "family": "polynomial_ridge",
+      "features": "dynamic",
+      "metrics": {
+        "bias": 0.01360735073939044,
+        "mae": 0.09440023925859055,
+        "rmse": 0.1171873695452116
+      },
+      "parameters": [
+        40
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "polynomial_ridge:dynamic:residual:0.5:400": {
+      "family": "polynomial_ridge",
+      "features": "dynamic",
+      "metrics": {
+        "bias": 0.013727353254475104,
+        "mae": 0.0943812826703667,
+        "rmse": 0.1168002422062584
+      },
+      "parameters": [
+        400
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "polynomial_ridge:fluxes:residual:0.5:40": {
+      "family": "polynomial_ridge",
+      "features": "fluxes",
+      "metrics": {
+        "bias": 0.013627162215571328,
+        "mae": 0.09368018692488726,
+        "rmse": 0.11634311352813778
+      },
+      "parameters": [
+        40
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "polynomial_ridge:fluxes:residual:0.5:400": {
+      "family": "polynomial_ridge",
+      "features": "fluxes",
+      "metrics": {
+        "bias": 0.013807764571012553,
+        "mae": 0.09473573870140091,
+        "rmse": 0.1173191398451225
+      },
+      "parameters": [
+        400
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "polynomial_ridge:layers:residual:0.5:40": {
+      "family": "polynomial_ridge",
+      "features": "layers",
+      "metrics": {
+        "bias": 0.014297146954562035,
+        "mae": 0.09388096892550858,
+        "rmse": 0.11654618027956909
+      },
+      "parameters": [
+        40
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "polynomial_ridge:layers:residual:0.5:400": {
+      "family": "polynomial_ridge",
+      "features": "layers",
+      "metrics": {
+        "bias": 0.01437211927214879,
+        "mae": 0.09444815746025462,
+        "rmse": 0.11679850019889407
+      },
+      "parameters": [
+        400
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "polynomial_ridge:soil:residual:0.5:40": {
+      "family": "polynomial_ridge",
+      "features": "soil",
+      "metrics": {
+        "bias": 0.03085277956347127,
+        "mae": 0.08926318542521255,
+        "rmse": 0.11121998494687739
+      },
+      "parameters": [
+        40
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "polynomial_ridge:soil:residual:0.5:400": {
+      "family": "polynomial_ridge",
+      "features": "soil",
+      "metrics": {
+        "bias": 0.012111954667663322,
+        "mae": 0.0806825088008262,
+        "rmse": 0.10043399601914411
+      },
+      "parameters": [
+        400
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "polynomial_ridge:v1:residual:0.5:40": {
+      "family": "polynomial_ridge",
+      "features": "v1",
+      "metrics": {
+        "bias": 0.01420187645484189,
+        "mae": 0.0933773603521188,
+        "rmse": 0.1158280057777223
+      },
+      "parameters": [
+        40
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "polynomial_ridge:v1:residual:0.5:400": {
+      "family": "polynomial_ridge",
+      "features": "v1",
+      "metrics": {
+        "bias": 0.014458497821817866,
+        "mae": 0.09467652212193392,
+        "rmse": 0.11703094796277501
+      },
+      "parameters": [
+        400
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:all:direct:1:40": {
+      "family": "ridge",
+      "features": "all",
+      "metrics": {
+        "bias": -0.000486520700721017,
+        "mae": 0.06924777764886994,
+        "rmse": 0.08560277164301237
+      },
+      "parameters": [
+        40
+      ],
+      "strength": 1.0,
+      "target": "direct"
+    },
+    "ridge:all:residual:0.5:4": {
+      "family": "ridge",
+      "features": "all",
+      "metrics": {
+        "bias": 0.013536329308060778,
+        "mae": 0.07726678788780245,
+        "rmse": 0.09548902825952589
+      },
+      "parameters": [
+        4
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:all:residual:0.5:40": {
+      "family": "ridge",
+      "features": "all",
+      "metrics": {
+        "bias": 0.01280519618622883,
+        "mae": 0.07786633773128429,
+        "rmse": 0.09609852529723206
+      },
+      "parameters": [
+        40
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:all:residual:0.5:400": {
+      "family": "ridge",
+      "features": "all",
+      "metrics": {
+        "bias": 0.012826805888686111,
+        "mae": 0.07907630140171086,
+        "rmse": 0.09783081555653121
+      },
+      "parameters": [
+        400
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:all:residual:0.5:4000": {
+      "family": "ridge",
+      "features": "all",
+      "metrics": {
+        "bias": 0.013989410563060353,
+        "mae": 0.08474725096922199,
+        "rmse": 0.10553385344021143
+      },
+      "parameters": [
+        4000
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:all:residual:1:4": {
+      "family": "ridge",
+      "features": "all",
+      "metrics": {
+        "bias": 0.0006547319045882481,
+        "mae": 0.06969447177694947,
+        "rmse": 0.08602009875400485
+      },
+      "parameters": [
+        4
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:all:residual:1:40": {
+      "family": "ridge",
+      "features": "all",
+      "metrics": {
+        "bias": -0.0007749528679256816,
+        "mae": 0.06890510193039737,
+        "rmse": 0.08524549401509036
+      },
+      "parameters": [
+        40
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:all:residual:1:400": {
+      "family": "ridge",
+      "features": "all",
+      "metrics": {
+        "bias": -0.0007212296530045993,
+        "mae": 0.0681405354365435,
+        "rmse": 0.08409956155967449
+      },
+      "parameters": [
+        400
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:all:residual:1:4000": {
+      "family": "ridge",
+      "features": "all",
+      "metrics": {
+        "bias": 0.0015248095573555226,
+        "mae": 0.07156645971076352,
+        "rmse": 0.08866520593623632
+      },
+      "parameters": [
+        4000
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:all_without_fluxes:residual:0.5:4": {
+      "family": "ridge",
+      "features": "all_without_fluxes",
+      "metrics": {
+        "bias": 0.013544148700316472,
+        "mae": 0.07753580002601189,
+        "rmse": 0.09566186810910027
+      },
+      "parameters": [
+        4
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:all_without_fluxes:residual:0.5:40": {
+      "family": "ridge",
+      "features": "all_without_fluxes",
+      "metrics": {
+        "bias": 0.01270151962094021,
+        "mae": 0.07817517733651463,
+        "rmse": 0.09633828854381288
+      },
+      "parameters": [
+        40
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:all_without_fluxes:residual:0.5:400": {
+      "family": "ridge",
+      "features": "all_without_fluxes",
+      "metrics": {
+        "bias": 0.01271866520188435,
+        "mae": 0.07954429535684972,
+        "rmse": 0.09825906200767506
+      },
+      "parameters": [
+        400
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:all_without_fluxes:residual:0.5:4000": {
+      "family": "ridge",
+      "features": "all_without_fluxes",
+      "metrics": {
+        "bias": 0.013952759409040208,
+        "mae": 0.08482214041098791,
+        "rmse": 0.10561231270566776
+      },
+      "parameters": [
+        4000
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:all_without_fluxes:residual:1:4": {
+      "family": "ridge",
+      "features": "all_without_fluxes",
+      "metrics": {
+        "bias": 0.0006861031974795251,
+        "mae": 0.06994120829138989,
+        "rmse": 0.08623774181128446
+      },
+      "parameters": [
+        4
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:all_without_fluxes:residual:1:40": {
+      "family": "ridge",
+      "features": "all_without_fluxes",
+      "metrics": {
+        "bias": -0.0009706244616794616,
+        "mae": 0.06938338947256285,
+        "rmse": 0.08552495350755393
+      },
+      "parameters": [
+        40
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:all_without_fluxes:residual:1:400": {
+      "family": "ridge",
+      "features": "all_without_fluxes",
+      "metrics": {
+        "bias": -0.0009249796906540613,
+        "mae": 0.0688602860698237,
+        "rmse": 0.08475564074310805
+      },
+      "parameters": [
+        400
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:all_without_fluxes:residual:1:4000": {
+      "family": "ridge",
+      "features": "all_without_fluxes",
+      "metrics": {
+        "bias": 0.0014426152310812576,
+        "mae": 0.07172668134382948,
+        "rmse": 0.08895806461340974
+      },
+      "parameters": [
+        4000
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:all_without_layers:residual:0.5:4": {
+      "family": "ridge",
+      "features": "all_without_layers",
+      "metrics": {
+        "bias": 0.013354494295438812,
+        "mae": 0.07716157258358035,
+        "rmse": 0.09535161675126537
+      },
+      "parameters": [
+        4
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:all_without_layers:residual:0.5:40": {
+      "family": "ridge",
+      "features": "all_without_layers",
+      "metrics": {
+        "bias": 0.012701944112974026,
+        "mae": 0.0777693917838602,
+        "rmse": 0.09604607349012834
+      },
+      "parameters": [
+        40
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:all_without_layers:residual:0.5:400": {
+      "family": "ridge",
+      "features": "all_without_layers",
+      "metrics": {
+        "bias": 0.01278961077639027,
+        "mae": 0.07937375746905555,
+        "rmse": 0.09830097087843903
+      },
+      "parameters": [
+        400
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:all_without_layers:residual:0.5:4000": {
+      "family": "ridge",
+      "features": "all_without_layers",
+      "metrics": {
+        "bias": 0.013918718660885761,
+        "mae": 0.08540209491128696,
+        "rmse": 0.1064708771587714
+      },
+      "parameters": [
+        4000
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:all_without_layers:residual:1:4": {
+      "family": "ridge",
+      "features": "all_without_layers",
+      "metrics": {
+        "bias": 0.000302416080273541,
+        "mae": 0.06922569219460956,
+        "rmse": 0.08553839788981561
+      },
+      "parameters": [
+        4
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:all_without_layers:residual:1:40": {
+      "family": "ridge",
+      "features": "all_without_layers",
+      "metrics": {
+        "bias": -0.0009690084717677526,
+        "mae": 0.0684419701281667,
+        "rmse": 0.08470477350324915
+      },
+      "parameters": [
+        40
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:all_without_layers:residual:1:400": {
+      "family": "ridge",
+      "features": "all_without_layers",
+      "metrics": {
+        "bias": -0.0007813250616162871,
+        "mae": 0.06844659766657424,
+        "rmse": 0.08434895173707686
+      },
+      "parameters": [
+        400
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:all_without_layers:residual:1:4000": {
+      "family": "ridge",
+      "features": "all_without_layers",
+      "metrics": {
+        "bias": 0.0014108381872729285,
+        "mae": 0.0726482727352828,
+        "rmse": 0.0901927276545228
+      },
+      "parameters": [
+        4000
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:dynamic:direct:1:40": {
+      "family": "ridge",
+      "features": "dynamic",
+      "metrics": {
+        "bias": 0.003193912668790885,
+        "mae": 0.09495642959644307,
+        "rmse": 0.11574125292538492
+      },
+      "parameters": [
+        40
+      ],
+      "strength": 1.0,
+      "target": "direct"
+    },
+    "ridge:dynamic:residual:0.5:4": {
+      "family": "ridge",
+      "features": "dynamic",
+      "metrics": {
+        "bias": 0.014948514528298791,
+        "mae": 0.09664896980691963,
+        "rmse": 0.11891587061043789
+      },
+      "parameters": [
+        4
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:dynamic:residual:0.5:40": {
+      "family": "ridge",
+      "features": "dynamic",
+      "metrics": {
+        "bias": 0.01494062183161006,
+        "mae": 0.09674966470140264,
+        "rmse": 0.11901006961587297
+      },
+      "parameters": [
+        40
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:dynamic:residual:0.5:400": {
+      "family": "ridge",
+      "features": "dynamic",
+      "metrics": {
+        "bias": 0.014882978159301445,
+        "mae": 0.09709714285667022,
+        "rmse": 0.1194835107037241
+      },
+      "parameters": [
+        400
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:dynamic:residual:0.5:4000": {
+      "family": "ridge",
+      "features": "dynamic",
+      "metrics": {
+        "bias": 0.014537987289430896,
+        "mae": 0.09993006733923637,
+        "rmse": 0.12332235338226508
+      },
+      "parameters": [
+        4000
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:dynamic:residual:1:4": {
+      "family": "ridge",
+      "features": "dynamic",
+      "metrics": {
+        "bias": 0.0032210062113195203,
+        "mae": 0.09509616238339982,
+        "rmse": 0.11599052064436283
+      },
+      "parameters": [
+        4
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:dynamic:residual:1:40": {
+      "family": "ridge",
+      "features": "dynamic",
+      "metrics": {
+        "bias": 0.0032052208179420556,
+        "mae": 0.09508762593513487,
+        "rmse": 0.11587112107980858
+      },
+      "parameters": [
+        40
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:dynamic:residual:1:400": {
+      "family": "ridge",
+      "features": "dynamic",
+      "metrics": {
+        "bias": 0.003089933473324829,
+        "mae": 0.09454249963033479,
+        "rmse": 0.11515234071979528
+      },
+      "parameters": [
+        400
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:dynamic:residual:1:4000": {
+      "family": "ridge",
+      "features": "dynamic",
+      "metrics": {
+        "bias": 0.002399951733583731,
+        "mae": 0.09628265921882927,
+        "rmse": 0.11853918254068072
+      },
+      "parameters": [
+        4000
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:fluxes:residual:0.5:4": {
+      "family": "ridge",
+      "features": "fluxes",
+      "metrics": {
+        "bias": 0.014918673009943467,
+        "mae": 0.09668622345373126,
+        "rmse": 0.1188681050737188
+      },
+      "parameters": [
+        4
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:fluxes:residual:0.5:40": {
+      "family": "ridge",
+      "features": "fluxes",
+      "metrics": {
+        "bias": 0.014918396643836896,
+        "mae": 0.09681002946824585,
+        "rmse": 0.11904759490690503
+      },
+      "parameters": [
+        40
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:fluxes:residual:0.5:400": {
+      "family": "ridge",
+      "features": "fluxes",
+      "metrics": {
+        "bias": 0.014838888427946588,
+        "mae": 0.09766178820212199,
+        "rmse": 0.12031264556802743
+      },
+      "parameters": [
+        400
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:fluxes:residual:0.5:4000": {
+      "family": "ridge",
+      "features": "fluxes",
+      "metrics": {
+        "bias": 0.014423515949583937,
+        "mae": 0.10077410755065976,
+        "rmse": 0.12458900442072748
+      },
+      "parameters": [
+        4000
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:fluxes:residual:1:4": {
+      "family": "ridge",
+      "features": "fluxes",
+      "metrics": {
+        "bias": 0.003161323174608872,
+        "mae": 0.09509151199125113,
+        "rmse": 0.11576045334360324
+      },
+      "parameters": [
+        4
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:fluxes:residual:1:40": {
+      "family": "ridge",
+      "features": "fluxes",
+      "metrics": {
+        "bias": 0.003160770442395726,
+        "mae": 0.09499660776423458,
+        "rmse": 0.11556873075311405
+      },
+      "parameters": [
+        40
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:fluxes:residual:1:400": {
+      "family": "ridge",
+      "features": "fluxes",
+      "metrics": {
+        "bias": 0.0030017540106151122,
+        "mae": 0.09505379363205611,
+        "rmse": 0.1159102265296775
+      },
+      "parameters": [
+        400
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:fluxes:residual:1:4000": {
+      "family": "ridge",
+      "features": "fluxes",
+      "metrics": {
+        "bias": 0.0021710090538898078,
+        "mae": 0.09751018173955865,
+        "rmse": 0.12041382102498432
+      },
+      "parameters": [
+        4000
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:layers:residual:0.5:4": {
+      "family": "ridge",
+      "features": "layers",
+      "metrics": {
+        "bias": 0.01495751459897457,
+        "mae": 0.09669737555560277,
+        "rmse": 0.11890200117117572
+      },
+      "parameters": [
+        4
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:layers:residual:0.5:40": {
+      "family": "ridge",
+      "features": "layers",
+      "metrics": {
+        "bias": 0.015048266102457556,
+        "mae": 0.09674149224515999,
+        "rmse": 0.11891971698625466
+      },
+      "parameters": [
+        40
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:layers:residual:0.5:400": {
+      "family": "ridge",
+      "features": "layers",
+      "metrics": {
+        "bias": 0.015095765159403968,
+        "mae": 0.09709633378092906,
+        "rmse": 0.11943922056320617
+      },
+      "parameters": [
+        400
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:layers:residual:0.5:4000": {
+      "family": "ridge",
+      "features": "layers",
+      "metrics": {
+        "bias": 0.014642604045590916,
+        "mae": 0.09983128121317379,
+        "rmse": 0.12316575739462716
+      },
+      "parameters": [
+        4000
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:layers:residual:1:4": {
+      "family": "ridge",
+      "features": "layers",
+      "metrics": {
+        "bias": 0.0032390063526710725,
+        "mae": 0.09510699422176593,
+        "rmse": 0.11584908237537454
+      },
+      "parameters": [
+        4
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:layers:residual:1:40": {
+      "family": "ridge",
+      "features": "layers",
+      "metrics": {
+        "bias": 0.0034205093596370506,
+        "mae": 0.09494202440783847,
+        "rmse": 0.11549543098794483
+      },
+      "parameters": [
+        40
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:layers:residual:1:400": {
+      "family": "ridge",
+      "features": "layers",
+      "metrics": {
+        "bias": 0.0035155074735298704,
+        "mae": 0.09421185414930633,
+        "rmse": 0.11483276055336662
+      },
+      "parameters": [
+        400
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:layers:residual:1:4000": {
+      "family": "ridge",
+      "features": "layers",
+      "metrics": {
+        "bias": 0.002609185245903766,
+        "mae": 0.09604515987362044,
+        "rmse": 0.1181910147046244
+      },
+      "parameters": [
+        4000
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:soil:residual:0.5:4": {
+      "family": "ridge",
+      "features": "soil",
+      "metrics": {
+        "bias": 0.013380579750318004,
+        "mae": 0.07738522247034492,
+        "rmse": 0.09548186642947187
+      },
+      "parameters": [
+        4
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:soil:residual:0.5:40": {
+      "family": "ridge",
+      "features": "soil",
+      "metrics": {
+        "bias": 0.01262027197159491,
+        "mae": 0.0780626206684449,
+        "rmse": 0.09626848345081217
+      },
+      "parameters": [
+        40
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:soil:residual:0.5:400": {
+      "family": "ridge",
+      "features": "soil",
+      "metrics": {
+        "bias": 0.01270671625304635,
+        "mae": 0.07978212049443273,
+        "rmse": 0.09867429826892414
+      },
+      "parameters": [
+        400
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:soil:residual:0.5:4000": {
+      "family": "ridge",
+      "features": "soil",
+      "metrics": {
+        "bias": 0.0138821454629882,
+        "mae": 0.08546660387379226,
+        "rmse": 0.10660598752890293
+      },
+      "parameters": [
+        4000
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:soil:residual:1:4": {
+      "family": "ridge",
+      "features": "soil",
+      "metrics": {
+        "bias": 0.0003631937370020029,
+        "mae": 0.06942279627674973,
+        "rmse": 0.085663232321898
+      },
+      "parameters": [
+        4
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:soil:residual:1:40": {
+      "family": "ridge",
+      "features": "soil",
+      "metrics": {
+        "bias": -0.0011259549041342284,
+        "mae": 0.06889616981217749,
+        "rmse": 0.08495214617944132
+      },
+      "parameters": [
+        40
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:soil:residual:1:400": {
+      "family": "ridge",
+      "features": "soil",
+      "metrics": {
+        "bias": -0.0009415125784254306,
+        "mae": 0.06904956576873139,
+        "rmse": 0.08493881380362504
+      },
+      "parameters": [
+        400
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:soil:residual:1:4000": {
+      "family": "ridge",
+      "features": "soil",
+      "metrics": {
+        "bias": 0.0013278128255255887,
+        "mae": 0.07266493668872218,
+        "rmse": 0.09045901554235976
+      },
+      "parameters": [
+        4000
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:v1:direct:1:40": {
+      "family": "ridge",
+      "features": "v1",
+      "metrics": {
+        "bias": 0.0033345982056449627,
+        "mae": 0.09461818636562261,
+        "rmse": 0.1149829431092585
+      },
+      "parameters": [
+        40
+      ],
+      "strength": 1.0,
+      "target": "direct"
+    },
+    "ridge:v1:residual:0.5:4": {
+      "family": "ridge",
+      "features": "v1",
+      "metrics": {
+        "bias": 0.014938450400280467,
+        "mae": 0.09669757082564268,
+        "rmse": 0.11878560540722127
+      },
+      "parameters": [
+        4
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:v1:residual:0.5:40": {
+      "family": "ridge",
+      "features": "v1",
+      "metrics": {
+        "bias": 0.015031308298652324,
+        "mae": 0.09680305160126267,
+        "rmse": 0.11892243408097324
+      },
+      "parameters": [
+        40
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:v1:residual:0.5:400": {
+      "family": "ridge",
+      "features": "v1",
+      "metrics": {
+        "bias": 0.015047220600046983,
+        "mae": 0.0975357490099393,
+        "rmse": 0.12010497103900863
+      },
+      "parameters": [
+        400
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:v1:residual:0.5:4000": {
+      "family": "ridge",
+      "features": "v1",
+      "metrics": {
+        "bias": 0.01453823943342611,
+        "mae": 0.10071098035449337,
+        "rmse": 0.1244874642486306
+      },
+      "parameters": [
+        4000
+      ],
+      "strength": 0.5,
+      "target": "residual"
+    },
+    "ridge:v1:residual:1:4": {
+      "family": "ridge",
+      "features": "v1",
+      "metrics": {
+        "bias": 0.0032008779552828736,
+        "mae": 0.0949522369920387,
+        "rmse": 0.11547266687392506
+      },
+      "parameters": [
+        4
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:v1:residual:1:40": {
+      "family": "ridge",
+      "features": "v1",
+      "metrics": {
+        "bias": 0.003386593752026583,
+        "mae": 0.09479613738208452,
+        "rmse": 0.11515023842354076
+      },
+      "parameters": [
+        40
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:v1:residual:1:400": {
+      "family": "ridge",
+      "features": "v1",
+      "metrics": {
+        "bias": 0.003418418354815898,
+        "mae": 0.09455964459274997,
+        "rmse": 0.115334487695832
+      },
+      "parameters": [
+        400
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    },
+    "ridge:v1:residual:1:4000": {
+      "family": "ridge",
+      "features": "v1",
+      "metrics": {
+        "bias": 0.002400456021574162,
+        "mae": 0.09708968995706754,
+        "rmse": 0.11989972048837105
+      },
+      "parameters": [
+        4000
+      ],
+      "strength": 1.0,
+      "target": "residual"
+    }
+  },
+  "model_cycle_development": [
+    "49R1"
+  ],
+  "nested_development": {
+    "ifs": {
+      "bias": 0.02667602284527806,
+      "mae": 0.10694545513902033,
+      "rmse": 0.13297890259957262
+    },
+    "learned_procedure": {
+      "bias": 0.01640610106402878,
+      "mae": 0.07843938758668893,
+      "rmse": 0.09686659110294277
+    },
+    "outer_folds": [
+      {
+        "fit_sites": [
+          "SCAN:2003:WI:SCAN",
+          "SCAN:2004:IL:SCAN",
+          "SCAN:2047:MO:SCAN",
+          "SCAN:2048:MO:SCAN",
+          "SCAN:2050:MN:SCAN",
+          "SCAN:2060:MO:SCAN",
+          "SCAN:2061:MO:SCAN",
+          "SCAN:2068:IA:SCAN",
+          "SCAN:2092:KS:SCAN",
+          "SCAN:2093:KS:SCAN",
+          "SCAN:2094:KS:SCAN",
+          "SCAN:2111:NE:SCAN",
+          "SCAN:2147:KS:SCAN",
+          "SCAN:2194:MO:SCAN",
+          "SCAN:2220:MO:SCAN",
+          "SCAN:2225:MO:SCAN",
+          "SCAN:2227:MO:SCAN",
+          "USCRN:04994",
+          "USCRN:53974",
+          "USCRN:54808",
+          "USCRN:54811",
+          "USCRN:54902",
+          "USCRN:54903"
+        ],
+        "metrics": {
+          "bias": 0.029434129588334,
+          "mae": 0.07466746331725516,
+          "rmse": 0.08647722520591646
+        },
+        "selected": "elastic_net:soil:residual:0.75:0.004/0.75",
+        "selected_learned": "elastic_net:soil:residual:0.75:0.004/0.75",
+        "test_blocks": [
+          "18:-46",
+          "21:-46",
+          "22:-47"
+        ],
+        "test_sites": [
+          "SCAN:2002:MN:SCAN",
+          "SCAN:2196:WI:SCAN",
+          "SCAN:2226:MO:SCAN",
+          "SCAN:2230:MO:SCAN",
+          "SCAN:2231:MO:SCAN",
+          "USCRN:23909"
+        ]
+      },
+      {
+        "fit_sites": [
+          "SCAN:2002:MN:SCAN",
+          "SCAN:2047:MO:SCAN",
+          "SCAN:2050:MN:SCAN",
+          "SCAN:2060:MO:SCAN",
+          "SCAN:2061:MO:SCAN",
+          "SCAN:2092:KS:SCAN",
+          "SCAN:2093:KS:SCAN",
+          "SCAN:2094:KS:SCAN",
+          "SCAN:2111:NE:SCAN",
+          "SCAN:2147:KS:SCAN",
+          "SCAN:2194:MO:SCAN",
+          "SCAN:2196:WI:SCAN",
+          "SCAN:2220:MO:SCAN",
+          "SCAN:2225:MO:SCAN",
+          "SCAN:2226:MO:SCAN",
+          "SCAN:2227:MO:SCAN",
+          "SCAN:2230:MO:SCAN",
+          "SCAN:2231:MO:SCAN",
+          "USCRN:04994",
+          "USCRN:23909",
+          "USCRN:53974",
+          "USCRN:54902",
+          "USCRN:54903"
+        ],
+        "metrics": {
+          "bias": 0.012003772116842237,
+          "mae": 0.05532774903411074,
+          "rmse": 0.07151731774775329
+        },
+        "selected": "boosted_trees:all:direct:1:7/25/2.0",
+        "selected_learned": "boosted_trees:all:direct:1:7/25/2.0",
+        "test_blocks": [
+          "18:-45",
+          "20:-45",
+          "21:-48",
+          "22:-45"
+        ],
+        "test_sites": [
+          "SCAN:2003:WI:SCAN",
+          "SCAN:2004:IL:SCAN",
+          "SCAN:2048:MO:SCAN",
+          "SCAN:2068:IA:SCAN",
+          "USCRN:54808",
+          "USCRN:54811"
+        ]
+      },
+      {
+        "fit_sites": [
+          "SCAN:2002:MN:SCAN",
+          "SCAN:2003:WI:SCAN",
+          "SCAN:2004:IL:SCAN",
+          "SCAN:2047:MO:SCAN",
+          "SCAN:2048:MO:SCAN",
+          "SCAN:2050:MN:SCAN",
+          "SCAN:2060:MO:SCAN",
+          "SCAN:2061:MO:SCAN",
+          "SCAN:2068:IA:SCAN",
+          "SCAN:2092:KS:SCAN",
+          "SCAN:2094:KS:SCAN",
+          "SCAN:2111:NE:SCAN",
+          "SCAN:2147:KS:SCAN",
+          "SCAN:2194:MO:SCAN",
+          "SCAN:2196:WI:SCAN",
+          "SCAN:2226:MO:SCAN",
+          "SCAN:2230:MO:SCAN",
+          "SCAN:2231:MO:SCAN",
+          "USCRN:23909",
+          "USCRN:53974",
+          "USCRN:54808",
+          "USCRN:54811",
+          "USCRN:54902"
+        ],
+        "metrics": {
+          "bias": -0.010038902025600423,
+          "mae": 0.09138856616974414,
+          "rmse": 0.10678585109678672
+        },
+        "selected": "ridge:soil:residual:1:4",
+        "selected_learned": "ridge:soil:residual:1:4",
+        "test_blocks": [
+          "19:-46",
+          "19:-50",
+          "22:-46",
+          "24:-48"
+        ],
+        "test_sites": [
+          "SCAN:2093:KS:SCAN",
+          "SCAN:2220:MO:SCAN",
+          "SCAN:2225:MO:SCAN",
+          "SCAN:2227:MO:SCAN",
+          "USCRN:04994",
+          "USCRN:54903"
+        ]
+      },
+      {
+        "fit_sites": [
+          "SCAN:2002:MN:SCAN",
+          "SCAN:2003:WI:SCAN",
+          "SCAN:2004:IL:SCAN",
+          "SCAN:2047:MO:SCAN",
+          "SCAN:2048:MO:SCAN",
+          "SCAN:2061:MO:SCAN",
+          "SCAN:2068:IA:SCAN",
+          "SCAN:2092:KS:SCAN",
+          "SCAN:2093:KS:SCAN",
+          "SCAN:2147:KS:SCAN",
+          "SCAN:2196:WI:SCAN",
+          "SCAN:2220:MO:SCAN",
+          "SCAN:2225:MO:SCAN",
+          "SCAN:2226:MO:SCAN",
+          "SCAN:2227:MO:SCAN",
+          "SCAN:2230:MO:SCAN",
+          "SCAN:2231:MO:SCAN",
+          "USCRN:04994",
+          "USCRN:23909",
+          "USCRN:54808",
+          "USCRN:54811",
+          "USCRN:54902",
+          "USCRN:54903"
+        ],
+        "metrics": {
+          "bias": 0.00841872401474117,
+          "mae": 0.0852148029546072,
+          "rmse": 0.10727021703763687
+        },
+        "selected": "ridge:all_without_fluxes:residual:0.5:40",
+        "selected_learned": "ridge:all_without_fluxes:residual:0.5:40",
+        "test_blocks": [
+          "18:-47",
+          "19:-49",
+          "20:-51",
+          "23:-49"
+        ],
+        "test_sites": [
+          "SCAN:2050:MN:SCAN",
+          "SCAN:2060:MO:SCAN",
+          "SCAN:2094:KS:SCAN",
+          "SCAN:2111:NE:SCAN",
+          "SCAN:2194:MO:SCAN",
+          "USCRN:53974"
+        ]
+      },
+      {
+        "fit_sites": [
+          "SCAN:2002:MN:SCAN",
+          "SCAN:2003:WI:SCAN",
+          "SCAN:2004:IL:SCAN",
+          "SCAN:2048:MO:SCAN",
+          "SCAN:2050:MN:SCAN",
+          "SCAN:2060:MO:SCAN",
+          "SCAN:2068:IA:SCAN",
+          "SCAN:2093:KS:SCAN",
+          "SCAN:2094:KS:SCAN",
+          "SCAN:2111:NE:SCAN",
+          "SCAN:2194:MO:SCAN",
+          "SCAN:2196:WI:SCAN",
+          "SCAN:2220:MO:SCAN",
+          "SCAN:2225:MO:SCAN",
+          "SCAN:2226:MO:SCAN",
+          "SCAN:2227:MO:SCAN",
+          "SCAN:2230:MO:SCAN",
+          "SCAN:2231:MO:SCAN",
+          "USCRN:04994",
+          "USCRN:23909",
+          "USCRN:53974",
+          "USCRN:54808",
+          "USCRN:54811",
+          "USCRN:54903"
+        ],
+        "metrics": {
+          "bias": 0.04737411773818655,
+          "mae": 0.08703015023193518,
+          "rmse": 0.10871249204737073
+        },
+        "selected": "boosted_trees:all:direct:1:7/25/2.0",
+        "selected_learned": "boosted_trees:all:direct:1:7/25/2.0",
+        "test_blocks": [
+          "18:-49",
+          "19:-48",
+          "20:-47"
+        ],
+        "test_sites": [
+          "SCAN:2047:MO:SCAN",
+          "SCAN:2061:MO:SCAN",
+          "SCAN:2092:KS:SCAN",
+          "SCAN:2147:KS:SCAN",
+          "USCRN:54902"
+        ]
+      }
+    ],
+    "pairs": 4053,
+    "persistence": {
+      "bias": 0.022033069742461775,
+      "mae": 0.10805193049948128,
+      "rmse": 0.13421757402061765
+    },
+    "prior_ridge": {
+      "bias": 0.015031308298652324,
+      "mae": 0.09680305160126267,
+      "rmse": 0.11892243408097324
+    },
+    "selected_procedure": {
+      "bias": 0.01640610106402878,
+      "mae": 0.07843938758668893,
+      "rmse": 0.09686659110294277
+    },
+    "sites": 29
+  },
+  "non_nested_ablation": {
+    "all": {
+      "best": "ridge:all:residual:1:400",
+      "bias": -0.0007212296530045993,
+      "mae": 0.0681405354365435,
+      "rmse": 0.08409956155967449
+    },
+    "all_without_fluxes": {
+      "best": "ridge:all_without_fluxes:residual:1:400",
+      "bias": -0.0009249796906540613,
+      "mae": 0.0688602860698237,
+      "rmse": 0.08475564074310805
+    },
+    "all_without_layers": {
+      "best": "ridge:all_without_layers:residual:1:400",
+      "bias": -0.0007813250616162871,
+      "mae": 0.06844659766657424,
+      "rmse": 0.08434895173707686
+    },
+    "dynamic": {
+      "best": "boosted_trees:dynamic:direct:1:7/25/2.0",
+      "bias": 0.0027443382072358806,
+      "mae": 0.08853084239210599,
+      "rmse": 0.10925974749816172
+    },
+    "fluxes": {
+      "best": "boosted_trees:fluxes:residual:0.75:7/25/2.0",
+      "bias": 0.009782577287337535,
+      "mae": 0.08989816717586044,
+      "rmse": 0.11187574383465719
+    },
+    "layers": {
+      "best": "boosted_trees:layers:residual:0.75:15/50/1.0",
+      "bias": 0.009641703809078025,
+      "mae": 0.08989918052409962,
+      "rmse": 0.11227146481569365
+    },
+    "soil": {
+      "best": "ridge:soil:residual:1:40",
+      "bias": -0.0011259549041342284,
+      "mae": 0.06889616981217749,
+      "rmse": 0.08495214617944132
+    },
+    "v1": {
+      "best": "boosted_trees:v1:direct:1:7/25/2.0",
+      "bias": 0.0034969088724116004,
+      "mae": 0.08843943454623446,
+      "rmse": 0.1096522641198036
+    }
+  },
+  "operational_cycle": "50R1",
+  "post_upgrade_diagnostic": {
+    "all_research_probes": {
+      "by_lead": {
+        "1": {
+          "metrics": {
+            "ifs:v1:residual:1": {
+              "bias": -0.09869327272727273,
+              "mae": 0.09869327272727273,
+              "rmse": 0.11070049799510226
+            },
+            "persistence:v1:residual:1": {
+              "bias": -0.08332963636363637,
+              "mae": 0.08352654545454546,
+              "rmse": 0.09937321608233003
+            },
+            "ridge:all_without_fluxes:residual:1:400": {
+              "bias": -0.053327711165702875,
+              "interval_coverage": 0.9090909090909091,
+              "mae": 0.06885126977057077,
+              "rmse": 0.07838472488297339
+            },
+            "ridge:v1:residual:0.5:40": {
+              "bias": -0.115032459002401,
+              "interval_coverage": 0.45454545454545453,
+              "mae": 0.115032459002401,
+              "rmse": 0.1259865902671972
+            }
+          },
+          "pairs": 11
+        },
+        "2": {
+          "metrics": {
+            "ifs:v1:residual:1": {
+              "bias": -0.11007945454545452,
+              "mae": 0.11739763636363634,
+              "rmse": 0.12907182252529018
+            },
+            "persistence:v1:residual:1": {
+              "bias": -0.0986249090909091,
+              "mae": 0.10030672727272728,
+              "rmse": 0.1152831782532986
+            },
+            "ridge:all_without_fluxes:residual:1:400": {
+              "bias": -0.0710236568614639,
+              "interval_coverage": 0.9090909090909091,
+              "mae": 0.0807636139304544,
+              "rmse": 0.09586102293515629
+            },
+            "ridge:v1:residual:0.5:40": {
+              "bias": -0.1273780941981476,
+              "interval_coverage": 0.36363636363636365,
+              "mae": 0.1273780941981476,
+              "rmse": 0.14011341331549007
+            }
+          },
+          "pairs": 11
+        },
+        "3": {
+          "metrics": {
+            "ifs:v1:residual:1": {
+              "bias": -0.1102349090909091,
+              "mae": 0.1102349090909091,
+              "rmse": 0.12665552579626074
+            },
+            "persistence:v1:residual:1": {
+              "bias": -0.10978036363636362,
+              "mae": 0.10978036363636362,
+              "rmse": 0.1260393525711135
+            },
+            "ridge:all_without_fluxes:residual:1:400": {
+              "bias": -0.07939691900591755,
+              "interval_coverage": 0.8181818181818182,
+              "mae": 0.08392845690921887,
+              "rmse": 0.10037167887303279
+            },
+            "ridge:v1:residual:0.5:40": {
+              "bias": -0.1297659691066736,
+              "interval_coverage": 0.45454545454545453,
+              "mae": 0.1297659691066736,
+              "rmse": 0.13960903240768904
+            }
+          },
+          "pairs": 11
+        },
+        "4": {
+          "metrics": {
+            "ifs:v1:residual:1": {
+              "bias": -0.10200754545454543,
+              "mae": 0.10289390909090908,
+              "rmse": 0.1218359814724847
+            },
+            "persistence:v1:residual:1": {
+              "bias": -0.10518936363636365,
+              "mae": 0.10518936363636365,
+              "rmse": 0.12595754630935269
+            },
+            "ridge:all_without_fluxes:residual:1:400": {
+              "bias": -0.07250331435074964,
+              "interval_coverage": 0.8181818181818182,
+              "mae": 0.07782248116424237,
+              "rmse": 0.09748256391441866
+            },
+            "ridge:v1:residual:0.5:40": {
+              "bias": -0.12366737055930624,
+              "interval_coverage": 0.45454545454545453,
+              "mae": 0.12366737055930624,
+              "rmse": 0.13609830092706762
+            }
+          },
+          "pairs": 11
+        },
+        "5": {
+          "metrics": {
+            "ifs:v1:residual:1": {
+              "bias": -0.09242427272727273,
+              "mae": 0.09242427272727273,
+              "rmse": 0.11196283340100775
+            },
+            "persistence:v1:residual:1": {
+              "bias": -0.09551518181818182,
+              "mae": 0.0976060909090909,
+              "rmse": 0.1158297342477703
+            },
+            "ridge:all_without_fluxes:residual:1:400": {
+              "bias": -0.06237196760067227,
+              "interval_coverage": 0.8181818181818182,
+              "mae": 0.07096659966214153,
+              "rmse": 0.08856147258810113
+            },
+            "ridge:v1:residual:0.5:40": {
+              "bias": -0.11363248684845108,
+              "interval_coverage": 0.6363636363636364,
+              "mae": 0.11363248684845108,
+              "rmse": 0.12712548175024602
+            }
+          },
+          "pairs": 11
+        }
+      },
+      "by_station": {
+        "USCRN:13301": {
+          "metrics": {
+            "ifs:v1:residual:1": {
+              "bias": -0.1026878909090909,
+              "mae": 0.1043288,
+              "rmse": 0.12027920874834219
+            },
+            "persistence:v1:residual:1": {
+              "bias": -0.09848789090909094,
+              "mae": 0.0992818181818182,
+              "rmse": 0.11690423128993625
+            },
+            "ridge:all_without_fluxes:residual:1:400": {
+              "bias": -0.06772471379690125,
+              "interval_coverage": 0.8545454545454545,
+              "mae": 0.07646648428732558,
+              "rmse": 0.09247049197148992
+            },
+            "ridge:v1:residual:0.5:40": {
+              "bias": -0.12189527594299591,
+              "interval_coverage": 0.4727272727272727,
+              "mae": 0.12189527594299591,
+              "rmse": 0.13392438693034958
+            }
+          },
+          "nearest_fitting_km": 64.30913068139675,
+          "pairs": 55
+        }
+      },
+      "metrics": {
+        "ifs:v1:residual:1": {
+          "bias": -0.1026878909090909,
+          "mae": 0.1043288,
+          "rmse": 0.12027920874834219
+        },
+        "persistence:v1:residual:1": {
+          "bias": -0.09848789090909094,
+          "mae": 0.0992818181818182,
+          "rmse": 0.11690423128993625
+        },
+        "ridge:all_without_fluxes:residual:1:400": {
+          "bias": -0.06772471379690125,
+          "interval_coverage": 0.8545454545454545,
+          "mae": 0.07646648428732558,
+          "rmse": 0.09247049197148992
+        },
+        "ridge:v1:residual:0.5:40": {
+          "bias": -0.12189527594299591,
+          "interval_coverage": 0.4727272727272727,
+          "mae": 0.12189527594299591,
+          "rmse": 0.13392438693034958
+        }
+      },
+      "pairs": 55,
+      "stations": 1
+    },
+    "cycle": "50R1",
+    "forecast_verification_sites_with_survey": [
+      "USCRN:13301"
+    ],
+    "observations": {
+      "csv_sha256": "2f1c0745b57e3b31780a0af6b1b3852394d6d8e9267e58d9768f3e7d0d88dda3",
+      "protocol_sha256": "478639f1df64d297b54d39c26c0b14c38b3ba035735fe8af5bc81245013ebefe",
+      "source_sha256": {
+        "https://wcc.sc.egov.usda.gov/awdbRestApi/services/v1/data?stationTriplets=2195%3AMO%3ASCAN&elements=SMS%3A-2%3A1&duration=HOURLY&beginDate=2026-05-18&endDate=2026-11-01&returnFlags=true&returnSuspectData=false": "fc16d2f4d16cf49bc34d5ab110a1f01d8acd05969baa07fa49543f02f655b603",
+        "https://www.ncei.noaa.gov/pub/data/uscrn/products/hourly02/2026/CRNH0203-2026-KY_Bowling_Green_21_NNE.txt": "9f7a39421ef85c08c90c6ccea0f6375786d616cf544645220d85a85fdf4e187e",
+        "https://www.ncei.noaa.gov/pub/data/uscrn/products/hourly02/2026/CRNH0203-2026-KY_Versailles_3_NNW.txt": "0c887ff2bdcdd22201fef3839ff4398d984872b1c47d2dd3947c130202bb79eb",
+        "https://www.ncei.noaa.gov/pub/data/uscrn/products/hourly02/2026/CRNH0203-2026-MO_Chillicothe_22_ENE.txt": "0bd5ecb4f6d3841697277d2ba9cfc66d0b7260ffcccbaba3c22dc9ea442728d5",
+        "https://www.ncei.noaa.gov/pub/data/uscrn/products/hourly02/2026/CRNH0203-2026-ND_Jamestown_38_WSW.txt": "c5546033e64e45e5002a41ea4fa6b07a8714c175ea6f82778c8c7e87626af92d"
+      },
+      "usable_days": {
+        "SCAN:2195:MO:SCAN": 0,
+        "USCRN:13301": 166,
+        "USCRN:54937": 166,
+        "USCRN:63838": 56,
+        "USCRN:63849": 100
+      }
+    },
+    "qualified_in_support_probes": {
+      "by_lead": {
+        "1": {
+          "metrics": {
+            "ifs:v1:residual:1": {
+              "bias": -0.09869327272727273,
+              "mae": 0.09869327272727273,
+              "rmse": 0.11070049799510226
+            },
+            "persistence:v1:residual:1": {
+              "bias": -0.08332963636363637,
+              "mae": 0.08352654545454546,
+              "rmse": 0.09937321608233003
+            },
+            "ridge:all_without_fluxes:residual:1:400": {
+              "bias": -0.053327711165702875,
+              "interval_coverage": 0.9090909090909091,
+              "mae": 0.06885126977057077,
+              "rmse": 0.07838472488297339
+            },
+            "ridge:v1:residual:0.5:40": {
+              "bias": -0.115032459002401,
+              "interval_coverage": 0.45454545454545453,
+              "mae": 0.115032459002401,
+              "rmse": 0.1259865902671972
+            }
+          },
+          "pairs": 11
+        },
+        "2": {
+          "metrics": {
+            "ifs:v1:residual:1": {
+              "bias": -0.11007945454545452,
+              "mae": 0.11739763636363634,
+              "rmse": 0.12907182252529018
+            },
+            "persistence:v1:residual:1": {
+              "bias": -0.0986249090909091,
+              "mae": 0.10030672727272728,
+              "rmse": 0.1152831782532986
+            },
+            "ridge:all_without_fluxes:residual:1:400": {
+              "bias": -0.0710236568614639,
+              "interval_coverage": 0.9090909090909091,
+              "mae": 0.0807636139304544,
+              "rmse": 0.09586102293515629
+            },
+            "ridge:v1:residual:0.5:40": {
+              "bias": -0.1273780941981476,
+              "interval_coverage": 0.36363636363636365,
+              "mae": 0.1273780941981476,
+              "rmse": 0.14011341331549007
+            }
+          },
+          "pairs": 11
+        },
+        "3": {
+          "metrics": {
+            "ifs:v1:residual:1": {
+              "bias": -0.1102349090909091,
+              "mae": 0.1102349090909091,
+              "rmse": 0.12665552579626074
+            },
+            "persistence:v1:residual:1": {
+              "bias": -0.10978036363636362,
+              "mae": 0.10978036363636362,
+              "rmse": 0.1260393525711135
+            },
+            "ridge:all_without_fluxes:residual:1:400": {
+              "bias": -0.07939691900591755,
+              "interval_coverage": 0.8181818181818182,
+              "mae": 0.08392845690921887,
+              "rmse": 0.10037167887303279
+            },
+            "ridge:v1:residual:0.5:40": {
+              "bias": -0.1297659691066736,
+              "interval_coverage": 0.45454545454545453,
+              "mae": 0.1297659691066736,
+              "rmse": 0.13960903240768904
+            }
+          },
+          "pairs": 11
+        },
+        "4": {
+          "metrics": {
+            "ifs:v1:residual:1": {
+              "bias": -0.10200754545454543,
+              "mae": 0.10289390909090908,
+              "rmse": 0.1218359814724847
+            },
+            "persistence:v1:residual:1": {
+              "bias": -0.10518936363636365,
+              "mae": 0.10518936363636365,
+              "rmse": 0.12595754630935269
+            },
+            "ridge:all_without_fluxes:residual:1:400": {
+              "bias": -0.07250331435074964,
+              "interval_coverage": 0.8181818181818182,
+              "mae": 0.07782248116424237,
+              "rmse": 0.09748256391441866
+            },
+            "ridge:v1:residual:0.5:40": {
+              "bias": -0.12366737055930624,
+              "interval_coverage": 0.45454545454545453,
+              "mae": 0.12366737055930624,
+              "rmse": 0.13609830092706762
+            }
+          },
+          "pairs": 11
+        },
+        "5": {
+          "metrics": {
+            "ifs:v1:residual:1": {
+              "bias": -0.09242427272727273,
+              "mae": 0.09242427272727273,
+              "rmse": 0.11196283340100775
+            },
+            "persistence:v1:residual:1": {
+              "bias": -0.09551518181818182,
+              "mae": 0.0976060909090909,
+              "rmse": 0.1158297342477703
+            },
+            "ridge:all_without_fluxes:residual:1:400": {
+              "bias": -0.06237196760067227,
+              "interval_coverage": 0.8181818181818182,
+              "mae": 0.07096659966214153,
+              "rmse": 0.08856147258810113
+            },
+            "ridge:v1:residual:0.5:40": {
+              "bias": -0.11363248684845108,
+              "interval_coverage": 0.6363636363636364,
+              "mae": 0.11363248684845108,
+              "rmse": 0.12712548175024602
+            }
+          },
+          "pairs": 11
+        }
+      },
+      "by_station": {
+        "USCRN:13301": {
+          "metrics": {
+            "ifs:v1:residual:1": {
+              "bias": -0.1026878909090909,
+              "mae": 0.1043288,
+              "rmse": 0.12027920874834219
+            },
+            "persistence:v1:residual:1": {
+              "bias": -0.09848789090909094,
+              "mae": 0.0992818181818182,
+              "rmse": 0.11690423128993625
+            },
+            "ridge:all_without_fluxes:residual:1:400": {
+              "bias": -0.06772471379690125,
+              "interval_coverage": 0.8545454545454545,
+              "mae": 0.07646648428732558,
+              "rmse": 0.09247049197148992
+            },
+            "ridge:v1:residual:0.5:40": {
+              "bias": -0.12189527594299591,
+              "interval_coverage": 0.4727272727272727,
+              "mae": 0.12189527594299591,
+              "rmse": 0.13392438693034958
+            }
+          },
+          "nearest_fitting_km": 64.30913068139675,
+          "pairs": 55
+        }
+      },
+      "metrics": {
+        "ifs:v1:residual:1": {
+          "bias": -0.1026878909090909,
+          "mae": 0.1043288,
+          "rmse": 0.12027920874834219
+        },
+        "persistence:v1:residual:1": {
+          "bias": -0.09848789090909094,
+          "mae": 0.0992818181818182,
+          "rmse": 0.11690423128993625
+        },
+        "ridge:all_without_fluxes:residual:1:400": {
+          "bias": -0.06772471379690125,
+          "interval_coverage": 0.8545454545454545,
+          "mae": 0.07646648428732558,
+          "rmse": 0.09247049197148992
+        },
+        "ridge:v1:residual:0.5:40": {
+          "bias": -0.12189527594299591,
+          "interval_coverage": 0.4727272727272727,
+          "mae": 0.12189527594299591,
+          "rmse": 0.13392438693034958
+        }
+      },
+      "pairs": 55,
+      "stations": 1
+    },
+    "verified_managed_farms_in_support": [],
+    "weather_issues": {
+      "USCRN:13301": {
+        "available": 11,
+        "expected": 24
+      },
+      "USCRN:54937": {
+        "available": 0,
+        "expected": 24
+      },
+      "USCRN:63838": {
+        "available": 0,
+        "expected": 24
+      },
+      "USCRN:63849": {
+        "available": 0,
+        "expected": 24
+      }
+    },
+    "weather_sources_sha256": {
+      "1ca16a3d1a738ed0293c6e9101930e36a425b1d9c63a930126a37b098148d797": "cd6c3f63f6a0f2ea7fd72caa33f58014f479c367e9b47d2dec65c53275c6c862",
+      "276c1a6bf39ba758fab1a5e78fc3227b98cdea5698eb5b9af60597b3b5e47389": "fc2bacafb3fe14a6b9c5edcc1da646bfff9a3a47572c4cbd41e54f1519f18bfc",
+      "6d8e85d5ce9ae2400670ebdb00776d07389a172a2b9e41b4a1fcf511d0cbd861": "299f74307d00d553dc2e019663f9e7e39bf5240e80833ca97bdd618516bf91c8",
+      "788e63168d9c4ef55f8c671a5bdb2d1df59739e1f80973a4c1707f4fa4a76a72": "69487eed342f964819903f5c368778414863f09b201a1c895f59c0ba5be082ab",
+      "7b645cdde6ef22f0ea66842e14ecf4c9b312c96f79ee5a8b2e106bee9944ed08": "b7aafc08d7717e986864dd4989df61d7f608a992cc144ee43c40675d7ea5f517",
+      "82e9bd54f36758f7bd637f5eeddbb107b61663ded3a2d0dd237180698acfce28": "05d2b5f89ed2d4d7cb742e038cacb7dd5a8c4057cae1f01a68dc536c272927fe",
+      "c00b17418447c39221cef6d49f1da714909f03071abf7e0772446fb3321402c2": "a4ff968349f6539227b72080a519c79442c59acf8401458faf972b353f65b04b",
+      "c6d55ba93ae9f09e1c5b5b5f851bfa6a4b8ff8a6a7c608c85517286f39437b77": "77bb9c4499b9535c5e69a0db96262cb8326a75d6fe6bfab07e2b70d0a3a960d4",
+      "e7447a8d4294e2db116f1868a560422e8718e9bba56afa0f560c4325dc960612": "2432e5933031e5973606a1368d8d13d51feb47d42b1d962acfaf86368f17751e",
+      "eac19dca74f31172da81a2a107113f8d22ef6dbd8df7a9867547ba1a52768ddf": "68beb9b6f90d3f735b452c47045e874fa0442120bc59761cdc63414564591683",
+      "ed750f5c5ee4fab52270b4f97041ef1d72dfd6f52c23dea25f80d970df7b5ee7": "610615680a1133792f9308039511b3361bfb97d86c07a193286ac550f672370f"
+    }
+  },
+  "previously_scored_ifc": {
+    "by_lead": {
+      "1": {
+        "metrics": {
+          "ifs:v1:residual:1": {
+            "bias": -0.05051038010752688,
+            "mae": 0.08235039103942654,
+            "rmse": 0.10413033525316898
+          },
+          "persistence:v1:residual:1": {
+            "bias": -0.05409756648745519,
+            "mae": 0.08253061102150538,
+            "rmse": 0.10340387277464029
+          },
+          "ridge:all_without_fluxes:residual:1:400": {
+            "bias": 0.007323346548415286,
+            "interval_coverage": 0.9233870967741936,
+            "mae": 0.0632481489038369,
+            "rmse": 0.07931993366153553
+          },
+          "ridge:v1:residual:0.5:40": {
+            "bias": -0.05574437622789229,
+            "interval_coverage": 0.8130376344086022,
+            "mae": 0.07914120149975178,
+            "rmse": 0.09724334985032376
+          }
+        },
+        "pairs": 204
+      },
+      "2": {
+        "metrics": {
+          "ifs:v1:residual:1": {
+            "bias": -0.04807357380756579,
+            "mae": 0.08300527117598686,
+            "rmse": 0.10538105882474938
+          },
+          "persistence:v1:residual:1": {
+            "bias": -0.05582583532072369,
+            "mae": 0.08287878885690789,
+            "rmse": 0.10573249193002368
+          },
+          "ridge:all_without_fluxes:residual:1:400": {
+            "bias": 0.0028958609821057245,
+            "interval_coverage": 0.9140625,
+            "mae": 0.06266278193484144,
+            "rmse": 0.07843409754392794
+          },
+          "ridge:v1:residual:0.5:40": {
+            "bias": -0.057424252891058174,
+            "interval_coverage": 0.8125,
+            "mae": 0.07971496198959974,
+            "rmse": 0.09790930112035258
+          }
+        },
+        "pairs": 212
+      },
+      "3": {
+        "metrics": {
+          "ifs:v1:residual:1": {
+            "bias": -0.04102723825187969,
+            "mae": 0.07918428195488719,
+            "rmse": 0.10411235556189352
+          },
+          "persistence:v1:residual:1": {
+            "bias": -0.051499042763157886,
+            "mae": 0.08578913486842103,
+            "rmse": 0.10894681794493401
+          },
+          "ridge:all_without_fluxes:residual:1:400": {
+            "bias": 0.00392068064361248,
+            "interval_coverage": 0.9017857142857143,
+            "mae": 0.07084605877827571,
+            "rmse": 0.08444132361880406
+          },
+          "ridge:v1:residual:0.5:40": {
+            "bias": -0.05195176635310856,
+            "interval_coverage": 0.8139097744360902,
+            "mae": 0.07809455035190711,
+            "rmse": 0.09754976315504008
+          }
+        },
+        "pairs": 211
+      },
+      "4": {
+        "metrics": {
+          "ifs:v1:residual:1": {
+            "bias": -0.03935614826127818,
+            "mae": 0.08119889027255636,
+            "rmse": 0.10586388014497163
+          },
+          "persistence:v1:residual:1": {
+            "bias": -0.04783523660714284,
+            "mae": 0.08417413416353382,
+            "rmse": 0.10749309933913491
+          },
+          "ridge:all_without_fluxes:residual:1:400": {
+            "bias": 0.005581587278767642,
+            "interval_coverage": 0.9107142857142857,
+            "mae": 0.07102752117062529,
+            "rmse": 0.0853265201181301
+          },
+          "ridge:v1:residual:0.5:40": {
+            "bias": -0.04978209088017587,
+            "interval_coverage": 0.7857142857142856,
+            "mae": 0.07903499381080874,
+            "rmse": 0.09825220136468084
+          }
+        },
+        "pairs": 211
+      },
+      "5": {
+        "metrics": {
+          "ifs:v1:residual:1": {
+            "bias": -0.042041562234719866,
+            "mae": 0.08294217484992722,
+            "rmse": 0.10753809572581943
+          },
+          "persistence:v1:residual:1": {
+            "bias": -0.045826692904135345,
+            "mae": 0.08462961674599806,
+            "rmse": 0.10805316389457163
+          },
+          "ridge:all_without_fluxes:residual:1:400": {
+            "bias": 0.004980775759559266,
+            "interval_coverage": 0.8745679723502305,
+            "mae": 0.07362718441182796,
+            "rmse": 0.08919400631933157
+          },
+          "ridge:v1:residual:0.5:40": {
+            "bias": -0.050556205366727745,
+            "interval_coverage": 0.8287730414746545,
+            "mae": 0.08031882997062781,
+            "rmse": 0.10070556190967894
+          }
+        },
+        "pairs": 210
+      }
+    },
+    "by_station": {
+      "IFC:CCO02": {
+        "metrics": {
+          "ifs:v1:residual:1": {
+            "bias": -0.031417188679245284,
+            "mae": 0.07303015723270441,
+            "rmse": 0.09662734773725216
+          },
+          "persistence:v1:residual:1": {
+            "bias": -0.04443605660377358,
+            "mae": 0.0748735534591195,
+            "rmse": 0.0950242164628767
+          },
+          "ridge:all_without_fluxes:residual:1:400": {
+            "bias": 0.007650129319492962,
+            "interval_coverage": 0.89937106918239,
+            "mae": 0.05768590136689189,
+            "rmse": 0.07391173475751767
+          },
+          "ridge:v1:residual:0.5:40": {
+            "bias": -0.042145195952138774,
+            "interval_coverage": 0.8238993710691824,
+            "mae": 0.07070260416776464,
+            "rmse": 0.08780874803291405
+          }
+        },
+        "nearest_fitting_km": 113.09363707132363,
+        "pairs": 159
+      },
+      "IFC:HS0002": {
+        "metrics": {
+          "ifs:v1:residual:1": {
+            "bias": -0.09374363694267515,
+            "mae": 0.10876409554140129,
+            "rmse": 0.1400533021885496
+          },
+          "persistence:v1:residual:1": {
+            "bias": -0.09417675796178344,
+            "mae": 0.11194296178343949,
+            "rmse": 0.1491309367458058
+          },
+          "ridge:all_without_fluxes:residual:1:400": {
+            "bias": -0.004318133488324548,
+            "interval_coverage": 0.9426751592356688,
+            "mae": 0.0691797671606065,
+            "rmse": 0.08049452117306835
+          },
+          "ridge:v1:residual:0.5:40": {
+            "bias": -0.09516469426693921,
+            "interval_coverage": 0.6560509554140127,
+            "mae": 0.1005459528993693,
+            "rmse": 0.1289845434746657
+          }
+        },
+        "nearest_fitting_km": 145.3729583401146,
+        "pairs": 157
+      },
+      "IFC:HS0011": {
+        "metrics": {
+          "ifs:v1:residual:1": {
+            "bias": -0.007050264150943397,
+            "mae": 0.06095094339622643,
+            "rmse": 0.07749628635070809
+          },
+          "persistence:v1:residual:1": {
+            "bias": -0.022547119496855346,
+            "mae": 0.07080567295597484,
+            "rmse": 0.08635382200141214
+          },
+          "ridge:all_without_fluxes:residual:1:400": {
+            "bias": 0.08588571265607284,
+            "interval_coverage": 0.779874213836478,
+            "mae": 0.09107697895303932,
+            "rmse": 0.11189396578619605
+          },
+          "ridge:v1:residual:0.5:40": {
+            "bias": -0.026690580500960365,
+            "interval_coverage": 0.9371069182389937,
+            "mae": 0.059823467895332785,
+            "rmse": 0.07297664140041638
+          }
+        },
+        "nearest_fitting_km": 73.31098127457228,
+        "pairs": 159
+      },
+      "IFC:MDDLCDR01": {
+        "metrics": {
+          "ifs:v1:residual:1": {
+            "bias": -0.08282666666666667,
+            "mae": 0.10951367295597486,
+            "rmse": 0.1347702621199751
+          },
+          "persistence:v1:residual:1": {
+            "bias": -0.09018515723270439,
+            "mae": 0.11257904402515721,
+            "rmse": 0.13505166034037427
+          },
+          "ridge:all_without_fluxes:residual:1:400": {
+            "bias": -0.044482963542879034,
+            "interval_coverage": 0.7484276729559748,
+            "mae": 0.09715074428178039,
+            "rmse": 0.10908471910683613
+          },
+          "ridge:v1:residual:0.5:40": {
+            "bias": -0.09512264063821951,
+            "interval_coverage": 0.5660377358490566,
+            "mae": 0.11583006451028759,
+            "rmse": 0.13604466055255462
+          }
+        },
+        "nearest_fitting_km": 94.27168222465019,
+        "pairs": 159
+      },
+      "IFC:NSHNBTNA04": {
+        "metrics": {
+          "ifs:v1:residual:1": {
+            "bias": -0.09429700000000002,
+            "mae": 0.09429700000000002,
+            "rmse": 0.09432035840686784
+          },
+          "persistence:v1:residual:1": {
+            "bias": -0.079297,
+            "mae": 0.079297,
+            "rmse": 0.07935004732197708
+          },
+          "ridge:all_without_fluxes:residual:1:400": {
+            "bias": 0.010638311799735678,
+            "interval_coverage": 1.0,
+            "mae": 0.010638311799735678,
+            "rmse": 0.01135256203032364
+          },
+          "ridge:v1:residual:0.5:40": {
+            "bias": -0.08390540692016775,
+            "interval_coverage": 1.0,
+            "mae": 0.08390540692016775,
+            "rmse": 0.08399983686730501
+          }
+        },
+        "nearest_fitting_km": 98.20498503842508,
+        "pairs": 2
+      },
+      "IFC:RACCOON03": {
+        "metrics": {
+          "ifs:v1:residual:1": {
+            "bias": -0.0655720566037736,
+            "mae": 0.08151230817610064,
+            "rmse": 0.10392840195586878
+          },
+          "persistence:v1:residual:1": {
+            "bias": -0.08413180503144654,
+            "mae": 0.08781985534591195,
+            "rmse": 0.10980319944024612
+          },
+          "ridge:all_without_fluxes:residual:1:400": {
+            "bias": -0.0085262918597248,
+            "interval_coverage": 0.9874213836477987,
+            "mae": 0.05113288719220406,
+            "rmse": 0.059685770339938736
+          },
+          "ridge:v1:residual:0.5:40": {
+            "bias": -0.07047590362823922,
+            "interval_coverage": 0.7547169811320755,
+            "mae": 0.07767210132318209,
+            "rmse": 0.09543121348674759
+          }
+        },
+        "nearest_fitting_km": 58.514716938415816,
+        "pairs": 159
+      },
+      "IFC:RACCOON04": {
+        "metrics": {
+          "ifs:v1:residual:1": {
+            "bias": 0.027633062893081758,
+            "mae": 0.08147310062893082,
+            "rmse": 0.10191312610402842
+          },
+          "persistence:v1:residual:1": {
+            "bias": 0.012456962264150943,
+            "mae": 0.07274063522012579,
+            "rmse": 0.08921176433036791
+          },
+          "ridge:all_without_fluxes:residual:1:400": {
+            "bias": 0.03927580680819773,
+            "interval_coverage": 0.9433962264150944,
+            "mae": 0.07299230348470574,
+            "rmse": 0.08377885866184885
+          },
+          "ridge:v1:residual:0.5:40": {
+            "bias": 0.015416347210930948,
+            "interval_coverage": 0.8742138364779874,
+            "mae": 0.06979541815790904,
+            "rmse": 0.0852397431306526
+          }
+        },
+        "nearest_fitting_km": 88.36856655388917,
+        "pairs": 159
+      },
+      "IFC:UPPRIOWA01": {
+        "metrics": {
+          "ifs:v1:residual:1": {
+            "bias": -0.038242989361702125,
+            "mae": 0.05222064893617021,
+            "rmse": 0.06551112011687853
+          },
+          "persistence:v1:residual:1": {
+            "bias": -0.024328095744680856,
+            "mae": 0.05866571276595746,
+            "rmse": 0.06822139605904207
+          },
+          "ridge:all_without_fluxes:residual:1:400": {
+            "bias": -0.04318475711099819,
+            "interval_coverage": 1.0,
+            "mae": 0.05972599686438246,
+            "rmse": 0.06505181253651915
+          },
+          "ridge:v1:residual:0.5:40": {
+            "bias": -0.04646450602710423,
+            "interval_coverage": 0.9893617021276596,
+            "mae": 0.05863285044124468,
+            "rmse": 0.06412453318913923
+          }
+        },
+        "nearest_fitting_km": 144.85251178053454,
+        "pairs": 94
+      }
+    },
+    "metrics": {
+      "ifs:v1:residual:1": {
+        "bias": -0.04818959243899056,
+        "mae": 0.08272024085843858,
+        "rmse": 0.10458005582390884
+      },
+      "persistence:v1:residual:1": {
+        "bias": -0.053330628725886654,
+        "mae": 0.08359055444446077,
+        "rmse": 0.10484014136800418
+      },
+      "ridge:all_without_fluxes:residual:1:400": {
+        "bias": 0.005367226822696578,
+        "interval_coverage": 0.9126457156591755,
+        "mae": 0.06369786138791826,
+        "rmse": 0.08008117390687064
+      },
+      "ridge:v1:residual:0.5:40": {
+        "bias": -0.05556907259035476,
+        "interval_coverage": 0.825173437538621,
+        "mae": 0.07961348328940725,
+        "rmse": 0.09728950817560712
+      }
+    },
+    "pairs": 1048,
+    "stations": 8
+  },
+  "promoted": false,
+  "promotion_blocker": "The IFC comparison was previously scored on 49R1. The 50R1 research probes are not a verified managed-farm holdout.",
+  "schema_version": 1,
+  "seed": 1729,
+  "selected": "ridge:all_without_fluxes:residual:1:400",
+  "selected_learned": "ridge:all_without_fluxes:residual:1:400",
+  "sources_sha256": {
+    "development_ifs": "158af0236ba1dc7438bbcf32d06fdb4c995b2495753eb317900e3b6e8627a6c5",
+    "development_observations": "29212179c9a4b9e85f6b729a7a446a840752aec0cab1009ec42a1ed7e966b573",
+    "development_soil": "4c120fa91a6bae12815f5467299d2030286ec2f8664407f16f3c9eae658d327f",
+    "known_farm_ifs": "54963a34521bebce812d6a6d8800eac7ad91d1906547dbaf8db31cfb5ad3d6a0",
+    "known_farm_observations": "7b454419c0bd58b42c266ada1412dc158ce0fe10666033a5d56d209d74952d41",
+    "known_farm_soil": "860dbf3e2198dc67e46ebcb7be3c07e24cf66483485049b4d7c6148f8dbbce87",
+    "postcycle_soil": "1b3a9b355fd05aef8b0650baf5ab42c69d564b8c4a792e563578253ef6375789"
+  },
+  "target": "daily volumetric soil moisture around 5 cm in m\u00b3/m\u00b3",
+  "thread_limit": 1,
+  "versions": {
+    "numpy": "1.26.4",
+    "scikit_learn": "1.5.2"
+  }
+}

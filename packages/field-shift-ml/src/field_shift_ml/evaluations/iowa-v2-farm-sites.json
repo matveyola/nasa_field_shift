@@ -1,0 +1,67 @@
+{
+  "network": "Iowa Flood Center Hydrologic Monitoring Network",
+  "target_depth_cm": 5,
+  "start_date": "2025-01-01",
+  "end_date": "2025-12-31",
+  "site_selection": "All unique IFC sites at least 40 km from the v1 NOAA/SCAN input stations and IFC evaluation probes, whose exact coordinates intersect a 2025 USDA CDL corn or soybean pixel. Selection used location and land cover only.",
+  "cdl_url": "https://pdi.scinet.usda.gov/image/rest/services/CDL_WM/ImageServer",
+  "cdl_year": 2025,
+  "sites": [
+    {
+      "station_id": "IFC:CCO02",
+      "latitude": 41.741627,
+      "longitude": -91.9433,
+      "cdl_code": 5,
+      "nearest_v1_site_km": 113.09
+    },
+    {
+      "station_id": "IFC:HS0002",
+      "latitude": 41.28859,
+      "longitude": -91.571754,
+      "cdl_code": 5,
+      "nearest_v1_site_km": 145.37
+    },
+    {
+      "station_id": "IFC:HS0011",
+      "latitude": 42.209293,
+      "longitude": -93.275505,
+      "cdl_code": 1,
+      "nearest_v1_site_km": 43.33
+    },
+    {
+      "station_id": "IFC:MDDLCDR01",
+      "latitude": 42.3088,
+      "longitude": -92.7717,
+      "cdl_code": 1,
+      "nearest_v1_site_km": 85.52
+    },
+    {
+      "station_id": "IFC:NSHNBTNA04",
+      "latitude": 41.6374,
+      "longitude": -95.286,
+      "cdl_code": 1,
+      "nearest_v1_site_km": 70.67
+    },
+    {
+      "station_id": "IFC:RACCOON03",
+      "latitude": 42.649,
+      "longitude": -95.1096,
+      "cdl_code": 5,
+      "nearest_v1_site_km": 58.51
+    },
+    {
+      "station_id": "IFC:RACCOON04",
+      "latitude": 42.902664,
+      "longitude": -94.884415,
+      "cdl_code": 5,
+      "nearest_v1_site_km": 88.37
+    },
+    {
+      "station_id": "IFC:UPPRIOWA01",
+      "latitude": 43.3279,
+      "longitude": -91.9569,
+      "cdl_code": 1,
+      "nearest_v1_site_km": 43.26
+    }
+  ]
+}

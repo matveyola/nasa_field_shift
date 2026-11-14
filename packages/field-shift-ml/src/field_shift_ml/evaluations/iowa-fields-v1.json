@@ -1,0 +1,86 @@
+{
+  "end_date": "2025-12-31",
+  "model_version": "fieldshift-vwc-bb3c6d0539ec",
+  "observation_csv_sha256": "a7f8b1675ff7182d692950cdd5fc1fade0cfeb51af3eeeb8a0a58cb1556d1ad8",
+  "sites": [
+    {
+      "days": 246,
+      "era5_land": {
+        "bias": 0.07270050813008129,
+        "mae": 0.0727616544715447,
+        "rmse": 0.08079822002454105
+      },
+      "interval_coverage": 0.9959349593495935,
+      "latitude": 42.9502,
+      "location": "CROPCNTRL01",
+      "longitude": -91.8289,
+      "minimum_fit_or_calibration_distance_km": 120.40140948391478,
+      "model": {
+        "bias": -0.009916758220674437,
+        "mae": 0.038414798244277654,
+        "rmse": 0.04681557844833956
+      },
+      "shares_fit_or_calibration_block": true,
+      "station_count": 1,
+      "station_id": "IFC:CROPCNTRL01"
+    },
+    {
+      "days": 256,
+      "era5_land": {
+        "bias": -0.0150565,
+        "mae": 0.0472188671875,
+        "rmse": 0.06521871933851699
+      },
+      "interval_coverage": 0.6796875,
+      "latitude": 41.65148,
+      "location": "WILSONFRM01",
+      "longitude": -94.42888,
+      "minimum_fit_or_calibration_distance_km": 96.19322224382951,
+      "model": {
+        "bias": -0.09497473334686186,
+        "mae": 0.1048119238486937,
+        "rmse": 0.11889194503667551
+      },
+      "shares_fit_or_calibration_block": false,
+      "station_count": 1,
+      "station_id": "IFC:WILSONFRM01"
+    },
+    {
+      "days": 263,
+      "era5_land": {
+        "bias": -0.05087131939163498,
+        "mae": 0.05682473384030418,
+        "rmse": 0.07478437258143736
+      },
+      "interval_coverage": 0.4752851711026616,
+      "latitude": 41.63303,
+      "location": "WILSONFRM02",
+      "longitude": -94.43566,
+      "minimum_fit_or_calibration_distance_km": 96.54902505180804,
+      "model": {
+        "bias": -0.12960550588594547,
+        "mae": 0.12960550588594547,
+        "rmse": 0.14347786237031593
+      },
+      "shares_fit_or_calibration_block": false,
+      "station_count": 1,
+      "station_id": "IFC:WILSONFRM02"
+    }
+  ],
+  "start_date": "2025-01-01",
+  "summary": {
+    "days": 765,
+    "era5_land": {
+      "bias": 0.0022575629128154372,
+      "mae": 0.05893508516644962,
+      "rmse": 0.0738794876667167
+    },
+    "interval_coverage": 0.7169692101507517,
+    "model": {
+      "bias": -0.07816566581782725,
+      "mae": 0.09094407599297227,
+      "rmse": 0.11092473419758075
+    },
+    "station_count": 3
+  }
+}

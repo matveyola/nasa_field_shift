@@ -1,0 +1,278 @@
+{
+  "status": "research_only",
+  "release_gate": {
+    "fresh_farm_coverage": false,
+    "fresh_predecessor_coverage": false,
+    "fresh_mae_improvement": false,
+    "fresh_rmse_improvement": true,
+    "fresh_interval_coverage": true
+  },
+  "data_sources": {
+    "usda": {
+      "url": "https://doi.org/10.15482/USDA.ADC/1411953",
+      "sha256": "b9e40bf74554c32849dcb6e6a613d6b7a60b4b8a2f8cbed33073d7c7732f95b6"
+    },
+    "morrow_plots": {
+      "url": "https://doi.org/10.13012/B2IDB-7865141_V2",
+      "export": "https://sandical.r-universe.dev/morrowplots/data/morrowplots/csv",
+      "sha256": "9cafffd53c08fbc0bcca12baad1e7abc0d3870317e53c7e98e917cbc18fae2f8"
+    },
+    "zhou_et_al": {
+      "url": "https://doi.org/10.5281/zenodo.13901372",
+      "export": "https://zenodo.org/records/13901372/files/Corn_ExperimentalCalibrationDataWithSoil.csv?download=1",
+      "sha256": "9df07c56ec6d80786bb9be2df28d9b2ce90d8c9bce81b21a84e99d4f9b4a373f"
+    }
+  },
+  "fitting_farms": [
+    "ARL",
+    "ISUAG.USB",
+    "NWREC",
+    "WOOSTER"
+  ],
+  "calibration_farms": [
+    "FREEMAN",
+    "LAN"
+  ],
+  "selected": "ridge_v1",
+  "selection_scores": {
+    "predecessor_mean": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "predecessor_median": {
+      "mae": 1.7051002604166658,
+      "rmse": 2.0703345746639354,
+      "bias": -0.0004995659722224853
+    },
+    "pooled_mean": {
+      "mae": 1.4177693865740737,
+      "rmse": 1.8399680262208693,
+      "bias": -4.163336342344338e-17
+    },
+    "partially_pooled_mean": {
+      "mae": 1.4160542625144672,
+      "rmse": 1.8220679746814412,
+      "bias": -0.047726001880787086
+    },
+    "ridge_blend_25": {
+      "mae": 1.384754580668893,
+      "rmse": 1.7795278550960254,
+      "bias": 0.04029970979733097
+    },
+    "ridge_blend_50": {
+      "mae": 1.3025691076795638,
+      "rmse": 1.7388433305584228,
+      "bias": 0.0802663756131804
+    },
+    "ridge_v1": {
+      "mae": 1.1948843596175724,
+      "rmse": 1.694653765604841,
+      "bias": 0.1601997072448791
+    }
+  },
+  "nested_development_cv": {
+    "candidate": {
+      "mae": 1.473183299402751,
+      "rmse": 1.8280200598054626,
+      "bias": 0.06694246048383992
+    },
+    "baseline": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "selection_by_held_out_farm": {
+      "ARL": "ridge_blend_50",
+      "ISUAG.USB": "predecessor_mean",
+      "NWREC": "ridge_v1",
+      "WOOSTER": "pooled_mean"
+    }
+  },
+  "interval_half_width_t_ha": 2.9889854293379425,
+  "usda_v1_test_regression_diagnostic": {
+    "candidate": {
+      "mae": 1.1884085266742812,
+      "rmse": 1.6055553200456998,
+      "bias": 0.2039169998762206
+    },
+    "baseline": {
+      "mae": 1.0719760199652777,
+      "rmse": 1.584108869900127,
+      "bias": 0.18650195312499987
+    },
+    "ridge_v1": {
+      "mae": 1.1884085266742812,
+      "rmse": 1.6055553200456998,
+      "bias": 0.2039169998762206
+    },
+    "farms": [
+      "HOYTVILLE.LTR",
+      "MAR",
+      "ORR",
+      "SERF"
+    ],
+    "farm_years": 24,
+    "interval_coverage": 0.90625
+  },
+  "usda_v1_test_by_predecessor": {
+    "Soy": {
+      "candidate": {
+        "mae": 1.0828619914165596,
+        "rmse": 1.448713366819126,
+        "bias": 0.07087542512116249
+      },
+      "baseline": {
+        "mae": 0.8846994357638887,
+        "rmse": 1.3361682655514144,
+        "bias": -0.08542361111111135
+      },
+      "ridge_v1": {
+        "mae": 1.0828619914165596,
+        "rmse": 1.448713366819126,
+        "bias": 0.07087542512116249
+      },
+      "farms": [
+        "HOYTVILLE.LTR",
+        "MAR",
+        "ORR",
+        "SERF"
+      ],
+      "farm_years": 16,
+      "interval_coverage": 0.9375
+    },
+    "Wheat": {
+      "candidate": {
+        "mae": 1.4638788738640054,
+        "rmse": 1.9093786596686324,
+        "bias": 1.075233982836813
+      },
+      "baseline": {
+        "mae": 1.3944739583333334,
+        "rmse": 1.902564407605379,
+        "bias": 1.3944739583333334
+      },
+      "ridge_v1": {
+        "mae": 1.4638788738640054,
+        "rmse": 1.9093786596686324,
+        "bias": 1.075233982836813
+      },
+      "farms": [
+        "MAR",
+        "ORR"
+      ],
+      "farm_years": 8,
+      "interval_coverage": 0.875
+    }
+  },
+  "morrow_plots_external_diagnostic": {
+    "candidate": {
+      "mae": 1.5363355889041017,
+      "rmse": 2.117467844789582,
+      "bias": -1.022549887917675
+    },
+    "baseline": {
+      "mae": 1.5963494465026318,
+      "rmse": 2.313389839187821,
+      "bias": -1.3833693460605756
+    },
+    "ridge_v1": {
+      "mae": 1.5363355889041017,
+      "rmse": 2.117467844789582,
+      "bias": -1.022549887917675
+    },
+    "farms": [
+      "Morrow Plots"
+    ],
+    "farm_years": 9,
+    "interval_coverage": 0.7777777777777777,
+    "matched_subplot_pairs": 27,
+    "years": [
+      1999,
+      2001,
+      2003,
+      2005,
+      2007,
+      2009,
+      2013,
+      2017,
+      2021
+    ],
+    "predecessors": [
+      "Soy"
+    ],
+    "min_distance_from_usda_km": 223.76611189049214
+  },
+  "zhou_et_al_extrapolation_diagnostic": {
+    "candidate": {
+      "mae": 1.1938194066973042,
+      "rmse": 1.6092836316558177,
+      "bias": 0.8265629347138413
+    },
+    "baseline": {
+      "mae": 0.9805766832010583,
+      "rmse": 1.2541475642638575,
+      "bias": -0.10444168154761929
+    },
+    "ridge_v1": {
+      "mae": 1.1938194066973042,
+      "rmse": 1.6092836316558177,
+      "bias": 0.8265629347138413
+    },
+    "farms": [
+      "NE",
+      "SD"
+    ],
+    "farm_years": 29,
+    "interval_coverage": 0.9285714285714286,
+    "min_distance_from_usda_or_morrow_km": 240.6830959739491,
+    "by_farm": {
+      "NE": {
+        "candidate": {
+          "mae": 1.6849220566373793,
+          "rmse": 2.1173795407576472,
+          "bias": 1.5905543078637596
+        },
+        "baseline": {
+          "mae": 1.190208308531746,
+          "rmse": 1.449579503457763,
+          "bias": 0.3845095882936507
+        },
+        "ridge_v1": {
+          "mae": 1.6849220566373793,
+          "rmse": 2.1173795407576472,
+          "bias": 1.5905543078637596
+        },
+        "farms": [
+          "NE"
+        ],
+        "farm_years": 14,
+        "interval_coverage": 0.8571428571428572,
+        "nitrogen": "SN"
+      },
+      "SD": {
+        "candidate": {
+          "mae": 0.7027167567572292,
+          "rmse": 0.8344408275076248,
+          "bias": 0.06257156156392334
+        },
+        "baseline": {
+          "mae": 0.7709450578703706,
+          "rmse": 1.022003663913725,
+          "bias": -0.5933929513888891
+        },
+        "ridge_v1": {
+          "mae": 0.7027167567572292,
+          "rmse": 0.8344408275076248,
+          "bias": 0.06257156156392334
+        },
+        "farms": [
+          "SD"
+        ],
+        "farm_years": 15,
+        "interval_coverage": 1.0,
+        "nitrogen": "LN"
+      }
+    }
+  }
+}

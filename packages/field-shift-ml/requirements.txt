@@ -1,0 +1,9 @@
+# Offline training only. The geo_ml worker reads a validated JSON artifact.
+joblib==1.4.2
+numpy==1.26.4
+scikit-learn==1.5.2
+scipy==1.14.1
+threadpoolctl==3.5.0
+# Shared API helpers used by the offline workflows.
+pydantic==2.14.3
+redis==8.1.0

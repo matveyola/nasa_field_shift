@@ -1,0 +1,321 @@
+{
+  "farms": {
+    "IFC:CCO02": {
+      "days": 261,
+      "era5_land": {
+        "bias": 0.012574678160919539,
+        "mae": 0.04403473180076629,
+        "rmse": 0.0597427047069764
+      },
+      "group_count": 1,
+      "interval_coverage": 0.9386973180076629,
+      "model": {
+        "bias": -0.00127435961546043,
+        "mae": 0.04731890819070423,
+        "rmse": 0.062261099247118604
+      },
+      "site_count": 1,
+      "v1": {
+        "bias": -0.05658218569998227,
+        "mae": 0.07139202962720245,
+        "rmse": 0.08499683696627627
+      }
+    },
+    "IFC:HS0002": {
+      "days": 263,
+      "era5_land": {
+        "bias": -0.027764186311787075,
+        "mae": 0.057455045627376425,
+        "rmse": 0.07103021893947219
+      },
+      "group_count": 1,
+      "interval_coverage": 0.9429657794676806,
+      "model": {
+        "bias": -0.016594303779031035,
+        "mae": 0.05172801121201039,
+        "rmse": 0.06453275110830001
+      },
+      "site_count": 1,
+      "v1": {
+        "bias": -0.09533704876026075,
+        "mae": 0.09641476204434736,
+        "rmse": 0.11577708784003815
+      }
+    },
+    "IFC:HS0011": {
+      "days": 262,
+      "era5_land": {
+        "bias": 0.026479503816793894,
+        "mae": 0.04282360305343512,
+        "rmse": 0.055826412219055495
+      },
+      "group_count": 1,
+      "interval_coverage": 0.8625954198473282,
+      "model": {
+        "bias": 0.03971958202242314,
+        "mae": 0.0521870262452874,
+        "rmse": 0.06898524288972653
+      },
+      "site_count": 1,
+      "v1": {
+        "bias": -0.04751063039137113,
+        "mae": 0.06300498142518494,
+        "rmse": 0.07520124589126052
+      }
+    },
+    "IFC:MDDLCDR01": {
+      "days": 258,
+      "era5_land": {
+        "bias": -0.02667403100775194,
+        "mae": 0.06699420930232558,
+        "rmse": 0.07737483644610835
+      },
+      "group_count": 1,
+      "interval_coverage": 0.7906976744186046,
+      "model": {
+        "bias": -0.040863448157062915,
+        "mae": 0.08000471641014216,
+        "rmse": 0.0915402006513089
+      },
+      "site_count": 1,
+      "v1": {
+        "bias": -0.10286319072049874,
+        "mae": 0.11175386873661212,
+        "rmse": 0.1326898047979555
+      }
+    },
+    "IFC:NSHNBTNA04": {
+      "days": 24,
+      "era5_land": {
+        "bias": 0.006789166666666666,
+        "mae": 0.01914675,
+        "rmse": 0.02250159795066416
+      },
+      "group_count": 1,
+      "interval_coverage": 1.0,
+      "model": {
+        "bias": 0.039130028992369,
+        "mae": 0.04119013232173315,
+        "rmse": 0.046034366961476815
+      },
+      "site_count": 1,
+      "v1": {
+        "bias": -0.04615524363403043,
+        "mae": 0.04615524363403043,
+        "rmse": 0.05095807390215369
+      }
+    },
+    "IFC:RACCOON03": {
+      "days": 250,
+      "era5_land": {
+        "bias": 0.004282852,
+        "mae": 0.038151372,
+        "rmse": 0.04938616848175205
+      },
+      "group_count": 1,
+      "interval_coverage": 0.968,
+      "model": {
+        "bias": -0.02767558161492297,
+        "mae": 0.04360867082964357,
+        "rmse": 0.056462843200684544
+      },
+      "site_count": 1,
+      "v1": {
+        "bias": -0.06959279505818339,
+        "mae": 0.0735477837250665,
+        "rmse": 0.0915679826391014
+      }
+    },
+    "IFC:RACCOON04": {
+      "days": 248,
+      "era5_land": {
+        "bias": 0.09061972580645161,
+        "mae": 0.0966989435483871,
+        "rmse": 0.11404903085119476
+      },
+      "group_count": 1,
+      "interval_coverage": 0.8991935483870968,
+      "model": {
+        "bias": 0.019829337092087135,
+        "mae": 0.05992996059111739,
+        "rmse": 0.0728219164346472
+      },
+      "site_count": 1,
+      "v1": {
+        "bias": 0.007363614240756705,
+        "mae": 0.05955603794777266,
+        "rmse": 0.07642241842030303
+      }
+    },
+    "IFC:UPPRIOWA01": {
+      "days": 138,
+      "era5_land": {
+        "bias": 0.03339411594202899,
+        "mae": 0.05090508695652173,
+        "rmse": 0.06933096663797875
+      },
+      "group_count": 1,
+      "interval_coverage": 0.9710144927536232,
+      "model": {
+        "bias": -0.04464083012374226,
+        "mae": 0.06287705497326138,
+        "rmse": 0.07051194701238593
+      },
+      "site_count": 1,
+      "v1": {
+        "bias": -0.06783657303854067,
+        "mae": 0.07888318717516618,
+        "rmse": 0.08801424735456291
+      }
+    }
+  },
+  "frozen_artifact_sha256": "7d9f1f534d308d97d6966d00da967570e2c88305e9db333ee33276b2aad28901",
+  "frozen_version": "fieldshift-vwc-d275752a77c0",
+  "insufficient_pair_counts": {
+    "IFC:NSHNBTNA04": 24
+  },
+  "interval_coverage": 0.9104520332688566,
+  "matched_stations": [
+    {
+      "block": "20:-46",
+      "days": 261,
+      "from": "2025-03-12",
+      "latitude": 41.741627,
+      "location": "CCO02",
+      "longitude": -91.9433,
+      "network": "IFC",
+      "station_id": "IFC:CCO02",
+      "to": "2025-12-28"
+    },
+    {
+      "block": "20:-46",
+      "days": 263,
+      "from": "2025-02-26",
+      "latitude": 41.28859,
+      "location": "HS0002",
+      "longitude": -91.571754,
+      "network": "IFC",
+      "station_id": "IFC:HS0002",
+      "to": "2025-12-28"
+    },
+    {
+      "block": "21:-47",
+      "days": 262,
+      "from": "2025-02-28",
+      "latitude": 42.209293,
+      "location": "HS0011",
+      "longitude": -93.275505,
+      "network": "IFC",
+      "station_id": "IFC:HS0011",
+      "to": "2025-12-28"
+    },
+    {
+      "block": "21:-47",
+      "days": 258,
+      "from": "2025-03-14",
+      "latitude": 42.3088,
+      "location": "MDDLCDR01",
+      "longitude": -92.7717,
+      "network": "IFC",
+      "station_id": "IFC:MDDLCDR01",
+      "to": "2025-12-28"
+    },
+    {
+      "block": "20:-48",
+      "days": 24,
+      "from": "2025-03-13",
+      "latitude": 41.6374,
+      "location": "NSHNBTNA04",
+      "longitude": -95.286,
+      "network": "IFC",
+      "station_id": "IFC:NSHNBTNA04",
+      "to": "2025-04-09"
+    },
+    {
+      "block": "21:-48",
+      "days": 250,
+      "from": "2025-03-14",
+      "latitude": 42.649,
+      "location": "RACCOON03",
+      "longitude": -95.1096,
+      "network": "IFC",
+      "station_id": "IFC:RACCOON03",
+      "to": "2025-12-27"
+    },
+    {
+      "block": "21:-48",
+      "days": 248,
+      "from": "2025-03-04",
+      "latitude": 42.902664,
+      "location": "RACCOON04",
+      "longitude": -94.884415,
+      "network": "IFC",
+      "station_id": "IFC:RACCOON04",
+      "to": "2025-11-26"
+    },
+    {
+      "block": "21:-46",
+      "days": 138,
+      "from": "2025-07-08",
+      "latitude": 43.3279,
+      "location": "UPPRIOWA01",
+      "longitude": -91.9569,
+      "network": "IFC",
+      "station_id": "IFC:UPPRIOWA01",
+      "to": "2025-11-25"
+    }
+  ],
+  "model_version": "fieldshift-vwc-a91e5897a6c2",
+  "observations_sha256": "7b454419c0bd58b42c266ada1412dc158ce0fe10666033a5d56d209d74952d41",
+  "operational_scope_diagnostic": {
+    "days": 1026,
+    "era5_land": {
+      "bias": -0.003826241353985978,
+      "mae": 0.05323107874160456,
+      "rmse": 0.06690287635496804
+    },
+    "group_count": 4,
+    "interval_coverage": 0.8829314550126108,
+    "model": {
+      "bias": -0.004563378948411535,
+      "mae": 0.05796753017042838,
+      "rmse": 0.07290126131287987
+    },
+    "site_count": 4,
+    "v1": {
+      "bias": -0.07576022690101915,
+      "mae": 0.08578879035895733,
+      "rmse": 0.10513532107987336
+    }
+  },
+  "promotion_checks": {
+    "aggregate_gain": false,
+    "enough_farms": false,
+    "interval_coverage": true,
+    "no_material_farm_degradation": false,
+    "regional_sanity": false,
+    "wins_most_farms": false
+  },
+  "soils_sha256": "860dbf3e2198dc67e46ebcb7be3c07e24cf66483485049b4d7c6148f8dbbce87",
+  "summary": {
+    "days": 1680,
+    "era5_land": {
+      "bias": 0.016130379772379286,
+      "mae": 0.05672328461268745,
+      "rmse": 0.0736506176823769
+    },
+    "group_count": 7,
+    "interval_coverage": 0.9104520332688566,
+    "model": {
+      "bias": -0.010214229167958472,
+      "mae": 0.056807764064595215,
+      "rmse": 0.07034863321232855
+    },
+    "site_count": 7,
+    "v1": {
+      "bias": -0.06176554420401145,
+      "mae": 0.07922180724019318,
+      "rmse": 0.0969994088811899
+    }
+  }
+}

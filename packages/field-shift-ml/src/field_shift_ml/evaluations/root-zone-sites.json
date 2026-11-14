@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "network": "USDA NRCS SCAN",
+  "model_cycle": "50R1",
+  "spatial_buffer_km": 40,
+  "minimum_holdout_pairs_per_farm": 30,
+  "fit_and_calibration": {"first_issue": "2026-05-18", "last_issue": "2026-08-10"},
+  "evaluation": {"first_issue": "2026-08-17", "last_issue": "2026-10-26"},
+  "calibration": ["2093:KS:SCAN", "2004:IL:SCAN", "2072:SD:SCAN", "2002:MN:SCAN"],
+  "fit": [
+    "2031:IA:SCAN", "2068:IA:SCAN", "2001:NE:SCAN", "2094:KS:SCAN", "2147:KS:SCAN",
+    "2195:MO:SCAN", "2047:MO:SCAN", "2220:MO:SCAN", "2196:WI:SCAN", "2050:MN:SCAN",
+    "2048:MO:SCAN", "2223:MO:SCAN", "2230:MO:SCAN", "2011:NY:SCAN", "2005:KY:SCAN",
+    "2193:MO:SCAN", "2225:MO:SCAN", "2194:MO:SCAN", "2227:MO:SCAN", "2226:MO:SCAN",
+    "2231:MO:SCAN", "2061:MO:SCAN", "2092:KS:SCAN"
+  ],
+  "evaluation_farms": {
+    "2111:NE:SCAN": "Johnson Farm, Nebraska",
+    "2030:AR:SCAN": "UAPB Lonoke Farm, Arkansas",
+    "2077:TN:SCAN": "Eastview Farm, Tennessee",
+    "2056:AL:SCAN": "Stanley Farm, Alabama",
+    "2173:AL:SCAN": "Isbell Farms, Alabama",
+    "2036:PA:SCAN": "Rock Springs agricultural research site, Pennsylvania"
+  }
+}

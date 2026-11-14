@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "network": "USDA NRCS SCAN",
+  "model_cycle": "50R1",
+  "spatial_buffer_km": 40,
+  "minimum_holdout_pairs_per_farm": 30,
+  "evaluation": {"first_issue": "2026-08-17", "last_issue": "2026-10-26"},
+  "noaa_research_site": {
+    "station_id": "USCRN:13301",
+    "name": "Chillicothe 22 ENE, University of Missouri Forage Systems Research Station",
+    "latitude": 39.8668,
+    "longitude": -93.147,
+    "file": "CRNH0203-2026-MO_Chillicothe_22_ENE.txt"
+  },
+  "fit": [],
+  "calibration": [],
+  "evaluation_farms": {
+    "2022:OK:SCAN": "Fort Reno #1, Oklahoma",
+    "2038:SC:SCAN": "Youmans Farm, South Carolina",
+    "2178:AL:SCAN": "Morris Farms, Alabama",
+    "2180:AL:SCAN": "Koptis Farms, Alabama",
+    "2181:AL:SCAN": "Perdido Riv Farms, Alabama",
+    "2182:AL:SCAN": "River Road Farms, Alabama",
+    "2198:WA:SCAN": "Cook Farm Field D, Washington",
+    "2224:MO:SCAN": "Busby Farm, Missouri"
+  }
+}

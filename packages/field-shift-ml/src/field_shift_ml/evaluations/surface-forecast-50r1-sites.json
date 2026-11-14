@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "model_cycle": "50R1",
+  "target_depth_cm": 5,
+  "first_issue": "2026-05-18",
+  "last_issue": "2026-10-26",
+  "spatial_buffer_km": 40,
+  "serving_radius_km": 180,
+  "selection": "Keep USDA SCAN stations in the prior Midwest catalog and NOAA USCRN stations within the earlier surface-study rectangle when less than 300 km from historical fitting sites, at least 40 km from all earlier surface-study stations, and outside all historical fitting and calibration 2-degree blocks. Choose from metadata only and keep non-farm sites as transfer diagnostics.",
+  "sites": [
+    {
+      "station_id": "SCAN:2195:MO:SCAN",
+      "latitude": 39.2285,
+      "longitude": -92.11942,
+      "state": "MO",
+      "network": "SCAN",
+      "location": "CMRB LTAR-MO",
+      "data_timezone_hours": -6,
+      "managed_crop_verified": false
+    },
+    {
+      "station_id": "USCRN:13301",
+      "latitude": 39.8668,
+      "longitude": -93.147,
+      "state": "MO",
+      "network": "USCRN",
+      "location": "Chillicothe 22 ENE, University of Missouri Forage Systems Research Station",
+      "file": "CRNH0203-2026-MO_Chillicothe_22_ENE.txt",
+      "managed_crop_verified": false
+    },
+    {
+      "station_id": "USCRN:54937",
+      "latitude": 46.77,
+      "longitude": -99.48,
+      "state": "ND",
+      "network": "USCRN",
+      "location": "Jamestown 38 WSW, North Dakota State University Central Grasslands",
+      "file": "CRNH0203-2026-ND_Jamestown_38_WSW.txt",
+      "managed_crop_verified": false
+    },
+    {
+      "station_id": "USCRN:63838",
+      "latitude": 38.0945,
+      "longitude": -84.7465,
+      "state": "KY",
+      "network": "USCRN",
+      "location": "Versailles 3 NNW, University of Kentucky Woodford County Site",
+      "file": "CRNH0203-2026-KY_Versailles_3_NNW.txt",
+      "managed_crop_verified": false
+    },
+    {
+      "station_id": "USCRN:63849",
+      "latitude": 37.2504,
+      "longitude": -86.2325,
+      "state": "KY",
+      "network": "USCRN",
+      "location": "Bowling Green 21 NNE, Mammoth Cave National Park",
+      "file": "CRNH0203-2026-KY_Bowling_Green_21_NNE.txt",
+      "managed_crop_verified": false
+    }
+  ]
+}

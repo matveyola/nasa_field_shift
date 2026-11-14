@@ -1,0 +1,5182 @@
+{
+  "status": "research_only",
+  "release_gate": {
+    "fresh_sealed_farms": false,
+    "fresh_wheat_predecessor_farms": false,
+    "fresh_mae_improvement": true,
+    "fresh_rmse_improvement": true,
+    "fresh_interval_coverage": true
+  },
+  "candidates": 723,
+  "development_farms": [
+    "ARL",
+    "ISUAG.USB",
+    "NWREC",
+    "WOOSTER"
+  ],
+  "development_farm_years": 23,
+  "development_predecessor_support": {
+    "Soy": [
+      "ARL",
+      "ISUAG.USB",
+      "NWREC",
+      "WOOSTER"
+    ],
+    "Wheat": [
+      "ARL",
+      "NWREC"
+    ]
+  },
+  "calibration_farms": [
+    "FREEMAN",
+    "LAN"
+  ],
+  "baseline_nested_score": {
+    "mae": 1.4727761140046292,
+    "rmse": 1.8315885375282754,
+    "bias": 0.00033304398148149844
+  },
+  "geography_ridge_v1_nested_score": {
+    "mae": 1.1948843596175724,
+    "rmse": 1.694653765604841,
+    "bias": 0.1601997072448791
+  },
+  "full_search": {
+    "final_candidate": "ridge/geo/alpha=0.3/interactions",
+    "development_selection_score": {
+      "mae": 1.0277963003311528,
+      "rmse": 1.4728034609819403,
+      "bias": 0.10146282145033117
+    },
+    "nested_score": {
+      "mae": 1.557768350198704,
+      "rmse": 1.8573368014733256,
+      "bias": -0.5092928618510837
+    },
+    "by_held_farm": {
+      "ARL": {
+        "candidate": "ridge/soil/alpha=100",
+        "scores": {
+          "mae": 1.266889797565091,
+          "rmse": 1.6609148074547284,
+          "bias": 1.1601540342138401
+        },
+        "baseline": {
+          "mae": 1.2906061921296295,
+          "rmse": 1.682527662442805,
+          "bias": 1.191160300925925
+        },
+        "supported": 8,
+        "farm_years": 8
+      },
+      "ISUAG.USB": {
+        "candidate": "extra_trees/plan/max_depth=1/min_samples_leaf=2",
+        "scores": {
+          "mae": 1.5611950231481466,
+          "rmse": 1.5611950231481466,
+          "bias": -1.5611950231481466
+        },
+        "baseline": {
+          "mae": 0.9912557870370358,
+          "rmse": 0.9912557870370358,
+          "bias": -0.9912557870370358
+        },
+        "supported": 1,
+        "farm_years": 1
+      },
+      "NWREC": {
+        "candidate": "ridge_v1/geo",
+        "scores": {
+          "mae": 2.393890625,
+          "rmse": 2.674582330294032,
+          "bias": -1.0093494183824994
+        },
+        "baseline": {
+          "mae": 2.393890625,
+          "rmse": 2.7501518262199465,
+          "bias": -1.192492476851851
+        },
+        "supported": 8,
+        "farm_years": 8
+      },
+      "WOOSTER": {
+        "candidate": "ridge/geo+plan/alpha=1",
+        "scores": {
+          "mae": 1.0090979550815768,
+          "rmse": 1.203927504870071,
+          "bias": -0.6267810400875288
+        },
+        "baseline": {
+          "mae": 1.2153518518518518,
+          "rmse": 1.4290009957096932,
+          "bias": 0.9939201388888884
+        },
+        "supported": 6,
+        "farm_years": 6
+      }
+    }
+  },
+  "nested_feature_ablation": {
+    "geo": {
+      "final_candidate": "ridge/climate/alpha=3/interactions",
+      "development_selection_score": {
+        "mae": 1.0924072687277682,
+        "rmse": 1.5256406997869216,
+        "bias": -0.13370004620917467
+      },
+      "nested_score": {
+        "mae": 1.571801261601921,
+        "rmse": 1.8948573902775308,
+        "bias": -0.19629655727408596
+      },
+      "by_held_farm": {
+        "ARL": {
+          "candidate": "ridge/soil/alpha=100",
+          "scores": {
+            "mae": 1.266889797565091,
+            "rmse": 1.6609148074547284,
+            "bias": 1.1601540342138401
+          },
+          "baseline": {
+            "mae": 1.2906061921296295,
+            "rmse": 1.682527662442805,
+            "bias": 1.191160300925925
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "ISUAG.USB": {
+          "candidate": "extra_trees/plan/max_depth=1/min_samples_leaf=2",
+          "scores": {
+            "mae": 1.5611950231481466,
+            "rmse": 1.5611950231481466,
+            "bias": -1.5611950231481466
+          },
+          "baseline": {
+            "mae": 0.9912557870370358,
+            "rmse": 0.9912557870370358,
+            "bias": -0.9912557870370358
+          },
+          "supported": 1,
+          "farm_years": 1
+        },
+        "NWREC": {
+          "candidate": "extra_trees/climate/max_depth=2/min_samples_leaf=2",
+          "scores": {
+            "mae": 2.393890625,
+            "rmse": 2.7368807271843285,
+            "bias": -1.1658051070601845
+          },
+          "baseline": {
+            "mae": 2.393890625,
+            "rmse": 2.7501518262199465,
+            "bias": -1.192492476851851
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "WOOSTER": {
+          "candidate": "extra_trees/climate/max_depth=2/min_samples_leaf=2",
+          "scores": {
+            "mae": 1.0652296006944446,
+            "rmse": 1.2943933348096146,
+            "bias": 0.7816598668981478
+          },
+          "baseline": {
+            "mae": 1.2153518518518518,
+            "rmse": 1.4290009957096932,
+            "bias": 0.9939201388888884
+          },
+          "supported": 6,
+          "farm_years": 6
+        }
+      }
+    },
+    "climate": {
+      "final_candidate": "ridge/geo/alpha=0.3/interactions",
+      "development_selection_score": {
+        "mae": 1.0277963003311528,
+        "rmse": 1.4728034609819403,
+        "bias": 0.10146282145033117
+      },
+      "nested_score": {
+        "mae": 1.5025466779118504,
+        "rmse": 1.8136907472277302,
+        "bias": -0.45407118956423
+      },
+      "by_held_farm": {
+        "ARL": {
+          "candidate": "ridge/soil/alpha=100",
+          "scores": {
+            "mae": 1.266889797565091,
+            "rmse": 1.6609148074547284,
+            "bias": 1.1601540342138401
+          },
+          "baseline": {
+            "mae": 1.2906061921296295,
+            "rmse": 1.682527662442805,
+            "bias": 1.191160300925925
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "ISUAG.USB": {
+          "candidate": "huber/predecessor/alpha=3/epsilon=1.35",
+          "scores": {
+            "mae": 1.3403083340007316,
+            "rmse": 1.3403083340007316,
+            "bias": -1.3403083340007316
+          },
+          "baseline": {
+            "mae": 0.9912557870370358,
+            "rmse": 0.9912557870370358,
+            "bias": -0.9912557870370358
+          },
+          "supported": 1,
+          "farm_years": 1
+        },
+        "NWREC": {
+          "candidate": "ridge_v1/geo",
+          "scores": {
+            "mae": 2.393890625,
+            "rmse": 2.674582330294032,
+            "bias": -1.0093494183824994
+          },
+          "baseline": {
+            "mae": 2.393890625,
+            "rmse": 2.7501518262199465,
+            "bias": -1.192492476851851
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "WOOSTER": {
+          "candidate": "ridge/geo+plan/alpha=1",
+          "scores": {
+            "mae": 1.0090979550815768,
+            "rmse": 1.203927504870071,
+            "bias": -0.6267810400875288
+          },
+          "baseline": {
+            "mae": 1.2153518518518518,
+            "rmse": 1.4290009957096932,
+            "bias": 0.9939201388888884
+          },
+          "supported": 6,
+          "farm_years": 6
+        }
+      }
+    },
+    "soil": {
+      "final_candidate": "ridge/geo/alpha=0.3/interactions",
+      "development_selection_score": {
+        "mae": 1.0277963003311528,
+        "rmse": 1.4728034609819403,
+        "bias": 0.10146282145033117
+      },
+      "nested_score": {
+        "mae": 1.5766946769621963,
+        "rmse": 1.8736433387504134,
+        "bias": -0.48413086874484335
+      },
+      "by_held_farm": {
+        "ARL": {
+          "candidate": "ridge/geo/alpha=30/interactions/taper=400km",
+          "scores": {
+            "mae": 1.3425951046190594,
+            "rmse": 1.7326267528146126,
+            "bias": 1.2608020066388015
+          },
+          "baseline": {
+            "mae": 1.2906061921296295,
+            "rmse": 1.682527662442805,
+            "bias": 1.191160300925925
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "ISUAG.USB": {
+          "candidate": "extra_trees/plan/max_depth=1/min_samples_leaf=2",
+          "scores": {
+            "mae": 1.5611950231481466,
+            "rmse": 1.5611950231481466,
+            "bias": -1.5611950231481466
+          },
+          "baseline": {
+            "mae": 0.9912557870370358,
+            "rmse": 0.9912557870370358,
+            "bias": -0.9912557870370358
+          },
+          "supported": 1,
+          "farm_years": 1
+        },
+        "NWREC": {
+          "candidate": "ridge_v1/geo",
+          "scores": {
+            "mae": 2.393890625,
+            "rmse": 2.674582330294032,
+            "bias": -1.0093494183824994
+          },
+          "baseline": {
+            "mae": 2.393890625,
+            "rmse": 2.7501518262199465,
+            "bias": -1.192492476851851
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "WOOSTER": {
+          "candidate": "ridge/geo+plan/alpha=1",
+          "scores": {
+            "mae": 1.0090979550815768,
+            "rmse": 1.203927504870071,
+            "bias": -0.6267810400875288
+          },
+          "baseline": {
+            "mae": 1.2153518518518518,
+            "rmse": 1.4290009957096932,
+            "bias": 0.9939201388888884
+          },
+          "supported": 6,
+          "farm_years": 6
+        }
+      }
+    },
+    "plan": {
+      "final_candidate": "ridge/geo/alpha=0.3/interactions",
+      "development_selection_score": {
+        "mae": 1.0277963003311528,
+        "rmse": 1.4728034609819403,
+        "bias": 0.10146282145033117
+      },
+      "nested_score": {
+        "mae": 1.5399857466176952,
+        "rmse": 1.8431778603956144,
+        "bias": -0.07008250305021123
+      },
+      "by_held_farm": {
+        "ARL": {
+          "candidate": "ridge/soil/alpha=100",
+          "scores": {
+            "mae": 1.266889797565091,
+            "rmse": 1.6609148074547284,
+            "bias": 1.1601540342138401
+          },
+          "baseline": {
+            "mae": 1.2906061921296295,
+            "rmse": 1.682527662442805,
+            "bias": 1.191160300925925
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "ISUAG.USB": {
+          "candidate": "huber/predecessor/alpha=3/epsilon=1.35",
+          "scores": {
+            "mae": 1.3403083340007316,
+            "rmse": 1.3403083340007316,
+            "bias": -1.3403083340007316
+          },
+          "baseline": {
+            "mae": 0.9912557870370358,
+            "rmse": 0.9912557870370358,
+            "bias": -0.9912557870370358
+          },
+          "supported": 1,
+          "farm_years": 1
+        },
+        "NWREC": {
+          "candidate": "ridge_v1/geo",
+          "scores": {
+            "mae": 2.393890625,
+            "rmse": 2.674582330294032,
+            "bias": -1.0093494183824994
+          },
+          "baseline": {
+            "mae": 2.393890625,
+            "rmse": 2.7501518262199465,
+            "bias": -1.192492476851851
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "WOOSTER": {
+          "candidate": "gradient_boosting/geo/max_depth=2/learning_rate=0.08",
+          "scores": {
+            "mae": 1.158854229904957,
+            "rmse": 1.3714092864185248,
+            "bias": 0.9091737059685463
+          },
+          "baseline": {
+            "mae": 1.2153518518518518,
+            "rmse": 1.4290009957096932,
+            "bias": 0.9939201388888884
+          },
+          "supported": 6,
+          "farm_years": 6
+        }
+      }
+    }
+  },
+  "nested_single_group": {
+    "geo": {
+      "final_candidate": "ridge/geo/alpha=0.3/interactions",
+      "development_selection_score": {
+        "mae": 1.0277963003311528,
+        "rmse": 1.4728034609819403,
+        "bias": 0.10146282145033117
+      },
+      "nested_score": {
+        "mae": 1.5589120733811874,
+        "rmse": 1.8596085587534783,
+        "bias": -0.044920509943970795
+      },
+      "by_held_farm": {
+        "ARL": {
+          "candidate": "ridge/geo/alpha=30/interactions/taper=400km",
+          "scores": {
+            "mae": 1.3425951046190594,
+            "rmse": 1.7326267528146126,
+            "bias": 1.2608020066388015
+          },
+          "baseline": {
+            "mae": 1.2906061921296295,
+            "rmse": 1.682527662442805,
+            "bias": 1.191160300925925
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "ISUAG.USB": {
+          "candidate": "huber/predecessor/alpha=3/epsilon=1.35",
+          "scores": {
+            "mae": 1.3403083340007316,
+            "rmse": 1.3403083340007316,
+            "bias": -1.3403083340007316
+          },
+          "baseline": {
+            "mae": 0.9912557870370358,
+            "rmse": 0.9912557870370358,
+            "bias": -0.9912557870370358
+          },
+          "supported": 1,
+          "farm_years": 1
+        },
+        "NWREC": {
+          "candidate": "ridge_v1/geo",
+          "scores": {
+            "mae": 2.393890625,
+            "rmse": 2.674582330294032,
+            "bias": -1.0093494183824994
+          },
+          "baseline": {
+            "mae": 2.393890625,
+            "rmse": 2.7501518262199465,
+            "bias": -1.192492476851851
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "WOOSTER": {
+          "candidate": "gradient_boosting/geo/max_depth=2/learning_rate=0.08",
+          "scores": {
+            "mae": 1.158854229904957,
+            "rmse": 1.3714092864185248,
+            "bias": 0.9091737059685463
+          },
+          "baseline": {
+            "mae": 1.2153518518518518,
+            "rmse": 1.4290009957096932,
+            "bias": 0.9939201388888884
+          },
+          "supported": 6,
+          "farm_years": 6
+        }
+      }
+    },
+    "climate": {
+      "final_candidate": "ridge/climate/alpha=3/interactions",
+      "development_selection_score": {
+        "mae": 1.0924072687277682,
+        "rmse": 1.5256406997869216,
+        "bias": -0.13370004620917467
+      },
+      "nested_score": {
+        "mae": 1.5225086879562018,
+        "rmse": 1.8569663422575573,
+        "bias": -0.133323318309211
+      },
+      "by_held_farm": {
+        "ARL": {
+          "candidate": "mean/predecessor",
+          "scores": {
+            "mae": 1.2906061921296295,
+            "rmse": 1.682527662442805,
+            "bias": 1.191160300925925
+          },
+          "baseline": {
+            "mae": 1.2906061921296295,
+            "rmse": 1.682527662442805,
+            "bias": 1.191160300925925
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "ISUAG.USB": {
+          "candidate": "huber/predecessor/alpha=3/epsilon=1.35",
+          "scores": {
+            "mae": 1.3403083340007316,
+            "rmse": 1.3403083340007316,
+            "bias": -1.3403083340007316
+          },
+          "baseline": {
+            "mae": 0.9912557870370358,
+            "rmse": 0.9912557870370358,
+            "bias": -0.9912557870370358
+          },
+          "supported": 1,
+          "farm_years": 1
+        },
+        "NWREC": {
+          "candidate": "extra_trees/climate/max_depth=2/min_samples_leaf=2",
+          "scores": {
+            "mae": 2.393890625,
+            "rmse": 2.7368807271843285,
+            "bias": -1.1658051070601845
+          },
+          "baseline": {
+            "mae": 2.393890625,
+            "rmse": 2.7501518262199465,
+            "bias": -1.192492476851851
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "WOOSTER": {
+          "candidate": "extra_trees/climate/max_depth=2/min_samples_leaf=2",
+          "scores": {
+            "mae": 1.0652296006944446,
+            "rmse": 1.2943933348096146,
+            "bias": 0.7816598668981478
+          },
+          "baseline": {
+            "mae": 1.2153518518518518,
+            "rmse": 1.4290009957096932,
+            "bias": 0.9939201388888884
+          },
+          "supported": 6,
+          "farm_years": 6
+        }
+      }
+    },
+    "soil": {
+      "final_candidate": "elastic_net/soil/alpha=0.35/l1_ratio=0.8",
+      "development_selection_score": {
+        "mae": 1.414150618696303,
+        "rmse": 1.7687027010404628,
+        "bias": -0.35093137980002087
+      },
+      "nested_score": {
+        "mae": 1.568109339502805,
+        "rmse": 1.8930443347380805,
+        "bias": -0.0736828783398846
+      },
+      "by_held_farm": {
+        "ARL": {
+          "candidate": "ridge/soil/alpha=100",
+          "scores": {
+            "mae": 1.266889797565091,
+            "rmse": 1.6609148074547284,
+            "bias": 1.1601540342138401
+          },
+          "baseline": {
+            "mae": 1.2906061921296295,
+            "rmse": 1.682527662442805,
+            "bias": 1.191160300925925
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "ISUAG.USB": {
+          "candidate": "huber/predecessor/alpha=3/epsilon=1.35",
+          "scores": {
+            "mae": 1.3403083340007316,
+            "rmse": 1.3403083340007316,
+            "bias": -1.3403083340007316
+          },
+          "baseline": {
+            "mae": 0.9912557870370358,
+            "rmse": 0.9912557870370358,
+            "bias": -0.9912557870370358
+          },
+          "supported": 1,
+          "farm_years": 1
+        },
+        "NWREC": {
+          "candidate": "mean/predecessor",
+          "scores": {
+            "mae": 2.393890625,
+            "rmse": 2.7501518262199465,
+            "bias": -1.192492476851851
+          },
+          "baseline": {
+            "mae": 2.393890625,
+            "rmse": 2.7501518262199465,
+            "bias": -1.192492476851851
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "WOOSTER": {
+          "candidate": "ridge/predecessor/alpha=100",
+          "scores": {
+            "mae": 1.271348601445396,
+            "rmse": 1.4886463374692676,
+            "bias": 1.0779152632792048
+          },
+          "baseline": {
+            "mae": 1.2153518518518518,
+            "rmse": 1.4290009957096932,
+            "bias": 0.9939201388888884
+          },
+          "supported": 6,
+          "farm_years": 6
+        }
+      }
+    },
+    "plan": {
+      "final_candidate": "mean/predecessor",
+      "development_selection_score": {
+        "mae": 1.4727761140046292,
+        "rmse": 1.8315885375282754,
+        "bias": 0.00033304398148149844
+      },
+      "nested_score": {
+        "mae": 1.5740384381439394,
+        "rmse": 1.897809839683539,
+        "bias": -0.06593131166186336
+      },
+      "by_held_farm": {
+        "ARL": {
+          "candidate": "mean/predecessor",
+          "scores": {
+            "mae": 1.2906061921296295,
+            "rmse": 1.682527662442805,
+            "bias": 1.191160300925925
+          },
+          "baseline": {
+            "mae": 1.2906061921296295,
+            "rmse": 1.682527662442805,
+            "bias": 1.191160300925925
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "ISUAG.USB": {
+          "candidate": "huber/predecessor/alpha=3/epsilon=1.35",
+          "scores": {
+            "mae": 1.3403083340007316,
+            "rmse": 1.3403083340007316,
+            "bias": -1.3403083340007316
+          },
+          "baseline": {
+            "mae": 0.9912557870370358,
+            "rmse": 0.9912557870370358,
+            "bias": -0.9912557870370358
+          },
+          "supported": 1,
+          "farm_years": 1
+        },
+        "NWREC": {
+          "candidate": "mean/predecessor",
+          "scores": {
+            "mae": 2.393890625,
+            "rmse": 2.7501518262199465,
+            "bias": -1.192492476851851
+          },
+          "baseline": {
+            "mae": 2.393890625,
+            "rmse": 2.7501518262199465,
+            "bias": -1.192492476851851
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "WOOSTER": {
+          "candidate": "ridge/predecessor/alpha=100",
+          "scores": {
+            "mae": 1.271348601445396,
+            "rmse": 1.4886463374692676,
+            "bias": 1.0779152632792048
+          },
+          "baseline": {
+            "mae": 1.2153518518518518,
+            "rmse": 1.4290009957096932,
+            "bias": 0.9939201388888884
+          },
+          "supported": 6,
+          "farm_years": 6
+        }
+      }
+    }
+  },
+  "nested_family_search": {
+    "ridge": {
+      "final_candidate": "ridge/geo/alpha=0.3/interactions",
+      "development_selection_score": {
+        "mae": 1.0277963003311528,
+        "rmse": 1.4728034609819403,
+        "bias": 0.10146282145033117
+      },
+      "nested_score": {
+        "mae": 1.5526941792587226,
+        "rmse": 1.8547089468841582,
+        "bias": -0.5096185270521457
+      },
+      "by_held_farm": {
+        "ARL": {
+          "candidate": "ridge/soil/alpha=100",
+          "scores": {
+            "mae": 1.266889797565091,
+            "rmse": 1.6609148074547284,
+            "bias": 1.1601540342138401
+          },
+          "baseline": {
+            "mae": 1.2906061921296295,
+            "rmse": 1.682527662442805,
+            "bias": 1.191160300925925
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "ISUAG.USB": {
+          "candidate": "ridge/plan/alpha=10",
+          "scores": {
+            "mae": 1.5408983393882207,
+            "rmse": 1.5408983393882207,
+            "bias": -1.5408983393882207
+          },
+          "baseline": {
+            "mae": 0.9912557870370358,
+            "rmse": 0.9912557870370358,
+            "bias": -0.9912557870370358
+          },
+          "supported": 1,
+          "farm_years": 1
+        },
+        "NWREC": {
+          "candidate": "ridge/climate/alpha=3/interactions/taper=400km",
+          "scores": {
+            "mae": 2.393890625,
+            "rmse": 2.679054680978748,
+            "bias": -1.030948762946673
+          },
+          "baseline": {
+            "mae": 2.393890625,
+            "rmse": 2.7501518262199465,
+            "bias": -1.192492476851851
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "WOOSTER": {
+          "candidate": "ridge/geo+plan/alpha=1",
+          "scores": {
+            "mae": 1.0090979550815768,
+            "rmse": 1.203927504870071,
+            "bias": -0.6267810400875288
+          },
+          "baseline": {
+            "mae": 1.2153518518518518,
+            "rmse": 1.4290009957096932,
+            "bias": 0.9939201388888884
+          },
+          "supported": 6,
+          "farm_years": 6
+        }
+      }
+    },
+    "elastic_net": {
+      "final_candidate": "elastic_net/geo/alpha=0.04/l1_ratio=0.2",
+      "development_selection_score": {
+        "mae": 1.0795591468662802,
+        "rmse": 1.488996328149674,
+        "bias": 0.061868361646965964
+      },
+      "nested_score": {
+        "mae": 1.4991128035236483,
+        "rmse": 1.8377230700124896,
+        "bias": -0.5027412262772041
+      },
+      "by_held_farm": {
+        "ARL": {
+          "candidate": "elastic_net/soil+plan/alpha=0.35/l1_ratio=0.8",
+          "scores": {
+            "mae": 1.1793450360595576,
+            "rmse": 1.5809786631517198,
+            "bias": 1.042812092832496
+          },
+          "baseline": {
+            "mae": 1.2906061921296295,
+            "rmse": 1.682527662442805,
+            "bias": 1.191160300925925
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "ISUAG.USB": {
+          "candidate": "elastic_net/plan/alpha=0.35/l1_ratio=0.2",
+          "scores": {
+            "mae": 1.5039211753564072,
+            "rmse": 1.5039211753564072,
+            "bias": -1.5039211753564072
+          },
+          "baseline": {
+            "mae": 0.9912557870370358,
+            "rmse": 0.9912557870370358,
+            "bias": -0.9912557870370358
+          },
+          "supported": 1,
+          "farm_years": 1
+        },
+        "NWREC": {
+          "candidate": "mean/predecessor",
+          "scores": {
+            "mae": 2.393890625,
+            "rmse": 2.7501518262199465,
+            "bias": -1.192492476851851
+          },
+          "baseline": {
+            "mae": 2.393890625,
+            "rmse": 2.7501518262199465,
+            "bias": -1.192492476851851
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "WOOSTER": {
+          "candidate": "elastic_net/geo+plan/alpha=0.04/l1_ratio=0.2",
+          "scores": {
+            "mae": 0.9192943776786274,
+            "rmse": 1.0882540263822666,
+            "bias": -0.35736334573305323
+          },
+          "baseline": {
+            "mae": 1.2153518518518518,
+            "rmse": 1.4290009957096932,
+            "bias": 0.9939201388888884
+          },
+          "supported": 6,
+          "farm_years": 6
+        }
+      }
+    },
+    "huber": {
+      "final_candidate": "huber/geo+climate/alpha=3/epsilon=1.8",
+      "development_selection_score": {
+        "mae": 1.1004088349606622,
+        "rmse": 1.4990609392967553,
+        "bias": -0.1676416335608087
+      },
+      "nested_score": {
+        "mae": 1.579479104722699,
+        "rmse": 1.9016155622788984,
+        "bias": -0.5671404023178483
+      },
+      "by_held_farm": {
+        "ARL": {
+          "candidate": "huber/soil+plan/alpha=3/epsilon=1.35",
+          "scores": {
+            "mae": 1.3516343547514462,
+            "rmse": 1.741085581316749,
+            "bias": 1.272533112452174
+          },
+          "baseline": {
+            "mae": 1.2906061921296295,
+            "rmse": 1.682527662442805,
+            "bias": 1.191160300925925
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "ISUAG.USB": {
+          "candidate": "huber/predecessor/alpha=3/epsilon=1.35",
+          "scores": {
+            "mae": 1.3403083340007316,
+            "rmse": 1.3403083340007316,
+            "bias": -1.3403083340007316
+          },
+          "baseline": {
+            "mae": 0.9912557870370358,
+            "rmse": 0.9912557870370358,
+            "bias": -0.9912557870370358
+          },
+          "supported": 1,
+          "farm_years": 1
+        },
+        "NWREC": {
+          "candidate": "mean/predecessor",
+          "scores": {
+            "mae": 2.393890625,
+            "rmse": 2.7501518262199465,
+            "bias": -1.192492476851851
+          },
+          "baseline": {
+            "mae": 2.393890625,
+            "rmse": 2.7501518262199465,
+            "bias": -1.192492476851851
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "WOOSTER": {
+          "candidate": "huber/geo+plan/alpha=0.3/epsilon=1.8",
+          "scores": {
+            "mae": 1.2320831051386174,
+            "rmse": 1.4399397514768992,
+            "bias": -1.0082939108709843
+          },
+          "baseline": {
+            "mae": 1.2153518518518518,
+            "rmse": 1.4290009957096932,
+            "bias": 0.9939201388888884
+          },
+          "supported": 6,
+          "farm_years": 6
+        }
+      }
+    },
+    "kernel_ridge": {
+      "final_candidate": "kernel_ridge/geo/alpha=0.25/gamma=0.125",
+      "development_selection_score": {
+        "mae": 1.3123698765350307,
+        "rmse": 1.6755546198829065,
+        "bias": 0.33543511960808126
+      },
+      "nested_score": {
+        "mae": 1.6513485170854383,
+        "rmse": 1.9592592170304512,
+        "bias": -0.19020057196651352
+      },
+      "by_held_farm": {
+        "ARL": {
+          "candidate": "mean/predecessor",
+          "scores": {
+            "mae": 1.2906061921296295,
+            "rmse": 1.682527662442805,
+            "bias": 1.191160300925925
+          },
+          "baseline": {
+            "mae": 1.2906061921296295,
+            "rmse": 1.682527662442805,
+            "bias": 1.191160300925925
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "ISUAG.USB": {
+          "candidate": "kernel_ridge/plan/alpha=0.25/gamma=0.125",
+          "scores": {
+            "mae": 1.724713772435202,
+            "rmse": 1.724713772435202,
+            "bias": -1.724713772435202
+          },
+          "baseline": {
+            "mae": 0.9912557870370358,
+            "rmse": 0.9912557870370358,
+            "bias": -0.9912557870370358
+          },
+          "supported": 1,
+          "farm_years": 1
+        },
+        "NWREC": {
+          "candidate": "mean/predecessor",
+          "scores": {
+            "mae": 2.393890625,
+            "rmse": 2.7501518262199465,
+            "bias": -1.192492476851851
+          },
+          "baseline": {
+            "mae": 2.393890625,
+            "rmse": 2.7501518262199465,
+            "bias": -1.192492476851851
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "WOOSTER": {
+          "candidate": "kernel_ridge/geo/alpha=0.25/gamma=0.125",
+          "scores": {
+            "mae": 1.1961834787769208,
+            "rmse": 1.4092248646334915,
+            "bias": 0.9652436604950749
+          },
+          "baseline": {
+            "mae": 1.2153518518518518,
+            "rmse": 1.4290009957096932,
+            "bias": 0.9939201388888884
+          },
+          "supported": 6,
+          "farm_years": 6
+        }
+      }
+    },
+    "extra_trees": {
+      "final_candidate": "extra_trees/climate+soil+plan/max_depth=2/min_samples_leaf=2",
+      "development_selection_score": {
+        "mae": 1.2326828920717594,
+        "rmse": 1.631918813671017,
+        "bias": -0.18961358145254603
+      },
+      "nested_score": {
+        "mae": 1.6002730881679204,
+        "rmse": 1.9184167922455508,
+        "bias": -0.1594384572723764
+      },
+      "by_held_farm": {
+        "ARL": {
+          "candidate": "extra_trees/geo/max_depth=1/min_samples_leaf=2",
+          "scores": {
+            "mae": 1.380777103829089,
+            "rmse": 1.7657836319163553,
+            "bias": 1.3075864342206778
+          },
+          "baseline": {
+            "mae": 1.2906061921296295,
+            "rmse": 1.682527662442805,
+            "bias": 1.191160300925925
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "ISUAG.USB": {
+          "candidate": "extra_trees/plan/max_depth=1/min_samples_leaf=2",
+          "scores": {
+            "mae": 1.5611950231481466,
+            "rmse": 1.5611950231481466,
+            "bias": -1.5611950231481466
+          },
+          "baseline": {
+            "mae": 0.9912557870370358,
+            "rmse": 0.9912557870370358,
+            "bias": -0.9912557870370358
+          },
+          "supported": 1,
+          "farm_years": 1
+        },
+        "NWREC": {
+          "candidate": "extra_trees/climate/max_depth=2/min_samples_leaf=2",
+          "scores": {
+            "mae": 2.393890625,
+            "rmse": 2.7368807271843285,
+            "bias": -1.1658051070601845
+          },
+          "baseline": {
+            "mae": 2.393890625,
+            "rmse": 2.7501518262199465,
+            "bias": -1.192492476851851
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "WOOSTER": {
+          "candidate": "extra_trees/climate/max_depth=2/min_samples_leaf=2",
+          "scores": {
+            "mae": 1.0652296006944446,
+            "rmse": 1.2943933348096146,
+            "bias": 0.7816598668981478
+          },
+          "baseline": {
+            "mae": 1.2153518518518518,
+            "rmse": 1.4290009957096932,
+            "bias": 0.9939201388888884
+          },
+          "supported": 6,
+          "farm_years": 6
+        }
+      }
+    },
+    "gradient_boosting": {
+      "final_candidate": "gradient_boosting/climate+plan/max_depth=2/learning_rate=0.08",
+      "development_selection_score": {
+        "mae": 1.247025606712568,
+        "rmse": 1.5715880877810304,
+        "bias": -0.18483241245888352
+      },
+      "nested_score": {
+        "mae": 1.5613886248895312,
+        "rmse": 1.9037447782636903,
+        "bias": -0.20158660449586843
+      },
+      "by_held_farm": {
+        "ARL": {
+          "candidate": "gradient_boosting/geo/max_depth=2/learning_rate=0.08",
+          "scores": {
+            "mae": 1.2501451687655998,
+            "rmse": 1.7238321945425084,
+            "bias": 0.9196368287873988
+          },
+          "baseline": {
+            "mae": 1.2906061921296295,
+            "rmse": 1.682527662442805,
+            "bias": 1.191160300925925
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "ISUAG.USB": {
+          "candidate": "gradient_boosting/plan/max_depth=1/learning_rate=0.03",
+          "scores": {
+            "mae": 1.4426644758875673,
+            "rmse": 1.4426644758875673,
+            "bias": -1.4426644758875673
+          },
+          "baseline": {
+            "mae": 0.9912557870370358,
+            "rmse": 0.9912557870370358,
+            "bias": -0.9912557870370358
+          },
+          "supported": 1,
+          "farm_years": 1
+        },
+        "NWREC": {
+          "candidate": "mean/predecessor",
+          "scores": {
+            "mae": 2.393890625,
+            "rmse": 2.7501518262199465,
+            "bias": -1.192492476851851
+          },
+          "baseline": {
+            "mae": 2.393890625,
+            "rmse": 2.7501518262199465,
+            "bias": -1.192492476851851
+          },
+          "supported": 8,
+          "farm_years": 8
+        },
+        "WOOSTER": {
+          "candidate": "gradient_boosting/geo/max_depth=2/learning_rate=0.08",
+          "scores": {
+            "mae": 1.158854229904957,
+            "rmse": 1.3714092864185248,
+            "bias": 0.9091737059685463
+          },
+          "baseline": {
+            "mae": 1.2153518518518518,
+            "rmse": 1.4290009957096932,
+            "bias": 0.9939201388888884
+          },
+          "supported": 6,
+          "farm_years": 6
+        }
+      }
+    }
+  },
+  "calibrated_interval_half_width_t_ha": {
+    "ridge/geo/alpha=0.3/interactions": 4.63447778690379
+  },
+  "reused_diagnostics": {
+    "usda_original_holdout": {
+      "full_search": {
+        "farms": [
+          "HOYTVILLE.LTR",
+          "MAR",
+          "ORR",
+          "SERF"
+        ],
+        "farm_years": 24,
+        "candidate": {
+          "mae": 1.628457463377346,
+          "rmse": 1.9905330538676236,
+          "bias": 0.2280431988488974
+        },
+        "baseline": {
+          "mae": 1.0719760199652777,
+          "rmse": 1.584108869900127,
+          "bias": 0.18650195312499987
+        },
+        "geography_ridge_v1": {
+          "mae": 1.1884085266742812,
+          "rmse": 1.6055553200456998,
+          "bias": 0.2039169998762206
+        },
+        "supported_predictions": 24,
+        "interval_coverage": 0.96875
+      },
+      "without_plan_features": {
+        "farms": [
+          "HOYTVILLE.LTR",
+          "MAR",
+          "ORR",
+          "SERF"
+        ],
+        "farm_years": 24,
+        "candidate": {
+          "mae": 1.628457463377346,
+          "rmse": 1.9905330538676236,
+          "bias": 0.2280431988488974
+        },
+        "baseline": {
+          "mae": 1.0719760199652777,
+          "rmse": 1.584108869900127,
+          "bias": 0.18650195312499987
+        },
+        "geography_ridge_v1": {
+          "mae": 1.1884085266742812,
+          "rmse": 1.6055553200456998,
+          "bias": 0.2039169998762206
+        },
+        "supported_predictions": 24,
+        "interval_coverage": 0.96875
+      }
+    },
+    "morrow_plots": {
+      "full_search": {
+        "farms": [
+          "Morrow Plots"
+        ],
+        "farm_years": 9,
+        "candidate": {
+          "mae": 1.4673728602780622,
+          "rmse": 1.8972542315499838,
+          "bias": -0.40188533028331885
+        },
+        "baseline": {
+          "mae": 1.5963494465026318,
+          "rmse": 2.313389839187821,
+          "bias": -1.3833693460605756
+        },
+        "geography_ridge_v1": {
+          "mae": 1.5363355889041017,
+          "rmse": 2.117467844789582,
+          "bias": -1.022549887917675
+        },
+        "supported_predictions": 9,
+        "interval_coverage": 1.0
+      },
+      "without_plan_features": {
+        "farms": [
+          "Morrow Plots"
+        ],
+        "farm_years": 9,
+        "candidate": {
+          "mae": 1.4673728602780622,
+          "rmse": 1.8972542315499838,
+          "bias": -0.40188533028331885
+        },
+        "baseline": {
+          "mae": 1.5963494465026318,
+          "rmse": 2.313389839187821,
+          "bias": -1.3833693460605756
+        },
+        "geography_ridge_v1": {
+          "mae": 1.5363355889041017,
+          "rmse": 2.117467844789582,
+          "bias": -1.022549887917675
+        },
+        "supported_predictions": 9,
+        "interval_coverage": 1.0
+      }
+    },
+    "nebraska_south_dakota": {
+      "full_search": {
+        "farms": [
+          "NE",
+          "SD"
+        ],
+        "farm_years": 29,
+        "candidate": {
+          "mae": 1.5796816975126848,
+          "rmse": 2.049526061112294,
+          "bias": 0.7059712152653521
+        },
+        "baseline": {
+          "mae": 0.9805766832010583,
+          "rmse": 1.2541475642638575,
+          "bias": -0.10444168154761929
+        },
+        "geography_ridge_v1": {
+          "mae": 1.1938194066973042,
+          "rmse": 1.6092836316558177,
+          "bias": 0.8265629347138413
+        },
+        "supported_predictions": 29,
+        "interval_coverage": 0.9642857142857143
+      },
+      "without_plan_features": {
+        "farms": [
+          "NE",
+          "SD"
+        ],
+        "farm_years": 29,
+        "candidate": {
+          "mae": 1.5796816975126848,
+          "rmse": 2.049526061112294,
+          "bias": 0.7059712152653521
+        },
+        "baseline": {
+          "mae": 0.9805766832010583,
+          "rmse": 1.2541475642638575,
+          "bias": -0.10444168154761929
+        },
+        "geography_ridge_v1": {
+          "mae": 1.1938194066973042,
+          "rmse": 1.6092836316558177,
+          "bias": 0.8265629347138413
+        },
+        "supported_predictions": 29,
+        "interval_coverage": 0.9642857142857143
+      }
+    }
+  },
+  "fresh_kellogg_living_field_lab": {
+    "full_search": {
+      "farms": [
+        "Kellogg Living Field Lab"
+      ],
+      "farm_years": 6,
+      "candidate": {
+        "mae": 1.1424000896194828,
+        "rmse": 1.2230294348302628,
+        "bias": 0.9301867014322357
+      },
+      "baseline": {
+        "mae": 1.9448318865740741,
+        "rmse": 2.080183007735915,
+        "bias": 1.9448318865740741
+      },
+      "geography_ridge_v1": {
+        "mae": 1.041695812580921,
+        "rmse": 1.2229790511789773,
+        "bias": 1.041695812580921
+      },
+      "supported_predictions": 6,
+      "interval_coverage": 1.0
+    },
+    "without_plan_features": {
+      "farms": [
+        "Kellogg Living Field Lab"
+      ],
+      "farm_years": 6,
+      "candidate": {
+        "mae": 1.1424000896194828,
+        "rmse": 1.2230294348302628,
+        "bias": 0.9301867014322357
+      },
+      "baseline": {
+        "mae": 1.9448318865740741,
+        "rmse": 2.080183007735915,
+        "bias": 1.9448318865740741
+      },
+      "geography_ridge_v1": {
+        "mae": 1.041695812580921,
+        "rmse": 1.2229790511789773,
+        "bias": 1.041695812580921
+      },
+      "supported_predictions": 6,
+      "interval_coverage": 1.0
+    },
+    "minimum_distance_from_other_trials_km": 187.98071755164355,
+    "matched_replicate_pairs": 24,
+    "farm_years_by_predecessor": {
+      "Soy": 2,
+      "Wheat": 4
+    },
+    "by_predecessor": {
+      "Soy": {
+        "full_search": {
+          "farms": [
+            "Kellogg Living Field Lab"
+          ],
+          "farm_years": 2,
+          "candidate": {
+            "mae": 0.9012500000000002,
+            "rmse": 0.9392922481904463,
+            "bias": 0.2646098354382592
+          },
+          "baseline": {
+            "mae": 1.423808159722222,
+            "rmse": 1.6850760333562345,
+            "bias": 1.423808159722222
+          },
+          "geography_ridge_v1": {
+            "mae": 0.9871031938978084,
+            "rmse": 1.336646654094961,
+            "bias": 0.9871031938978084
+          },
+          "supported_predictions": 2,
+          "interval_coverage": 1.0
+        },
+        "without_plan_features": {
+          "farms": [
+            "Kellogg Living Field Lab"
+          ],
+          "farm_years": 2,
+          "candidate": {
+            "mae": 0.9012500000000002,
+            "rmse": 0.9392922481904463,
+            "bias": 0.2646098354382592
+          },
+          "baseline": {
+            "mae": 1.423808159722222,
+            "rmse": 1.6850760333562345,
+            "bias": 1.423808159722222
+          },
+          "geography_ridge_v1": {
+            "mae": 0.9871031938978084,
+            "rmse": 1.336646654094961,
+            "bias": 0.9871031938978084
+          },
+          "supported_predictions": 2,
+          "interval_coverage": 1.0
+        }
+      },
+      "Wheat": {
+        "full_search": {
+          "farms": [
+            "Kellogg Living Field Lab"
+          ],
+          "farm_years": 4,
+          "candidate": {
+            "mae": 1.262975134429224,
+            "rmse": 1.3425969365139028,
+            "bias": 1.262975134429224
+          },
+          "baseline": {
+            "mae": 2.20534375,
+            "rmse": 2.2518884074070065,
+            "bias": 2.20534375
+          },
+          "geography_ridge_v1": {
+            "mae": 1.068992121922477,
+            "rmse": 1.1619830035255765,
+            "bias": 1.068992121922477
+          },
+          "supported_predictions": 4,
+          "interval_coverage": 1.0
+        },
+        "without_plan_features": {
+          "farms": [
+            "Kellogg Living Field Lab"
+          ],
+          "farm_years": 4,
+          "candidate": {
+            "mae": 1.262975134429224,
+            "rmse": 1.3425969365139028,
+            "bias": 1.262975134429224
+          },
+          "baseline": {
+            "mae": 2.20534375,
+            "rmse": 2.2518884074070065,
+            "bias": 2.20534375
+          },
+          "geography_ridge_v1": {
+            "mae": 1.068992121922477,
+            "rmse": 1.1619830035255765,
+            "bias": 1.068992121922477
+          },
+          "supported_predictions": 4,
+          "interval_coverage": 1.0
+        }
+      }
+    }
+  },
+  "feature_coverage": {
+    "geo": {
+      "latitude": 23,
+      "longitude": 23
+    },
+    "climate": {
+      "spring_precip_mm": 23,
+      "summer_precip_mm": 23,
+      "summer_dry_spell_days": 23,
+      "summer_vpd_kpa": 23,
+      "season_gdd_10_30": 23,
+      "summer_heat_degree_days_30": 23,
+      "spring_frost_days": 23
+    },
+    "soil": {
+      "sand_percent": 23,
+      "clay_percent": 23,
+      "organic_matter_percent": 23,
+      "bulk_density_g_cm3": 23,
+      "available_water_fraction": 23,
+      "natural_drainage_rank": 23,
+      "available_water_0_100_cm_mm": 23,
+      "available_water_25_100_cm_mm": 23,
+      "spring_water_table_depth_cm": 23,
+      "slope_percent": 23
+    },
+    "plan": {
+      "no_till_share": 23,
+      "drained_share": 23,
+      "three_crop_share": 23
+    }
+  },
+  "candidate_development_scores": {
+    "mean/predecessor": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge_v1/geo": {
+      "mae": 1.1948843596175724,
+      "rmse": 1.694653765604841,
+      "bias": 0.1601997072448791
+    },
+    "ridge/predecessor/alpha=0.3": {
+      "mae": 1.5132270032789523,
+      "rmse": 1.8407698015836815,
+      "bias": -6.491399224102178e-05
+    },
+    "ridge/predecessor/alpha=1": {
+      "mae": 1.5085865359938493,
+      "rmse": 1.8369335414953547,
+      "bias": -0.000312282497984439
+    },
+    "ridge/predecessor/alpha=3": {
+      "mae": 1.501389627417568,
+      "rmse": 1.8312110077394919,
+      "bias": -0.0005480297684329999
+    },
+    "ridge/predecessor/alpha=10": {
+      "mae": 1.4933759571554417,
+      "rmse": 1.8251146473984328,
+      "bias": -0.0004580854059030617
+    },
+    "ridge/predecessor/alpha=30": {
+      "mae": 1.4889293992487707,
+      "rmse": 1.821839538323215,
+      "bias": -0.00018554941570674005
+    },
+    "ridge/predecessor/alpha=100": {
+      "mae": 1.4868699593145116,
+      "rmse": 1.8203463078869213,
+      "bias": 4.07594496431088e-06
+    },
+    "elastic_net/predecessor/alpha=0.04/l1_ratio=0.2": {
+      "mae": 1.502614828865484,
+      "rmse": 1.8322667001107371,
+      "bias": 9.858485875939921e-05
+    },
+    "elastic_net/predecessor/alpha=0.04/l1_ratio=0.8": {
+      "mae": 1.485874638310185,
+      "rmse": 1.8196297830091779,
+      "bias": 0.00011101466049390221
+    },
+    "elastic_net/predecessor/alpha=0.12/l1_ratio=0.2": {
+      "mae": 1.4874400580966787,
+      "rmse": 1.8207368604335936,
+      "bias": 7.225255836613988e-05
+    },
+    "elastic_net/predecessor/alpha=0.12/l1_ratio=0.8": {
+      "mae": 1.485874638310185,
+      "rmse": 1.8196297830091779,
+      "bias": 0.00011101466049390221
+    },
+    "elastic_net/predecessor/alpha=0.35/l1_ratio=0.2": {
+      "mae": 1.485874638310185,
+      "rmse": 1.8196297830091779,
+      "bias": 0.00011101466049390221
+    },
+    "elastic_net/predecessor/alpha=0.35/l1_ratio=0.8": {
+      "mae": 1.485874638310185,
+      "rmse": 1.8196297830091779,
+      "bias": 0.00011101466049390221
+    },
+    "huber/predecessor/alpha=0.3/epsilon=1.35": {
+      "mae": 1.5322621318434089,
+      "rmse": 1.8253679087652885,
+      "bias": -0.04282900658430958
+    },
+    "huber/predecessor/alpha=0.3/epsilon=1.8": {
+      "mae": 1.5176231322478622,
+      "rmse": 1.8320422060699977,
+      "bias": -0.048129799086825145
+    },
+    "huber/predecessor/alpha=3/epsilon=1.35": {
+      "mae": 1.526056819611302,
+      "rmse": 1.8157517831209173,
+      "bias": -0.052716891160018875
+    },
+    "huber/predecessor/alpha=3/epsilon=1.8": {
+      "mae": 1.5027742566457016,
+      "rmse": 1.8177758372115873,
+      "bias": -0.04833555476758265
+    },
+    "ridge/geo/alpha=0.3": {
+      "mae": 1.0784353818013956,
+      "rmse": 1.4983887010691526,
+      "bias": -0.024308834432119057
+    },
+    "ridge/geo/alpha=0.3/interactions": {
+      "mae": 1.0277963003311528,
+      "rmse": 1.4728034609819403,
+      "bias": 0.10146282145033117
+    },
+    "ridge/geo/alpha=1": {
+      "mae": 1.0723664326652975,
+      "rmse": 1.4949019862683837,
+      "bias": 0.07307414413094428
+    },
+    "ridge/geo/alpha=1/interactions": {
+      "mae": 1.0430669390092107,
+      "rmse": 1.504696850263463,
+      "bias": 0.14324008939368957
+    },
+    "ridge/geo/alpha=3": {
+      "mae": 1.1696281879072976,
+      "rmse": 1.5878413337932094,
+      "bias": 0.1436529330442188
+    },
+    "ridge/geo/alpha=3/interactions": {
+      "mae": 1.1750663107124042,
+      "rmse": 1.5955815799484647,
+      "bias": 0.16147581489742355
+    },
+    "ridge/geo/alpha=10": {
+      "mae": 1.3199654801762055,
+      "rmse": 1.7179560260541793,
+      "bias": 0.13495236465022023
+    },
+    "ridge/geo/alpha=10/interactions": {
+      "mae": 1.3163494861039549,
+      "rmse": 1.7158260117909598,
+      "bias": 0.133303687450923
+    },
+    "ridge/geo/alpha=30": {
+      "mae": 1.415462150702963,
+      "rmse": 1.7794120631622172,
+      "bias": 0.07804972938050815
+    },
+    "ridge/geo/alpha=30/interactions": {
+      "mae": 1.4133165345536187,
+      "rmse": 1.777277418182882,
+      "bias": 0.0791694140879949
+    },
+    "ridge/geo/alpha=100": {
+      "mae": 1.4626815307297405,
+      "rmse": 1.8033001829471218,
+      "bias": 0.030812108390972877
+    },
+    "ridge/geo/alpha=100/interactions": {
+      "mae": 1.4620427657328798,
+      "rmse": 1.8026850300575694,
+      "bias": 0.03195112436110802
+    },
+    "elastic_net/geo/alpha=0.04/l1_ratio=0.2": {
+      "mae": 1.0795591468662802,
+      "rmse": 1.488996328149674,
+      "bias": 0.061868361646965964
+    },
+    "elastic_net/geo/alpha=0.04/l1_ratio=0.8": {
+      "mae": 1.1410784547163269,
+      "rmse": 1.5578146629968281,
+      "bias": 0.2163910931692586
+    },
+    "elastic_net/geo/alpha=0.12/l1_ratio=0.2": {
+      "mae": 1.1971266175320545,
+      "rmse": 1.6029603583753056,
+      "bias": 0.18927448928457621
+    },
+    "elastic_net/geo/alpha=0.12/l1_ratio=0.8": {
+      "mae": 1.267046811924414,
+      "rmse": 1.6429937088931796,
+      "bias": 0.20099126077763174
+    },
+    "elastic_net/geo/alpha=0.35/l1_ratio=0.2": {
+      "mae": 1.2870058310288248,
+      "rmse": 1.661250257116365,
+      "bias": 0.09649033009902169
+    },
+    "elastic_net/geo/alpha=0.35/l1_ratio=0.8": {
+      "mae": 1.4491532221193275,
+      "rmse": 1.7868323386161487,
+      "bias": 0.10160089750545005
+    },
+    "huber/geo/alpha=0.3/epsilon=1.35": {
+      "mae": 1.5750925817237027,
+      "rmse": 1.950491947825026,
+      "bias": 0.19701288045544862
+    },
+    "huber/geo/alpha=0.3/epsilon=1.8": {
+      "mae": 1.1481184800890971,
+      "rmse": 1.537300791295371,
+      "bias": -0.031153458738859212
+    },
+    "huber/geo/alpha=3/epsilon=1.35": {
+      "mae": 1.5530647559306703,
+      "rmse": 1.8455652355957277,
+      "bias": 0.083930704237884
+    },
+    "huber/geo/alpha=3/epsilon=1.8": {
+      "mae": 1.3250437475704044,
+      "rmse": 1.6782363782250949,
+      "bias": 0.09245470927186833
+    },
+    "ridge/geo/alpha=0.3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo/alpha=0.3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo/alpha=0.3/interactions/taper=400km": {
+      "mae": 1.3418087195357915,
+      "rmse": 1.7015070728934543,
+      "bias": 0.08634858908648124
+    },
+    "ridge/geo/alpha=3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo/alpha=3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo/alpha=3/interactions/taper=400km": {
+      "mae": 1.4152013425512784,
+      "rmse": 1.768694169577866,
+      "bias": 0.10197469889054409
+    },
+    "ridge/geo/alpha=30/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo/alpha=30/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo/alpha=30/interactions/taper=400km": {
+      "mae": 1.4721063349206867,
+      "rmse": 1.8247972878736232,
+      "bias": 0.04917482978517507
+    },
+    "kernel_ridge/geo/alpha=0.25/gamma=0.125": {
+      "mae": 1.3123698765350307,
+      "rmse": 1.6755546198829065,
+      "bias": 0.33543511960808126
+    },
+    "kernel_ridge/geo/alpha=0.25/gamma=0.5": {
+      "mae": 1.3814729324151505,
+      "rmse": 1.7348736880190243,
+      "bias": 0.1952366648343074
+    },
+    "kernel_ridge/geo/alpha=0.25/gamma=2": {
+      "mae": 1.4590658910787766,
+      "rmse": 1.8191552241823925,
+      "bias": 0.02132238713571179
+    },
+    "kernel_ridge/geo/alpha=2/gamma=0.125": {
+      "mae": 1.4094091118483987,
+      "rmse": 1.7580556493862478,
+      "bias": 0.1884149602547902
+    },
+    "kernel_ridge/geo/alpha=2/gamma=0.5": {
+      "mae": 1.4119645474192788,
+      "rmse": 1.7627089934192819,
+      "bias": 0.1318332871327544
+    },
+    "kernel_ridge/geo/alpha=2/gamma=2": {
+      "mae": 1.4631892705288598,
+      "rmse": 1.822578712354403,
+      "bias": 0.015379478216049586
+    },
+    "extra_trees/geo/max_depth=1/min_samples_leaf=2": {
+      "mae": 1.5703576030213153,
+      "rmse": 1.908181265651165,
+      "bias": 0.1434546899112653
+    },
+    "extra_trees/geo/max_depth=1/min_samples_leaf=4": {
+      "mae": 1.5703576030213153,
+      "rmse": 1.908181265651165,
+      "bias": 0.1434546899112653
+    },
+    "extra_trees/geo/max_depth=2/min_samples_leaf=2": {
+      "mae": 1.4470251073013114,
+      "rmse": 1.8661308485980135,
+      "bias": 0.21455284891010787
+    },
+    "extra_trees/geo/max_depth=2/min_samples_leaf=4": {
+      "mae": 1.4470251073013114,
+      "rmse": 1.8678249193038636,
+      "bias": 0.21184473259066336
+    },
+    "extra_trees/geo/max_depth=4/min_samples_leaf=2": {
+      "mae": 1.3917358036747682,
+      "rmse": 1.8515419616329787,
+      "bias": 0.27119621069637334
+    },
+    "extra_trees/geo/max_depth=4/min_samples_leaf=4": {
+      "mae": 1.3912844509548608,
+      "rmse": 1.8524695028348988,
+      "bias": 0.2675853889371141
+    },
+    "gradient_boosting/geo/max_depth=1/learning_rate=0.03": {
+      "mae": 1.4110030733654693,
+      "rmse": 1.8624709796067798,
+      "bias": 0.3883921416698559
+    },
+    "gradient_boosting/geo/max_depth=1/learning_rate=0.08": {
+      "mae": 1.3557507373165572,
+      "rmse": 1.8641786710862125,
+      "bias": 0.2758351768865715
+    },
+    "gradient_boosting/geo/max_depth=2/learning_rate=0.03": {
+      "mae": 1.476905222861468,
+      "rmse": 1.8585905629015338,
+      "bias": 0.21393017652267793
+    },
+    "gradient_boosting/geo/max_depth=2/learning_rate=0.08": {
+      "mae": 1.3405808036997304,
+      "rmse": 1.7545934895627964,
+      "bias": 0.06637494865522257
+    },
+    "ridge/climate/alpha=0.3": {
+      "mae": 1.411125329921346,
+      "rmse": 1.6974977090656027,
+      "bias": -0.13926309576692264
+    },
+    "ridge/climate/alpha=0.3/interactions": {
+      "mae": 1.2876222479412986,
+      "rmse": 1.6350196374520738,
+      "bias": -0.12767126301173012
+    },
+    "ridge/climate/alpha=1": {
+      "mae": 1.279024406429827,
+      "rmse": 1.607149852207899,
+      "bias": -0.1373319975902941
+    },
+    "ridge/climate/alpha=1/interactions": {
+      "mae": 1.1991927578794974,
+      "rmse": 1.5740173131740318,
+      "bias": -0.13231573172853062
+    },
+    "ridge/climate/alpha=3": {
+      "mae": 1.1481404481991104,
+      "rmse": 1.539229881608367,
+      "bias": -0.13593819494049958
+    },
+    "ridge/climate/alpha=3/interactions": {
+      "mae": 1.0924072687277682,
+      "rmse": 1.5256406997869216,
+      "bias": -0.13370004620917467
+    },
+    "ridge/climate/alpha=10": {
+      "mae": 1.1694225342406344,
+      "rmse": 1.5218468778870275,
+      "bias": -0.13064035896561288
+    },
+    "ridge/climate/alpha=10/interactions": {
+      "mae": 1.1316891207408402,
+      "rmse": 1.5147447175648427,
+      "bias": -0.12718961101964765
+    },
+    "ridge/climate/alpha=30": {
+      "mae": 1.2311640270092876,
+      "rmse": 1.550206659046751,
+      "bias": -0.11029758088060868
+    },
+    "ridge/climate/alpha=30/interactions": {
+      "mae": 1.2140274096713213,
+      "rmse": 1.5502399102825974,
+      "bias": -0.10543567659177627
+    },
+    "ridge/climate/alpha=100": {
+      "mae": 1.3113555269601278,
+      "rmse": 1.6325674393962282,
+      "bias": -0.06824274805104112
+    },
+    "ridge/climate/alpha=100/interactions": {
+      "mae": 1.3093057876601697,
+      "rmse": 1.635262038449982,
+      "bias": -0.06554456290620438
+    },
+    "elastic_net/climate/alpha=0.04/l1_ratio=0.2": {
+      "mae": 1.2456324687630345,
+      "rmse": 1.61799953251981,
+      "bias": -0.20327381731733643
+    },
+    "elastic_net/climate/alpha=0.04/l1_ratio=0.8": {
+      "mae": 1.394290694022553,
+      "rmse": 1.6414177638517127,
+      "bias": -0.1078764176924735
+    },
+    "elastic_net/climate/alpha=0.12/l1_ratio=0.2": {
+      "mae": 1.1951416716283871,
+      "rmse": 1.5460711480652118,
+      "bias": -0.19899110889094035
+    },
+    "elastic_net/climate/alpha=0.12/l1_ratio=0.8": {
+      "mae": 1.3259329268534557,
+      "rmse": 1.5912343847198764,
+      "bias": 0.033097855017327975
+    },
+    "elastic_net/climate/alpha=0.35/l1_ratio=0.2": {
+      "mae": 1.2499867582971864,
+      "rmse": 1.5463791395053397,
+      "bias": -0.15255511662372598
+    },
+    "elastic_net/climate/alpha=0.35/l1_ratio=0.8": {
+      "mae": 1.3353777993314264,
+      "rmse": 1.6348860125952454,
+      "bias": 0.10834831326635505
+    },
+    "huber/climate/alpha=0.3/epsilon=1.35": {
+      "mae": 1.2151407649226607,
+      "rmse": 1.5788316965351257,
+      "bias": 0.03743860841986613
+    },
+    "huber/climate/alpha=0.3/epsilon=1.8": {
+      "mae": 1.2626455866706885,
+      "rmse": 1.6148990929674794,
+      "bias": -0.2529388456206984
+    },
+    "huber/climate/alpha=3/epsilon=1.35": {
+      "mae": 1.1491379435540467,
+      "rmse": 1.5084523510572283,
+      "bias": -0.02406750963580013
+    },
+    "huber/climate/alpha=3/epsilon=1.8": {
+      "mae": 1.1275850603107,
+      "rmse": 1.5250956102092157,
+      "bias": -0.21897201933619725
+    },
+    "ridge/climate/alpha=0.3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/climate/alpha=0.3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/climate/alpha=0.3/interactions/taper=400km": {
+      "mae": 1.260321480119272,
+      "rmse": 1.6953201275283938,
+      "bias": 0.02984591912117867
+    },
+    "ridge/climate/alpha=3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/climate/alpha=3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/climate/alpha=3/interactions/taper=400km": {
+      "mae": 1.3198161952206056,
+      "rmse": 1.7051702733323941,
+      "bias": 0.017300144898999965
+    },
+    "ridge/climate/alpha=30/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/climate/alpha=30/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/climate/alpha=30/interactions/taper=400km": {
+      "mae": 1.3819908175143334,
+      "rmse": 1.7374333491992557,
+      "bias": -0.002530848729628541
+    },
+    "kernel_ridge/climate/alpha=0.25/gamma=0.125": {
+      "mae": 1.4136155835431439,
+      "rmse": 1.781826592603607,
+      "bias": -0.0667621969350697
+    },
+    "kernel_ridge/climate/alpha=0.25/gamma=0.5": {
+      "mae": 1.4681690161975436,
+      "rmse": 1.8280827731298317,
+      "bias": -0.006294668675042197
+    },
+    "kernel_ridge/climate/alpha=0.25/gamma=2": {
+      "mae": 1.4727760431896284,
+      "rmse": 1.8315884912631788,
+      "bias": 0.0003329533032737642
+    },
+    "kernel_ridge/climate/alpha=2/gamma=0.125": {
+      "mae": 1.4360960570596673,
+      "rmse": 1.7975183639039838,
+      "bias": -0.03947645245279553
+    },
+    "kernel_ridge/climate/alpha=2/gamma=0.5": {
+      "mae": 1.4697671575155375,
+      "rmse": 1.8292883603605021,
+      "bias": -0.003994831312109749
+    },
+    "kernel_ridge/climate/alpha=2/gamma=2": {
+      "mae": 1.4727760681539317,
+      "rmse": 1.8315885075729397,
+      "bias": 0.0003329852699226061
+    },
+    "extra_trees/climate/max_depth=1/min_samples_leaf=2": {
+      "mae": 1.3692270598234952,
+      "rmse": 1.7273379379639275,
+      "bias": -0.21763744755497694
+    },
+    "extra_trees/climate/max_depth=1/min_samples_leaf=4": {
+      "mae": 1.3692270598234952,
+      "rmse": 1.7460554657728335,
+      "bias": -0.2448643500434028
+    },
+    "extra_trees/climate/max_depth=2/min_samples_leaf=2": {
+      "mae": 1.3136719111689814,
+      "rmse": 1.6966732186631586,
+      "bias": -0.2156784782503856
+    },
+    "extra_trees/climate/max_depth=2/min_samples_leaf=4": {
+      "mae": 1.3118665002893515,
+      "rmse": 1.7119014548197276,
+      "bias": -0.25942055362654315
+    },
+    "extra_trees/climate/max_depth=4/min_samples_leaf=2": {
+      "mae": 1.3078655478395063,
+      "rmse": 1.69371871721946,
+      "bias": -0.20987211492091035
+    },
+    "extra_trees/climate/max_depth=4/min_samples_leaf=4": {
+      "mae": 1.3215942081404317,
+      "rmse": 1.7169311015073132,
+      "bias": -0.2691482614776234
+    },
+    "gradient_boosting/climate/max_depth=1/learning_rate=0.03": {
+      "mae": 1.3942931798190854,
+      "rmse": 1.6937380156556194,
+      "bias": 0.11271221360591911
+    },
+    "gradient_boosting/climate/max_depth=1/learning_rate=0.08": {
+      "mae": 1.3233164038982674,
+      "rmse": 1.6015551006261846,
+      "bias": -3.79747042143705e-05
+    },
+    "gradient_boosting/climate/max_depth=2/learning_rate=0.03": {
+      "mae": 1.3921359088646021,
+      "rmse": 1.6845316516381417,
+      "bias": 0.049979693277468595
+    },
+    "gradient_boosting/climate/max_depth=2/learning_rate=0.08": {
+      "mae": 1.318246885010343,
+      "rmse": 1.5990235891957645,
+      "bias": -0.060289693310721246
+    },
+    "ridge/soil/alpha=0.3": {
+      "mae": 1.842427711197466,
+      "rmse": 2.1856151797141297,
+      "bias": -0.04690586629951443
+    },
+    "ridge/soil/alpha=0.3/interactions": {
+      "mae": 1.9627646766962015,
+      "rmse": 2.270985454106352,
+      "bias": -0.09668430175224449
+    },
+    "ridge/soil/alpha=1": {
+      "mae": 1.8456095630330906,
+      "rmse": 2.1723629014752475,
+      "bias": -0.04002370311875857
+    },
+    "ridge/soil/alpha=1/interactions": {
+      "mae": 1.9455819205132423,
+      "rmse": 2.250411350675121,
+      "bias": -0.09117229809599006
+    },
+    "ridge/soil/alpha=3": {
+      "mae": 1.8385193387475802,
+      "rmse": 2.149268558775976,
+      "bias": -0.03967912568360708
+    },
+    "ridge/soil/alpha=3/interactions": {
+      "mae": 1.9094492649363037,
+      "rmse": 2.2056417874353884,
+      "bias": -0.08017833816990383
+    },
+    "ridge/soil/alpha=10": {
+      "mae": 1.801587703651605,
+      "rmse": 2.0946358120144586,
+      "bias": -0.053086487900643645
+    },
+    "ridge/soil/alpha=10/interactions": {
+      "mae": 1.832143701407793,
+      "rmse": 2.1178268259146495,
+      "bias": -0.06441155746436791
+    },
+    "ridge/soil/alpha=30": {
+      "mae": 1.7195758794128049,
+      "rmse": 2.004063259162158,
+      "bias": -0.07064781858977746
+    },
+    "ridge/soil/alpha=30/interactions": {
+      "mae": 1.7283094902291083,
+      "rmse": 2.0112364422218514,
+      "bias": -0.05926831580319178
+    },
+    "ridge/soil/alpha=100": {
+      "mae": 1.6063837626773845,
+      "rmse": 1.9003682249818303,
+      "bias": -0.06913248367941895
+    },
+    "ridge/soil/alpha=100/interactions": {
+      "mae": 1.608940629564734,
+      "rmse": 1.903125200662496,
+      "bias": -0.05907693469182018
+    },
+    "elastic_net/soil/alpha=0.04/l1_ratio=0.2": {
+      "mae": 1.4749031562146215,
+      "rmse": 1.8499381863302253,
+      "bias": -0.3571151026591653
+    },
+    "elastic_net/soil/alpha=0.04/l1_ratio=0.8": {
+      "mae": 1.4912902248703996,
+      "rmse": 1.827283842066232,
+      "bias": -0.5990690661482497
+    },
+    "elastic_net/soil/alpha=0.12/l1_ratio=0.2": {
+      "mae": 1.5015890244300456,
+      "rmse": 1.8454671573167547,
+      "bias": -0.3280137203700609
+    },
+    "elastic_net/soil/alpha=0.12/l1_ratio=0.8": {
+      "mae": 1.4856611623322122,
+      "rmse": 1.8175418885046064,
+      "bias": -0.5302123755749969
+    },
+    "elastic_net/soil/alpha=0.35/l1_ratio=0.2": {
+      "mae": 1.4919997602221342,
+      "rmse": 1.8340994391223295,
+      "bias": -0.3079165509921699
+    },
+    "elastic_net/soil/alpha=0.35/l1_ratio=0.8": {
+      "mae": 1.414150618696303,
+      "rmse": 1.7687027010404628,
+      "bias": -0.35093137980002087
+    },
+    "huber/soil/alpha=0.3/epsilon=1.35": {
+      "mae": 2.219295258266966,
+      "rmse": 2.5660785161568618,
+      "bias": 0.3596453899799236
+    },
+    "huber/soil/alpha=0.3/epsilon=1.8": {
+      "mae": 1.8873155190992896,
+      "rmse": 2.1841532199143048,
+      "bias": 0.07102874556481387
+    },
+    "huber/soil/alpha=3/epsilon=1.35": {
+      "mae": 2.1050419699529614,
+      "rmse": 2.407697117448376,
+      "bias": 0.300154455659411
+    },
+    "huber/soil/alpha=3/epsilon=1.8": {
+      "mae": 1.864535222678181,
+      "rmse": 2.1306503343999683,
+      "bias": 0.06540579982461348
+    },
+    "ridge/soil/alpha=0.3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/soil/alpha=0.3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/soil/alpha=0.3/interactions/taper=400km": {
+      "mae": 1.5725246167267009,
+      "rmse": 1.9043898289184922,
+      "bias": -0.09292350118849842
+    },
+    "ridge/soil/alpha=3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/soil/alpha=3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/soil/alpha=3/interactions/taper=400km": {
+      "mae": 1.5631347752513767,
+      "rmse": 1.894433266451464,
+      "bias": -0.07940070351061558
+    },
+    "ridge/soil/alpha=30/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/soil/alpha=30/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/soil/alpha=30/interactions/taper=400km": {
+      "mae": 1.5293190685086437,
+      "rmse": 1.8632105133719357,
+      "bias": -0.04491510520183894
+    },
+    "kernel_ridge/soil/alpha=0.25/gamma=0.125": {
+      "mae": 1.499254733936769,
+      "rmse": 1.8536609462740579,
+      "bias": 0.01264299804923719
+    },
+    "kernel_ridge/soil/alpha=0.25/gamma=0.5": {
+      "mae": 1.473805793710037,
+      "rmse": 1.8325994921567408,
+      "bias": 0.001827295286745898
+    },
+    "kernel_ridge/soil/alpha=0.25/gamma=2": {
+      "mae": 1.4727761183692263,
+      "rmse": 1.8315885431631973,
+      "bias": 0.00033305178095567606
+    },
+    "kernel_ridge/soil/alpha=2/gamma=0.125": {
+      "mae": 1.4932556663863699,
+      "rmse": 1.8477956726360798,
+      "bias": 0.009970574580056736
+    },
+    "kernel_ridge/soil/alpha=2/gamma=0.5": {
+      "mae": 1.4735494393350488,
+      "rmse": 1.832346323601492,
+      "bias": 0.001454211418540283
+    },
+    "kernel_ridge/soil/alpha=2/gamma=2": {
+      "mae": 1.4727761172780773,
+      "rmse": 1.8315885417544668,
+      "bias": 0.00033304983108707614
+    },
+    "extra_trees/soil/max_depth=1/min_samples_leaf=2": {
+      "mae": 1.447145018024209,
+      "rmse": 1.7880588810576346,
+      "bias": -0.06920397195698297
+    },
+    "extra_trees/soil/max_depth=1/min_samples_leaf=4": {
+      "mae": 1.447145018024209,
+      "rmse": 1.8070122516983484,
+      "bias": -0.10537530442226076
+    },
+    "extra_trees/soil/max_depth=2/min_samples_leaf=2": {
+      "mae": 1.3880144434799375,
+      "rmse": 1.7667612202579126,
+      "bias": -0.1845930326485337
+    },
+    "extra_trees/soil/max_depth=2/min_samples_leaf=4": {
+      "mae": 1.3868128496334873,
+      "rmse": 1.788961618598218,
+      "bias": -0.2207319516782404
+    },
+    "extra_trees/soil/max_depth=4/min_samples_leaf=2": {
+      "mae": 1.397813380111882,
+      "rmse": 1.772226125396099,
+      "bias": -0.19439196928047814
+    },
+    "extra_trees/soil/max_depth=4/min_samples_leaf=4": {
+      "mae": 1.4007095751350305,
+      "rmse": 1.7966094673253852,
+      "bias": -0.23462867717978358
+    },
+    "gradient_boosting/soil/max_depth=1/learning_rate=0.03": {
+      "mae": 1.6104366211695016,
+      "rmse": 1.8645267899106006,
+      "bias": 0.06778614373267024
+    },
+    "gradient_boosting/soil/max_depth=1/learning_rate=0.08": {
+      "mae": 1.5292228118328495,
+      "rmse": 1.8035182394021507,
+      "bias": -0.12603828239028264
+    },
+    "gradient_boosting/soil/max_depth=2/learning_rate=0.03": {
+      "mae": 1.484933537425895,
+      "rmse": 1.7907529751509974,
+      "bias": -0.08740701043176696
+    },
+    "gradient_boosting/soil/max_depth=2/learning_rate=0.08": {
+      "mae": 1.4889742252029508,
+      "rmse": 1.803920662270333,
+      "bias": -0.39698031717213766
+    },
+    "ridge/plan/alpha=0.3": {
+      "mae": 1.6570498654243135,
+      "rmse": 2.1108021851977505,
+      "bias": -0.18284447786006072
+    },
+    "ridge/plan/alpha=0.3/interactions": {
+      "mae": 1.7354578457808012,
+      "rmse": 2.157338184630487,
+      "bias": -0.21819473698619468
+    },
+    "ridge/plan/alpha=1": {
+      "mae": 1.6666603167426202,
+      "rmse": 2.102436714141329,
+      "bias": -0.17289005299338778
+    },
+    "ridge/plan/alpha=1/interactions": {
+      "mae": 1.7296305413791306,
+      "rmse": 2.140900474463128,
+      "bias": -0.2048429232159966
+    },
+    "ridge/plan/alpha=3": {
+      "mae": 1.678602164272674,
+      "rmse": 2.0805624296783694,
+      "bias": -0.15387382024672425
+    },
+    "ridge/plan/alpha=3/interactions": {
+      "mae": 1.714205553774331,
+      "rmse": 2.1035763838524932,
+      "bias": -0.17734929659293447
+    },
+    "ridge/plan/alpha=10": {
+      "mae": 1.6678369720588884,
+      "rmse": 2.022956895754556,
+      "bias": -0.12221782137432508
+    },
+    "ridge/plan/alpha=10/interactions": {
+      "mae": 1.6730854640016153,
+      "rmse": 2.02704570865655,
+      "bias": -0.1303401550086179
+    },
+    "ridge/plan/alpha=30": {
+      "mae": 1.6146065665230631,
+      "rmse": 1.9436791153544577,
+      "bias": -0.08366378295304616
+    },
+    "ridge/plan/alpha=30/interactions": {
+      "mae": 1.6113858702638089,
+      "rmse": 1.9419058925724646,
+      "bias": -0.0839075650028626
+    },
+    "ridge/plan/alpha=100": {
+      "mae": 1.5466419090056207,
+      "rmse": 1.872145347594143,
+      "bias": -0.040423843220956816
+    },
+    "ridge/plan/alpha=100/interactions": {
+      "mae": 1.5455094813610777,
+      "rmse": 1.8715167802628077,
+      "bias": -0.040684144478697594
+    },
+    "elastic_net/plan/alpha=0.04/l1_ratio=0.2": {
+      "mae": 1.6642628425425627,
+      "rmse": 2.1029494439710743,
+      "bias": -0.17313302007236583
+    },
+    "elastic_net/plan/alpha=0.04/l1_ratio=0.8": {
+      "mae": 1.6672531807496955,
+      "rmse": 2.088162872777931,
+      "bias": -0.15254842595035586
+    },
+    "elastic_net/plan/alpha=0.12/l1_ratio=0.2": {
+      "mae": 1.6786025348769622,
+      "rmse": 2.081172880646897,
+      "bias": -0.14871914595960717
+    },
+    "elastic_net/plan/alpha=0.12/l1_ratio=0.8": {
+      "mae": 1.6825306438756416,
+      "rmse": 2.040089602756669,
+      "bias": -0.08755249792824892
+    },
+    "elastic_net/plan/alpha=0.35/l1_ratio=0.2": {
+      "mae": 1.6678664318768455,
+      "rmse": 2.0180738162376297,
+      "bias": -0.0996531709324512
+    },
+    "elastic_net/plan/alpha=0.35/l1_ratio=0.8": {
+      "mae": 1.5802692003171894,
+      "rmse": 1.9030366713802198,
+      "bias": -0.05881316371984307
+    },
+    "huber/plan/alpha=0.3/epsilon=1.35": {
+      "mae": 1.716782732942613,
+      "rmse": 2.1113210731584777,
+      "bias": -0.1502588735772025
+    },
+    "huber/plan/alpha=0.3/epsilon=1.8": {
+      "mae": 1.6704768324671646,
+      "rmse": 2.1324959271990744,
+      "bias": -0.21637996226924186
+    },
+    "huber/plan/alpha=3/epsilon=1.35": {
+      "mae": 1.695407761486417,
+      "rmse": 2.079058527785949,
+      "bias": -0.13575704361921842
+    },
+    "huber/plan/alpha=3/epsilon=1.8": {
+      "mae": 1.6853479612512239,
+      "rmse": 2.0835697023063693,
+      "bias": -0.18000892549353287
+    },
+    "ridge/plan/alpha=0.3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/plan/alpha=0.3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/plan/alpha=0.3/interactions/taper=400km": {
+      "mae": 1.5343678824106894,
+      "rmse": 1.9033384329343528,
+      "bias": -0.089357876387417
+    },
+    "ridge/plan/alpha=3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/plan/alpha=3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/plan/alpha=3/interactions/taper=400km": {
+      "mae": 1.5294939113658788,
+      "rmse": 1.8915748853204706,
+      "bias": -0.075075563707464
+    },
+    "ridge/plan/alpha=30/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/plan/alpha=30/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/plan/alpha=30/interactions/taper=400km": {
+      "mae": 1.5049647199107534,
+      "rmse": 1.8542204155826087,
+      "bias": -0.03858081006489405
+    },
+    "kernel_ridge/plan/alpha=0.25/gamma=0.125": {
+      "mae": 1.7304288188517167,
+      "rmse": 2.085549801755492,
+      "bias": -0.13655841692169404
+    },
+    "kernel_ridge/plan/alpha=0.25/gamma=0.5": {
+      "mae": 1.6906658328791615,
+      "rmse": 2.045118438157603,
+      "bias": -0.16669300470738796
+    },
+    "kernel_ridge/plan/alpha=0.25/gamma=2": {
+      "mae": 1.678272722177146,
+      "rmse": 2.0360255399423406,
+      "bias": -0.18134547202000775
+    },
+    "kernel_ridge/plan/alpha=2/gamma=0.125": {
+      "mae": 1.649614301185629,
+      "rmse": 1.9850418246703492,
+      "bias": -0.10614775644684772
+    },
+    "kernel_ridge/plan/alpha=2/gamma=0.5": {
+      "mae": 1.6267670622499888,
+      "rmse": 1.9763520334749873,
+      "bias": -0.12156269403362988
+    },
+    "kernel_ridge/plan/alpha=2/gamma=2": {
+      "mae": 1.6162205931503322,
+      "rmse": 1.9707244102466361,
+      "bias": -0.1252551855323113
+    },
+    "extra_trees/plan/max_depth=1/min_samples_leaf=2": {
+      "mae": 1.6582594762731477,
+      "rmse": 2.061094218055288,
+      "bias": -0.1678654513888888
+    },
+    "extra_trees/plan/max_depth=1/min_samples_leaf=4": {
+      "mae": 1.6582594762731477,
+      "rmse": 2.061094218055288,
+      "bias": -0.1678654513888888
+    },
+    "extra_trees/plan/max_depth=2/min_samples_leaf=2": {
+      "mae": 1.7080750144675925,
+      "rmse": 2.10240038123622,
+      "bias": -0.15242505787036997
+    },
+    "extra_trees/plan/max_depth=2/min_samples_leaf=4": {
+      "mae": 1.7080750144675925,
+      "rmse": 2.10240038123622,
+      "bias": -0.15242505787036997
+    },
+    "extra_trees/plan/max_depth=4/min_samples_leaf=2": {
+      "mae": 1.7414271556712964,
+      "rmse": 2.1292014489132787,
+      "bias": -0.18577719907407386
+    },
+    "extra_trees/plan/max_depth=4/min_samples_leaf=4": {
+      "mae": 1.7414271556712964,
+      "rmse": 2.1292014489132787,
+      "bias": -0.18577719907407386
+    },
+    "gradient_boosting/plan/max_depth=1/learning_rate=0.03": {
+      "mae": 1.6012770877937281,
+      "rmse": 1.9211932591248746,
+      "bias": -0.09285125526640178
+    },
+    "gradient_boosting/plan/max_depth=1/learning_rate=0.08": {
+      "mae": 1.5667115045322753,
+      "rmse": 1.960115138016876,
+      "bias": -0.29038075700908883
+    },
+    "gradient_boosting/plan/max_depth=2/learning_rate=0.03": {
+      "mae": 1.6229363979543856,
+      "rmse": 1.9415580183999028,
+      "bias": -0.08376615130864828
+    },
+    "gradient_boosting/plan/max_depth=2/learning_rate=0.08": {
+      "mae": 1.5967420227060918,
+      "rmse": 1.973631975294292,
+      "bias": -0.2854478437134663
+    },
+    "ridge/geo+climate/alpha=0.3": {
+      "mae": 1.3275695103139324,
+      "rmse": 1.6237186184451518,
+      "bias": -0.15814471699190485
+    },
+    "ridge/geo+climate/alpha=0.3/interactions": {
+      "mae": 1.238135165088014,
+      "rmse": 1.5999673330014803,
+      "bias": -0.10724446914460566
+    },
+    "ridge/geo+climate/alpha=1": {
+      "mae": 1.2037422407760692,
+      "rmse": 1.5387404238621496,
+      "bias": -0.13133979931083728
+    },
+    "ridge/geo+climate/alpha=1/interactions": {
+      "mae": 1.1459371476350615,
+      "rmse": 1.5434629030092937,
+      "bias": -0.09943366645791793
+    },
+    "ridge/geo+climate/alpha=3": {
+      "mae": 1.0648708146584975,
+      "rmse": 1.4875152940127405,
+      "bias": -0.09834596900102636
+    },
+    "ridge/geo+climate/alpha=3/interactions": {
+      "mae": 1.0358699608381592,
+      "rmse": 1.5038909024161233,
+      "bias": -0.08310499200053573
+    },
+    "ridge/geo+climate/alpha=10": {
+      "mae": 1.1134158155306288,
+      "rmse": 1.4920797059848396,
+      "bias": -0.07062391037921213
+    },
+    "ridge/geo+climate/alpha=10/interactions": {
+      "mae": 1.0784832996848401,
+      "rmse": 1.4997575473179063,
+      "bias": -0.06356459289491583
+    },
+    "ridge/geo+climate/alpha=30": {
+      "mae": 1.179769169688691,
+      "rmse": 1.5340442161226502,
+      "bias": -0.05469814544404472
+    },
+    "ridge/geo+climate/alpha=30/interactions": {
+      "mae": 1.1611088966531002,
+      "rmse": 1.5381180754744839,
+      "bias": -0.049657885277785516
+    },
+    "ridge/geo+climate/alpha=100": {
+      "mae": 1.2880720474061962,
+      "rmse": 1.6245214834051267,
+      "bias": -0.03725145161383631
+    },
+    "ridge/geo+climate/alpha=100/interactions": {
+      "mae": 1.2884757102788946,
+      "rmse": 1.6273700915935725,
+      "bias": -0.03439464704961868
+    },
+    "elastic_net/geo+climate/alpha=0.04/l1_ratio=0.2": {
+      "mae": 1.1583711668643533,
+      "rmse": 1.5507562555730665,
+      "bias": -0.2658127839014802
+    },
+    "elastic_net/geo+climate/alpha=0.04/l1_ratio=0.8": {
+      "mae": 1.260485757869393,
+      "rmse": 1.5426652104618337,
+      "bias": -0.11999823737587997
+    },
+    "elastic_net/geo+climate/alpha=0.12/l1_ratio=0.2": {
+      "mae": 1.1601201699009647,
+      "rmse": 1.5011523582518287,
+      "bias": -0.21095999648067776
+    },
+    "elastic_net/geo+climate/alpha=0.12/l1_ratio=0.8": {
+      "mae": 1.2649964294480733,
+      "rmse": 1.5638813624605674,
+      "bias": 0.08391047979345975
+    },
+    "elastic_net/geo+climate/alpha=0.35/l1_ratio=0.2": {
+      "mae": 1.187275032568433,
+      "rmse": 1.5244711941482372,
+      "bias": -0.12674120551068113
+    },
+    "elastic_net/geo+climate/alpha=0.35/l1_ratio=0.8": {
+      "mae": 1.3676360605968607,
+      "rmse": 1.6662541854439148,
+      "bias": 0.17570283329527114
+    },
+    "huber/geo+climate/alpha=0.3/epsilon=1.35": {
+      "mae": 1.1334477997262509,
+      "rmse": 1.5250762017187616,
+      "bias": 0.0884253978417549
+    },
+    "huber/geo+climate/alpha=0.3/epsilon=1.8": {
+      "mae": 1.216674120907978,
+      "rmse": 1.5645021683997082,
+      "bias": -0.2639389442640795
+    },
+    "huber/geo+climate/alpha=3/epsilon=1.35": {
+      "mae": 1.103837060936007,
+      "rmse": 1.5007307122599074,
+      "bias": 0.06425449986251085
+    },
+    "huber/geo+climate/alpha=3/epsilon=1.8": {
+      "mae": 1.1004088349606622,
+      "rmse": 1.4990609392967553,
+      "bias": -0.1676416335608087
+    },
+    "ridge/geo+climate/alpha=0.3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+climate/alpha=0.3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+climate/alpha=0.3/interactions/taper=400km": {
+      "mae": 1.2834227504398263,
+      "rmse": 1.704533441086436,
+      "bias": 0.05257110704447027
+    },
+    "ridge/geo+climate/alpha=3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+climate/alpha=3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+climate/alpha=3/interactions/taper=400km": {
+      "mae": 1.3474644568992555,
+      "rmse": 1.7180013697247047,
+      "bias": 0.04880782395936739
+    },
+    "ridge/geo+climate/alpha=30/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+climate/alpha=30/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+climate/alpha=30/interactions/taper=400km": {
+      "mae": 1.3990188008534241,
+      "rmse": 1.7476430107093361,
+      "bias": 0.02767760332394125
+    },
+    "kernel_ridge/geo+climate/alpha=0.25/gamma=0.125": {
+      "mae": 1.467895564803759,
+      "rmse": 1.8197840689936615,
+      "bias": 0.01000534212525197
+    },
+    "kernel_ridge/geo+climate/alpha=0.25/gamma=0.5": {
+      "mae": 1.472776086736771,
+      "rmse": 1.8315866281053812,
+      "bias": 0.0003357681459872052
+    },
+    "kernel_ridge/geo+climate/alpha=0.25/gamma=2": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "kernel_ridge/geo+climate/alpha=2/gamma=0.125": {
+      "mae": 1.4698399999248388,
+      "rmse": 1.8229511489049952,
+      "bias": 0.008112836279331537
+    },
+    "kernel_ridge/geo+climate/alpha=2/gamma=0.5": {
+      "mae": 1.4727760988458114,
+      "rmse": 1.8315871088482256,
+      "bias": 0.0003350919104078386
+    },
+    "kernel_ridge/geo+climate/alpha=2/gamma=2": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "extra_trees/geo+climate/max_depth=1/min_samples_leaf=2": {
+      "mae": 1.358761412820698,
+      "rmse": 1.694652838414042,
+      "bias": -0.05621954029224546
+    },
+    "extra_trees/geo+climate/max_depth=1/min_samples_leaf=4": {
+      "mae": 1.358761412820698,
+      "rmse": 1.7072886434848165,
+      "bias": -0.07944482723283183
+    },
+    "extra_trees/geo+climate/max_depth=2/min_samples_leaf=2": {
+      "mae": 1.3003708942177852,
+      "rmse": 1.6671272067919527,
+      "bias": -0.058276138117283854
+    },
+    "extra_trees/geo+climate/max_depth=2/min_samples_leaf=4": {
+      "mae": 1.2967279067804782,
+      "rmse": 1.6759136805481263,
+      "bias": -0.0946772280092592
+    },
+    "extra_trees/geo+climate/max_depth=4/min_samples_leaf=2": {
+      "mae": 1.3075646972656245,
+      "rmse": 1.6702998576940042,
+      "bias": -0.06546994116512332
+    },
+    "extra_trees/geo+climate/max_depth=4/min_samples_leaf=4": {
+      "mae": 1.3050659420814041,
+      "rmse": 1.6795418909341833,
+      "bias": -0.10301526331018512
+    },
+    "gradient_boosting/geo+climate/max_depth=1/learning_rate=0.03": {
+      "mae": 1.4193850127053573,
+      "rmse": 1.7143490633172662,
+      "bias": 0.06608484995298064
+    },
+    "gradient_boosting/geo+climate/max_depth=1/learning_rate=0.08": {
+      "mae": 1.257163757015916,
+      "rmse": 1.6119530816454448,
+      "bias": -0.018663904250077402
+    },
+    "gradient_boosting/geo+climate/max_depth=2/learning_rate=0.03": {
+      "mae": 1.407286748608795,
+      "rmse": 1.7020605393258663,
+      "bias": 0.041616127812560105
+    },
+    "gradient_boosting/geo+climate/max_depth=2/learning_rate=0.08": {
+      "mae": 1.258500023545906,
+      "rmse": 1.591576756129256,
+      "bias": -0.1769658293074016
+    },
+    "ridge/geo+soil/alpha=0.3": {
+      "mae": 1.6382921323649065,
+      "rmse": 1.951889443753636,
+      "bias": -0.13230469753611082
+    },
+    "ridge/geo+soil/alpha=0.3/interactions": {
+      "mae": 1.7386843358901825,
+      "rmse": 2.0427573333604294,
+      "bias": -0.21918025984757492
+    },
+    "ridge/geo+soil/alpha=1": {
+      "mae": 1.6578517775244397,
+      "rmse": 1.9582179639100417,
+      "bias": -0.12345089805493902
+    },
+    "ridge/geo+soil/alpha=1/interactions": {
+      "mae": 1.7347452139278037,
+      "rmse": 2.0362991310423597,
+      "bias": -0.20925252894964164
+    },
+    "ridge/geo+soil/alpha=3": {
+      "mae": 1.676519193787485,
+      "rmse": 1.9669884385459346,
+      "bias": -0.11692063995300274
+    },
+    "ridge/geo+soil/alpha=3/interactions": {
+      "mae": 1.7247228765403766,
+      "rmse": 2.0211868978004697,
+      "bias": -0.18678726386446395
+    },
+    "ridge/geo+soil/alpha=10": {
+      "mae": 1.6773013926763023,
+      "rmse": 1.9647075431264156,
+      "bias": -0.11283143444264312
+    },
+    "ridge/geo+soil/alpha=10/interactions": {
+      "mae": 1.698322778340189,
+      "rmse": 1.9876905468385604,
+      "bias": -0.1417194777264191
+    },
+    "ridge/geo+soil/alpha=30": {
+      "mae": 1.6446974260172733,
+      "rmse": 1.9341679155185012,
+      "bias": -0.10103948056033708
+    },
+    "ridge/geo+soil/alpha=30/interactions": {
+      "mae": 1.6520920689210956,
+      "rmse": 1.940254682409028,
+      "bias": -0.0952336982547567
+    },
+    "ridge/geo+soil/alpha=100": {
+      "mae": 1.5791791804802355,
+      "rmse": 1.8776915546556454,
+      "bias": -0.07130977393211367
+    },
+    "ridge/geo+soil/alpha=100/interactions": {
+      "mae": 1.5816636019826824,
+      "rmse": 1.8795635284705399,
+      "bias": -0.06045716853623455
+    },
+    "elastic_net/geo+soil/alpha=0.04/l1_ratio=0.2": {
+      "mae": 1.5602175446728341,
+      "rmse": 1.9124609722074344,
+      "bias": -0.5562218030816649
+    },
+    "elastic_net/geo+soil/alpha=0.04/l1_ratio=0.8": {
+      "mae": 1.5244192683426667,
+      "rmse": 1.8512408375423035,
+      "bias": -0.6115435583434947
+    },
+    "elastic_net/geo+soil/alpha=0.12/l1_ratio=0.2": {
+      "mae": 1.5665047149433355,
+      "rmse": 1.8946856150163152,
+      "bias": -0.4634819397094376
+    },
+    "elastic_net/geo+soil/alpha=0.12/l1_ratio=0.8": {
+      "mae": 1.4997809215869444,
+      "rmse": 1.8285550487422377,
+      "bias": -0.5113833391526659
+    },
+    "elastic_net/geo+soil/alpha=0.35/l1_ratio=0.2": {
+      "mae": 1.5290203527666184,
+      "rmse": 1.8616510542353442,
+      "bias": -0.3596340139076994
+    },
+    "elastic_net/geo+soil/alpha=0.35/l1_ratio=0.8": {
+      "mae": 1.4219561687293907,
+      "rmse": 1.7749480249471732,
+      "bias": -0.3405249998277801
+    },
+    "huber/geo+soil/alpha=0.3/epsilon=1.35": {
+      "mae": 1.8783815276335716,
+      "rmse": 2.1525010790885624,
+      "bias": 0.1825898059923173
+    },
+    "huber/geo+soil/alpha=0.3/epsilon=1.8": {
+      "mae": 1.6767629990562938,
+      "rmse": 1.9485529021679713,
+      "bias": -0.0323917534194255
+    },
+    "huber/geo+soil/alpha=3/epsilon=1.35": {
+      "mae": 1.8449101649503419,
+      "rmse": 2.1117908128805785,
+      "bias": 0.1692912186504287
+    },
+    "huber/geo+soil/alpha=3/epsilon=1.8": {
+      "mae": 1.7064337073847713,
+      "rmse": 1.9586204147407795,
+      "bias": -0.02063050320827989
+    },
+    "ridge/geo+soil/alpha=0.3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+soil/alpha=0.3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+soil/alpha=0.3/interactions/taper=400km": {
+      "mae": 1.5679351397512318,
+      "rmse": 1.892773206299128,
+      "bias": -0.03858671817427355
+    },
+    "ridge/geo+soil/alpha=3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+soil/alpha=3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+soil/alpha=3/interactions/taper=400km": {
+      "mae": 1.5613820068722002,
+      "rmse": 1.8869372956030641,
+      "bias": -0.032730623337950064
+    },
+    "ridge/geo+soil/alpha=30/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+soil/alpha=30/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+soil/alpha=30/interactions/taper=400km": {
+      "mae": 1.5321677726102707,
+      "rmse": 1.8638823186019449,
+      "bias": -0.017824765883031213
+    },
+    "kernel_ridge/geo+soil/alpha=0.25/gamma=0.125": {
+      "mae": 1.4911982505605341,
+      "rmse": 1.8460075955267925,
+      "bias": 0.008953592718105344
+    },
+    "kernel_ridge/geo+soil/alpha=0.25/gamma=0.5": {
+      "mae": 1.4728266298141375,
+      "rmse": 1.8316377818346476,
+      "bias": 0.0004054870101190129
+    },
+    "kernel_ridge/geo+soil/alpha=0.25/gamma=2": {
+      "mae": 1.4727761140046536,
+      "rmse": 1.831588537528307,
+      "bias": 0.0003330439815252412
+    },
+    "kernel_ridge/geo+soil/alpha=2/gamma=0.125": {
+      "mae": 1.4865794357485813,
+      "rmse": 1.8422856620581876,
+      "bias": 0.006946445849755451
+    },
+    "kernel_ridge/geo+soil/alpha=2/gamma=0.5": {
+      "mae": 1.472813994897822,
+      "rmse": 1.8316254664146867,
+      "bias": 0.0003873822417196222
+    },
+    "kernel_ridge/geo+soil/alpha=2/gamma=2": {
+      "mae": 1.4727761140046478,
+      "rmse": 1.831588537528299,
+      "bias": 0.00033304398151430553
+    },
+    "extra_trees/geo+soil/max_depth=1/min_samples_leaf=2": {
+      "mae": 1.4085200843340082,
+      "rmse": 1.783856838672971,
+      "bias": 0.017171757450810263
+    },
+    "extra_trees/geo+soil/max_depth=1/min_samples_leaf=4": {
+      "mae": 1.408520084334008,
+      "rmse": 1.797329235686571,
+      "bias": -0.006994728370948973
+    },
+    "extra_trees/geo+soil/max_depth=2/min_samples_leaf=2": {
+      "mae": 1.3269338348765432,
+      "rmse": 1.7507244117463048,
+      "bias": -0.06505272231867262
+    },
+    "extra_trees/geo+soil/max_depth=2/min_samples_leaf=4": {
+      "mae": 1.3248295355902777,
+      "rmse": 1.76464102261776,
+      "bias": -0.09162843605324063
+    },
+    "extra_trees/geo+soil/max_depth=4/min_samples_leaf=2": {
+      "mae": 1.342265854070216,
+      "rmse": 1.7573438141846056,
+      "bias": -0.08038474151234544
+    },
+    "extra_trees/geo+soil/max_depth=4/min_samples_leaf=4": {
+      "mae": 1.3359469159915123,
+      "rmse": 1.769345051290531,
+      "bias": -0.1027458164544752
+    },
+    "gradient_boosting/geo+soil/max_depth=1/learning_rate=0.03": {
+      "mae": 1.6544118636634706,
+      "rmse": 1.8921721081275567,
+      "bias": 0.11917845237246359
+    },
+    "gradient_boosting/geo+soil/max_depth=1/learning_rate=0.08": {
+      "mae": 1.5477192923443432,
+      "rmse": 1.817551183707331,
+      "bias": -0.019143412625724363
+    },
+    "gradient_boosting/geo+soil/max_depth=2/learning_rate=0.03": {
+      "mae": 1.5156584438327891,
+      "rmse": 1.8102509723021334,
+      "bias": -0.01938056892760222
+    },
+    "gradient_boosting/geo+soil/max_depth=2/learning_rate=0.08": {
+      "mae": 1.4769718518522608,
+      "rmse": 1.7986704331759824,
+      "bias": -0.25983330452345693
+    },
+    "ridge/geo+plan/alpha=0.3": {
+      "mae": 1.4428554780988163,
+      "rmse": 1.7518053867249956,
+      "bias": -0.12414098379176022
+    },
+    "ridge/geo+plan/alpha=0.3/interactions": {
+      "mae": 1.5309354122902683,
+      "rmse": 1.7994062476190822,
+      "bias": -0.17428558377153858
+    },
+    "ridge/geo+plan/alpha=1": {
+      "mae": 1.4365869396747308,
+      "rmse": 1.73726847760419,
+      "bias": -0.15176091148666418
+    },
+    "ridge/geo+plan/alpha=1/interactions": {
+      "mae": 1.5027286689228776,
+      "rmse": 1.7790512113518007,
+      "bias": -0.1914277376080676
+    },
+    "ridge/geo+plan/alpha=3": {
+      "mae": 1.4465087362952593,
+      "rmse": 1.7512511103804236,
+      "bias": -0.16942381320478375
+    },
+    "ridge/geo+plan/alpha=3/interactions": {
+      "mae": 1.4885798381570703,
+      "rmse": 1.778115274363535,
+      "bias": -0.1925376204175644
+    },
+    "ridge/geo+plan/alpha=10": {
+      "mae": 1.4546295959933042,
+      "rmse": 1.8034886878413252,
+      "bias": -0.13338545954808248
+    },
+    "ridge/geo+plan/alpha=10/interactions": {
+      "mae": 1.4645881550666107,
+      "rmse": 1.8095352347833997,
+      "bias": -0.13777840917914105
+    },
+    "ridge/geo+plan/alpha=30": {
+      "mae": 1.4896968658787058,
+      "rmse": 1.8400298805424613,
+      "bias": -0.06686644979329434
+    },
+    "ridge/geo+plan/alpha=30/interactions": {
+      "mae": 1.4884384448285555,
+      "rmse": 1.839073391839298,
+      "bias": -0.06426706842319631
+    },
+    "ridge/geo+plan/alpha=100": {
+      "mae": 1.5100482330750622,
+      "rmse": 1.8409588647286677,
+      "bias": -0.021332263776041728
+    },
+    "ridge/geo+plan/alpha=100/interactions": {
+      "mae": 1.5086572461505627,
+      "rmse": 1.8400623541326033,
+      "bias": -0.02026672972158044
+    },
+    "elastic_net/geo+plan/alpha=0.04/l1_ratio=0.2": {
+      "mae": 1.4239366858366782,
+      "rmse": 1.716275120514552,
+      "bias": -0.10317017646595407
+    },
+    "elastic_net/geo+plan/alpha=0.04/l1_ratio=0.8": {
+      "mae": 1.4387001852037624,
+      "rmse": 1.7233029826348871,
+      "bias": -0.10676786450294956
+    },
+    "elastic_net/geo+plan/alpha=0.12/l1_ratio=0.2": {
+      "mae": 1.434172990715406,
+      "rmse": 1.7227908158403187,
+      "bias": -0.1281478154712096
+    },
+    "elastic_net/geo+plan/alpha=0.12/l1_ratio=0.8": {
+      "mae": 1.519545730765141,
+      "rmse": 1.782934645069642,
+      "bias": -0.0764192778749956
+    },
+    "elastic_net/geo+plan/alpha=0.35/l1_ratio=0.2": {
+      "mae": 1.4746787341215033,
+      "rmse": 1.7840187090201112,
+      "bias": -0.09816584722384208
+    },
+    "elastic_net/geo+plan/alpha=0.35/l1_ratio=0.8": {
+      "mae": 1.5671833794481609,
+      "rmse": 1.8585964329799844,
+      "bias": -0.01642925982338352
+    },
+    "huber/geo+plan/alpha=0.3/epsilon=1.35": {
+      "mae": 1.7575532677525714,
+      "rmse": 2.0096443943842166,
+      "bias": -0.08539713572262626
+    },
+    "huber/geo+plan/alpha=0.3/epsilon=1.8": {
+      "mae": 1.5325369039402745,
+      "rmse": 1.8130848093755636,
+      "bias": -0.21038612887528996
+    },
+    "huber/geo+plan/alpha=3/epsilon=1.35": {
+      "mae": 1.6853667860128854,
+      "rmse": 1.9265738878768315,
+      "bias": -0.13803521017612524
+    },
+    "huber/geo+plan/alpha=3/epsilon=1.8": {
+      "mae": 1.5133879306721603,
+      "rmse": 1.8009759771215492,
+      "bias": -0.19742038308946203
+    },
+    "ridge/geo+plan/alpha=0.3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+plan/alpha=0.3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+plan/alpha=0.3/interactions/taper=400km": {
+      "mae": 1.4965538844262427,
+      "rmse": 1.8061303771337713,
+      "bias": 0.08223515103106885
+    },
+    "ridge/geo+plan/alpha=3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+plan/alpha=3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+plan/alpha=3/interactions/taper=400km": {
+      "mae": 1.496444943132776,
+      "rmse": 1.8244751174494644,
+      "bias": 0.049243059677103435
+    },
+    "ridge/geo+plan/alpha=30/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+plan/alpha=30/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+plan/alpha=30/interactions/taper=400km": {
+      "mae": 1.4991351439660836,
+      "rmse": 1.8456890084184714,
+      "bias": 0.013362924678909722
+    },
+    "kernel_ridge/geo+plan/alpha=0.25/gamma=0.125": {
+      "mae": 1.5702355568101116,
+      "rmse": 1.8686376117471677,
+      "bias": -0.005031514536484137
+    },
+    "kernel_ridge/geo+plan/alpha=0.25/gamma=0.5": {
+      "mae": 1.524464064197705,
+      "rmse": 1.8651085389206583,
+      "bias": -0.0503945522947985
+    },
+    "kernel_ridge/geo+plan/alpha=0.25/gamma=2": {
+      "mae": 1.4739801316348295,
+      "rmse": 1.8323043142600643,
+      "bias": -0.0009543984996921303
+    },
+    "kernel_ridge/geo+plan/alpha=2/gamma=0.125": {
+      "mae": 1.5458198270924564,
+      "rmse": 1.8704726804222658,
+      "bias": -0.021757745794070173
+    },
+    "kernel_ridge/geo+plan/alpha=2/gamma=0.5": {
+      "mae": 1.508965336427819,
+      "rmse": 1.8547485556996994,
+      "bias": -0.0352193719503374
+    },
+    "kernel_ridge/geo+plan/alpha=2/gamma=2": {
+      "mae": 1.47360831317156,
+      "rmse": 1.832078989011502,
+      "bias": -0.0005514635810511954
+    },
+    "extra_trees/geo+plan/max_depth=1/min_samples_leaf=2": {
+      "mae": 1.6212646213107638,
+      "rmse": 1.9970892926653225,
+      "bias": -0.10502839265046286
+    },
+    "extra_trees/geo+plan/max_depth=1/min_samples_leaf=4": {
+      "mae": 1.6212646213107638,
+      "rmse": 1.9970892926653225,
+      "bias": -0.10502839265046286
+    },
+    "extra_trees/geo+plan/max_depth=2/min_samples_leaf=2": {
+      "mae": 1.5934734465422453,
+      "rmse": 1.984556621229775,
+      "bias": -0.11491115451388861
+    },
+    "extra_trees/geo+plan/max_depth=2/min_samples_leaf=4": {
+      "mae": 1.58965279887635,
+      "rmse": 1.9871120978439523,
+      "bias": -0.12779055748456775
+    },
+    "extra_trees/geo+plan/max_depth=4/min_samples_leaf=2": {
+      "mae": 1.615047028718171,
+      "rmse": 1.9997837166932226,
+      "bias": -0.1364847366898146
+    },
+    "extra_trees/geo+plan/max_depth=4/min_samples_leaf=4": {
+      "mae": 1.6118875596788191,
+      "rmse": 2.002809420558893,
+      "bias": -0.15002531828703697
+    },
+    "gradient_boosting/geo+plan/max_depth=1/learning_rate=0.03": {
+      "mae": 1.5618020864386974,
+      "rmse": 1.9181626622065593,
+      "bias": 0.2791419011593459
+    },
+    "gradient_boosting/geo+plan/max_depth=1/learning_rate=0.08": {
+      "mae": 1.5091614712979566,
+      "rmse": 1.9076329932813092,
+      "bias": 0.12189199882278866
+    },
+    "gradient_boosting/geo+plan/max_depth=2/learning_rate=0.03": {
+      "mae": 1.4733636035645732,
+      "rmse": 1.8433004510214088,
+      "bias": 0.16644711828929973
+    },
+    "gradient_boosting/geo+plan/max_depth=2/learning_rate=0.08": {
+      "mae": 1.3751598647966028,
+      "rmse": 1.7667768336084555,
+      "bias": 0.030721336454593497
+    },
+    "ridge/climate+soil/alpha=0.3": {
+      "mae": 1.4926254972326178,
+      "rmse": 1.7157766411645483,
+      "bias": 0.01670134064123373
+    },
+    "ridge/climate+soil/alpha=0.3/interactions": {
+      "mae": 1.5670227390754758,
+      "rmse": 1.816111031619981,
+      "bias": 0.13438568708920362
+    },
+    "ridge/climate+soil/alpha=1": {
+      "mae": 1.4845437905925436,
+      "rmse": 1.7090179185353473,
+      "bias": 0.013570622757685596
+    },
+    "ridge/climate+soil/alpha=1/interactions": {
+      "mae": 1.5679365635222835,
+      "rmse": 1.815928525721015,
+      "bias": 0.1343529903414773
+    },
+    "ridge/climate+soil/alpha=3": {
+      "mae": 1.4777697436654205,
+      "rmse": 1.7100145892400433,
+      "bias": 0.005470279771922039
+    },
+    "ridge/climate+soil/alpha=3/interactions": {
+      "mae": 1.5684890112307204,
+      "rmse": 1.8148602080500047,
+      "bias": 0.13266278237471912
+    },
+    "ridge/climate+soil/alpha=10": {
+      "mae": 1.4721664269752532,
+      "rmse": 1.7185493190637664,
+      "bias": -0.011618079367481887
+    },
+    "ridge/climate+soil/alpha=10/interactions": {
+      "mae": 1.5617552120474016,
+      "rmse": 1.8091589459853792,
+      "bias": 0.1210086540263736
+    },
+    "ridge/climate+soil/alpha=30": {
+      "mae": 1.465197072655114,
+      "rmse": 1.724828378425492,
+      "bias": -0.03629835936475565
+    },
+    "ridge/climate+soil/alpha=30/interactions": {
+      "mae": 1.5382630391498204,
+      "rmse": 1.7955736552604422,
+      "bias": 0.0892154275787154
+    },
+    "ridge/climate+soil/alpha=100": {
+      "mae": 1.449460058518556,
+      "rmse": 1.7359639908023776,
+      "bias": -0.05975554448118324
+    },
+    "ridge/climate+soil/alpha=100/interactions": {
+      "mae": 1.5016684319814702,
+      "rmse": 1.7806691739821097,
+      "bias": 0.032892889564664664
+    },
+    "elastic_net/climate+soil/alpha=0.04/l1_ratio=0.2": {
+      "mae": 1.2990675091704795,
+      "rmse": 1.578792946334472,
+      "bias": -0.1816850015820574
+    },
+    "elastic_net/climate+soil/alpha=0.04/l1_ratio=0.8": {
+      "mae": 1.2421860699151812,
+      "rmse": 1.5769404253782704,
+      "bias": -0.36647579988865236
+    },
+    "elastic_net/climate+soil/alpha=0.12/l1_ratio=0.2": {
+      "mae": 1.2803847140077655,
+      "rmse": 1.5768050838059107,
+      "bias": -0.1895426607929877
+    },
+    "elastic_net/climate+soil/alpha=0.12/l1_ratio=0.8": {
+      "mae": 1.293034538457118,
+      "rmse": 1.630115019245624,
+      "bias": -0.01038442597195645
+    },
+    "elastic_net/climate+soil/alpha=0.35/l1_ratio=0.2": {
+      "mae": 1.2742514626617605,
+      "rmse": 1.6101995001245886,
+      "bias": -0.13310831947394244
+    },
+    "elastic_net/climate+soil/alpha=0.35/l1_ratio=0.8": {
+      "mae": 1.3233203936993534,
+      "rmse": 1.6393161214880108,
+      "bias": 0.09508438973541664
+    },
+    "huber/climate+soil/alpha=0.3/epsilon=1.35": {
+      "mae": 1.576421254111138,
+      "rmse": 1.847511503604833,
+      "bias": 0.20171061196031778
+    },
+    "huber/climate+soil/alpha=0.3/epsilon=1.8": {
+      "mae": 1.5227901462038123,
+      "rmse": 1.7501633891359114,
+      "bias": 0.07390204821531474
+    },
+    "huber/climate+soil/alpha=3/epsilon=1.35": {
+      "mae": 1.562793463299898,
+      "rmse": 1.825237206354499,
+      "bias": 0.15058087383013022
+    },
+    "huber/climate+soil/alpha=3/epsilon=1.8": {
+      "mae": 1.5054879245111836,
+      "rmse": 1.7448088978125658,
+      "bias": 0.05415113743676442
+    },
+    "ridge/climate+soil/alpha=0.3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/climate+soil/alpha=0.3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/climate+soil/alpha=0.3/interactions/taper=400km": {
+      "mae": 1.472005715851725,
+      "rmse": 1.7820259334481738,
+      "bias": -0.0006056378789120604
+    },
+    "ridge/climate+soil/alpha=3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/climate+soil/alpha=3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/climate+soil/alpha=3/interactions/taper=400km": {
+      "mae": 1.4739299917753035,
+      "rmse": 1.784763718233383,
+      "bias": 0.0008687600236075429
+    },
+    "ridge/climate+soil/alpha=30/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/climate+soil/alpha=30/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/climate+soil/alpha=30/interactions/taper=400km": {
+      "mae": 1.4726774859016871,
+      "rmse": 1.7925198518454621,
+      "bias": -0.0015343177625714998
+    },
+    "kernel_ridge/climate+soil/alpha=0.25/gamma=0.125": {
+      "mae": 1.4728950083640622,
+      "rmse": 1.8315852269132902,
+      "bias": -0.0001827825231406795
+    },
+    "kernel_ridge/climate+soil/alpha=0.25/gamma=0.5": {
+      "mae": 1.4727761140059206,
+      "rmse": 1.8315885375288867,
+      "bias": 0.00033304397969931293
+    },
+    "kernel_ridge/climate+soil/alpha=0.25/gamma=2": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "kernel_ridge/climate+soil/alpha=2/gamma=0.125": {
+      "mae": 1.4728697753225415,
+      "rmse": 1.8315907097898438,
+      "bias": -4.318764394420361e-05
+    },
+    "kernel_ridge/climate+soil/alpha=2/gamma=0.5": {
+      "mae": 1.4727761140055875,
+      "rmse": 1.8315885375287344,
+      "bias": 0.00033304398018980946
+    },
+    "kernel_ridge/climate+soil/alpha=2/gamma=2": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "extra_trees/climate+soil/max_depth=1/min_samples_leaf=2": {
+      "mae": 1.447931179470486,
+      "rmse": 1.7479588992477564,
+      "bias": -0.09347149522569444
+    },
+    "extra_trees/climate+soil/max_depth=1/min_samples_leaf=4": {
+      "mae": 1.4479311794704863,
+      "rmse": 1.7651413406097671,
+      "bias": -0.1287800250771605
+    },
+    "extra_trees/climate+soil/max_depth=2/min_samples_leaf=2": {
+      "mae": 1.3776770568094137,
+      "rmse": 1.7192257035182743,
+      "bias": -0.15181914906442898
+    },
+    "extra_trees/climate+soil/max_depth=2/min_samples_leaf=4": {
+      "mae": 1.3862062415605712,
+      "rmse": 1.7433170440562857,
+      "bias": -0.20862407648533945
+    },
+    "extra_trees/climate+soil/max_depth=4/min_samples_leaf=2": {
+      "mae": 1.3979461684992283,
+      "rmse": 1.7335468033286507,
+      "bias": -0.17208826075424372
+    },
+    "extra_trees/climate+soil/max_depth=4/min_samples_leaf=4": {
+      "mae": 1.4098306749131946,
+      "rmse": 1.7604383226918892,
+      "bias": -0.23224850983796289
+    },
+    "gradient_boosting/climate+soil/max_depth=1/learning_rate=0.03": {
+      "mae": 1.517416193559848,
+      "rmse": 1.7833659057426923,
+      "bias": 0.08563940093159543
+    },
+    "gradient_boosting/climate+soil/max_depth=1/learning_rate=0.08": {
+      "mae": 1.4040253315958482,
+      "rmse": 1.6846526050812969,
+      "bias": 0.0007540754786415501
+    },
+    "gradient_boosting/climate+soil/max_depth=2/learning_rate=0.03": {
+      "mae": 1.3934446757252237,
+      "rmse": 1.7051727037372724,
+      "bias": -0.032758835965556295
+    },
+    "gradient_boosting/climate+soil/max_depth=2/learning_rate=0.08": {
+      "mae": 1.2652375968219012,
+      "rmse": 1.579178893962165,
+      "bias": -0.16137637685165349
+    },
+    "ridge/climate+plan/alpha=0.3": {
+      "mae": 1.305838164714608,
+      "rmse": 1.6583474348048812,
+      "bias": -0.20417916765974747
+    },
+    "ridge/climate+plan/alpha=0.3/interactions": {
+      "mae": 1.1788703352642984,
+      "rmse": 1.5504042265068967,
+      "bias": -0.23700144120951486
+    },
+    "ridge/climate+plan/alpha=1": {
+      "mae": 1.2155693078780498,
+      "rmse": 1.6127452956423847,
+      "bias": -0.18948069689446034
+    },
+    "ridge/climate+plan/alpha=1/interactions": {
+      "mae": 1.1301581401638325,
+      "rmse": 1.5279724656049898,
+      "bias": -0.22145575207365914
+    },
+    "ridge/climate+plan/alpha=3": {
+      "mae": 1.1666111718653367,
+      "rmse": 1.5630165333781447,
+      "bias": -0.17041420645467345
+    },
+    "ridge/climate+plan/alpha=3/interactions": {
+      "mae": 1.1562615804964267,
+      "rmse": 1.5094627910972367,
+      "bias": -0.19563081216991232
+    },
+    "ridge/climate+plan/alpha=10": {
+      "mae": 1.2122000237041604,
+      "rmse": 1.5341217022093743,
+      "bias": -0.1506429834725384
+    },
+    "ridge/climate+plan/alpha=10/interactions": {
+      "mae": 1.195904041758686,
+      "rmse": 1.5172689274593152,
+      "bias": -0.16202446414249883
+    },
+    "ridge/climate+plan/alpha=30": {
+      "mae": 1.2675068281124462,
+      "rmse": 1.565879966420269,
+      "bias": -0.12656987919384763
+    },
+    "ridge/climate+plan/alpha=30/interactions": {
+      "mae": 1.258199114906578,
+      "rmse": 1.5669675150934084,
+      "bias": -0.12893495073458783
+    },
+    "ridge/climate+plan/alpha=100": {
+      "mae": 1.3404235398027906,
+      "rmse": 1.654834831944154,
+      "bias": -0.08322295364352243
+    },
+    "ridge/climate+plan/alpha=100/interactions": {
+      "mae": 1.3409010730788675,
+      "rmse": 1.6600625740972346,
+      "bias": -0.08491256887251618
+    },
+    "elastic_net/climate+plan/alpha=0.04/l1_ratio=0.2": {
+      "mae": 1.2614708081550101,
+      "rmse": 1.658827101054663,
+      "bias": -0.3232870013334059
+    },
+    "elastic_net/climate+plan/alpha=0.04/l1_ratio=0.8": {
+      "mae": 1.5405815246202423,
+      "rmse": 1.7479988728240414,
+      "bias": -0.2556698043014513
+    },
+    "elastic_net/climate+plan/alpha=0.12/l1_ratio=0.2": {
+      "mae": 1.3009056628901756,
+      "rmse": 1.6067884899186349,
+      "bias": -0.2961168883605061
+    },
+    "elastic_net/climate+plan/alpha=0.12/l1_ratio=0.8": {
+      "mae": 1.4316285850255657,
+      "rmse": 1.6443814820768201,
+      "bias": -0.06750796115835717
+    },
+    "elastic_net/climate+plan/alpha=0.35/l1_ratio=0.2": {
+      "mae": 1.3431740495858553,
+      "rmse": 1.5887179479628042,
+      "bias": -0.23280073919597538
+    },
+    "elastic_net/climate+plan/alpha=0.35/l1_ratio=0.8": {
+      "mae": 1.3881594197865716,
+      "rmse": 1.6640020415194545,
+      "bias": 0.055566692811209774
+    },
+    "huber/climate+plan/alpha=0.3/epsilon=1.35": {
+      "mae": 1.0982643213556444,
+      "rmse": 1.544588157174858,
+      "bias": 0.03021763224142899
+    },
+    "huber/climate+plan/alpha=0.3/epsilon=1.8": {
+      "mae": 1.1849414382079155,
+      "rmse": 1.6103995462624765,
+      "bias": -0.3387184890827725
+    },
+    "huber/climate+plan/alpha=3/epsilon=1.35": {
+      "mae": 1.1612181050602584,
+      "rmse": 1.5328535509344166,
+      "bias": 0.03991277608118155
+    },
+    "huber/climate+plan/alpha=3/epsilon=1.8": {
+      "mae": 1.1903959599463507,
+      "rmse": 1.5344431028259327,
+      "bias": -0.24515044715191908
+    },
+    "ridge/climate+plan/alpha=0.3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/climate+plan/alpha=0.3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/climate+plan/alpha=0.3/interactions/taper=400km": {
+      "mae": 1.297391032137724,
+      "rmse": 1.6760368252226132,
+      "bias": -0.0023832617033489466
+    },
+    "ridge/climate+plan/alpha=3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/climate+plan/alpha=3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/climate+plan/alpha=3/interactions/taper=400km": {
+      "mae": 1.3309013595041936,
+      "rmse": 1.6940918878449058,
+      "bias": 0.0009180392350694319
+    },
+    "ridge/climate+plan/alpha=30/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/climate+plan/alpha=30/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/climate+plan/alpha=30/interactions/taper=400km": {
+      "mae": 1.392234716548401,
+      "rmse": 1.7431277783450732,
+      "bias": -0.010527341996128025
+    },
+    "kernel_ridge/climate+plan/alpha=0.25/gamma=0.125": {
+      "mae": 1.4416935409580551,
+      "rmse": 1.804818382175701,
+      "bias": -0.04832707777890518
+    },
+    "kernel_ridge/climate+plan/alpha=0.25/gamma=0.5": {
+      "mae": 1.4722843030614177,
+      "rmse": 1.8312100571856706,
+      "bias": -0.0003752171018753804
+    },
+    "kernel_ridge/climate+plan/alpha=0.25/gamma=2": {
+      "mae": 1.4727761139959166,
+      "rmse": 1.8315885375225833,
+      "bias": 0.00033304397032516217
+    },
+    "kernel_ridge/climate+plan/alpha=2/gamma=0.125": {
+      "mae": 1.4537995859802815,
+      "rmse": 1.813775969900122,
+      "bias": -0.02956080643290233
+    },
+    "kernel_ridge/climate+plan/alpha=2/gamma=0.5": {
+      "mae": 1.4724600173419113,
+      "rmse": 1.8313451264893725,
+      "bias": -0.0001221575361716604
+    },
+    "kernel_ridge/climate+plan/alpha=2/gamma=2": {
+      "mae": 1.4727761139990714,
+      "rmse": 1.8315885375246443,
+      "bias": 0.00033304397436452476
+    },
+    "extra_trees/climate+plan/max_depth=1/min_samples_leaf=2": {
+      "mae": 1.4056858377338928,
+      "rmse": 1.744274772396228,
+      "bias": -0.2925975983796294
+    },
+    "extra_trees/climate+plan/max_depth=1/min_samples_leaf=4": {
+      "mae": 1.4056858377338928,
+      "rmse": 1.7545935656907732,
+      "bias": -0.30781965422453694
+    },
+    "extra_trees/climate+plan/max_depth=2/min_samples_leaf=2": {
+      "mae": 1.3535758837287806,
+      "rmse": 1.7161713972213082,
+      "bias": -0.28270901813271576
+    },
+    "extra_trees/climate+plan/max_depth=2/min_samples_leaf=4": {
+      "mae": 1.3549887484326777,
+      "rmse": 1.721941993411588,
+      "bias": -0.3239887683256172
+    },
+    "extra_trees/climate+plan/max_depth=4/min_samples_leaf=2": {
+      "mae": 1.3639686836902003,
+      "rmse": 1.7224836134397654,
+      "bias": -0.2931018180941355
+    },
+    "extra_trees/climate+plan/max_depth=4/min_samples_leaf=4": {
+      "mae": 1.3674958013840666,
+      "rmse": 1.72956336265001,
+      "bias": -0.33649582127700606
+    },
+    "gradient_boosting/climate+plan/max_depth=1/learning_rate=0.03": {
+      "mae": 1.4007823382102005,
+      "rmse": 1.701251636338146,
+      "bias": -0.0005506109037289668
+    },
+    "gradient_boosting/climate+plan/max_depth=1/learning_rate=0.08": {
+      "mae": 1.2888355897278714,
+      "rmse": 1.5934373877630086,
+      "bias": -0.07779043975931504
+    },
+    "gradient_boosting/climate+plan/max_depth=2/learning_rate=0.03": {
+      "mae": 1.3518727505780705,
+      "rmse": 1.6596240534202615,
+      "bias": -0.03332103869211068
+    },
+    "gradient_boosting/climate+plan/max_depth=2/learning_rate=0.08": {
+      "mae": 1.247025606712568,
+      "rmse": 1.5715880877810304,
+      "bias": -0.18483241245888352
+    },
+    "ridge/soil+plan/alpha=0.3": {
+      "mae": 1.9577199395561409,
+      "rmse": 2.3167679434548387,
+      "bias": 0.10141497573770103
+    },
+    "ridge/soil+plan/alpha=0.3/interactions": {
+      "mae": 2.090438661285751,
+      "rmse": 2.4119044490998514,
+      "bias": 0.07480136084545592
+    },
+    "ridge/soil+plan/alpha=1": {
+      "mae": 1.9479586444584163,
+      "rmse": 2.303037653116375,
+      "bias": 0.09872637503809178
+    },
+    "ridge/soil+plan/alpha=1/interactions": {
+      "mae": 2.0730894006033735,
+      "rmse": 2.3910154144557647,
+      "bias": 0.0717465434928058
+    },
+    "ridge/soil+plan/alpha=3": {
+      "mae": 1.9301757291559538,
+      "rmse": 2.269621292943304,
+      "bias": 0.08909156851707954
+    },
+    "ridge/soil+plan/alpha=3/interactions": {
+      "mae": 2.0297156182048264,
+      "rmse": 2.34048538354128,
+      "bias": 0.06284421503623448
+    },
+    "ridge/soil+plan/alpha=10": {
+      "mae": 1.873798038580878,
+      "rmse": 2.1893599156990575,
+      "bias": 0.054167989262852725
+    },
+    "ridge/soil+plan/alpha=10/interactions": {
+      "mae": 1.9241922645390335,
+      "rmse": 2.2261271099250775,
+      "bias": 0.03695882355644122
+    },
+    "ridge/soil+plan/alpha=30": {
+      "mae": 1.7677295703079126,
+      "rmse": 2.071931895332424,
+      "bias": -0.005072017817554798
+    },
+    "ridge/soil+plan/alpha=30/interactions": {
+      "mae": 1.7812654570795328,
+      "rmse": 2.08211033222021,
+      "bias": -0.00408518800625705
+    },
+    "ridge/soil+plan/alpha=100": {
+      "mae": 1.6435585718673646,
+      "rmse": 1.939963517193085,
+      "bias": -0.051897803205723465
+    },
+    "ridge/soil+plan/alpha=100/interactions": {
+      "mae": 1.6441653031595802,
+      "rmse": 1.9414200500034329,
+      "bias": -0.043606919018304977
+    },
+    "elastic_net/soil+plan/alpha=0.04/l1_ratio=0.2": {
+      "mae": 1.4364354702122017,
+      "rmse": 1.8425125503240967,
+      "bias": -0.3373531041269511
+    },
+    "elastic_net/soil+plan/alpha=0.04/l1_ratio=0.8": {
+      "mae": 1.5234395518200932,
+      "rmse": 1.8690012558027524,
+      "bias": -0.6817702249226109
+    },
+    "elastic_net/soil+plan/alpha=0.12/l1_ratio=0.2": {
+      "mae": 1.4492822344221787,
+      "rmse": 1.83331874629408,
+      "bias": -0.3246911872889656
+    },
+    "elastic_net/soil+plan/alpha=0.12/l1_ratio=0.8": {
+      "mae": 1.5011051768258854,
+      "rmse": 1.845220724601854,
+      "bias": -0.5935724110045187
+    },
+    "elastic_net/soil+plan/alpha=0.35/l1_ratio=0.2": {
+      "mae": 1.4702076434242874,
+      "rmse": 1.8259038203251738,
+      "bias": -0.3056561314643295
+    },
+    "elastic_net/soil+plan/alpha=0.35/l1_ratio=0.8": {
+      "mae": 1.4407065107014045,
+      "rmse": 1.7883234759823317,
+      "bias": -0.3774872718051227
+    },
+    "huber/soil+plan/alpha=0.3/epsilon=1.35": {
+      "mae": 2.223553894007108,
+      "rmse": 2.5790163838873688,
+      "bias": 0.39322990602644337
+    },
+    "huber/soil+plan/alpha=0.3/epsilon=1.8": {
+      "mae": 1.9937898635333702,
+      "rmse": 2.318091347924727,
+      "bias": 0.19783147373608306
+    },
+    "huber/soil+plan/alpha=3/epsilon=1.35": {
+      "mae": 2.186257136008348,
+      "rmse": 2.5278300959277358,
+      "bias": 0.37658287613721736
+    },
+    "huber/soil+plan/alpha=3/epsilon=1.8": {
+      "mae": 1.9533261785290734,
+      "rmse": 2.2517841002120718,
+      "bias": 0.17220085420704115
+    },
+    "ridge/soil+plan/alpha=0.3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/soil+plan/alpha=0.3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/soil+plan/alpha=0.3/interactions/taper=400km": {
+      "mae": 1.5591017133015344,
+      "rmse": 1.900405289132018,
+      "bias": -0.0931028381107253
+    },
+    "ridge/soil+plan/alpha=3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/soil+plan/alpha=3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/soil+plan/alpha=3/interactions/taper=400km": {
+      "mae": 1.5544570634936798,
+      "rmse": 1.894160408228768,
+      "bias": -0.0830713628215425
+    },
+    "ridge/soil+plan/alpha=30/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/soil+plan/alpha=30/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/soil+plan/alpha=30/interactions/taper=400km": {
+      "mae": 1.530785216164797,
+      "rmse": 1.8682256496059169,
+      "bias": -0.05031091501182289
+    },
+    "kernel_ridge/soil+plan/alpha=0.25/gamma=0.125": {
+      "mae": 1.4949556710551002,
+      "rmse": 1.8513799852896355,
+      "bias": 0.009525046287674784
+    },
+    "kernel_ridge/soil+plan/alpha=0.25/gamma=0.5": {
+      "mae": 1.47325847182421,
+      "rmse": 1.8322934246549307,
+      "bias": 0.0012784814739082025
+    },
+    "kernel_ridge/soil+plan/alpha=0.25/gamma=2": {
+      "mae": 1.4727761174395069,
+      "rmse": 1.8315885426466163,
+      "bias": 0.00033305085123604144
+    },
+    "kernel_ridge/soil+plan/alpha=2/gamma=0.125": {
+      "mae": 1.4892150583820383,
+      "rmse": 1.8460057737078248,
+      "bias": 0.007258108296630364
+    },
+    "kernel_ridge/soil+plan/alpha=2/gamma=0.5": {
+      "mae": 1.4731378401439923,
+      "rmse": 1.832116871015068,
+      "bias": 0.001042232105948296
+    },
+    "kernel_ridge/soil+plan/alpha=2/gamma=2": {
+      "mae": 1.4727761165807876,
+      "rmse": 1.831588541367031,
+      "bias": 0.0003330491337974057
+    },
+    "extra_trees/soil+plan/max_depth=1/min_samples_leaf=2": {
+      "mae": 1.4319262197989,
+      "rmse": 1.8061396666833098,
+      "bias": -0.09802160192418968
+    },
+    "extra_trees/soil+plan/max_depth=1/min_samples_leaf=4": {
+      "mae": 1.4319262197989004,
+      "rmse": 1.8133975105186482,
+      "bias": -0.11010484483506933
+    },
+    "extra_trees/soil+plan/max_depth=2/min_samples_leaf=2": {
+      "mae": 1.3732868971836416,
+      "rmse": 1.7815677752812187,
+      "bias": -0.197324591290509
+    },
+    "extra_trees/soil+plan/max_depth=2/min_samples_leaf=4": {
+      "mae": 1.3776283396026232,
+      "rmse": 1.7941488748977656,
+      "bias": -0.21555468749999976
+    },
+    "extra_trees/soil+plan/max_depth=4/min_samples_leaf=2": {
+      "mae": 1.396596788194444,
+      "rmse": 1.7937724356306006,
+      "bias": -0.2206344823013115
+    },
+    "extra_trees/soil+plan/max_depth=4/min_samples_leaf=4": {
+      "mae": 1.3956940827546294,
+      "rmse": 1.8035817282823987,
+      "bias": -0.23362043065200588
+    },
+    "gradient_boosting/soil+plan/max_depth=1/learning_rate=0.03": {
+      "mae": 1.6052716154867448,
+      "rmse": 1.8644061977719746,
+      "bias": 0.05610788374188885
+    },
+    "gradient_boosting/soil+plan/max_depth=1/learning_rate=0.08": {
+      "mae": 1.546174211994584,
+      "rmse": 1.8045581166810745,
+      "bias": -0.09757956650041677
+    },
+    "gradient_boosting/soil+plan/max_depth=2/learning_rate=0.03": {
+      "mae": 1.4775469572512725,
+      "rmse": 1.7994552454421469,
+      "bias": -0.12603446341705485
+    },
+    "gradient_boosting/soil+plan/max_depth=2/learning_rate=0.08": {
+      "mae": 1.493542936980371,
+      "rmse": 1.8076410237132274,
+      "bias": -0.40393539922509053
+    },
+    "ridge/geo+climate+soil/alpha=0.3": {
+      "mae": 1.4114714814569442,
+      "rmse": 1.6506460688271343,
+      "bias": -0.00800761406271039
+    },
+    "ridge/geo+climate+soil/alpha=0.3/interactions": {
+      "mae": 1.505108468879316,
+      "rmse": 1.733349074853634,
+      "bias": 0.08058830332854454
+    },
+    "ridge/geo+climate+soil/alpha=1": {
+      "mae": 1.4055658357774097,
+      "rmse": 1.6501586869549478,
+      "bias": -0.0072778544941053
+    },
+    "ridge/geo+climate+soil/alpha=1/interactions": {
+      "mae": 1.507354841051523,
+      "rmse": 1.7354397395264978,
+      "bias": 0.08212775202175313
+    },
+    "ridge/geo+climate+soil/alpha=3": {
+      "mae": 1.402856109485396,
+      "rmse": 1.6605186410262711,
+      "bias": -0.009925886423802975
+    },
+    "ridge/geo+climate+soil/alpha=3/interactions": {
+      "mae": 1.5113973368288167,
+      "rmse": 1.739849820793241,
+      "bias": 0.08451591273016337
+    },
+    "ridge/geo+climate+soil/alpha=10": {
+      "mae": 1.4158488486464391,
+      "rmse": 1.6808311418339479,
+      "bias": -0.020107057140347752
+    },
+    "ridge/geo+climate+soil/alpha=10/interactions": {
+      "mae": 1.5139753194770633,
+      "rmse": 1.7470360932664424,
+      "bias": 0.08356503551317135
+    },
+    "ridge/geo+climate+soil/alpha=30": {
+      "mae": 1.4225338546144224,
+      "rmse": 1.6990623342153737,
+      "bias": -0.03722766566312668
+    },
+    "ridge/geo+climate+soil/alpha=30/interactions": {
+      "mae": 1.50516535998278,
+      "rmse": 1.7523791693743385,
+      "bias": 0.06849816258478938
+    },
+    "ridge/geo+climate+soil/alpha=100": {
+      "mae": 1.4292903601105291,
+      "rmse": 1.7234592435676088,
+      "bias": -0.05362695444423354
+    },
+    "ridge/geo+climate+soil/alpha=100/interactions": {
+      "mae": 1.4857808106091746,
+      "rmse": 1.7602725894093028,
+      "bias": 0.030801571915086624
+    },
+    "elastic_net/geo+climate+soil/alpha=0.04/l1_ratio=0.2": {
+      "mae": 1.319295359291077,
+      "rmse": 1.5749988407005482,
+      "bias": -0.2996917007979059
+    },
+    "elastic_net/geo+climate+soil/alpha=0.04/l1_ratio=0.8": {
+      "mae": 1.2454607546889749,
+      "rmse": 1.5762835853703163,
+      "bias": -0.4120739796026265
+    },
+    "elastic_net/geo+climate+soil/alpha=0.12/l1_ratio=0.2": {
+      "mae": 1.2897369754088757,
+      "rmse": 1.5753159558829442,
+      "bias": -0.26396840142592787
+    },
+    "elastic_net/geo+climate+soil/alpha=0.12/l1_ratio=0.8": {
+      "mae": 1.2568435227749208,
+      "rmse": 1.6020144511006815,
+      "bias": -0.0586232997218921
+    },
+    "elastic_net/geo+climate+soil/alpha=0.35/l1_ratio=0.2": {
+      "mae": 1.28255155026468,
+      "rmse": 1.6156629269216212,
+      "bias": -0.1591369076335674
+    },
+    "elastic_net/geo+climate+soil/alpha=0.35/l1_ratio=0.8": {
+      "mae": 1.3311191040649275,
+      "rmse": 1.6460531640624945,
+      "bias": 0.10548193037979646
+    },
+    "huber/geo+climate+soil/alpha=0.3/epsilon=1.35": {
+      "mae": 1.475713448872301,
+      "rmse": 1.7464410085623843,
+      "bias": 0.16019360724189086
+    },
+    "huber/geo+climate+soil/alpha=0.3/epsilon=1.8": {
+      "mae": 1.4360311420307141,
+      "rmse": 1.6791704629222637,
+      "bias": 0.042553507555126734
+    },
+    "huber/geo+climate+soil/alpha=3/epsilon=1.35": {
+      "mae": 1.4893567711451956,
+      "rmse": 1.7483264285262394,
+      "bias": 0.12959805453378878
+    },
+    "huber/geo+climate+soil/alpha=3/epsilon=1.8": {
+      "mae": 1.438868081468975,
+      "rmse": 1.6945383238384597,
+      "bias": 0.034913673025619506
+    },
+    "ridge/geo+climate+soil/alpha=0.3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+climate+soil/alpha=0.3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+climate+soil/alpha=0.3/interactions/taper=400km": {
+      "mae": 1.4782296302857054,
+      "rmse": 1.787408517692454,
+      "bias": 0.02005659143784987
+    },
+    "ridge/geo+climate+soil/alpha=3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+climate+soil/alpha=3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+climate+soil/alpha=3/interactions/taper=400km": {
+      "mae": 1.479821321071216,
+      "rmse": 1.789986797151587,
+      "bias": 0.020602938001077504
+    },
+    "ridge/geo+climate+soil/alpha=30/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+climate+soil/alpha=30/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+climate+soil/alpha=30/interactions/taper=400km": {
+      "mae": 1.4776351276407704,
+      "rmse": 1.7969618863203092,
+      "bias": 0.01439219726031556
+    },
+    "kernel_ridge/geo+climate+soil/alpha=0.25/gamma=0.125": {
+      "mae": 1.472982082453138,
+      "rmse": 1.831692234827681,
+      "bias": 0.00012251789590236875
+    },
+    "kernel_ridge/geo+climate+soil/alpha=0.25/gamma=0.5": {
+      "mae": 1.472776114005055,
+      "rmse": 1.8315885375285057,
+      "bias": 0.00033304398105594995
+    },
+    "kernel_ridge/geo+climate+soil/alpha=0.25/gamma=2": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "kernel_ridge/geo+climate+soil/alpha=2/gamma=0.125": {
+      "mae": 1.4729294044631278,
+      "rmse": 1.8316657877185767,
+      "bias": 0.0001771899885353
+    },
+    "kernel_ridge/geo+climate+soil/alpha=2/gamma=0.5": {
+      "mae": 1.4727761140049414,
+      "rmse": 1.8315885375284444,
+      "bias": 0.0003330439811693037
+    },
+    "kernel_ridge/geo+climate+soil/alpha=2/gamma=2": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "extra_trees/geo+climate+soil/max_depth=1/min_samples_leaf=2": {
+      "mae": 1.4631152856143905,
+      "rmse": 1.7895651832612798,
+      "bias": -0.09400575388213739
+    },
+    "extra_trees/geo+climate+soil/max_depth=1/min_samples_leaf=4": {
+      "mae": 1.4631152856143903,
+      "rmse": 1.7990833393139594,
+      "bias": -0.11009061234085654
+    },
+    "extra_trees/geo+climate+soil/max_depth=2/min_samples_leaf=2": {
+      "mae": 1.4017455584490737,
+      "rmse": 1.765122439754159,
+      "bias": -0.14699088059413581
+    },
+    "extra_trees/geo+climate+soil/max_depth=2/min_samples_leaf=4": {
+      "mae": 1.3974894085165892,
+      "rmse": 1.7689042696051047,
+      "bias": -0.16124040316358026
+    },
+    "extra_trees/geo+climate+soil/max_depth=4/min_samples_leaf=2": {
+      "mae": 1.40284595630787,
+      "rmse": 1.7658249799244308,
+      "bias": -0.14809127845293205
+    },
+    "extra_trees/geo+climate+soil/max_depth=4/min_samples_leaf=4": {
+      "mae": 1.4127758065682867,
+      "rmse": 1.7787544607361871,
+      "bias": -0.17652680121527778
+    },
+    "gradient_boosting/geo+climate+soil/max_depth=1/learning_rate=0.03": {
+      "mae": 1.5192482031152783,
+      "rmse": 1.7937864562253145,
+      "bias": 0.14843741141464004
+    },
+    "gradient_boosting/geo+climate+soil/max_depth=1/learning_rate=0.08": {
+      "mae": 1.3116176608172556,
+      "rmse": 1.644234544172384,
+      "bias": 0.08296059733422718
+    },
+    "gradient_boosting/geo+climate+soil/max_depth=2/learning_rate=0.03": {
+      "mae": 1.4482793885754763,
+      "rmse": 1.7469996801313472,
+      "bias": 0.06347491337083702
+    },
+    "gradient_boosting/geo+climate+soil/max_depth=2/learning_rate=0.08": {
+      "mae": 1.3062928783567638,
+      "rmse": 1.628684881936394,
+      "bias": -0.05647595878881946
+    },
+    "ridge/geo+climate+plan/alpha=0.3": {
+      "mae": 1.242493593485579,
+      "rmse": 1.5984254690385047,
+      "bias": -0.22475569537367496
+    },
+    "ridge/geo+climate+plan/alpha=0.3/interactions": {
+      "mae": 1.1213344939815664,
+      "rmse": 1.5052455871391166,
+      "bias": -0.2640739213134914
+    },
+    "ridge/geo+climate+plan/alpha=1": {
+      "mae": 1.1549353813436598,
+      "rmse": 1.5557543421119449,
+      "bias": -0.19940060200970877
+    },
+    "ridge/geo+climate+plan/alpha=1/interactions": {
+      "mae": 1.1210206683303798,
+      "rmse": 1.489912731917486,
+      "bias": -0.23839246778029197
+    },
+    "ridge/geo+climate+plan/alpha=3": {
+      "mae": 1.136014101233416,
+      "rmse": 1.5155079054439782,
+      "bias": -0.16316537873157252
+    },
+    "ridge/geo+climate+plan/alpha=3/interactions": {
+      "mae": 1.132750616015558,
+      "rmse": 1.4806593765685758,
+      "bias": -0.19696162700972053
+    },
+    "ridge/geo+climate+plan/alpha=10": {
+      "mae": 1.162336024198337,
+      "rmse": 1.5019187710740296,
+      "bias": -0.1226044723967832
+    },
+    "ridge/geo+climate+plan/alpha=10/interactions": {
+      "mae": 1.149484282152946,
+      "rmse": 1.4949267553321373,
+      "bias": -0.14464800219848029
+    },
+    "ridge/geo+climate+plan/alpha=30": {
+      "mae": 1.2116375484257191,
+      "rmse": 1.5448788660333026,
+      "bias": -0.09149409365446302
+    },
+    "ridge/geo+climate+plan/alpha=30/interactions": {
+      "mae": 1.1981100707273247,
+      "rmse": 1.5471466695287015,
+      "bias": -0.10162016930100076
+    },
+    "ridge/geo+climate+plan/alpha=100": {
+      "mae": 1.3149647525402863,
+      "rmse": 1.6428116877566683,
+      "bias": -0.059420681817503415
+    },
+    "ridge/geo+climate+plan/alpha=100/interactions": {
+      "mae": 1.315835959324677,
+      "rmse": 1.647020844402367,
+      "bias": -0.06304501365919711
+    },
+    "elastic_net/geo+climate+plan/alpha=0.04/l1_ratio=0.2": {
+      "mae": 1.2432065582716678,
+      "rmse": 1.6013293046519173,
+      "bias": -0.37948605777155997
+    },
+    "elastic_net/geo+climate+plan/alpha=0.04/l1_ratio=0.8": {
+      "mae": 1.4010515997008288,
+      "rmse": 1.6442810343662826,
+      "bias": -0.3018163104552365
+    },
+    "elastic_net/geo+climate+plan/alpha=0.12/l1_ratio=0.2": {
+      "mae": 1.27016238933614,
+      "rmse": 1.5587372073629524,
+      "bias": -0.3247976546050539
+    },
+    "elastic_net/geo+climate+plan/alpha=0.12/l1_ratio=0.8": {
+      "mae": 1.3599688582897687,
+      "rmse": 1.6074273191754478,
+      "bias": -0.021131163486956876
+    },
+    "elastic_net/geo+climate+plan/alpha=0.35/l1_ratio=0.2": {
+      "mae": 1.260381721591577,
+      "rmse": 1.5496236632084746,
+      "bias": -0.2050426835623976
+    },
+    "elastic_net/geo+climate+plan/alpha=0.35/l1_ratio=0.8": {
+      "mae": 1.4204173261944544,
+      "rmse": 1.6948312082620662,
+      "bias": 0.12292156769767759
+    },
+    "huber/geo+climate+plan/alpha=0.3/epsilon=1.35": {
+      "mae": 1.0671119159895563,
+      "rmse": 1.5243782828310493,
+      "bias": 0.03526109321388494
+    },
+    "huber/geo+climate+plan/alpha=0.3/epsilon=1.8": {
+      "mae": 1.1583250400107619,
+      "rmse": 1.5703485761560734,
+      "bias": -0.35729363952343735
+    },
+    "huber/geo+climate+plan/alpha=3/epsilon=1.35": {
+      "mae": 1.17272802610128,
+      "rmse": 1.554005472981992,
+      "bias": 0.057246940681212596
+    },
+    "huber/geo+climate+plan/alpha=3/epsilon=1.8": {
+      "mae": 1.1714500062599476,
+      "rmse": 1.5118164551750441,
+      "bias": -0.23058986685260102
+    },
+    "ridge/geo+climate+plan/alpha=0.3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+climate+plan/alpha=0.3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+climate+plan/alpha=0.3/interactions/taper=400km": {
+      "mae": 1.3116800212604656,
+      "rmse": 1.6899398222441777,
+      "bias": 0.012073607029125927
+    },
+    "ridge/geo+climate+plan/alpha=3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+climate+plan/alpha=3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+climate+plan/alpha=3/interactions/taper=400km": {
+      "mae": 1.3475513646622648,
+      "rmse": 1.7071214823595788,
+      "bias": 0.02295472174625209
+    },
+    "ridge/geo+climate+plan/alpha=30/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+climate+plan/alpha=30/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+climate+plan/alpha=30/interactions/taper=400km": {
+      "mae": 1.4055253859821522,
+      "rmse": 1.750655506408841,
+      "bias": 0.015039464667881104
+    },
+    "kernel_ridge/geo+climate+plan/alpha=0.25/gamma=0.125": {
+      "mae": 1.4731361470356001,
+      "rmse": 1.8280549215589057,
+      "bias": -0.0003226645237730565
+    },
+    "kernel_ridge/geo+climate+plan/alpha=0.25/gamma=0.5": {
+      "mae": 1.4727761694859798,
+      "rmse": 1.8315884301778251,
+      "bias": 0.00033316144223917784
+    },
+    "kernel_ridge/geo+climate+plan/alpha=0.25/gamma=2": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "kernel_ridge/geo+climate+plan/alpha=2/gamma=0.125": {
+      "mae": 1.4732930553716703,
+      "rmse": 1.8289213306977232,
+      "bias": 0.0004100822066126498
+    },
+    "kernel_ridge/geo+climate+plan/alpha=2/gamma=0.5": {
+      "mae": 1.4727761530303363,
+      "rmse": 1.8315884554346575,
+      "bias": 0.00033313617628241704
+    },
+    "kernel_ridge/geo+climate+plan/alpha=2/gamma=2": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "extra_trees/geo+climate+plan/max_depth=1/min_samples_leaf=2": {
+      "mae": 1.3235533191068674,
+      "rmse": 1.7170165551707193,
+      "bias": -0.14037093098958334
+    },
+    "extra_trees/geo+climate+plan/max_depth=1/min_samples_leaf=4": {
+      "mae": 1.3235533191068674,
+      "rmse": 1.7305516314746405,
+      "bias": -0.15959460238233028
+    },
+    "extra_trees/geo+climate+plan/max_depth=2/min_samples_leaf=2": {
+      "mae": 1.254450062692901,
+      "rmse": 1.6874969089735752,
+      "bias": -0.1254438114872683
+    },
+    "extra_trees/geo+climate+plan/max_depth=2/min_samples_leaf=4": {
+      "mae": 1.2499304952739194,
+      "rmse": 1.694418952307026,
+      "bias": -0.14414846402391962
+    },
+    "extra_trees/geo+climate+plan/max_depth=4/min_samples_leaf=2": {
+      "mae": 1.2594049358603392,
+      "rmse": 1.6891687829361965,
+      "bias": -0.13039868465470666
+    },
+    "extra_trees/geo+climate+plan/max_depth=4/min_samples_leaf=4": {
+      "mae": 1.252709840374228,
+      "rmse": 1.6953163625007825,
+      "bias": -0.14692780912422837
+    },
+    "gradient_boosting/geo+climate+plan/max_depth=1/learning_rate=0.03": {
+      "mae": 1.3771048678313216,
+      "rmse": 1.6928990234260253,
+      "bias": 0.09879798000349126
+    },
+    "gradient_boosting/geo+climate+plan/max_depth=1/learning_rate=0.08": {
+      "mae": 1.3247187162419545,
+      "rmse": 1.6554169799760372,
+      "bias": -0.060233228496622236
+    },
+    "gradient_boosting/geo+climate+plan/max_depth=2/learning_rate=0.03": {
+      "mae": 1.3895771592480548,
+      "rmse": 1.6965674930584254,
+      "bias": 0.00569752050869029
+    },
+    "gradient_boosting/geo+climate+plan/max_depth=2/learning_rate=0.08": {
+      "mae": 1.2391494798629619,
+      "rmse": 1.5787021655535454,
+      "bias": -0.16346282024998446
+    },
+    "ridge/geo+soil+plan/alpha=0.3": {
+      "mae": 1.676712299379057,
+      "rmse": 1.998600482354684,
+      "bias": -0.05690391652899854
+    },
+    "ridge/geo+soil+plan/alpha=0.3/interactions": {
+      "mae": 1.7743696383319596,
+      "rmse": 2.066264885124935,
+      "bias": -0.12864784859145464
+    },
+    "ridge/geo+soil+plan/alpha=1": {
+      "mae": 1.6808670850763996,
+      "rmse": 1.998266832876701,
+      "bias": -0.056002566195853684
+    },
+    "ridge/geo+soil+plan/alpha=1/interactions": {
+      "mae": 1.7712484106872477,
+      "rmse": 2.062278949779305,
+      "bias": -0.12397958611747192
+    },
+    "ridge/geo+soil+plan/alpha=3": {
+      "mae": 1.6888484207505718,
+      "rmse": 1.9974973434820578,
+      "bias": -0.054993827580930424
+    },
+    "ridge/geo+soil+plan/alpha=3/interactions": {
+      "mae": 1.7626206111373102,
+      "rmse": 2.0518977396201397,
+      "bias": -0.11309789721407479
+    },
+    "ridge/geo+soil+plan/alpha=10": {
+      "mae": 1.6954822468171438,
+      "rmse": 1.9923527119660858,
+      "bias": -0.057269605037191695
+    },
+    "ridge/geo+soil+plan/alpha=10/interactions": {
+      "mae": 1.7369529487706217,
+      "rmse": 2.024157434882136,
+      "bias": -0.09013929672067648
+    },
+    "ridge/geo+soil+plan/alpha=30": {
+      "mae": 1.6751959481835488,
+      "rmse": 1.967231820104458,
+      "bias": -0.0640422529305382
+    },
+    "ridge/geo+soil+plan/alpha=30/interactions": {
+      "mae": 1.6883024850737383,
+      "rmse": 1.9771229598130111,
+      "bias": -0.0668623909049378
+    },
+    "ridge/geo+soil+plan/alpha=100": {
+      "mae": 1.6094096891509535,
+      "rmse": 1.9071469910294045,
+      "bias": -0.06240439309360979
+    },
+    "ridge/geo+soil+plan/alpha=100/interactions": {
+      "mae": 1.6105087361498136,
+      "rmse": 1.9082881551186412,
+      "bias": -0.05346990807254261
+    },
+    "elastic_net/geo+soil+plan/alpha=0.04/l1_ratio=0.2": {
+      "mae": 1.517170731859689,
+      "rmse": 1.9009321426076666,
+      "bias": -0.582143088277748
+    },
+    "elastic_net/geo+soil+plan/alpha=0.04/l1_ratio=0.8": {
+      "mae": 1.56961920474637,
+      "rmse": 1.9164605651247473,
+      "bias": -0.7047104954083737
+    },
+    "elastic_net/geo+soil+plan/alpha=0.12/l1_ratio=0.2": {
+      "mae": 1.512807087863362,
+      "rmse": 1.8794613242495881,
+      "bias": -0.5235232417237058
+    },
+    "elastic_net/geo+soil+plan/alpha=0.12/l1_ratio=0.8": {
+      "mae": 1.5301340847158593,
+      "rmse": 1.8636160875291174,
+      "bias": -0.5580076322052209
+    },
+    "elastic_net/geo+soil+plan/alpha=0.35/l1_ratio=0.2": {
+      "mae": 1.4998433552111106,
+      "rmse": 1.844390918712667,
+      "bias": -0.38295367177560846
+    },
+    "elastic_net/geo+soil+plan/alpha=0.35/l1_ratio=0.8": {
+      "mae": 1.4485098858947594,
+      "rmse": 1.7944989680088477,
+      "bias": -0.3670787169931489
+    },
+    "huber/geo+soil+plan/alpha=0.3/epsilon=1.35": {
+      "mae": 1.8786334694628908,
+      "rmse": 2.1583708342994803,
+      "bias": 0.18481361210531738
+    },
+    "huber/geo+soil+plan/alpha=0.3/epsilon=1.8": {
+      "mae": 1.7018004579676103,
+      "rmse": 1.9936489700526778,
+      "bias": 0.019061752335937463
+    },
+    "huber/geo+soil+plan/alpha=3/epsilon=1.35": {
+      "mae": 1.8667869941195452,
+      "rmse": 2.145454811734456,
+      "bias": 0.1837762242548076
+    },
+    "huber/geo+soil+plan/alpha=3/epsilon=1.8": {
+      "mae": 1.7188446155426436,
+      "rmse": 1.992672865905059,
+      "bias": 0.02540776066571345
+    },
+    "ridge/geo+soil+plan/alpha=0.3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+soil+plan/alpha=0.3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+soil+plan/alpha=0.3/interactions/taper=400km": {
+      "mae": 1.5559028249038311,
+      "rmse": 1.8866130544217923,
+      "bias": -0.046572737372055965
+    },
+    "ridge/geo+soil+plan/alpha=3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+soil+plan/alpha=3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+soil+plan/alpha=3/interactions/taper=400km": {
+      "mae": 1.552401750175251,
+      "rmse": 1.8834789449999523,
+      "bias": -0.042017943337036893
+    },
+    "ridge/geo+soil+plan/alpha=30/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+soil+plan/alpha=30/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+soil+plan/alpha=30/interactions/taper=400km": {
+      "mae": 1.53220158787148,
+      "rmse": 1.8667463004415425,
+      "bias": -0.025829464734567757
+    },
+    "kernel_ridge/geo+soil+plan/alpha=0.25/gamma=0.125": {
+      "mae": 1.4869955684094547,
+      "rmse": 1.8435232426473926,
+      "bias": 0.004548191828976
+    },
+    "kernel_ridge/geo+soil+plan/alpha=0.25/gamma=0.5": {
+      "mae": 1.472799891130048,
+      "rmse": 1.8316229232042338,
+      "bias": 0.00037874971079439334
+    },
+    "kernel_ridge/geo+soil+plan/alpha=0.25/gamma=2": {
+      "mae": 1.4727761140046487,
+      "rmse": 1.831588537528304,
+      "bias": 0.00033304398151991216
+    },
+    "kernel_ridge/geo+soil+plan/alpha=2/gamma=0.125": {
+      "mae": 1.483288722122434,
+      "rmse": 1.8403917727927828,
+      "bias": 0.003625303700475619
+    },
+    "kernel_ridge/geo+soil+plan/alpha=2/gamma=0.5": {
+      "mae": 1.4727939282177684,
+      "rmse": 1.8316143159208893,
+      "bias": 0.00036734190744759654
+    },
+    "kernel_ridge/geo+soil+plan/alpha=2/gamma=2": {
+      "mae": 1.4727761140046438,
+      "rmse": 1.8315885375282968,
+      "bias": 0.00033304398151036424
+    },
+    "extra_trees/geo+soil+plan/max_depth=1/min_samples_leaf=2": {
+      "mae": 1.439197203836323,
+      "rmse": 1.8386773445024438,
+      "bias": -0.04359258957851075
+    },
+    "extra_trees/geo+soil+plan/max_depth=1/min_samples_leaf=4": {
+      "mae": 1.4391972038363232,
+      "rmse": 1.8524451471582486,
+      "bias": -0.06367906358506939
+    },
+    "extra_trees/geo+soil+plan/max_depth=2/min_samples_leaf=2": {
+      "mae": 1.345501610725308,
+      "rmse": 1.8037072961356369,
+      "bias": -0.11935632595486106
+    },
+    "extra_trees/geo+soil+plan/max_depth=2/min_samples_leaf=4": {
+      "mae": 1.343276548032407,
+      "rmse": 1.8140220389290316,
+      "bias": -0.130775547357253
+    },
+    "extra_trees/geo+soil+plan/max_depth=4/min_samples_leaf=2": {
+      "mae": 1.3487896170910487,
+      "rmse": 1.8051983667383142,
+      "bias": -0.12264433232060173
+    },
+    "extra_trees/geo+soil+plan/max_depth=4/min_samples_leaf=4": {
+      "mae": 1.3543939284336415,
+      "rmse": 1.8190493641398966,
+      "bias": -0.14189292775848755
+    },
+    "gradient_boosting/geo+soil+plan/max_depth=1/learning_rate=0.03": {
+      "mae": 1.614367979908242,
+      "rmse": 1.8730083174162047,
+      "bias": 0.11439138452416359
+    },
+    "gradient_boosting/geo+soil+plan/max_depth=1/learning_rate=0.08": {
+      "mae": 1.5321537676307475,
+      "rmse": 1.815277053134149,
+      "bias": -0.003568487331234619
+    },
+    "gradient_boosting/geo+soil+plan/max_depth=2/learning_rate=0.03": {
+      "mae": 1.5140029551259095,
+      "rmse": 1.8129266380876088,
+      "bias": -0.04823935887413533
+    },
+    "gradient_boosting/geo+soil+plan/max_depth=2/learning_rate=0.08": {
+      "mae": 1.4803948325501501,
+      "rmse": 1.7960910007674362,
+      "bias": -0.2768861375311757
+    },
+    "ridge/climate+soil+plan/alpha=0.3": {
+      "mae": 1.5299772218759744,
+      "rmse": 1.754544949351068,
+      "bias": 0.051713780385160356
+    },
+    "ridge/climate+soil+plan/alpha=0.3/interactions": {
+      "mae": 1.598617816347856,
+      "rmse": 1.853351045588335,
+      "bias": 0.14799335085229623
+    },
+    "ridge/climate+soil+plan/alpha=1": {
+      "mae": 1.5278478965396503,
+      "rmse": 1.7514023881721132,
+      "bias": 0.04949531926197717
+    },
+    "ridge/climate+soil+plan/alpha=1/interactions": {
+      "mae": 1.5980641251233672,
+      "rmse": 1.8525706795964592,
+      "bias": 0.14781149348298134
+    },
+    "ridge/climate+soil+plan/alpha=3": {
+      "mae": 1.5226914618918892,
+      "rmse": 1.746212574281474,
+      "bias": 0.04298696837511203
+    },
+    "ridge/climate+soil+plan/alpha=3/interactions": {
+      "mae": 1.5957868554110988,
+      "rmse": 1.8500847874617279,
+      "bias": 0.14536719957231778
+    },
+    "ridge/climate+soil+plan/alpha=10": {
+      "mae": 1.5103712025787859,
+      "rmse": 1.7432876862235898,
+      "bias": 0.022658230141152293
+    },
+    "ridge/climate+soil+plan/alpha=10/interactions": {
+      "mae": 1.585506686055249,
+      "rmse": 1.8411862246241504,
+      "bias": 0.12998923664335843
+    },
+    "ridge/climate+soil+plan/alpha=30": {
+      "mae": 1.4908110919098567,
+      "rmse": 1.7478535573563727,
+      "bias": -0.0130615660728567
+    },
+    "ridge/climate+soil+plan/alpha=30/interactions": {
+      "mae": 1.5606909874824255,
+      "rmse": 1.8238110484607568,
+      "bias": 0.09094876561788819
+    },
+    "ridge/climate+soil+plan/alpha=100": {
+      "mae": 1.4724616139700282,
+      "rmse": 1.757719552166774,
+      "bias": -0.05173165126804011
+    },
+    "ridge/climate+soil+plan/alpha=100/interactions": {
+      "mae": 1.5230124203499884,
+      "rmse": 1.8041833496521307,
+      "bias": 0.02847516245311995
+    },
+    "elastic_net/climate+soil+plan/alpha=0.04/l1_ratio=0.2": {
+      "mae": 1.3259573039410044,
+      "rmse": 1.6011007060700946,
+      "bias": -0.19102995035569736
+    },
+    "elastic_net/climate+soil+plan/alpha=0.04/l1_ratio=0.8": {
+      "mae": 1.3169146280106092,
+      "rmse": 1.6070969925547827,
+      "bias": -0.42657741729040843
+    },
+    "elastic_net/climate+soil+plan/alpha=0.12/l1_ratio=0.2": {
+      "mae": 1.311677328207666,
+      "rmse": 1.5882963647768753,
+      "bias": -0.19679757748909724
+    },
+    "elastic_net/climate+soil+plan/alpha=0.12/l1_ratio=0.8": {
+      "mae": 1.3333515756688128,
+      "rmse": 1.6548297336354456,
+      "bias": -0.08877330398330437
+    },
+    "elastic_net/climate+soil+plan/alpha=0.35/l1_ratio=0.2": {
+      "mae": 1.2928091774411095,
+      "rmse": 1.6086953002123856,
+      "bias": -0.1627020496752287
+    },
+    "elastic_net/climate+soil+plan/alpha=0.35/l1_ratio=0.8": {
+      "mae": 1.3722550406093872,
+      "rmse": 1.6665055172182754,
+      "bias": 0.04614974282538296
+    },
+    "huber/climate+soil+plan/alpha=0.3/epsilon=1.35": {
+      "mae": 1.5807179096429012,
+      "rmse": 1.8559794005540022,
+      "bias": 0.21499840521787902
+    },
+    "huber/climate+soil+plan/alpha=0.3/epsilon=1.8": {
+      "mae": 1.5592110838970525,
+      "rmse": 1.7854576854747102,
+      "bias": 0.08790152475562275
+    },
+    "huber/climate+soil+plan/alpha=3/epsilon=1.35": {
+      "mae": 1.5873371706648407,
+      "rmse": 1.862095844636713,
+      "bias": 0.22224818197368157
+    },
+    "huber/climate+soil+plan/alpha=3/epsilon=1.8": {
+      "mae": 1.5455212646857643,
+      "rmse": 1.7767930215655177,
+      "bias": 0.0920249582017222
+    },
+    "ridge/climate+soil+plan/alpha=0.3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/climate+soil+plan/alpha=0.3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/climate+soil+plan/alpha=0.3/interactions/taper=400km": {
+      "mae": 1.4656621519568984,
+      "rmse": 1.7756893585498734,
+      "bias": -0.008608108663438961
+    },
+    "ridge/climate+soil+plan/alpha=3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/climate+soil+plan/alpha=3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/climate+soil+plan/alpha=3/interactions/taper=400km": {
+      "mae": 1.4685939615615904,
+      "rmse": 1.7796762068193033,
+      "bias": -0.007017781844302394
+    },
+    "ridge/climate+soil+plan/alpha=30/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/climate+soil+plan/alpha=30/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/climate+soil+plan/alpha=30/interactions/taper=400km": {
+      "mae": 1.4732483635729314,
+      "rmse": 1.7937949295102722,
+      "bias": -0.008665530400743015
+    },
+    "kernel_ridge/climate+soil+plan/alpha=0.25/gamma=0.125": {
+      "mae": 1.4730251245590587,
+      "rmse": 1.8316877845587354,
+      "bias": -6.235635848575798e-05
+    },
+    "kernel_ridge/climate+soil+plan/alpha=0.25/gamma=0.5": {
+      "mae": 1.472776114006107,
+      "rmse": 1.8315885375290661,
+      "bias": 0.0003330439799745372
+    },
+    "kernel_ridge/climate+soil+plan/alpha=0.25/gamma=2": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "kernel_ridge/climate+soil+plan/alpha=2/gamma=0.125": {
+      "mae": 1.472959650752229,
+      "rmse": 1.8316624609554544,
+      "bias": 4.5535521605213215e-05
+    },
+    "kernel_ridge/climate+soil+plan/alpha=2/gamma=0.5": {
+      "mae": 1.4727761140056626,
+      "rmse": 1.8315885375288283,
+      "bias": 0.0003330439804284519
+    },
+    "kernel_ridge/climate+soil+plan/alpha=2/gamma=2": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "extra_trees/climate+soil+plan/max_depth=1/min_samples_leaf=2": {
+      "mae": 1.2810416214554394,
+      "rmse": 1.6556830481689064,
+      "bias": -0.13752238679108789
+    },
+    "extra_trees/climate+soil+plan/max_depth=1/min_samples_leaf=4": {
+      "mae": 1.2810416214554396,
+      "rmse": 1.6705996263864293,
+      "bias": -0.16467089301215257
+    },
+    "extra_trees/climate+soil+plan/max_depth=2/min_samples_leaf=2": {
+      "mae": 1.2326828920717594,
+      "rmse": 1.631918813671017,
+      "bias": -0.18961358145254603
+    },
+    "extra_trees/climate+soil+plan/max_depth=2/min_samples_leaf=4": {
+      "mae": 1.2287097800925928,
+      "rmse": 1.6454227378542483,
+      "bias": -0.232278739872685
+    },
+    "extra_trees/climate+soil+plan/max_depth=4/min_samples_leaf=2": {
+      "mae": 1.2500618489583333,
+      "rmse": 1.6399201968874244,
+      "bias": -0.20699253833912012
+    },
+    "extra_trees/climate+soil+plan/max_depth=4/min_samples_leaf=4": {
+      "mae": 1.2370478153935187,
+      "rmse": 1.6491180324652859,
+      "bias": -0.24061677517361085
+    },
+    "gradient_boosting/climate+soil+plan/max_depth=1/learning_rate=0.03": {
+      "mae": 1.4925188004026417,
+      "rmse": 1.7585560276951646,
+      "bias": 0.045957559808646055
+    },
+    "gradient_boosting/climate+soil+plan/max_depth=1/learning_rate=0.08": {
+      "mae": 1.4678922850499623,
+      "rmse": 1.737612667545293,
+      "bias": -0.02839419000266665
+    },
+    "gradient_boosting/climate+soil+plan/max_depth=2/learning_rate=0.03": {
+      "mae": 1.3925829129020364,
+      "rmse": 1.6911956475214,
+      "bias": -0.0663872548372569
+    },
+    "gradient_boosting/climate+soil+plan/max_depth=2/learning_rate=0.08": {
+      "mae": 1.2859255732497072,
+      "rmse": 1.6039003654843558,
+      "bias": -0.1438560583961437
+    },
+    "ridge/geo+climate+soil+plan/alpha=0.3": {
+      "mae": 1.4443102509150167,
+      "rmse": 1.6770839290813304,
+      "bias": 0.010182897797076195
+    },
+    "ridge/geo+climate+soil+plan/alpha=0.3/interactions": {
+      "mae": 1.5013039004029538,
+      "rmse": 1.745715471224668,
+      "bias": 0.07640772968841227
+    },
+    "ridge/geo+climate+soil+plan/alpha=1": {
+      "mae": 1.4432889075563333,
+      "rmse": 1.6762467440012914,
+      "bias": 0.009559146900002516
+    },
+    "ridge/geo+climate+soil+plan/alpha=1/interactions": {
+      "mae": 1.5022854226290618,
+      "rmse": 1.7475135122653782,
+      "bias": 0.07783235194572335
+    },
+    "ridge/geo+climate+soil+plan/alpha=3": {
+      "mae": 1.4410372653448318,
+      "rmse": 1.676785866567087,
+      "bias": 0.007020163903213092
+    },
+    "ridge/geo+climate+soil+plan/alpha=3/interactions": {
+      "mae": 1.505559748394812,
+      "rmse": 1.7515741021783835,
+      "bias": 0.0798338578413889
+    },
+    "ridge/geo+climate+soil+plan/alpha=10": {
+      "mae": 1.4367907662766846,
+      "rmse": 1.6875734928857098,
+      "bias": -0.003629550326153961
+    },
+    "ridge/geo+climate+soil+plan/alpha=10/interactions": {
+      "mae": 1.5130661219710742,
+      "rmse": 1.759579545051404,
+      "bias": 0.07745206886632812
+    },
+    "ridge/geo+climate+soil+plan/alpha=30": {
+      "mae": 1.4422647100073267,
+      "rmse": 1.7108925767771435,
+      "bias": -0.025575377597636333
+    },
+    "ridge/geo+climate+soil+plan/alpha=30/interactions": {
+      "mae": 1.5142958902934223,
+      "rmse": 1.768357432119259,
+      "bias": 0.060204315764336935
+    },
+    "ridge/geo+climate+soil+plan/alpha=100": {
+      "mae": 1.448364186324499,
+      "rmse": 1.7407049513417112,
+      "bias": -0.05043663051955518
+    },
+    "ridge/geo+climate+soil+plan/alpha=100/interactions": {
+      "mae": 1.5031604825496527,
+      "rmse": 1.7788048595678816,
+      "bias": 0.02205307010768241
+    },
+    "elastic_net/geo+climate+soil+plan/alpha=0.04/l1_ratio=0.2": {
+      "mae": 1.3477306208568285,
+      "rmse": 1.595577826685334,
+      "bias": -0.33107039198081917
+    },
+    "elastic_net/geo+climate+soil+plan/alpha=0.04/l1_ratio=0.8": {
+      "mae": 1.3323843492083702,
+      "rmse": 1.611445501895555,
+      "bias": -0.5014035447912113
+    },
+    "elastic_net/geo+climate+soil+plan/alpha=0.12/l1_ratio=0.2": {
+      "mae": 1.326693853923881,
+      "rmse": 1.582450427381826,
+      "bias": -0.3038707125563307
+    },
+    "elastic_net/geo+climate+soil+plan/alpha=0.12/l1_ratio=0.8": {
+      "mae": 1.3072308830410717,
+      "rmse": 1.6265977743410853,
+      "bias": -0.14244068492462778
+    },
+    "elastic_net/geo+climate+soil+plan/alpha=0.35/l1_ratio=0.2": {
+      "mae": 1.2960028689276895,
+      "rmse": 1.6086255101049425,
+      "bias": -0.1965554238455751
+    },
+    "elastic_net/geo+climate+soil+plan/alpha=0.35/l1_ratio=0.8": {
+      "mae": 1.3800525420551133,
+      "rmse": 1.6731323417776003,
+      "bias": 0.05654849238961067
+    },
+    "huber/geo+climate+soil+plan/alpha=0.3/epsilon=1.35": {
+      "mae": 1.4872002140135765,
+      "rmse": 1.7587543806361263,
+      "bias": 0.16440011843879057
+    },
+    "huber/geo+climate+soil+plan/alpha=0.3/epsilon=1.8": {
+      "mae": 1.4678635306076047,
+      "rmse": 1.7005084569937037,
+      "bias": 0.038189617557801196
+    },
+    "huber/geo+climate+soil+plan/alpha=3/epsilon=1.35": {
+      "mae": 1.4968371416921094,
+      "rmse": 1.766129558584223,
+      "bias": 0.16965928469460417
+    },
+    "huber/geo+climate+soil+plan/alpha=3/epsilon=1.8": {
+      "mae": 1.4610973391859874,
+      "rmse": 1.7061271980725075,
+      "bias": 0.051962187297978746
+    },
+    "ridge/geo+climate+soil+plan/alpha=0.3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+climate+soil+plan/alpha=0.3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+climate+soil+plan/alpha=0.3/interactions/taper=400km": {
+      "mae": 1.4704241457258507,
+      "rmse": 1.7795006821884987,
+      "bias": 0.00939863654123617
+    },
+    "ridge/geo+climate+soil+plan/alpha=3/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+climate+soil+plan/alpha=3/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+climate+soil+plan/alpha=3/interactions/taper=400km": {
+      "mae": 1.473060977835966,
+      "rmse": 1.783299654889613,
+      "bias": 0.010391575968326199
+    },
+    "ridge/geo+climate+soil+plan/alpha=30/interactions/taper=150km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+climate+soil+plan/alpha=30/interactions/taper=250km": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "ridge/geo+climate+soil+plan/alpha=30/interactions/taper=400km": {
+      "mae": 1.477040484666836,
+      "rmse": 1.7968605207790989,
+      "bias": 0.006075986081487338
+    },
+    "kernel_ridge/geo+climate+soil+plan/alpha=0.25/gamma=0.125": {
+      "mae": 1.472999417507552,
+      "rmse": 1.8317064898700468,
+      "bias": 0.00011138620967269047
+    },
+    "kernel_ridge/geo+climate+soil+plan/alpha=0.25/gamma=0.5": {
+      "mae": 1.4727761140050537,
+      "rmse": 1.831588537528505,
+      "bias": 0.00033304398105694916
+    },
+    "kernel_ridge/geo+climate+soil+plan/alpha=0.25/gamma=2": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "kernel_ridge/geo+climate+soil+plan/alpha=2/gamma=0.125": {
+      "mae": 1.4729395851726537,
+      "rmse": 1.8316748923525947,
+      "bias": 0.0001711378076655647
+    },
+    "kernel_ridge/geo+climate+soil+plan/alpha=2/gamma=0.5": {
+      "mae": 1.4727761140049263,
+      "rmse": 1.831588537528436,
+      "bias": 0.0003330439811847358
+    },
+    "kernel_ridge/geo+climate+soil+plan/alpha=2/gamma=2": {
+      "mae": 1.4727761140046292,
+      "rmse": 1.8315885375282754,
+      "bias": 0.00033304398148149844
+    },
+    "extra_trees/geo+climate+soil+plan/max_depth=1/min_samples_leaf=2": {
+      "mae": 1.426331550503954,
+      "rmse": 1.7711274086683442,
+      "bias": -0.07972707549672066
+    },
+    "extra_trees/geo+climate+soil+plan/max_depth=1/min_samples_leaf=4": {
+      "mae": 1.4263315505039542,
+      "rmse": 1.7846877888110138,
+      "bias": -0.10208955982349541
+    },
+    "extra_trees/geo+climate+soil+plan/max_depth=2/min_samples_leaf=2": {
+      "mae": 1.3342433599778165,
+      "rmse": 1.737823590019488,
+      "bias": -0.15409002218364182
+    },
+    "extra_trees/geo+climate+soil+plan/max_depth=2/min_samples_leaf=4": {
+      "mae": 1.3285221987123843,
+      "rmse": 1.746982796610359,
+      "bias": -0.16028860677083323
+    },
+    "extra_trees/geo+climate+soil+plan/max_depth=4/min_samples_leaf=2": {
+      "mae": 1.3401661271460263,
+      "rmse": 1.741202381435488,
+      "bias": -0.16001278935185165
+    },
+    "extra_trees/geo+climate+soil+plan/max_depth=4/min_samples_leaf=4": {
+      "mae": 1.3396395791136189,
+      "rmse": 1.753138569076455,
+      "bias": -0.17140598717206776
+    },
+    "gradient_boosting/geo+climate+soil+plan/max_depth=1/learning_rate=0.03": {
+      "mae": 1.47835239534186,
+      "rmse": 1.7590947505011392,
+      "bias": 0.08552966681839454
+    },
+    "gradient_boosting/geo+climate+soil+plan/max_depth=1/learning_rate=0.08": {
+      "mae": 1.2710082160516436,
+      "rmse": 1.609768960276084,
+      "bias": 0.02455456628720685
+    },
+    "gradient_boosting/geo+climate+soil+plan/max_depth=2/learning_rate=0.03": {
+      "mae": 1.406232655039506,
+      "rmse": 1.71072679976466,
+      "bias": 0.03296785598215976
+    },
+    "gradient_boosting/geo+climate+soil+plan/max_depth=2/learning_rate=0.08": {
+      "mae": 1.3203609174899829,
+      "rmse": 1.6208783614688105,
+      "bias": -0.23958034185399502
+    }
+  },
+  "sources": {
+    "usda_trial": {
+      "url": "https://doi.org/10.15482/USDA.ADC/1411953",
+      "sha256": "b9e40bf74554c32849dcb6e6a613d6b7a60b4b8a2f8cbed33073d7c7732f95b6"
+    },
+    "morrow": {
+      "url": "https://doi.org/10.13012/B2IDB-7865141_V2",
+      "sha256": "9cafffd53c08fbc0bcca12baad1e7abc0d3870317e53c7e98e917cbc18fae2f8"
+    },
+    "zhou": {
+      "url": "https://doi.org/10.5281/zenodo.13901372",
+      "sha256": "9df07c56ec6d80786bb9be2df28d9b2ce90d8c9bce81b21a84e99d4f9b4a373f"
+    },
+    "kbs": {
+      "url": "https://lter.kbs.msu.edu/datatables/108",
+      "sha256": "8cc824582dc976a70b03e5e75f4e1be3687d2c3ae7aead4f449bdaa00b4e0ca7"
+    },
+    "climate": {
+      "url": "https://doi.org/10.3334/ORNLDAAC/2129",
+      "years": [
+        1981,
+        2005
+      ],
+      "sha256_by_location": {
+        "38.581325_-92.105650_1981-2005.csv": "3c89b9d7ae4a3a20ac09ba12cf6aeb5cf0141870ae39dd5fa1faec3d0a95a673",
+        "39.801075_-90.821075_1981-2005.csv": "eb1e7f174de86ffe2ccb648a37d44155e7d3b2b5f2d4bed41e454d865cf0acff",
+        "40.104450_-88.225820_1981-2005.csv": "68ec456da4c976ff720bea64c170ebcbea0c21abdfbbeb3044ed7433ca4afd17",
+        "40.763600_-81.906350_1981-2005.csv": "564e04438db668f4f619ff0ec855c21ff2bab3a42a0f35f0163743e8a8324b0c",
+        "40.781300_-81.843350_1981-2005.csv": "2f5c1fa58075a08044f91da686033b9d3174cc005a4b1386498f672373e21c86",
+        "40.930825_-90.727275_1981-2005.csv": "9dc55c86d5ff18a09f5a85f831b8c9208439d4bb3765da21281ead73c0a0d9c6",
+        "41.166849_-96.418662_1981-2005.csv": "9e3f1c0d2a1e01fa85947719ab472550bddc5d57d3f2e339949ad994f29e2f84",
+        "41.193375_-91.483200_1981-2005.csv": "0ccdf4ff71d86a6082f7ed1c239c63e9ce324bff14d9165903a30dfe4638adb5",
+        "41.222225_-83.761850_1981-2005.csv": "5ae8408f3cfbc72c00a47d8a7b9b7397c7d73e55c427cf907a7bda91f09bf213",
+        "42.021350_-93.759300_1981-2005.csv": "f3c429f262f8fdf1c44e80762a94ebb7d2da9eab00cb373ac0306cbeb4bfa225",
+        "42.410825_-85.374998_1981-2005.csv": "d00aef50e4a9109963524ae95ca94754b0e7f0c51387df1a5507741253487d04",
+        "42.831350_-90.795550_1981-2005.csv": "f64782b9f5bce35b40557a5e198a507ab04a3d9223b74daa70e697ce729a663c",
+        "43.299250_-89.352450_1981-2005.csv": "ef61f77d175018b74bf9e25e1f0c9ac1a590507e09db02415273b3ab576c8aa6",
+        "44.352728_-96.804700_1981-2005.csv": "8eaf354646f9ca0d6376b1760711f3ce84285edeb48f49c96ffce9e6a6d73c73",
+        "44.761125_-90.098175_1981-2005.csv": "f387aed2bee68cd80b8d22bb1f361434f53afb4c806d809fbb453cc13c516a4b"
+      }
+    },
+    "soils": {
+      "url": "https://sdmdataaccess.sc.egov.usda.gov/Tabular/post.rest",
+      "snapshot_sha256": "026bfcaf28ca915cbbbbd1a4d76f69a04a8d8ca23f7283f357f67f72d5d3baaa",
+      "locations_available": 15,
+      "aggregate_map_units": 15,
+      "aggregate_sha256": "4aac83424b75a3ea54cc3f3b9b57c87456db49c9183eba639345396ed0f88186"
+    }
+  }
+}
