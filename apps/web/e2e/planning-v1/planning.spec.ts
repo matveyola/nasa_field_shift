@@ -139,3 +139,33 @@ test('HTTP stale rejection preserves server evidence and never acknowledges appl
   await expect(dialog.getByRole('alert')).toContainText('revision-2')
   await expect(root.getByText('Plan applied', { exact: true })).toHaveCount(0)
 })
+
+
+test('new manual locks are not mislabeled as existing commitments during replan', async ({ page }, testInfo) => {
+  const root = await open(page, testInfo, 'case=G23&strict=1')
+  await root.locator('summary').filter({ hasText: /^Crop commitments$/ }).click()
+  const commitment = root.getByRole('combobox', { name: 'G23 · 2027', exact: true })
+  await commitment.selectOption({ index: 1 })
+  await root.getByRole('button', { name: 'Replan', exact: true }).click()
+  await expect(root.getByText('Changes from previous plan', { exact: true })).toBeVisible()
+  await expect(root.getByRole('alert')).toHaveCount(0)
+})
+
+for (const refresh of ['delayed', 'fail-once']) test(`apply keeps replanning gated until commitments refresh: ${refresh}`, async ({ page }, testInfo) => {
+  const root = await open(page, testInfo, `case=G23&strict=1&refresh=${refresh}`)
+  await root.getByRole('button', { name: 'Apply selected plan', exact: true }).click()
+  const dialog = root.getByRole('dialog')
+  await dialog.getByLabel('I reviewed the plan and commitments', { exact: true }).check()
+  await dialog.getByRole('button', { name: 'Confirm application', exact: true }).click()
+  await expect(root.getByRole('button', { name: 'Replan', exact: true })).toBeDisabled()
+  if (refresh === 'fail-once') {
+    await expect(root.getByRole('alert')).toContainText('Controlled commitment refresh outage')
+    await root.getByRole('button', { name: 'Retry commitment refresh', exact: true }).click()
+  }
+  await expect(root.getByRole('button', { name: 'Replan', exact: true })).toBeEnabled()
+  await root.locator('summary').filter({ hasText: /^Crop commitments$/ }).click()
+  await expect(root.getByRole('combobox', { name: 'G23 · 2027 · Locked', exact: true })).toBeDisabled()
+  await root.getByRole('button', { name: 'Replan', exact: true }).click()
+  await expect(root.getByText('Changes from previous plan', { exact: true })).toBeVisible()
+  await expect(root.getByRole('alert')).toHaveCount(0)
+})

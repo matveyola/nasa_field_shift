@@ -15,8 +15,12 @@ from field_shift.modules.agent.remote import RemoteAgentError, RemoteAgentProvid
 from field_shift.modules.agent.routes import router as agent_router
 from field_shift.modules.farm.routes import router as farm_router
 from field_shift.modules.fields.history_routes import router as field_history_router
+from field_shift.modules.fields.planning_profile.routes import router as profile_router
 from field_shift.modules.fields.routes import router as fields_router
 from field_shift.modules.imagery.routes import router as imagery_router
+from field_shift.modules.planning_runtime.body_limit import PlanningBodyLimit
+from field_shift.modules.planning_runtime.routes import router as scenario_router
+from field_shift.modules.planning_runtime.routes import workspace_router
 from field_shift.modules.precision.routes import router as precision_router
 from field_shift.modules.rotations.planning_routes import router as rotation_planning_router
 from field_shift.modules.rotations.routes import router as rotations_router
@@ -48,6 +52,7 @@ def create_app(
             else DemoAgentProvider()
         )
     application.state.agent_provider = agent_provider
+    application.add_middleware(PlanningBodyLimit)
     application.middleware("http")(access_middleware)
 
     @application.exception_handler(NotFoundError)
@@ -72,6 +77,9 @@ def create_app(
 
     for router in (
         access_router,
+        profile_router,
+        scenario_router,
+        workspace_router,
         field_history_router,
         rotation_planning_router,
         precision_router,

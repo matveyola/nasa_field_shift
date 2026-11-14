@@ -13,7 +13,7 @@ uv sync --locked --python 3.12
 .venv/bin/ruff check src tests
 .venv/bin/ruff format --check src tests
 .venv/bin/python -m pytest -q
-PYTHONPATH=../../apps/api/src .venv/bin/python -m field_shift_models.cli benchmark --check reports/cpu-v1.json
+PYTHONPATH=../../apps/api/src .venv/bin/python -m field_shift_models.cli benchmark --check reports/cpu-v2.json
 ```
 
 `benchmark --output /tmp/crop-cpu.json` measures CPU/wall time and peak RSS in

@@ -291,3 +291,19 @@ def test_offline_parameter_trial_uses_ready_engine_without_changing_generic():
     key = "Dry yield (tonne/ha)"
     assert trial.harvests.iloc[0][key] != generic.harvests.iloc[0][key]
     assert again.harvests.iloc[0][key] == generic.harvests.iloc[0][key]
+
+
+def test_preexisting_profile_accepts_later_weather_without_rewriting_time():
+    from datetime import timedelta
+
+    p, c, w, h = synthetic_inputs()
+    later = revise(w, lambda d: d.update(as_of=(w.as_of + timedelta(hours=1)).isoformat()))
+    provider = AquaCropProvider({p.snapshot_id: h})
+    before = p.model_dump_json()
+    result = provider.evaluate(p, c, later)
+    assert result.as_of == later.as_of
+    assert result.seasons[0].status == "available"
+    assert p.model_dump_json() == before
+    future = p.model_copy(update={"as_of": later.as_of + timedelta(hours=1)})
+    with pytest.raises(ValueError, match="unavailable at the weather issue"):
+        provider.evaluate(future, c, later)

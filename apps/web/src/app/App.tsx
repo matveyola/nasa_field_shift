@@ -1,5 +1,5 @@
 import { useLocale } from '../shared/locale'
-import { useCallback, useEffect, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react'
 import { api } from '../api/client'
 import { scenarioOrDefault, type Field, type Scenario } from '../api/contracts'
 import { Assistant } from '../features/assistant/Assistant'
@@ -13,6 +13,7 @@ import { parseRoute, routeAddress, type Page, type Route } from './routing'
 import { Shell } from './Shell'
 import { NotificationProvider } from '../features/notifications/Notifications'
 
+const PlanningPage = lazy(() => import('../features/planning-integration/PlanningPage').then(module => ({ default: module.PlanningPage })))
 const noFields: Field[] = []
 
 function loadWorkspace(signal: AbortSignal) {
@@ -33,7 +34,7 @@ export function App() {
   const [assistantOpen, setAssistantOpen] = useState(() => route.page === 'agent')
   useEffect(() => {
     if (route.page !== 'agent') return
-    const address = routeAddress({ page: 'fields', fieldId: route.fieldId, scenario: route.scenario })
+    const address = routeAddress({ ...route, page: 'fields' })
     history.replaceState(null, '', address)
     setRoute(parseRoute(address))
     setAssistantOpen(true)
@@ -58,7 +59,7 @@ export function App() {
 
   function go(page: Page, options?: { fieldId?: string; jobId?: string | null; scenario?: Scenario; addField?: boolean; forecastDay?: string; analysis?: boolean; layer?: Route['layer']; signal?: Route['signal'] }) {
     if (page === 'agent') { // the assistant opens over the current page, for the field asked about
-      if (options?.fieldId && options.fieldId !== field?.id) setAddress({ page: route.page, fieldId: options.fieldId, scenario })
+      if (options?.fieldId && options.fieldId !== field?.id) setAddress({ ...route, fieldId: options.fieldId, scenario })
       setAssistantOpen(true)
       return
     }
@@ -68,6 +69,7 @@ export function App() {
       && (!options?.scenario || options.scenario === scenario)
     setAddress({
       page,
+      season: route.season, trajectory: route.trajectory, planning: route.planning,
       fieldId: options?.fieldId ?? field?.id,
       scenario: options?.scenario ?? scenario,
       jobId: options?.jobId === null ? undefined : options?.jobId ?? (sameAnalysis ? route.jobId : undefined),
@@ -81,7 +83,7 @@ export function App() {
   }
 
   function chooseField(fieldId: string) {
-    setAddress({ page: route.page, fieldId, scenario })
+    setAddress({ ...route, page: route.page, fieldId, scenario })
   }
 
   function openFieldForecast(fieldId: string, forecastDay?: string) {
@@ -95,7 +97,7 @@ export function App() {
   }
 
   function chooseScenario(value: Scenario) {
-    setAddress({ page: route.page, fieldId: field?.id, scenario: value })
+    setAddress({ ...route, page: route.page, fieldId: field?.id, scenario: value })
   }
 
   function createField(fieldId: string) {
@@ -118,7 +120,7 @@ export function App() {
   if (workspace.pending) content = <Loading text={t('Loading workspace…')} />
   else if (workspace.error) content = <ErrorBox message={workspace.error} retry={workspace.reload} />
   else if (farm) {
-    const season = farm.season
+    const season = route.season ?? farm.season
     const context = field ? { field_id: field.id, season, scenario } : undefined
     if (missingField) content = <Empty><p>{t('The linked field is no longer available.')}</p>
       <button className="button" type="button" onClick={() => go('fields')}>{t('Open Fields')}</button></Empty>
@@ -147,6 +149,10 @@ export function App() {
         chooseField={chooseField} chooseScenario={chooseScenario}
         showJob={showWaterJob} openAgent={(jobId) => go('agent', { jobId })} />
     )
+    else if (route.page === 'rotations' && route.planning) content = (
+      <Suspense fallback={<Loading text={t('Loading workspace…')} />}><PlanningPage fieldId={field.id} season={route.season ?? farm.season + 1}
+        trajectory={route.trajectory} onContext={(fieldId, season, trajectory) => setAddress({ ...route, fieldId, season, trajectory })} /></Suspense>
+    )
     else if (route.page === 'rotations') content = (
       <RotationsPage key={field.id + ':' + scenario} field={field} fields={fields} context={context}
         chooseField={chooseField} openFields={() => { go('fields'); window.scrollTo(0, 0) }}
@@ -154,13 +160,19 @@ export function App() {
     )
   }
 
+  if (route.page === 'rotations') content = <>
+    <div className="button-row"><button className="button subtle" aria-pressed={!route.planning} onClick={() => setAddress({ ...route, planning: false })}>{t('Rotation overview')}</button>
+      <button className="button subtle" aria-pressed={!!route.planning} onClick={() => setAddress({ ...route, planning: true })}>{t('Scenario planning')}</button></div>
+    {content}
+  </>
+
   return <NotificationProvider fields={fields} season={farm?.season ?? new Date().getUTCFullYear()} farmKey={farm?.name ?? 'workspace'}
     openAgent={(item) => go('agent', { fieldId: item.fieldId, scenario: 'baseline', jobId: null, signal: item.kind === 'water' ? 'water' : 'vegetation' })}
     openAnalysis={(item) => item.kind === 'water'
       ? openFieldForecast(item.fieldId, item.date)
       : go('fields', { fieldId: item.fieldId, analysis: true, layer: 'ndvi_variability' })}>
     <Shell route={route} farmName={farm?.name} navigate={go} assistantOpen={assistantOpen} openAssistant={() => setAssistantOpen(true)}>{content}</Shell>
-    {farm && <Assistant field={missingField ? undefined : field} season={farm.season} scenario={scenario}
+    {farm && <Assistant field={missingField ? undefined : field} season={route.season ?? farm.season} scenario={scenario}
       open={assistantOpen} onOpenChange={setAssistantOpen}
       openScreen={(screen) => go(screen)}
       openVegetation={(ndvi) => go('fields', { analysis: true, layer: ndvi ? 'ndvi_variability' : undefined })}

@@ -2,6 +2,9 @@ export const pages = ['fields', 'water', 'agent', 'rotations', 'farm'] as const
 export type Page = (typeof pages)[number]
 export type Route = {
   page: Page
+  planning?: boolean
+  season?: number
+  trajectory?: string
   fieldId?: string
   scenario?: string
   jobId?: string
@@ -30,6 +33,9 @@ export function parseRoute(address: string): Route {
   const signal = url.searchParams.get('signal')
   return {
     page, fieldId, scenario, jobId,
+    ...(page === 'rotations' && url.searchParams.get('planning') === '1' ? { planning: true } : {}),
+    ...(/^\d{4}$/.test(url.searchParams.get('season') ?? '') && Number(url.searchParams.get('season')) >= 1900 && Number(url.searchParams.get('season')) <= 2200 ? { season: Number(url.searchParams.get('season')) } : {}),
+    ...(/^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$/.test(url.searchParams.get('trajectory') ?? '') ? { trajectory: url.searchParams.get('trajectory')! } : {}),
     ...(page === 'fields' && url.searchParams.get('add') === '1' ? { addField: true } : {}),
     ...(analysis ? { analysis: true } : {}),
     ...(analysis && url.searchParams.get('layer') === 'ndvi_variability' ? { layer: 'ndvi_variability' } : {}),
@@ -40,6 +46,9 @@ export function parseRoute(address: string): Route {
 
 export function routeAddress(route: Route): string {
   const params = new URLSearchParams()
+  if (route.planning && route.page === 'rotations') params.set('planning', '1')
+  if (route.season !== undefined && Number.isInteger(route.season) && route.season >= 1900 && route.season <= 2200) params.set('season', String(route.season))
+  if (route.trajectory && /^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$/.test(route.trajectory)) params.set('trajectory', route.trajectory)
   if (route.fieldId) params.set('field', route.fieldId)
   if (route.scenario) params.set('scenario', route.scenario)
   if (route.jobId && (route.page === 'water' || route.page === 'agent')) params.set('job', route.jobId)

@@ -1,6 +1,6 @@
 # Test execution for Field Shift
 
-Read current `.github/workflows/ci.yml`, package manifests and test configuration before execution. This matrix is a starting inventory, not permission to skip newly added suites. `packages/field-shift-models` has tests outside the current CI jobs.
+Read current `.github/workflows/ci.yml`, package manifests and test configuration before execution. This matrix is a starting inventory, not permission to skip newly added suites. `packages/field-shift-models` and the planning integration are checked by the CI planning job.
 
 ## Modes
 
@@ -48,3 +48,21 @@ For deterministic browser runs, inspect and unset inherited `FS_E2E_LIVE`, `FS_E
 Keep logs under a task-specific temporary directory outside delivered source. Return one row per command: checkout/revision, command, exit status, duration, counts/skips and log path. Record missing dependencies or unavailable services as limitations, not successful checks. Check that tracked and untracked deliverable source did not change during execution.
 
 For agent orchestration changes, validate TOML, role discovery, skill metadata and links, plus realistic delegation behavior. Application suites need not run when their inputs and boundaries are unchanged. When changing the existing integration helper, run its own tests under `.agents/skills/issue-worktree/` as well.
+
+
+## Planning integration boundary
+
+Fast checks include planning-v1 generated export freshness, JSON case/invalid-payload
+checks, TypeScript contract boundaries and private crop-runtime lint/format before
+consumer verification. Install `services/agent` npm dependencies as well: planning
+export uses its locked json2ts tool; never substitute a globally installed generator.
+
+Full checks additionally run `npm run test:planning` in `apps/web` (isolated port
+18086), the frozen CPU benchmark from `packages/field-shift-models`, and
+`python3 infra/verify-planning.py` at the root. The latter builds unique API/web/crop
+images, exercises authenticated real CPU inference on explicitly synthetic inputs,
+full mobile/desktop confirmation and replan, PostgreSQL/Redis tests, restart,
+fresh-database restore and isolated migration downgrade/upgrade. It requires Docker,
+local package test environments and Playwright Chromium. Use a unique
+`PLANNING_VERIFY_OUTPUT` directory per concurrent run. Inspect empirical status
+separately; no synthetic suite establishes regional yield accuracy.

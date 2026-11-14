@@ -40,3 +40,14 @@ Field Shift об’єднує карту полів, стан рослиннос
 Перед відкатом зберегти незакомічену роботу. Переглянути `git log --oneline` і `git show <commit>`. Використовувати `git revert <commit>`; залежні зміни відкочувати у зворотному порядку. Для огляду попереднього стану використовувати окремий worktree. Не переписувати опубліковану історію та не застосовувати `reset --hard`.
 
 Git не відкочує базу, зовнішні результати чи секрети. Перед зміною схеми потрібна резервна копія. Відновлювати її в нову БД, перевірити результат і лише потім перемикати застосунок. Відкат коду сам по собі не гарантує сумісності схеми.
+
+
+## Planning integration and next acceptance gate
+
+#3–#6 share the frozen planning-v1 base and are integrated through #7 into
+`nazar-jobs`. The next scientific checkpoint is a permissioned pilot dataset,
+reviewed regional rules, sealed holdouts and a reproducible independent
+field/year evaluation. The current crop runtime abstains on mixed rotations and
+unsupported management/cultivars. Do not describe technical integration or
+synthetic geographic tests as measured recommendation accuracy. See
+[operating limits](planning/runtime.md) and [data audit](planning/data-audit.md).

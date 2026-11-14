@@ -96,6 +96,19 @@ class VerifyTests(unittest.TestCase):
         self.assertTrue(all(1 < index < first_unit for index in builds))
         self.assertTrue(all(check.cwd.is_absolute() for check in plan))
 
+    def test_planning_contracts_precede_consumer_builds(self) -> None:
+        plan = verify.build_plan(self.root, build=True)
+        names = [check.name for check in plan]
+        for required in [
+            "planning contract freshness",
+            "planning JSON contracts",
+            "planning contract TypeScript",
+        ]:
+            self.assertIn(required, names)
+            self.assertLess(names.index(required), names.index("web production build"))
+        self.assertIn("private crop runtime lint", names)
+        self.assertIn("private crop runtime format", names)
+
     def test_fast_covers_all_unit_environments_without_implicit_sync(self) -> None:
         plan = verify.build_plan(self.root)
         unit = {

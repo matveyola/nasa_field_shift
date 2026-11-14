@@ -72,3 +72,24 @@ def test_bounded_private_contract_inference(monkeypatch):
 def test_private_payload_bound_precedes_execution():
     with pytest.raises(ValueError, match="16 MiB"):
         bounded_worker("evaluate", {"oversize": "x" * (16 * 1024 * 1024)})
+
+
+def test_chronology_revision_preserves_frozen_baseline_numerics():
+    import json
+
+    reports = repository_root() / "packages/field-shift-models/reports"
+    old = json.loads((reports / "cpu-v1.json").read_text())
+    new = json.loads((reports / "cpu-v2.json").read_text())
+    assert old["accuracy_metrics"] is new["accuracy_metrics"] is None
+    assert old["promotion"] == new["promotion"] == "baseline_only"
+    for key, previous in old["runs"].items():
+        current = new["runs"][key]
+        assert current["input_sha256"] == previous["input_sha256"]
+        for a, b in zip(
+            previous["ospy"]["result"]["seasons"], current["ospy"]["result"]["seasons"], strict=True
+        ):
+            # These IDs deliberately incorporate the changed adapter source hash.
+            identity = {"opening_state_id", "closing_state_id"}
+            assert {k: v for k, v in a.items() if k not in identity} == {
+                k: v for k, v in b.items() if k not in identity
+            }

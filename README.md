@@ -25,6 +25,15 @@ On bare Debian/Ubuntu, install `libexpat1` for Rasterio's native runtime. The Do
 
 In **Fields**, use **Edit boundary** to move, insert, or remove vertices when a field expands or changes shape. The server recalculates the mapped field area when the outline changes. Use **Edit planted area** to mark one partial footprint for the active season, or select **Entire field** to clear the partial footprint. This keeps the physical boundary and farm area independent of the season’s planted area. The demo outlines were traced manually from NAIP imagery. When a boundary changes, older analyses remain in job history and the next refresh uses the new geometry.
 
+## Scenario crop planning
+
+The multi-field planner is available under **Rotations → Scenario planning**
+(`/rotations?planning=1`). It needs current field profiles, reviewed regional
+rules/weather/parameters and the optional private CPU crop service. Missing
+inputs produce a setup state. See [runtime setup and limits](docs/planning/runtime.md)
+and [available data / validation gaps](docs/planning/data-audit.md).
+The OSPy baseline is not independently validated for farm-level profit prediction.
+
 ## Code boundaries
 
 - `apps/web/src/app` owns the shell, routes and shared field/season/scenario. Feature directories own page behavior. `apps/web/src/api` owns the HTTP client and contracts.
