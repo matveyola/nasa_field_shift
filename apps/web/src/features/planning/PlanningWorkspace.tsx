@@ -25,6 +25,7 @@ export interface PlanningWorkspaceProps {
   /** Integration #7 resolves existing candidate/evaluation IDs; no invented HTTP endpoint. */
   loadEvidence?: (run: PlanningRun, signal: AbortSignal) => Promise<PlanningEvidence>
   onProfileSaved?: (profile: FieldProfileSnapshot) => void
+  onApplied?: () => void
   clock?: () => Date
 }
 const defaultClock = () => new Date()
@@ -36,7 +37,7 @@ export function PlanningWorkspace(props: PlanningWorkspaceProps) {
 }
 
 function WorkspaceSession({ initialRequest, initialRun, currentProfiles, cropOptions, context, onContextChange,
-  locale = 'uk', api = defaultApi, loadEvidence, onProfileSaved, clock = defaultClock }: PlanningWorkspaceProps) {
+  locale = 'uk', api = defaultApi, loadEvidence, onProfileSaved, onApplied, clock = defaultClock }: PlanningWorkspaceProps) {
   const t = tr(locale)
   const [draft, setDraft] = useState<FarmPlanningRequest>(() => ({ ...clone(initialRequest), season_count: 3 }))
   const [profiles, setProfiles] = useState(() => clone(initialRequest.fields))
@@ -61,6 +62,15 @@ function WorkspaceSession({ initialRequest, initialRun, currentProfiles, cropOpt
   const pendingApply = useRef<{ key: string; id: string } | null>(null)
   const mounted = useRef(true)
   const polls = useRef(0)
+  const knownLocks = useRef(JSON.stringify(initialRequest.locks))
+  useEffect(() => {
+    const next = JSON.stringify(initialRequest.locks)
+    if (next === knownLocks.current) return
+    knownLocks.current = next
+    // Server-confirmed commitments survive apply → replan in the same workspace.
+    setDraft(old => ({ ...old, locks: clone(initialRequest.locks) }))
+    setDirty(true); setConfirm(false)
+  }, [initialRequest.locks])
   const active = profiles.find(f => f.field_id === context.fieldId) ?? profiles[0]
   const plans = distinctPlans(run?.comparison?.alternatives ?? [])
   const selected = plans.find(p => p.alternative_id === alternativeId) ?? plans[0]
@@ -117,7 +127,7 @@ function WorkspaceSession({ initialRequest, initialRun, currentProfiles, cropOpt
     if (pendingSubmit.current?.fingerprint !== fingerprint) pendingSubmit.current = { fingerprint, request: prepareRequest(draft, selectedFields, crypto.randomUUID(), clock()) }
     const request = pendingSubmit.current.request
     const next = run ? await api.replan({ schema_version: '1.0.0', previous_run_id: run.run_id, request,
-      preserve_commitment_ids: run.request.locks.map(l => l.commitment_id!).filter(Boolean) }, signal) : await api.submit(request, signal)
+      preserve_commitment_ids: request.locks.map(l => l.commitment_id!).filter(Boolean) }, signal) : await api.submit(request, signal)
     if (signal.aborted) return
     setPrevious(selected); setRun(next)
     setDraft({ ...clone(next.request), fields: clone(profiles), weather: clone(initialRequest.weather) })
@@ -146,7 +156,7 @@ function WorkspaceSession({ initialRequest, initialRun, currentProfiles, cropOpt
       setError(`${t('Application failed')}: ${t(result.status)}. ${result.reasons.map(r => r.message).join(' ')}`)
       return
     }
-    setConfirm(false); setNotice('Plan applied')
+    setConfirm(false); setNotice('Plan applied'); onApplied?.()
   }
   const changeDraft = (value: FarmPlanningRequest) => { setDraft(value); setDirty(true); setNotice(''); setConfirm(false) }
   return <main className="planning-workspace" lang={locale}>

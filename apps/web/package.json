@@ -10,8 +10,9 @@
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
-    "test": "node --disable-warning=ExperimentalWarning --test tests/*.test.ts",
-    "preview": "vite preview"
+    "test": "node --disable-warning=ExperimentalWarning --test tests/*.test.ts tests/planning/*.test.ts",
+    "preview": "vite preview",
+    "test:planning": "node ../../services/agent/frontend/node_modules/@playwright/test/cli.js test --config playwright.planning.config.ts"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",

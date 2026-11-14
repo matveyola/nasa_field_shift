@@ -5,6 +5,7 @@ WORKDIR /src/apps/web
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY --from=agent-widget . /src/services/agent/frontend/src/widget
+COPY --from=planning-contracts . /src/contracts/planning-v1
 COPY . .
 RUN npm run build
 

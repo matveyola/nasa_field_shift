@@ -7,6 +7,8 @@ import { precisionPlansUkrainian } from './precisionPlansUkrainian'
 import { accessUkrainian } from './accessUkrainian'
 
 export const ukrainian: Readonly<Record<string, string>> = {
+  'Rotation overview': 'Огляд сівозмін',
+  'Scenario planning': 'Сценарне планування',
   ...analyticsUkrainian,
   ...priorityUkrainian,
   ...notificationsUkrainian,

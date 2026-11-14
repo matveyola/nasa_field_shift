@@ -64,3 +64,20 @@ test('the assistant can open only the supported NDVI layer in the field analysis
   assert.equal(parseRoute('/fields?analysis=vegetation&layer=untrusted').layer, undefined)
   assert.equal(routeAddress({ ...route, page: 'agent' }), '/agent?field=F-02')
 })
+
+
+test('planning context roundtrips across routes without opening planning on unrelated pages', () => {
+  const planning = parseRoute('/rotations?planning=1&field=F-02&season=2028&trajectory=reference')
+  assert.equal(planning.planning, true)
+  assert.equal(planning.season, 2028)
+  assert.equal(planning.trajectory, 'reference')
+  for (const page of ['fields', 'water', 'agent', 'rotations', 'farm'] as const) {
+    const next = parseRoute(routeAddress({ ...planning, page }))
+    assert.equal(next.fieldId, 'F-02')
+    assert.equal(next.season, 2028)
+    assert.equal(next.trajectory, 'reference')
+    assert.equal(next.planning, page === 'rotations' ? true : undefined)
+  }
+  assert.equal(parseRoute('/rotations?season=NaN&trajectory=%3Cscript%3E').season, undefined)
+  assert.equal(parseRoute('/rotations?season=2201&trajectory=%3Cscript%3E').trajectory, undefined)
+})
