@@ -28,7 +28,7 @@ uv run pytest
 ```
 
 ```bash
-uv run python -m contracts.export
+uv run python -m contracts.export --output-dir contracts/schema
 ```
 
 ```bash
@@ -212,7 +212,7 @@ Ajv covers the structural rules. The cross-field rules (1–9 above) run in Pyth
 - Tool inputs that never leave the agent service (`search_knowledge`, `propose_constraints`, `propose_ui_actions`, `analyze_soil_photo` / `SoilPhotoObservation`) are **not** in this package. They are agent-internal and will be defined in M2, M3 and M7. Everything here crosses a team boundary.
 - Added `FieldProfile` (geo → host), `TimeseriesQuery`, and `CompareRotationsRequest`, so members 1 and 2 have request shapes too.
 - Added the `rotation` fact domain, for facts that explain rotation scores.
-- Export command is `python -m contracts.export`, not `scripts/export_schemas.py`.
+- Export command is `python -m contracts.export --output-dir contracts/schema`, not `scripts/export_schemas.py`.
 
 ## Open questions for teammates
 

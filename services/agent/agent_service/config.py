@@ -5,7 +5,16 @@ from collections.abc import Mapping
 from typing import Literal
 from urllib.parse import urlsplit
 
-from pydantic import BaseModel, ConfigDict, Field, SecretStr, field_validator, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    SecretStr,
+    field_validator,
+    model_validator,
+)
+
+from .paths import knowledge_index_path
 
 ENV_PREFIX = "AGENT_"
 LOCAL_DEV_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000"]
@@ -59,7 +68,7 @@ class Settings(BaseModel):
     # Knowledge base (search_knowledge tool; LLM modes only). Built offline: see README › Knowledge base.
     # lexical needs no model; dense/hybrid need the bge-m3 weights; hybrid_rerank also needs the reranker.
     rag_mode: Literal["off", "lexical", "dense", "hybrid", "hybrid_rerank"] = "lexical"
-    rag_index_path: str = "data/knowledge/index/knowledge.sqlite"
+    rag_index_path: str = Field(default_factory=lambda: str(knowledge_index_path()))
     rag_timeout_s: float = Field(20.0, gt=0, le=120)             # per search_knowledge call
     rag_required: bool = False                                    # if true, /health/ready fails without an index
     rag_model_cache: str | None = None                            # Hugging Face cache folder with the pinned models
@@ -187,4 +196,5 @@ class Settings(BaseModel):
             if value is None or value == "":
                 continue
             raw[name] = [o.strip() for o in value.split(",") if o.strip()] if name == "cors_origins" else value
+        raw["rag_index_path"] = str(knowledge_index_path(environ))
         return cls.model_validate(raw)
