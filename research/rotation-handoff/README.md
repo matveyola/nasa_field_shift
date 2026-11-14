@@ -25,7 +25,7 @@ cd research/rotation-handoff
    | --- | --- |
    | Порівняння 2–3 планів на майбутні дати сівби | `POST /api/rotations/forecast`. Передайте поле та дати, покажіть джерела актуальної й архівної погоди з `weather_segments`. [Запити та поля відповіді](HYBRID_FORECAST.md) |
    | Поетапний вибір культур для 2040–2049 | `POST /api/rotations/climate/step`. Покажіть `top_candidates`. Для наступного кроку передайте попередній `choice` з датою сівби в `selected`. Для порівняння завершених планів викликайте `POST /api/rotations/climate/compare`. Ці маршрути використовують код Руслана. [Готові JSON-запити](CLIMATE_API.md) |
-   | Демонстрація Sutherland 2027, 50% історія і 50% NASA | Для картки демо використовуйте [збережений JSON](examples/sutherland-2026-28/result-nasa-2027.json) із позначкою «офлайн-сценарій для Sutherland». Порядок культур є в `ranking_by_water_shortfall.ensemble`, числа — у `candidates`. Приклад відтворюється локальним скриптом. Для розрахунку 50/50 за запитом потрібен окремий HTTP-маршрут. |
+   | Sutherland 2027, 50% історія і 50% NASA | `POST /api/rotations/scenarios/sutherland-2027` без тіла запиту. Позначте результат як «сценарій Sutherland 2027». Порядок культур є в `ranking_by_water_shortfall.ensemble`, числа — у `candidates`. Сервіс запускає баланс Руслана на погодних рядах із пакета. [Збережений результат для звірки](examples/sutherland-2026-28/result-nasa-2027.json) |
 
 4. **Додайте джерела до картки й відповіді асистента.** Показуйте сценарій, дати й одиниці. Дефіцит у відсотках — це частка незадоволеної потреби культури у воді. Для `null` показуйте «немає оцінки». Агенту передайте схему, [опис роботи з API](RAG_HANDOFF.md) і [правила відображення та переходу між сезонами](UI_AND_ASSISTANT.md). [Наявний адаптер Marsden](../../services/agent/agent_service/integrations/marsden.py) вже прокладає шлях до `assessment`. Для каталогу, `forecast` і кліматичних маршрутів додайте потрібні виклики в адаптері.
 
@@ -52,7 +52,15 @@ py -3 -m venv .venv
 ## Перевірка каталогу і Sutherland 50/50
 
 - Відкрийте [каталог гібридів і сортів](http://127.0.0.1:8081/api/rotations/cultivar-references). Очікується **20 записів**. За [фільтром сої для Айови](http://127.0.0.1:8081/api/rotations/cultivar-references?crop_id=soybeans&region_code=US-IA) має бути **5 записів із Sutherland**.
-- У другому терміналі відкрийте `research/rotation-handoff` і запустіть офлайн-приклад. У `--ruslan-dir` підставте шлях до папки `research/fieldshift_tasks`, де лежить `fstasks/balance.py`. Орієнтир версії — коміт `468a03d`. [Гілка Руслана](https://github.com/matveyola/nasa_preparation/tree/research/fieldshift-tasks-1-4)
+- Для розрахунку через API задайте `FIELDSHIFT_RUSLAN_DIR` перед запуском сервера. Шлях має вести до `research/fieldshift_tasks`, де лежить `fstasks/balance.py`. Приклад налаштування для macOS, Linux і Windows є в [інструкції кліматичного API](CLIMATE_API.md#запуск). Потім викличте маршрут у [Swagger](http://127.0.0.1:8081/docs) або в другому терміналі.
+
+```bash
+curl -fsS -X POST http://127.0.0.1:8081/api/rotations/scenarios/sutherland-2027
+```
+
+У відповіді обидві ваги в `ensemble` мають бути `0.5`. Очікуваний порядок — `wheat_spring, maize_grain, sunflower, soybeans`. Без налаштованого коду Руслана маршрут повертає HTTP `503`.
+
+Для офлайн-перевірки без запущеного API підставте той самий шлях у `--ruslan-dir`. Орієнтир версії — коміт `468a03d`. [Гілка Руслана](https://github.com/matveyola/nasa_preparation/tree/research/fieldshift-tasks-1-4)
 
 ```bash
 .venv/bin/python replay_sutherland_2026_28.py --ruslan-dir "/шлях/до/nasa_preparation/research/fieldshift_tasks" --nasa-2027 --output sutherland-check.json

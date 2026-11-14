@@ -9,6 +9,7 @@ from app import app
 
 EXAMPLES = Path(__file__).resolve().parents[1] / "examples/climate/api"
 CONFIGURED = os.getenv("FIELDSHIFT_RUSLAN_DIR")
+SUTHERLAND_2027_ROUTE = "/api/rotations/scenarios/sutherland-2027"
 
 
 async def request(route, payload=None):
@@ -71,6 +72,24 @@ class ClimateAPITests(TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(len(rows), 5)
         self.assertTrue(all(row["kind"] == "hybrid" for row in rows))
+
+    def test_sutherland_2027_requires_configured_engine(self):
+        with patch.dict(os.environ, {"FIELDSHIFT_RUSLAN_DIR": ""}):
+            status, response = asyncio.run(request(SUTHERLAND_2027_ROUTE, {}))
+        self.assertEqual(status, 503)
+        self.assertIn("FIELDSHIFT_RUSLAN_DIR", response["detail"])
+
+    @skipUnless(CONFIGURED, "Ruslan balance directory is not configured")
+    def test_sutherland_2027_replays_bundled_inputs(self):
+        fixture = EXAMPLES.parents[1] / "sutherland-2026-28/result-nasa-2027.json"
+        expected = json.loads(fixture.read_text(encoding="utf-8"))
+        with patch(
+            "field_shift.modules.rotations.climate_reference.urlopen",
+            side_effect=AssertionError("Sutherland should use local data"),
+        ):
+            status, result = asyncio.run(request(SUTHERLAND_2027_ROUTE, {}))
+        self.assertEqual(status, 200, result)
+        self.assertEqual(result, expected)
 
     @skipUnless(CONFIGURED, "Ruslan balance directory is not configured")
     def test_three_seasons_and_paired_rotations(self):

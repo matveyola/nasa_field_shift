@@ -9,6 +9,8 @@ from math import fsum, isfinite
 from pathlib import Path
 from statistics import median
 
+from pydantic import BaseModel
+
 from field_shift.modules.rotations import climate_balance as balance
 from field_shift.modules.rotations.climate_economics import season_economics
 from field_shift.modules.rotations.climate_reference import load_thermal_reference
@@ -34,6 +36,86 @@ MOISTURE_FIELDS = tuple(
     f"soil_moisture_{interval}cm_mean" for interval in ("0_to_7", "7_to_28", "28_to_100")
 )
 WEATHER_FIELDS = ("temperature_2m_min", "temperature_2m_max", "et0_fao_evapotranspiration")
+
+
+class SutherlandPreviousCrop(BaseModel):
+    crop_id: str
+    planting_date: date
+
+
+class SutherlandNasaMember(BaseModel):
+    model: str
+    scenario: str
+    member: str
+    grid_latitude: float
+    grid_longitude: float
+
+
+class SutherlandNasaSource(BaseModel):
+    dataset: str
+    version: str
+    source_url: str
+    sha256: str
+    overlay_start: date
+    overlay_end: date
+    members: dict[str, SutherlandNasaMember]
+
+
+class SutherlandEnsemble(BaseModel):
+    history_weight: float
+    nasa_weight: float
+    method: str
+    weight_kind: str
+
+
+class SutherlandCropRun(BaseModel):
+    opening_water_mm: float
+    season_end: date
+    end_reason: str
+    modeled_crop_days: int
+    water_shortfall_mm: float
+    water_shortfall_pct: float
+    drought_stress_days: int
+
+
+class SutherlandCandidate(BaseModel):
+    return_interval_status: str
+    historical: dict[str, SutherlandCropRun]
+    nasa: dict[str, dict[str, SutherlandCropRun]]
+    median_historical_water_shortfall_pct: float
+    median_water_shortfall_pct_by_nasa_model: dict[str, float]
+    median_nasa_water_shortfall_pct: float
+    ensemble_score: float
+
+
+class SutherlandRanking(BaseModel):
+    historical: list[str]
+    nasa_models: dict[str, list[str]]
+    nasa: list[str]
+    ensemble: list[str]
+
+
+class Sutherland2027Result(BaseModel):
+    field_id: str
+    previous_crop: SutherlandPreviousCrop
+    planting_date: date
+    historical_analog_years: list[int]
+    archive_cutoff: date
+    nasa: SutherlandNasaSource
+    ensemble: SutherlandEnsemble
+    candidates: dict[str, SutherlandCandidate]
+    ranking_by_water_shortfall: SutherlandRanking
+
+
+def run_sutherland_2027(engine_dir: str) -> Sutherland2027Result:
+    """Recalculate the bundled scenario using the same engine lock as climate requests."""
+    with balance._ENGINE_LOCK:
+        result = replay(
+            engine_dir, EXAMPLE / "weather.json.gz",
+            nasa_path=EXAMPLE / "nasa-2027.json.gz",
+            nasa_weight=DEFAULT_NASA_WEIGHT,
+        )
+    return Sutherland2027Result.model_validate(result)
 
 
 def calendar_rows(payload):

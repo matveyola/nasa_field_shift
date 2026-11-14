@@ -1,4 +1,6 @@
 from datetime import UTC, datetime
+from logging import getLogger
+from os import environ
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -28,6 +30,9 @@ from field_shift.modules.rotations.rotation_agronomy import (
     HybridReference,
     cultivar_references,
 )
+from replay_sutherland_2026_28 import Sutherland2027Result, run_sutherland_2027
+
+logger = getLogger(__name__)
 
 app = FastAPI(
     title="Field Shift: Rotation Assessment and Forecast",
@@ -169,6 +174,28 @@ def recommend_climate_season(request: climate_planner.ClimateStepRequest) -> dic
 @app.post("/api/rotations/climate/compare", response_model=climate_planner.ClimatePlansResult)
 def compare_climate_rotations(request: climate_planner.ClimatePlansRequest) -> dict:
     return _climate_response(climate_planner.compare, request)
+
+
+@app.post(
+    "/api/rotations/scenarios/sutherland-2027",
+    response_model=Sutherland2027Result,
+    responses={503: {"description": "Ruslan engine or bundled scenario data unavailable"}},
+)
+def calculate_sutherland_2027() -> Sutherland2027Result:
+    """Recalculate the Sutherland 2027 scenario at fixed historical/NASA weights of 50/50."""
+    if not climate_planner.model_is_configured():
+        raise HTTPException(
+            status_code=503,
+            detail="Configure FIELDSHIFT_RUSLAN_DIR to a directory containing fstasks/balance.py.",
+        )
+    try:
+        return run_sutherland_2027(environ[climate_planner.MODEL_ENV])
+    except (OSError, EOFError, ValueError, KeyError, ClimateReferenceError) as error:
+        logger.exception("Sutherland 2027 scenario could not run")
+        raise HTTPException(
+            status_code=503,
+            detail="The Sutherland 2027 scenario could not run. Check the engine and bundled inputs.",
+        ) from error
 
 
 @app.post("/api/rotations/forecast", response_model=hybrid_forecast.ForecastResult)

@@ -369,6 +369,28 @@
         }
       }
     },
+    "/api/rotations/scenarios/sutherland-2027": {
+      "post": {
+        "summary": "Calculate Sutherland 2027",
+        "description": "Recalculate the Sutherland 2027 scenario at fixed historical/NASA weights of 50/50.",
+        "operationId": "calculate_sutherland_2027_api_rotations_scenarios_sutherland_2027_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sutherland2027Result"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Ruslan engine or bundled scenario data unavailable"
+          }
+        }
+      }
+    },
     "/api/rotations/forecast": {
       "post": {
         "summary": "Forecast Rotations",
@@ -5528,6 +5550,333 @@
           "members"
         ],
         "title": "SuppliedPlan"
+      },
+      "Sutherland2027Result": {
+        "properties": {
+          "field_id": {
+            "type": "string",
+            "title": "Field Id"
+          },
+          "previous_crop": {
+            "$ref": "#/components/schemas/SutherlandPreviousCrop"
+          },
+          "planting_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Planting Date"
+          },
+          "historical_analog_years": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Historical Analog Years"
+          },
+          "archive_cutoff": {
+            "type": "string",
+            "format": "date",
+            "title": "Archive Cutoff"
+          },
+          "nasa": {
+            "$ref": "#/components/schemas/SutherlandNasaSource"
+          },
+          "ensemble": {
+            "$ref": "#/components/schemas/SutherlandEnsemble"
+          },
+          "candidates": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/SutherlandCandidate"
+            },
+            "type": "object",
+            "title": "Candidates"
+          },
+          "ranking_by_water_shortfall": {
+            "$ref": "#/components/schemas/SutherlandRanking"
+          }
+        },
+        "type": "object",
+        "required": [
+          "field_id",
+          "previous_crop",
+          "planting_date",
+          "historical_analog_years",
+          "archive_cutoff",
+          "nasa",
+          "ensemble",
+          "candidates",
+          "ranking_by_water_shortfall"
+        ],
+        "title": "Sutherland2027Result"
+      },
+      "SutherlandCandidate": {
+        "properties": {
+          "return_interval_status": {
+            "type": "string",
+            "title": "Return Interval Status"
+          },
+          "historical": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/SutherlandCropRun"
+            },
+            "type": "object",
+            "title": "Historical"
+          },
+          "nasa": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/SutherlandCropRun"
+              },
+              "type": "object"
+            },
+            "type": "object",
+            "title": "Nasa"
+          },
+          "median_historical_water_shortfall_pct": {
+            "type": "number",
+            "title": "Median Historical Water Shortfall Pct"
+          },
+          "median_water_shortfall_pct_by_nasa_model": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Median Water Shortfall Pct By Nasa Model"
+          },
+          "median_nasa_water_shortfall_pct": {
+            "type": "number",
+            "title": "Median Nasa Water Shortfall Pct"
+          },
+          "ensemble_score": {
+            "type": "number",
+            "title": "Ensemble Score"
+          }
+        },
+        "type": "object",
+        "required": [
+          "return_interval_status",
+          "historical",
+          "nasa",
+          "median_historical_water_shortfall_pct",
+          "median_water_shortfall_pct_by_nasa_model",
+          "median_nasa_water_shortfall_pct",
+          "ensemble_score"
+        ],
+        "title": "SutherlandCandidate"
+      },
+      "SutherlandCropRun": {
+        "properties": {
+          "opening_water_mm": {
+            "type": "number",
+            "title": "Opening Water Mm"
+          },
+          "season_end": {
+            "type": "string",
+            "format": "date",
+            "title": "Season End"
+          },
+          "end_reason": {
+            "type": "string",
+            "title": "End Reason"
+          },
+          "modeled_crop_days": {
+            "type": "integer",
+            "title": "Modeled Crop Days"
+          },
+          "water_shortfall_mm": {
+            "type": "number",
+            "title": "Water Shortfall Mm"
+          },
+          "water_shortfall_pct": {
+            "type": "number",
+            "title": "Water Shortfall Pct"
+          },
+          "drought_stress_days": {
+            "type": "integer",
+            "title": "Drought Stress Days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "opening_water_mm",
+          "season_end",
+          "end_reason",
+          "modeled_crop_days",
+          "water_shortfall_mm",
+          "water_shortfall_pct",
+          "drought_stress_days"
+        ],
+        "title": "SutherlandCropRun"
+      },
+      "SutherlandEnsemble": {
+        "properties": {
+          "history_weight": {
+            "type": "number",
+            "title": "History Weight"
+          },
+          "nasa_weight": {
+            "type": "number",
+            "title": "Nasa Weight"
+          },
+          "method": {
+            "type": "string",
+            "title": "Method"
+          },
+          "weight_kind": {
+            "type": "string",
+            "title": "Weight Kind"
+          }
+        },
+        "type": "object",
+        "required": [
+          "history_weight",
+          "nasa_weight",
+          "method",
+          "weight_kind"
+        ],
+        "title": "SutherlandEnsemble"
+      },
+      "SutherlandNasaMember": {
+        "properties": {
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "scenario": {
+            "type": "string",
+            "title": "Scenario"
+          },
+          "member": {
+            "type": "string",
+            "title": "Member"
+          },
+          "grid_latitude": {
+            "type": "number",
+            "title": "Grid Latitude"
+          },
+          "grid_longitude": {
+            "type": "number",
+            "title": "Grid Longitude"
+          }
+        },
+        "type": "object",
+        "required": [
+          "model",
+          "scenario",
+          "member",
+          "grid_latitude",
+          "grid_longitude"
+        ],
+        "title": "SutherlandNasaMember"
+      },
+      "SutherlandNasaSource": {
+        "properties": {
+          "dataset": {
+            "type": "string",
+            "title": "Dataset"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "source_url": {
+            "type": "string",
+            "title": "Source Url"
+          },
+          "sha256": {
+            "type": "string",
+            "title": "Sha256"
+          },
+          "overlay_start": {
+            "type": "string",
+            "format": "date",
+            "title": "Overlay Start"
+          },
+          "overlay_end": {
+            "type": "string",
+            "format": "date",
+            "title": "Overlay End"
+          },
+          "members": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/SutherlandNasaMember"
+            },
+            "type": "object",
+            "title": "Members"
+          }
+        },
+        "type": "object",
+        "required": [
+          "dataset",
+          "version",
+          "source_url",
+          "sha256",
+          "overlay_start",
+          "overlay_end",
+          "members"
+        ],
+        "title": "SutherlandNasaSource"
+      },
+      "SutherlandPreviousCrop": {
+        "properties": {
+          "crop_id": {
+            "type": "string",
+            "title": "Crop Id"
+          },
+          "planting_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Planting Date"
+          }
+        },
+        "type": "object",
+        "required": [
+          "crop_id",
+          "planting_date"
+        ],
+        "title": "SutherlandPreviousCrop"
+      },
+      "SutherlandRanking": {
+        "properties": {
+          "historical": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Historical"
+          },
+          "nasa_models": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "type": "object",
+            "title": "Nasa Models"
+          },
+          "nasa": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Nasa"
+          },
+          "ensemble": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Ensemble"
+          }
+        },
+        "type": "object",
+        "required": [
+          "historical",
+          "nasa_models",
+          "nasa",
+          "ensemble"
+        ],
+        "title": "SutherlandRanking"
       },
       "ValidationError": {
         "properties": {
