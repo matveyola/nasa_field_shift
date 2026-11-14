@@ -1,0 +1,2276 @@
+{
+  "global_weather_panel": {
+    "points": [
+      {
+        "acquired_at": "2026-11-14T21:43:12.217929+00:00",
+        "bytes": 97794,
+        "file": "global-kyiv-power-2023-2024.json",
+        "header": {
+          "api": {
+            "name": "POWER Daily API",
+            "version": "v2.10.3"
+          },
+          "end": "20241231",
+          "fill_value": -999.0,
+          "sources": [
+            "MERRA2",
+            "SYN1DEG",
+            "POWER"
+          ],
+          "start": "20230101",
+          "time_standard": "UTC",
+          "title": "NASA/POWER Source Native Resolution Daily Data"
+        },
+        "latitude": 50.45,
+        "longitude": 30.52,
+        "point": "kyiv",
+        "role": "gridded_weather_stress_input_without_yield_truth",
+        "sha256": "bcd31ae17d525d945a16975105469538775c33e27135f3cff02cd4f2532508d4",
+        "units": {
+          "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+          "PRECTOTCORR": "mm/day",
+          "PS": "kPa",
+          "RH2M": "%",
+          "T2M": "C",
+          "T2M_MAX": "C",
+          "T2M_MIN": "C",
+          "WS2M": "m/s"
+        },
+        "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=50.45&longitude=30.52&start=20230101&end=20241231&format=JSON&time-standard=UTC",
+        "valid_days": {
+          "ALLSKY_SFC_SW_DWN": 731,
+          "PRECTOTCORR": 731,
+          "PS": 731,
+          "RH2M": 731,
+          "T2M": 731,
+          "T2M_MAX": 731,
+          "T2M_MIN": 731,
+          "WS2M": 731
+        }
+      },
+      {
+        "acquired_at": "2026-11-14T21:43:14.174069+00:00",
+        "bytes": 99037,
+        "file": "global-rio-power-2023-2024.json",
+        "header": {
+          "api": {
+            "name": "POWER Daily API",
+            "version": "v2.10.3"
+          },
+          "end": "20241231",
+          "fill_value": -999.0,
+          "sources": [
+            "MERRA2",
+            "SYN1DEG",
+            "POWER"
+          ],
+          "start": "20230101",
+          "time_standard": "UTC",
+          "title": "NASA/POWER Source Native Resolution Daily Data"
+        },
+        "latitude": -22.91,
+        "longitude": -43.17,
+        "point": "rio",
+        "role": "gridded_weather_stress_input_without_yield_truth",
+        "sha256": "50ad0f3f7de2c9ccf71057f18fd264ffec375f946952243ea50ec15d416a86b5",
+        "units": {
+          "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+          "PRECTOTCORR": "mm/day",
+          "PS": "kPa",
+          "RH2M": "%",
+          "T2M": "C",
+          "T2M_MAX": "C",
+          "T2M_MIN": "C",
+          "WS2M": "m/s"
+        },
+        "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=-22.91&longitude=-43.17&start=20230101&end=20241231&format=JSON&time-standard=UTC",
+        "valid_days": {
+          "ALLSKY_SFC_SW_DWN": 731,
+          "PRECTOTCORR": 731,
+          "PS": 731,
+          "RH2M": 731,
+          "T2M": 731,
+          "T2M_MAX": 731,
+          "T2M_MIN": 731,
+          "WS2M": 731
+        }
+      },
+      {
+        "acquired_at": "2026-11-14T21:43:16.146530+00:00",
+        "bytes": 99370,
+        "file": "global-singapore-power-2023-2024.json",
+        "header": {
+          "api": {
+            "name": "POWER Daily API",
+            "version": "v2.10.3"
+          },
+          "end": "20241231",
+          "fill_value": -999.0,
+          "sources": [
+            "MERRA2",
+            "SYN1DEG",
+            "POWER"
+          ],
+          "start": "20230101",
+          "time_standard": "UTC",
+          "title": "NASA/POWER Source Native Resolution Daily Data"
+        },
+        "latitude": 1.35,
+        "longitude": 103.82,
+        "point": "singapore",
+        "role": "gridded_weather_stress_input_without_yield_truth",
+        "sha256": "c16f5c3a2229555545564d4a7508b407741317d3e45da580c45ac7cb97f73bdc",
+        "units": {
+          "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+          "PRECTOTCORR": "mm/day",
+          "PS": "kPa",
+          "RH2M": "%",
+          "T2M": "C",
+          "T2M_MAX": "C",
+          "T2M_MIN": "C",
+          "WS2M": "m/s"
+        },
+        "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=1.35&longitude=103.82&start=20230101&end=20241231&format=JSON&time-standard=UTC",
+        "valid_days": {
+          "ALLSKY_SFC_SW_DWN": 731,
+          "PRECTOTCORR": 731,
+          "PS": 731,
+          "RH2M": 731,
+          "T2M": 731,
+          "T2M_MAX": 731,
+          "T2M_MIN": 731,
+          "WS2M": 731
+        }
+      },
+      {
+        "acquired_at": "2026-11-14T21:43:18.070554+00:00",
+        "bytes": 97504,
+        "file": "global-sahara-power-2023-2024.json",
+        "header": {
+          "api": {
+            "name": "POWER Daily API",
+            "version": "v2.10.3"
+          },
+          "end": "20241231",
+          "fill_value": -999.0,
+          "sources": [
+            "MERRA2",
+            "SYN1DEG",
+            "POWER"
+          ],
+          "start": "20230101",
+          "time_standard": "UTC",
+          "title": "NASA/POWER Source Native Resolution Daily Data"
+        },
+        "latitude": 23.0,
+        "longitude": 13.0,
+        "point": "sahara",
+        "role": "gridded_weather_stress_input_without_yield_truth",
+        "sha256": "0a9446d8a41dc7da5c83b08b24f976816d14e1db7095982ecf0cc4bb6ebe1cb8",
+        "units": {
+          "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+          "PRECTOTCORR": "mm/day",
+          "PS": "kPa",
+          "RH2M": "%",
+          "T2M": "C",
+          "T2M_MAX": "C",
+          "T2M_MIN": "C",
+          "WS2M": "m/s"
+        },
+        "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=23.0&longitude=13.0&start=20230101&end=20241231&format=JSON&time-standard=UTC",
+        "valid_days": {
+          "ALLSKY_SFC_SW_DWN": 731,
+          "PRECTOTCORR": 731,
+          "PS": 731,
+          "RH2M": 731,
+          "T2M": 731,
+          "T2M_MAX": 731,
+          "T2M_MIN": 731,
+          "WS2M": 731
+        }
+      },
+      {
+        "acquired_at": "2026-11-14T21:43:20.098111+00:00",
+        "bytes": 99869,
+        "file": "global-antarctica-power-2023-2024.json",
+        "header": {
+          "api": {
+            "name": "POWER Daily API",
+            "version": "v2.10.3"
+          },
+          "end": "20241231",
+          "fill_value": -999.0,
+          "sources": [
+            "MERRA2",
+            "SYN1DEG",
+            "POWER"
+          ],
+          "start": "20230101",
+          "time_standard": "UTC",
+          "title": "NASA/POWER Source Native Resolution Daily Data"
+        },
+        "latitude": -80.0,
+        "longitude": 0.0,
+        "point": "antarctica",
+        "role": "gridded_weather_stress_input_without_yield_truth",
+        "sha256": "d8dc123f1290c1255d2c1c3769e45b2b86e6b4fcb095d88b97156edfb0f55a18",
+        "units": {
+          "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+          "PRECTOTCORR": "mm/day",
+          "PS": "kPa",
+          "RH2M": "%",
+          "T2M": "C",
+          "T2M_MAX": "C",
+          "T2M_MIN": "C",
+          "WS2M": "m/s"
+        },
+        "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=-80.0&longitude=0.0&start=20230101&end=20241231&format=JSON&time-standard=UTC",
+        "valid_days": {
+          "ALLSKY_SFC_SW_DWN": 731,
+          "PRECTOTCORR": 731,
+          "PS": 731,
+          "RH2M": 731,
+          "T2M": 731,
+          "T2M_MAX": 731,
+          "T2M_MIN": 731,
+          "WS2M": 731
+        }
+      },
+      {
+        "acquired_at": "2026-11-14T21:43:21.905351+00:00",
+        "bytes": 97086,
+        "file": "global-la_paz-power-2023-2024.json",
+        "header": {
+          "api": {
+            "name": "POWER Daily API",
+            "version": "v2.10.3"
+          },
+          "end": "20241231",
+          "fill_value": -999.0,
+          "sources": [
+            "MERRA2",
+            "SYN1DEG",
+            "POWER"
+          ],
+          "start": "20230101",
+          "time_standard": "UTC",
+          "title": "NASA/POWER Source Native Resolution Daily Data"
+        },
+        "latitude": -16.5,
+        "longitude": -68.15,
+        "point": "la_paz",
+        "role": "gridded_weather_stress_input_without_yield_truth",
+        "sha256": "82bf23f84dc2245ca248f86bb022f17bca4be4bf119a5f0a2696ea616d8a8eb6",
+        "units": {
+          "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+          "PRECTOTCORR": "mm/day",
+          "PS": "kPa",
+          "RH2M": "%",
+          "T2M": "C",
+          "T2M_MAX": "C",
+          "T2M_MIN": "C",
+          "WS2M": "m/s"
+        },
+        "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=-16.5&longitude=-68.15&start=20230101&end=20241231&format=JSON&time-standard=UTC",
+        "valid_days": {
+          "ALLSKY_SFC_SW_DWN": 731,
+          "PRECTOTCORR": 731,
+          "PS": 731,
+          "RH2M": 731,
+          "T2M": 731,
+          "T2M_MAX": 731,
+          "T2M_MIN": 731,
+          "WS2M": 731
+        }
+      }
+    ],
+    "total_bytes": 590660
+  },
+  "power": [
+    {
+      "acquired_at": null,
+      "bytes": 1693126,
+      "file": "ARL-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        43.29925,
+        -89.35245
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -89.352,
+          43.299,
+          280.28
+        ],
+        "type": "Point"
+      },
+      "sha256": "57e15041a6a98b4621e6b82de66b5b4165cc94ca24b43defa487dfc2892d40c5",
+      "site": "ARL",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=43.29925&longitude=-89.35245&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11688,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": "2026-11-14T21:38:49.094323+00:00",
+      "bytes": 1691714,
+      "file": "BRADFORD.A-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        38.892375,
+        -92.1966
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -92.197,
+          38.892,
+          224.74
+        ],
+        "type": "Point"
+      },
+      "sha256": "f8b1548f364af6b9b2b83e46b4ae449d584613ca8a0ac420652cd56fc7bd98e7",
+      "site": "BRADFORD.A",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=38.892375&longitude=-92.1966&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11688,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": "2026-11-14T21:38:52.105359+00:00",
+      "bytes": 1691714,
+      "file": "BRADFORD.B1-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        38.8891,
+        -92.20214999999999
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -92.202,
+          38.889,
+          224.74
+        ],
+        "type": "Point"
+      },
+      "sha256": "c47d5f3c0ae71a7c350d805c14a01dde120ca0262b335bbed604df983f75411c",
+      "site": "BRADFORD.B1",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=38.8891&longitude=-92.20214999999999&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11688,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": "2026-11-14T21:38:54.029886+00:00",
+      "bytes": 1691714,
+      "file": "BRADFORD.B2-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        38.9038,
+        -92.20897500000001
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -92.209,
+          38.904,
+          224.74
+        ],
+        "type": "Point"
+      },
+      "sha256": "fb51885a0c2e4ac97528fbad7bd3f606d65aa1f36a2d7d5e23f89a1c0b327594",
+      "site": "BRADFORD.B2",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=38.9038&longitude=-92.20897500000001&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11688,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": "2026-11-14T21:38:56.755818+00:00",
+      "bytes": 1691714,
+      "file": "BRADFORD.C-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        38.879,
+        -92.20490000000001
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -92.205,
+          38.879,
+          224.74
+        ],
+        "type": "Point"
+      },
+      "sha256": "237d4192ea8e404b4ecce0c21853e244ee6b489d85124ecb4ca061f65c5bca01",
+      "site": "BRADFORD.C",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=38.879&longitude=-92.20490000000001&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11688,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": "2026-11-14T21:38:59.823578+00:00",
+      "bytes": 1690910,
+      "file": "DPAC-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        40.26605,
+        -85.1599
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -85.16,
+          40.266,
+          278.55
+        ],
+        "type": "Point"
+      },
+      "sha256": "4958602dbfb5189f224582a54efca10282075d398774f04e44742403cd64a871",
+      "site": "DPAC",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=40.26605&longitude=-85.1599&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11688,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": null,
+      "bytes": 1691572,
+      "file": "FREEMAN-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        38.581325,
+        -92.10565
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -92.106,
+          38.581,
+          222.7
+        ],
+        "type": "Point"
+      },
+      "sha256": "f2b16a839320b7fd7de5e77a37963d40d4b60471386812af3a57ae79c2376919",
+      "site": "FREEMAN",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=38.581325&longitude=-92.10565&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11688,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": "2026-11-14T21:39:02.905774+00:00",
+      "bytes": 1692725,
+      "file": "GILMORE-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        42.74835,
+        -94.49577500000001
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -94.496,
+          42.748,
+          349.58
+        ],
+        "type": "Point"
+      },
+      "sha256": "51d385366d514b62d9a467d366c15faabf18a8445007466d15d250b98bd93a95",
+      "site": "GILMORE",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=42.74835&longitude=-94.49577500000001&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11687,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": "2026-11-14T21:39:05.590137+00:00",
+      "bytes": 1693639,
+      "file": "HICKS.B-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        44.346225000000004,
+        -95.53925
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -95.539,
+          44.346,
+          363.2
+        ],
+        "type": "Point"
+      },
+      "sha256": "3efaef23919fb1134b88bd267f96957af67ea8fee966a6d444c7bb2a7b96edb9",
+      "site": "HICKS.B",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=44.346225000000004&longitude=-95.53925&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11687,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": "2026-11-14T21:39:08.313985+00:00",
+      "bytes": 1693638,
+      "file": "HICKS.G-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        44.339075,
+        -95.550025
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -95.55,
+          44.339,
+          363.2
+        ],
+        "type": "Point"
+      },
+      "sha256": "f86f5a4560b864d0cd5622799a2110dd9670b174a9323d7f87fe9a483677e9e4",
+      "site": "HICKS.G",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=44.339075&longitude=-95.550025&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11687,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": "2026-11-14T21:39:11.296533+00:00",
+      "bytes": 1693638,
+      "file": "HICKS.P-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        44.336299999999994,
+        -95.5548
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -95.555,
+          44.336,
+          363.2
+        ],
+        "type": "Point"
+      },
+      "sha256": "5e49967bf1e96170bfe012420ba1761ad3ff1a1ebed6b3a5d2aba20e7b3d75f5",
+      "site": "HICKS.P",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=44.336299999999994&longitude=-95.5548&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11687,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": "2026-11-14T21:39:12.973430+00:00",
+      "bytes": 1690476,
+      "file": "HOYTVILLE.LTR-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        41.222225,
+        -83.76185000000001
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -83.762,
+          41.222,
+          243.8
+        ],
+        "type": "Point"
+      },
+      "sha256": "bc0bd75eee7a56175b51027b7c9a54c49e0a832a064c72e0d171e64c81d4ae57",
+      "site": "HOYTVILLE.LTR",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=41.222225&longitude=-83.76185000000001&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11685,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": "2026-11-14T21:39:15.624596+00:00",
+      "bytes": 1692314,
+      "file": "ISUAG-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        42.009525,
+        -93.78075000000001
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -93.781,
+          42.01,
+          310.22
+        ],
+        "type": "Point"
+      },
+      "sha256": "76d02590a66fb96925b76797da6d5963d01e5f2b9029d6092d0bb93f2e7d270c",
+      "site": "ISUAG",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=42.009525&longitude=-93.78075000000001&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11688,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": "2026-11-14T21:39:18.352440+00:00",
+      "bytes": 1692315,
+      "file": "ISUAG.USB-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        42.02135,
+        -93.7593
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -93.759,
+          42.021,
+          310.22
+        ],
+        "type": "Point"
+      },
+      "sha256": "02c63191d1962c7396a2f9e6d88cd235c1fc8c2486e3e364b9a34259e910247a",
+      "site": "ISUAG.USB",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=42.02135&longitude=-93.7593&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11688,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": null,
+      "bytes": 1690313,
+      "file": "KELLOGG-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        42.41585,
+        -85.36905
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -85.369,
+          42.416,
+          247.44
+        ],
+        "type": "Point"
+      },
+      "sha256": "2d764a6bc5c17f30b96f06e6c7700d688fa549c4e47a09f2bc4bba7d945535ff",
+      "site": "KELLOGG",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=42.41585&longitude=-85.36905&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11687,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": "2026-11-14T21:39:21.416716+00:00",
+      "bytes": 1693103,
+      "file": "LAN-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        42.83135,
+        -90.79554999999999
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -90.796,
+          42.831,
+          290.04
+        ],
+        "type": "Point"
+      },
+      "sha256": "12719f959c6028bf37ddb27100e9155341baa9c3128ce1d6f34a13a66b5fc175",
+      "site": "LAN",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=42.83135&longitude=-90.79554999999999&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11688,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": "2026-11-14T21:39:24.555296+00:00",
+      "bytes": 1695668,
+      "file": "MAR-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        44.761125,
+        -90.098175
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -90.098,
+          44.761,
+          416.61
+        ],
+        "type": "Point"
+      },
+      "sha256": "1cbe6171a597955efb5e110ade30b815ebead5ad36320b837bc67d6d9a9c8821",
+      "site": "MAR",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=44.761125&longitude=-90.098175&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11685,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": "2026-11-14T21:39:27.236424+00:00",
+      "bytes": 1690483,
+      "file": "MASON-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        42.628675,
+        -84.434825
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -84.435,
+          42.629,
+          281.97
+        ],
+        "type": "Point"
+      },
+      "sha256": "8f8a783af60f2d3036035caa2a1bce5106ff973f68c1f4c84c9292dafe1f63db",
+      "site": "MASON",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=42.628675&longitude=-84.434825&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11684,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": "2026-11-14T21:39:29.917406+00:00",
+      "bytes": 1690679,
+      "file": "NAEW.WS109-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        40.3704,
+        -81.794
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -81.794,
+          40.37,
+          314.08
+        ],
+        "type": "Point"
+      },
+      "sha256": "a13ec2726cfaa6c5903b501b040036e1f6f4617dce117da8fb26cabd2bccf3ec",
+      "site": "NAEW.WS109",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=40.3704&longitude=-81.794&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11688,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": "2026-11-14T21:39:32.563296+00:00",
+      "bytes": 1690680,
+      "file": "NAEW.WS111-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        40.3674,
+        -81.782
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -81.782,
+          40.367,
+          314.08
+        ],
+        "type": "Point"
+      },
+      "sha256": "3eef5875ba82e4b6f39ffc7114a1c09a20f06b6f433d9265ee6a024a28804d49",
+      "site": "NAEW.WS111",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=40.3674&longitude=-81.782&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11688,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": "2026-11-14T21:39:34.613420+00:00",
+      "bytes": 1690679,
+      "file": "NAEW.WS113-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        40.3671,
+        -81.7799
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -81.78,
+          40.367,
+          314.08
+        ],
+        "type": "Point"
+      },
+      "sha256": "b6d5cfaeda9ded804d8fd5df792727e74645f9b8b0bfc13803415492507c66bb",
+      "site": "NAEW.WS113",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=40.3671&longitude=-81.7799&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11688,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": "2026-11-14T21:39:37.375820+00:00",
+      "bytes": 1690680,
+      "file": "NAEW.WS118-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        40.3648,
+        -81.7868
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -81.787,
+          40.365,
+          314.08
+        ],
+        "type": "Point"
+      },
+      "sha256": "83abb749d1a92f83f24846d6f1529869e1642c6f403e4ad162910d5e88b6a69b",
+      "site": "NAEW.WS118",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=40.3648&longitude=-81.7868&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11688,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": "2026-11-14T21:39:40.226519+00:00",
+      "bytes": 1692484,
+      "file": "NWREC-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        40.930825,
+        -90.72727499999999
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -90.727,
+          40.931,
+          208.35
+        ],
+        "type": "Point"
+      },
+      "sha256": "c3189c25263248f00708d56c8b32bf0e60e05e1c75beba09db4f334db24f6ef8",
+      "site": "NWREC",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=40.930825&longitude=-90.72727499999999&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11688,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": "2026-11-14T21:39:43.017407+00:00",
+      "bytes": 1693908,
+      "file": "ORR-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        39.801075,
+        -90.821075
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -90.821,
+          39.801,
+          184.37
+        ],
+        "type": "Point"
+      },
+      "sha256": "544ec2b8ded2585d19c0dc526c1f39e6d814f4f796b3384f377cbdf135fa2cdb",
+      "site": "ORR",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=39.801075&longitude=-90.821075&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11688,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": "2026-11-14T21:39:45.772950+00:00",
+      "bytes": 1691266,
+      "file": "SEPAC-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        39.079575,
+        -85.509275
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -85.509,
+          39.08,
+          237.04
+        ],
+        "type": "Point"
+      },
+      "sha256": "c756fcddd477b161e7ebc4257e0f9beb2e41c00617a5b48b6e54ab65db072d1a",
+      "site": "SEPAC",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=39.079575&longitude=-85.509275&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11688,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": "2026-11-14T21:39:48.454910+00:00",
+      "bytes": 1692536,
+      "file": "SERF-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        41.193374999999996,
+        -91.4832
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -91.483,
+          41.193,
+          205.49
+        ],
+        "type": "Point"
+      },
+      "sha256": "49d3066fdc438f4b04c800023591190e8fcee0cf9f0b3e451c01eae7fd3c9342",
+      "site": "SERF",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=41.193374999999996&longitude=-91.4832&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11688,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": "2026-11-14T21:39:51.228094+00:00",
+      "bytes": 1690567,
+      "file": "STJOHNS-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        40.5176,
+        -84.08590000000001
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -84.086,
+          40.518,
+          276.17
+        ],
+        "type": "Point"
+      },
+      "sha256": "df432ddddae4eea7c5fc78e5fc9ace2da87c86efc61eed490f8a5eb620ae0838",
+      "site": "STJOHNS",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=40.5176&longitude=-84.08590000000001&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11688,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": "2026-11-14T21:39:53.901076+00:00",
+      "bytes": 1690737,
+      "file": "WATERMAN-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        40.018100000000004,
+        -83.042575
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -83.043,
+          40.018,
+          291.64
+        ],
+        "type": "Point"
+      },
+      "sha256": "2570ea3c9828626ce480631f6d5a654924ab45a31f9e8c3ec86d3b9e87cd7f82",
+      "site": "WATERMAN",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=40.018100000000004&longitude=-83.042575&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11688,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": "2026-11-14T21:39:56.717649+00:00",
+      "bytes": 1690593,
+      "file": "WOOSTER.COV-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        40.7813,
+        -81.84335
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -81.843,
+          40.781,
+          309.08
+        ],
+        "type": "Point"
+      },
+      "sha256": "a76c88fcacd635ea73ff4f820ec50d768826d8ac06d9f2d2509b5c40488d0377",
+      "site": "WOOSTER.COV",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=40.7813&longitude=-81.84335&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11688,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    },
+    {
+      "acquired_at": "2026-11-14T21:39:59.807470+00:00",
+      "bytes": 1690594,
+      "file": "WOOSTER.LTR-power-1981-2015.json",
+      "header": {
+        "api": {
+          "name": "POWER Daily API",
+          "version": "v2.10.3"
+        },
+        "end": "20151231",
+        "fill_value": -999.0,
+        "sources": [
+          "MERRA2",
+          "SRB",
+          "SYN1DEG",
+          "POWER"
+        ],
+        "start": "19810101",
+        "time_standard": "UTC",
+        "title": "NASA/POWER Source Native Resolution Daily Data"
+      },
+      "requested_coordinates": [
+        40.7636,
+        -81.90635
+      ],
+      "returned_geometry": {
+        "coordinates": [
+          -81.906,
+          40.764,
+          309.08
+        ],
+        "type": "Point"
+      },
+      "sha256": "187703766ff0dc6bd2e8ef1b5b5bb6ae671bdb68f36a41d83f60120c180f0088",
+      "site": "WOOSTER.LTR",
+      "units": {
+        "ALLSKY_SFC_SW_DWN": "MJ/m^2/day",
+        "PRECTOTCORR": "mm/day",
+        "PS": "kPa",
+        "RH2M": "%",
+        "T2M": "C",
+        "T2M_MAX": "C",
+        "T2M_MIN": "C",
+        "WS2M": "m/s"
+      },
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M%2CT2M_MAX%2CT2M_MIN%2CRH2M%2CWS2M%2CPRECTOTCORR%2CALLSKY_SFC_SW_DWN%2CPS&community=AG&latitude=40.7636&longitude=-81.90635&start=19810101&end=20151231&format=JSON&time-standard=UTC",
+      "valid_days": {
+        "ALLSKY_SFC_SW_DWN": 11688,
+        "PRECTOTCORR": 12783,
+        "PS": 12783,
+        "RH2M": 12783,
+        "T2M": 12783,
+        "T2M_MAX": 12783,
+        "T2M_MIN": 12783,
+        "WS2M": 12783
+      }
+    }
+  ],
+  "site_metadata": {
+    "ARL": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 4,
+      "latitude": 43.29925,
+      "longitude": -89.35245,
+      "physical_site": "ARL",
+      "state": "WI"
+    },
+    "BRADFORD.A": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 4,
+      "latitude": 38.892375,
+      "longitude": -92.1966,
+      "physical_site": "BRADFORD",
+      "state": "MO"
+    },
+    "BRADFORD.B1": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 4,
+      "latitude": 38.8891,
+      "longitude": -92.20214999999999,
+      "physical_site": "BRADFORD",
+      "state": "MO"
+    },
+    "BRADFORD.B2": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 4,
+      "latitude": 38.9038,
+      "longitude": -92.20897500000001,
+      "physical_site": "BRADFORD",
+      "state": "MO"
+    },
+    "BRADFORD.C": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 4,
+      "latitude": 38.879,
+      "longitude": -92.20490000000001,
+      "physical_site": "BRADFORD",
+      "state": "MO"
+    },
+    "DPAC": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 4,
+      "latitude": 40.26605,
+      "longitude": -85.1599,
+      "physical_site": "DPAC",
+      "state": "IN"
+    },
+    "FREEMAN": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 4,
+      "latitude": 38.581325,
+      "longitude": -92.10565,
+      "physical_site": "FREEMAN",
+      "state": "MO"
+    },
+    "GILMORE": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 4,
+      "latitude": 42.74835,
+      "longitude": -94.49577500000001,
+      "physical_site": "GILMORE",
+      "state": "IA"
+    },
+    "HICKS.B": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 4,
+      "latitude": 44.346225000000004,
+      "longitude": -95.53925,
+      "physical_site": "HICKS",
+      "state": "MN"
+    },
+    "HICKS.G": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 4,
+      "latitude": 44.339075,
+      "longitude": -95.550025,
+      "physical_site": "HICKS",
+      "state": "MN"
+    },
+    "HICKS.P": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 4,
+      "latitude": 44.336299999999994,
+      "longitude": -95.5548,
+      "physical_site": "HICKS",
+      "state": "MN"
+    },
+    "HOYTVILLE.LTR": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 4,
+      "latitude": 41.222225,
+      "longitude": -83.76185000000001,
+      "physical_site": "HOYTVILLE",
+      "state": "OH"
+    },
+    "ISUAG": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 4,
+      "latitude": 42.009525,
+      "longitude": -93.78075000000001,
+      "physical_site": "ISUAG",
+      "state": "IA"
+    },
+    "ISUAG.USB": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 4,
+      "latitude": 42.02135,
+      "longitude": -93.7593,
+      "physical_site": "ISUAG",
+      "state": "IA"
+    },
+    "KELLOGG": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 4,
+      "latitude": 42.41585,
+      "longitude": -85.36905,
+      "physical_site": "KELLOGG",
+      "state": "MI"
+    },
+    "LAN": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 4,
+      "latitude": 42.83135,
+      "longitude": -90.79554999999999,
+      "physical_site": "LAN",
+      "state": "WI"
+    },
+    "MAR": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 4,
+      "latitude": 44.761125,
+      "longitude": -90.098175,
+      "physical_site": "MAR",
+      "state": "WI"
+    },
+    "MASON": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 4,
+      "latitude": 42.628675,
+      "longitude": -84.434825,
+      "physical_site": "MASON",
+      "state": "MI"
+    },
+    "NAEW.WS109": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 1,
+      "latitude": 40.3704,
+      "longitude": -81.794,
+      "physical_site": "NAEW",
+      "state": "OH"
+    },
+    "NAEW.WS111": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 1,
+      "latitude": 40.3674,
+      "longitude": -81.782,
+      "physical_site": "NAEW",
+      "state": "OH"
+    },
+    "NAEW.WS113": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 1,
+      "latitude": 40.3671,
+      "longitude": -81.7799,
+      "physical_site": "NAEW",
+      "state": "OH"
+    },
+    "NAEW.WS118": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 1,
+      "latitude": 40.3648,
+      "longitude": -81.7868,
+      "physical_site": "NAEW",
+      "state": "OH"
+    },
+    "NWREC": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 4,
+      "latitude": 40.930825,
+      "longitude": -90.72727499999999,
+      "physical_site": "NWREC",
+      "state": "IL"
+    },
+    "ORR": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 4,
+      "latitude": 39.801075,
+      "longitude": -90.821075,
+      "physical_site": "ORR",
+      "state": "IL"
+    },
+    "SEPAC": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 4,
+      "latitude": 39.079575,
+      "longitude": -85.509275,
+      "physical_site": "SEPAC",
+      "state": "IN"
+    },
+    "SERF": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 4,
+      "latitude": 41.193374999999996,
+      "longitude": -91.4832,
+      "physical_site": "SERF",
+      "state": "IA"
+    },
+    "STJOHNS": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 4,
+      "latitude": 40.5176,
+      "longitude": -84.08590000000001,
+      "physical_site": "STJOHNS",
+      "state": "OH"
+    },
+    "WATERMAN": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 4,
+      "latitude": 40.018100000000004,
+      "longitude": -83.042575,
+      "physical_site": "WATERMAN",
+      "state": "OH"
+    },
+    "WOOSTER.COV": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 4,
+      "latitude": 40.7813,
+      "longitude": -81.84335,
+      "physical_site": "WOOSTER",
+      "state": "OH"
+    },
+    "WOOSTER.LTR": {
+      "coordinate_method": "mean_available_metadata_corner_pairs",
+      "coordinate_pairs": 4,
+      "latitude": 40.7636,
+      "longitude": -81.90635,
+      "physical_site": "WOOSTER",
+      "state": "OH"
+    }
+  },
+  "source_registry": {
+    "ARDN": {
+      "encoding": "cp1252",
+      "known_quality_issue": "2026-02 metadata warns incorrect nitrogen fertilizer assignments; nitrogen excluded",
+      "label_unit": "dry kg/ha",
+      "license": "CC0",
+      "metadata_sha256": "91c0a27e70c293c6d58752fe760b256ac2167cbef4be7b3eccd9e079a2c260c2",
+      "parent_url": "https://api.figshare.com/v2/articles/24851877",
+      "url": "https://api.figshare.com/v2/articles/24665640",
+      "years": [
+        2011,
+        2015
+      ]
+    },
+    "NASA_POWER": {
+      "auth": "none for public daily point API",
+      "documentation": "https://power.larc.nasa.gov/docs/services/api/temporal/daily/",
+      "historical_availability": "retrospectively revised; no preserved issue-date vintages",
+      "lineage": "https://power.larc.nasa.gov/docs/methodology/data/sources_meteorology/",
+      "precision": "native gridded proxy, not field measurement",
+      "terms": "NASA open scientific data; acknowledge POWER and source lineage",
+      "time_standard": "UTC"
+    },
+    "catalog": "docs/planning/global-data-sources.md"
+  },
+  "sources": {
+    "ardn-agro.csv": "8ad1c3224f84cc715fe73a11d475fb5acd0c0f51319b86173aff4a923036519f",
+    "ardn-ops_harv.csv": "e94fd10babbc27490dbb560b720232d5ea8df06d53f7e01b5addbee18b7ee220",
+    "ardn-ops_plant.csv": "5a866c19379b5f02a35464baa050690243d603f6a1d9c0273dba077b776df4cd",
+    "ardn-sitemeta.csv": "c591b7e72a1e4e80af9cfdca58ccd6f2cfe8777016d74377cea55fd5730b2291"
+  },
+  "total_bytes": 50756179,
+  "total_raw_power_bytes": 51346839
+}
