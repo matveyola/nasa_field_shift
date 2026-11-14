@@ -264,3 +264,16 @@ def test_measured_zero_and_negative_margin_are_valid(farm_data):
     result = BoundedSelector().compare(*validated(farm_data))
     assert result.solver_status == "optimal"
     assert result.alternatives[0].objective_value == -1800
+
+
+def test_evaluation_uses_pinned_weather_issue_not_later_submission_clock(farm_data):
+    """B dates evidence at the weather issue; submitting later must preserve that date."""
+    from datetime import timedelta
+
+    from field_shift.modules.rotations.scenario_planning.selector import candidate_errors
+
+    request, candidates, evaluations = validated(farm_data)
+    later = request.model_copy(update={"as_of": request.as_of + timedelta(hours=1)})
+    assert not candidate_errors(later, candidates[0], evaluations[0])
+    future = evaluations[0].model_copy(update={"as_of": later.as_of + timedelta(seconds=1)})
+    assert any(r.code == "evaluation_scope" for r in candidate_errors(later, candidates[0], future))

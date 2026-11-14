@@ -94,7 +94,8 @@ def candidate_errors(request, candidate, evaluation):
         evaluation.sequence_id != candidate.sequence_id
         or evaluation.field_snapshot_id != field.snapshot_id
         or evaluation.scenario_set_id != request.weather.scenario_set_id
-        or evaluation.as_of != request.as_of
+        or evaluation.as_of != request.weather.as_of
+        or evaluation.as_of > request.as_of
         or actual != expected
         or any(
             r.crop != next(a.crop for a in candidate.assignments if a.season == r.season)
