@@ -9,10 +9,10 @@ from datetime import UTC, datetime, timedelta
 from typing import Protocol
 from uuid import uuid4
 
+from field_shift_contracts.planning_v1.field import CropAssignment
+from field_shift_contracts.planning_v1.planning import ApplyPlanResult, PlanningRun
 from sqlalchemy import select
 
-from field_shift.contracts.planning_v1.field import CropAssignment
-from field_shift.contracts.planning_v1.planning import ApplyPlanResult, PlanningRun
 from field_shift.modules.farm.models import Farm
 from field_shift.modules.fields.models import Field
 

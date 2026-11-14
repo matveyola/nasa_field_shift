@@ -2,8 +2,8 @@ from collections.abc import Callable
 from datetime import UTC, date, datetime, timedelta
 from os import getenv
 
-from field_shift.modules.fields.schemas import Polygon
-from field_shift.modules.geo_ml.era5_land import (
+from field_shift_science.fields.schemas import Polygon
+from field_shift_science.geo_ml.era5_land import (
     GRID_STEP,
     UNIT,
     MoistureSourceError,
@@ -11,16 +11,16 @@ from field_shift.modules.geo_ml.era5_land import (
     grid_cells,
     latest_archive_day,
 )
-from field_shift.modules.geo_ml.moisture_features import fetch_moisture_features
-from field_shift.modules.geo_ml.moisture_model import (
+from field_shift_science.geo_ml.moisture_features import fetch_moisture_features
+from field_shift_science.geo_ml.moisture_model import (
     MoistureModel,
     MoistureModelUnavailable,
     MoistureModelV2,
     get_moisture_model,
     get_moisture_model_v2,
 )
-from field_shift.modules.geo_ml.schemas import GeoResult, MoistureInterval, MoistureSource
-from field_shift.modules.geo_ml.ssurgo import SSURGO_SOURCE, SoilSurveyError, fetch_soil_profile
+from field_shift_science.geo_ml.schemas import GeoResult, MoistureInterval, MoistureSource
+from field_shift_science.geo_ml.ssurgo import SSURGO_SOURCE, SoilSurveyError, fetch_soil_profile
 
 THAWED_LOOKBACK_DAYS = 7
 TRAINING_DATA_URL = "https://www.ncei.noaa.gov/access/crn/products.html"

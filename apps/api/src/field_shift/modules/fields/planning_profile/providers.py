@@ -4,14 +4,14 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Generic, Literal, Protocol, TypeVar
 
-from field_shift.contracts.planning_v1.common import Reason, SourceRecord
-from field_shift.contracts.planning_v1.field import (
+from field_shift_contracts.planning_v1.common import Reason, SourceRecord
+from field_shift_contracts.planning_v1.field import (
     FieldGeometry,
     HazardEvidence,
     SoilHorizon,
     TerrainRadiation,
 )
-from field_shift.contracts.planning_v1.weather import WeatherScenarioSet
+from field_shift_contracts.planning_v1.weather import WeatherScenarioSet
 
 from .evidence import reason
 

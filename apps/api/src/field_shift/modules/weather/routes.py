@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException
+from field_shift_science.fields.schemas import Season
+from field_shift_science.weather.historical import WeatherUnavailableError
 
 from field_shift.db import SessionDep
 from field_shift.modules.fields.history import boundary_for_season
-from field_shift.modules.fields.schemas import Season
 from field_shift.modules.fields.service import require_field
-from field_shift.modules.weather.historical import WeatherUnavailableError
 from field_shift.modules.weather.seasonal import (
     SeasonalWeather,
     WeatherForecast,

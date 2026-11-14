@@ -1,12 +1,5 @@
-from sqlalchemy import and_, select, update
-from sqlalchemy.orm import Session
-
-from field_shift.errors import ConflictError, NotFoundError
-from field_shift.modules.farm.models import FARM_ID, Farm
-from field_shift.modules.fields.geometry import area_hectares, covers_ring, same_boundary
-from field_shift.modules.fields.history import boundary_for_season, ensure_baseline, record_boundary
-from field_shift.modules.fields.models import Field, FieldPlanting
-from field_shift.modules.fields.schemas import (
+from field_shift_science.fields.geometry import area_hectares, covers_ring, same_boundary
+from field_shift_science.fields.schemas import (
     FieldBoundaryUpdate,
     FieldCreate,
     FieldPlantingRead,
@@ -14,6 +7,13 @@ from field_shift.modules.fields.schemas import (
     FieldRead,
     Polygon,
 )
+from sqlalchemy import and_, select, update
+from sqlalchemy.orm import Session
+
+from field_shift.errors import ConflictError, NotFoundError
+from field_shift.modules.farm.models import FARM_ID, Farm
+from field_shift.modules.fields.history import boundary_for_season, ensure_baseline, record_boundary
+from field_shift.modules.fields.models import Field, FieldPlanting
 
 
 def require_field(session: Session, field_id: str) -> Field:

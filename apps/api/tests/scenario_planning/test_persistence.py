@@ -7,10 +7,10 @@ from threading import Barrier
 
 import pytest
 from alembic import command
+from field_shift_contracts.planning_v1.planning import ApplyPlanRequest, ReplanRequest
 from sqlalchemy import inspect, select
 from sqlalchemy.orm import Session
 
-from field_shift.contracts.planning_v1.planning import ApplyPlanRequest, ReplanRequest
 from field_shift.modules.access.service import Principal
 from field_shift.modules.fields.models import Field
 from field_shift.modules.rotations.scenario_planning import service as clock_service
@@ -199,7 +199,7 @@ def test_replan_requires_commitments_and_new_request(database, farm_data):
         session.commit()
         new = copy.deepcopy(farm_data[0])
         new["request_id"] = "replan-2"
-        from field_shift.contracts.planning_v1 import FarmPlanningRequest
+        from field_shift_contracts.planning_v1 import FarmPlanningRequest
 
         payload = ReplanRequest(
             previous_run_id=run.run_id,

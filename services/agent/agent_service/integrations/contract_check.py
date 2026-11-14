@@ -30,16 +30,19 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 import httpx2
-from pydantic import SecretStr
-
-from contracts.integration import INTEGRATION_VERSION, ComparisonRequest, FieldProfileRequest
+from contracts.integration import (
+    INTEGRATION_VERSION,
+    ComparisonRequest,
+    FieldProfileRequest,
+)
 from contracts.models import CompareRotationsRequest, FieldContext
+from contracts.resources import field_context_fixtures
+from pydantic import SecretStr
 
 from .http import HttpGeoProvider, HttpService, HttpSimulationProvider
 from .normalize import check_comparison, check_profile, idempotency_key
 from .ports import IntegrationFailure
 
-FIXTURES = Path(__file__).parents[2] / "contracts" / "fixtures"
 SPEC = "docs/M5_TEAM_INTEGRATION_CONTRACT.md"
 ALL_SCENARIOS = ("typical", "drought_2024", "heat_plus_2_5c")
 
@@ -118,7 +121,7 @@ def _target(mode: str | None) -> str:
 def _context(field_id: str, path: str | None) -> FieldContext:
     if path:
         return FieldContext.model_validate_json(Path(path).read_text(encoding="utf-8"))
-    for p in FIXTURES.glob("field_context.*.json"):
+    for p in field_context_fixtures():
         ctx = FieldContext.model_validate_json(p.read_text(encoding="utf-8"))
         if ctx.field_id == field_id:
             return ctx

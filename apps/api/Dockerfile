@@ -4,13 +4,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends libexpat1 \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=uv /uv /usr/local/bin/uv
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 UV_PYTHON_DOWNLOADS=never
-ENV PATH="/app/.venv/bin:$PATH"
-WORKDIR /app
+ENV PATH="/apps/api/.venv/bin:$PATH"
+WORKDIR /apps/api
+COPY --from=shared-contracts . /packages/field-shift-contracts
+COPY --from=shared-science . /packages/field-shift-science
 COPY pyproject.toml uv.lock ./
 RUN uv sync --locked --no-dev --no-install-project
 RUN python -c "import rasterio; import shapely"
 COPY src ./src
-RUN uv sync --locked --no-dev --no-editable
+RUN uv sync --locked --no-dev --no-editable && rm -rf /apps/api/src /packages
 COPY alembic.ini ./
 COPY migrations ./migrations
 RUN useradd --create-home --uid 10001 fieldshift

@@ -5,7 +5,8 @@ import os
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-from field_shift.contracts.planning_v1 import ModelCard, SequenceEvaluation
+from field_shift_contracts.planning_v1 import ModelCard, SequenceEvaluation
+
 from field_shift.modules.rotations.scenario_planning.common import canonical
 
 MAX_BYTES = 16 * 1024 * 1024

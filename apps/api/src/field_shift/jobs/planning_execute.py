@@ -3,8 +3,9 @@
 import json
 import sys
 
+from field_shift_contracts.planning_v1 import ModelCard
+
 from field_shift.config import get_settings
-from field_shift.contracts.planning_v1 import ModelCard
 from field_shift.db import build_session_factory
 from field_shift.modules.fields.planning_profile.service import ProfileRepository
 from field_shift.modules.planning_runtime.calendars import (

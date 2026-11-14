@@ -1,8 +1,7 @@
 from typing import Literal
 
+from field_shift_science.fields.schemas import CropName, Season
 from pydantic import BaseModel
-
-from field_shift.modules.fields.schemas import CropName, Season
 
 PlanId = Literal["plan-a", "plan-b"]
 

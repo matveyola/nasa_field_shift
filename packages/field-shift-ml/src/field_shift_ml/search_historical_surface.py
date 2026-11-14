@@ -6,10 +6,12 @@ from collections import defaultdict
 from collections.abc import Iterable
 from dataclasses import asdict, dataclass, replace
 from datetime import date, timedelta
+from importlib.resources import files
 from itertools import combinations, product
 from pathlib import Path
 
 import numpy as np
+from field_shift_science.geo_ml.moisture_model import station_distance_km
 from sklearn import __version__ as sklearn_version
 from sklearn.ensemble import ExtraTreesRegressor, HistGradientBoostingRegressor
 from sklearn.impute import SimpleImputer
@@ -19,7 +21,6 @@ from sklearn.model_selection import GroupKFold
 from sklearn.preprocessing import StandardScaler
 from threadpoolctl import threadpool_limits
 
-from field_shift.modules.geo_ml.moisture_model import station_distance_km
 from field_shift_ml.historical_surface_features import StationRows, prepare_rows
 from field_shift_ml.train_moisture import (
     Station,
@@ -29,7 +30,8 @@ from field_shift_ml.train_moisture import (
 )
 from field_shift_ml.train_moisture_v2 import FIT_END, digest, read_soils
 
-ARTIFACT = Path("src/field_shift/modules/geo_ml/artifacts/moisture-v2.json")
+ARTIFACTS = files("field_shift_science.geo_ml").joinpath("artifacts")
+ARTIFACT = ARTIFACTS.joinpath("moisture-v2.json")
 BASE_GROUPS = ("raw", "land_history")
 EXTRA_GROUPS = ("weather", "soil", "terrain", "geography")
 COMPLEXITY = ("raw", "bias", "ridge", "robust_ridge", "elastic_net", "rbf", "boosting", "trees")
@@ -501,7 +503,7 @@ def fresh_diagnostic(args: argparse.Namespace) -> dict:
     registered = {site["station_id"]: site for site in manifest["sites"]}
     first_day = date.fromisoformat(manifest["first_issue"]) + timedelta(days=1)
     last_day = date.fromisoformat(manifest["last_issue"]) + timedelta(days=5)
-    original = json.loads(ARTIFACT.with_name("moisture-v1.json").read_bytes())
+    original = json.loads(ARTIFACTS.joinpath("moisture-v1.json").read_bytes())
     old_stations = set(previous) | {
         Station(site["station_id"], site["latitude"], site["longitude"], "", "")
         for cohort in original["validation"]["station_splits"].values()

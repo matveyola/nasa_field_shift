@@ -1,7 +1,8 @@
 from fastapi import APIRouter
+from field_shift_science.fields.schemas import Season
+from field_shift_science.weather.scenarios import Scenario
 
 from field_shift.db import SessionDep
-from field_shift.modules.fields.schemas import Season
 from field_shift.modules.rotations import service
 from field_shift.modules.rotations.planning_routes import router as planning_router
 from field_shift.modules.rotations.schemas import (
@@ -12,7 +13,6 @@ from field_shift.modules.rotations.schemas import (
     RotationYieldRead,
 )
 from field_shift.modules.rotations.yield_service import get_yield_comparison
-from field_shift.modules.weather.scenarios import Scenario
 
 router = APIRouter(prefix="/rotations", tags=["rotations"])
 router.include_router(planning_router)

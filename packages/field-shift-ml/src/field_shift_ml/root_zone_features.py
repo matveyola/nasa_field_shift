@@ -3,15 +3,15 @@
 from math import cos, log1p, pi, sin
 
 import numpy as np
-
-from field_shift.modules.crops.fao56 import crop_water_parameters
-from field_shift.modules.simulation.root_zone_inputs import root_zone_storage_mm
-from field_shift.modules.simulation.root_zone_model import (
+from field_shift_science.crops.fao56 import crop_water_parameters
+from field_shift_science.simulation.root_zone_inputs import root_zone_storage_mm
+from field_shift_science.simulation.root_zone_model import (
     CAPACITY_MM,
     DEPTH_M,
     reference_reserve_mm,
 )
-from field_shift.modules.simulation.water_balance import fao56_days
+from field_shift_science.simulation.water_balance import fao56_days
+
 from field_shift_ml.root_zone_history import HISTORY_FEATURES, history_features
 from field_shift_ml.root_zone_soil import SOIL_FEATURES
 from field_shift_ml.train_root_zone import Sample

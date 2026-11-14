@@ -6,13 +6,13 @@ from alembic import command
 from alembic.config import Config
 from fastapi import FastAPI, Request
 from fastapi.testclient import TestClient
+from field_shift_contracts.planning_v1 import ProfileWriteRequest, WeatherScenarioSet
+from field_shift_science.fields.geometry import area_hectares
 from sqlalchemy import inspect, select
 
-from field_shift.contracts.planning_v1 import ProfileWriteRequest, WeatherScenarioSet
 from field_shift.db import build_session_factory
 from field_shift.models import metadata
 from field_shift.modules.access.service import Principal
-from field_shift.modules.fields.geometry import area_hectares
 from field_shift.modules.fields.models import Field
 from field_shift.modules.fields.planning_profile.models import ProfileSnapshot
 from field_shift.modules.fields.planning_profile.routes import router
@@ -224,7 +224,8 @@ def test_real_session_authentication_and_csrf(workspace):
 
 
 def test_holes_topology_and_axis_order_are_not_silently_accepted(workspace):
-    from field_shift.contracts.planning_v1.field import FieldGeometry
+    from field_shift_contracts.planning_v1.field import FieldGeometry
+
     from field_shift.modules.fields.planning_profile.service import validate_geometry
 
     factory, request = workspace

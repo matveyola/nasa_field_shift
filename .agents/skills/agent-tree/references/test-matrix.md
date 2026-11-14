@@ -66,3 +66,20 @@ fresh-database restore and isolated migration downgrade/upgrade. It requires Doc
 local package test environments and Playwright Chromium. Use a unique
 `PLANNING_VERIFY_OUTPUT` directory per concurrent run. Inspect empirical status
 separately; no synthetic suite establishes regional yield accuracy.
+
+## Installed Python boundaries
+
+Follow `docs/python-packaging.md`. Tooling/fast include `infra/check_python_packaging.py`;
+fast also lints shared contracts/science using the prepared API Ruff environment.
+Packaging, resource, entry-point and dependency changes require
+`python3 infra/verify_python_wheels.py --output /tmp/<task>-wheels` plus affected
+Docker/live checks. Use pinned uv 0.11.0, matching CI and images, to preserve lock
+metadata. Clean wheels must work from a temporary unrelated directory under
+`python -I`, without editable imports or source-path overrides. The verifier checks
+all seven distributions and independent NumPy environments. It performs no training.
+
+For a prepared local assistant knowledge cache, export `AGENT_DATA_DIR` as the
+absolute `services/agent/data` path in that checkout before the full fast suite;
+otherwise report missing-index skips explicitly. Do not copy environments or
+private data between worktrees. Source-only fixes invalidate previously built
+same-version wheels; rebuild and reinstall them before accepting regression tests.

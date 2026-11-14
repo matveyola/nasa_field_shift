@@ -15,15 +15,15 @@ from pathlib import Path
 from zipfile import ZipFile
 
 import shapefile
+from field_shift_science.fields.geometry import area_hectares
+from field_shift_science.fields.schemas import Polygon
 from rasterio.warp import transform_geom
 from shapely.geometry import mapping, shape
 from sqlalchemy import select
 
 from field_shift.config import get_settings
 from field_shift.db import build_session_factory
-from field_shift.modules.fields.geometry import area_hectares
 from field_shift.modules.fields.models import PreparedContour
-from field_shift.modules.fields.schemas import Polygon
 
 SOURCE = "NASA Harvest · Sadeh et al. (2025)"
 SOURCE_URL = "https://data.harvestportal.org/dataset/ukraine-field-boundary-delineation-"

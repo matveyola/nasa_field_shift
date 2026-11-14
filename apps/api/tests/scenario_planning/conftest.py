@@ -9,13 +9,13 @@ from uuid import uuid4
 import pytest
 from alembic import command
 from alembic.config import Config
-from sqlalchemy.orm import Session
-
-from field_shift.contracts.planning_v1 import (
+from field_shift_contracts.planning_v1 import (
     CandidateSequence,
     FarmPlanningRequest,
     SequenceEvaluation,
 )
+from sqlalchemy.orm import Session
+
 from field_shift.db import build_engine
 from field_shift.modules.fields.models import Field
 from field_shift.seed import seed_demo

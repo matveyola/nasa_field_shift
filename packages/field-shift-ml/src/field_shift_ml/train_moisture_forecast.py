@@ -11,16 +11,13 @@ from os import getenv
 from pathlib import Path
 
 import numpy as np
-from sklearn.linear_model import Ridge
-from sklearn.preprocessing import StandardScaler
-
-from field_shift.modules.geo_ml.forecast_model import (
+from field_shift_science.geo_ml.forecast_model import (
     FORECAST_FEATURES,
     ForecastCorrection,
     forecast_features,
     forecast_version,
 )
-from field_shift.modules.geo_ml.ifs import (
+from field_shift_science.geo_ml.ifs import (
     CURRENT_MODEL_CYCLE,
     HORIZON,
     IFSForecastDay,
@@ -28,7 +25,10 @@ from field_shift.modules.geo_ml.ifs import (
     ifs_run_url,
     parse_ifs_runs,
 )
-from field_shift.modules.geo_ml.moisture_model import get_moisture_model, station_distance_km
+from field_shift_science.geo_ml.moisture_model import get_moisture_model, station_distance_km
+from sklearn.linear_model import Ridge
+from sklearn.preprocessing import StandardScaler
+
 from field_shift_ml.train_moisture import (
     Station,
     download_features,

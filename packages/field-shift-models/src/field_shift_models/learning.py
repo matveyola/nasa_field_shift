@@ -8,7 +8,7 @@ from datetime import datetime
 from math import asin, cos, radians, sin, sqrt
 
 import numpy as np
-from field_shift.contracts.planning_v1.models import TrainingObservation
+from field_shift_contracts.planning_v1.models import TrainingObservation
 from sklearn.ensemble import HistGradientBoostingRegressor
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import Ridge

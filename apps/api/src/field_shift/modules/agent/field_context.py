@@ -5,14 +5,14 @@ from math import fsum, isfinite
 from typing import Literal
 from urllib.parse import urlsplit
 
+from field_shift_science.fields.geometry import area_hectares
+from field_shift_science.fields.schemas import FieldRead
+from field_shift_science.simulation.schemas import WaterDay, WaterForecast, WaterResult, WaterSource
+from field_shift_science.weather.scenarios import Scenario
 from shapely.geometry import Polygon as ShapelyPolygon
 
 from field_shift.modules.farm.schemas import ScoutingEvidence
-from field_shift.modules.fields.geometry import area_hectares
-from field_shift.modules.fields.schemas import FieldRead
 from field_shift.modules.imagery.vegetation_schemas import METHOD_VERSION, VegetationSeason
-from field_shift.modules.simulation.schemas import WaterDay, WaterForecast, WaterResult, WaterSource
-from field_shift.modules.weather.scenarios import Scenario
 
 NDVI_LAYER = "l_ndvi_variability"
 VEGETATION_CHART = "c_vegetation"

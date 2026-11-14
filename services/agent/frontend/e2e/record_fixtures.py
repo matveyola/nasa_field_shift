@@ -3,7 +3,7 @@
 The e2e tests must not need a running backend, an LLM key or the network, so they replay what
 the real service produced for the demo's fixture fields. Run from field-shift-agent/:
 
-    PYTHONPATH=. uv run python frontend/e2e/record_fixtures.py
+    uv run python -m frontend.e2e.record_fixtures
 
 Rules-based answers come from the deterministic agent; the FAO-56 answer from the scripted LLM
 loop with the lexical knowledge index (data/knowledge/index must be built).

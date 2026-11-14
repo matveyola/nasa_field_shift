@@ -6,7 +6,7 @@ from datetime import date
 
 import numpy as np
 import pytest
-from field_shift.contracts.planning_v1.models import ModelCard, SequenceEvaluation
+from field_shift_contracts.planning_v1.models import ModelCard, SequenceEvaluation
 from pydantic import ValidationError
 
 from field_shift_models.engine import Parameters, RejectedInput, forcing_frame, run_engine

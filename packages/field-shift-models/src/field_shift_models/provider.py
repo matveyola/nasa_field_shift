@@ -3,8 +3,8 @@
 from datetime import UTC, datetime
 
 import numpy as np
-from field_shift.contracts.planning_v1.common import EvidenceRef, Metric, Reason, Uncertainty
-from field_shift.contracts.planning_v1.models import (
+from field_shift_contracts.planning_v1.common import EvidenceRef, Metric, Reason, Uncertainty
+from field_shift_contracts.planning_v1.models import (
     HarvestBasis,
     ModelCard,
     ModelRef,
@@ -90,7 +90,7 @@ class AquaCropProvider:
         self._licence = next(iter(manifest["licences"].values()))
 
     def model_card(self):
-        from field_shift.contracts.planning_v1.common import CropRef
+        from field_shift_contracts.planning_v1.common import CropRef
 
         return ModelCard(
             model=self._model,

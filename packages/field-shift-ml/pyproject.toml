@@ -23,7 +23,6 @@ field_shift_ml = ["evaluations/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src", "../../apps/api/src"]
 
 [tool.ruff]
 target-version = "py311"
@@ -34,3 +33,9 @@ select = ["E", "F", "I", "UP"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["field_shift", "field_shift_ml"]
+
+[project.scripts]
+field-shift-ml = "field_shift_ml.cli:main"
+
+[tool.uv.sources]
+field-shift-science = { path = "../field-shift-science", editable = true }

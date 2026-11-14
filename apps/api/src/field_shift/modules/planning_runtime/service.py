@@ -2,9 +2,9 @@
 
 from datetime import UTC, datetime
 
+from field_shift_contracts.planning_v1 import FieldProfileSnapshot, ProfileWriteRequest
 from sqlalchemy import select
 
-from field_shift.contracts.planning_v1 import FieldProfileSnapshot, ProfileWriteRequest
 from field_shift.modules.fields.models import Field
 from field_shift.modules.fields.planning_profile.models import ProfileSnapshot
 from field_shift.modules.fields.planning_profile.service import ProfileError, ProfileRepository
@@ -90,7 +90,7 @@ class RuntimeService(RunService):
                 ):
                     locks[(c.field_id, c.season)] = c.assignment
             data["locks"] = list(locks.values())
-            from field_shift.contracts.planning_v1 import FarmPlanningRequest
+            from field_shift_contracts.planning_v1 import FarmPlanningRequest
 
             template = FarmPlanningRequest.model_validate_json(canonical(data))
             result.update(

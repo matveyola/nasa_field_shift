@@ -5,12 +5,12 @@ import json
 import math
 from uuid import uuid4
 
+from field_shift_contracts.planning_v1 import FieldProfileSnapshot
+from field_shift_science.fields.geometry import area_hectares
 from shapely.geometry import shape
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
-from field_shift.contracts.planning_v1 import FieldProfileSnapshot
-from field_shift.modules.fields.geometry import area_hectares
 from field_shift.modules.fields.models import Field
 
 from .models import ProfileSnapshot

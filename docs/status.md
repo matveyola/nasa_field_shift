@@ -1,5 +1,36 @@
 # Стан проєкту
 
+## Встановлювані Python-пакети — 2026-11-14
+
+Ручне налаштування import-шляхів усунуто: немає production `PYTHONPATH`,
+`sys.path` injection чи pytest `pythonpath`. Сім distributions мають build backend,
+явні залежності та незалежні consumer locks. Спільні контракти й наукові розрахунки
+винесено з API; ML/моделі не встановлюють серверний API. Docker використовує
+non-editable пакети, а JSON-ресурси читаються через `importlib.resources`.
+
+Перевірено сім чистих wheel-інсталяцій із стороннього каталогу під `python -I`,
+`uv pip check`, відсутність editable imports, ресурси й реальний bounded crop run.
+Збережені frozen wire contracts, байти п'яти model artifacts і числові результати
+CPU-v2; CPU-v3 фіксує нову ідентичність коду. Точність моделей не переглядалася.
+
+На checkpoint `be1247c`: 26 fast/build команд, API 500, ML 52, crop models 56,
+agent 645 (1 optional embeddings skip), web 89, widget 99, tooling 38 — passed.
+Реальний Docker/API/model flow, desktop/mobile, 22 PostgreSQL/Redis перевірки,
+restart і backup/restore також пройдено; перед публікацією потрібна повторна
+перевірка об'єднаного дерева та фінальних образів. Опційні live-provider/embeddings
+перевірки й навчання не запускалися.
+
+Незалежне рев'ю перевірило незмінність обчислень/валідаторів та виявило дубль
+CI output, внесений під час цього refactor. Його прибрано й додано регресійну
+перевірку унікальності. Output `planning` уже був у базовій версії; попередня
+примітка про нібито відсутній output була помилковою.
+
+Правила закріплено в [packaging policy](python-packaging.md), `AGENTS.md`, ролях
+і test matrix harness. Статичний guard перевіряє також test helpers/conftest;
+CI вимагає окрему перевірку встановлених wheels. Індекси й звіти асистента мають
+явне місце поза встановленим кодом; environment paths нормалізуються однаково
+для CLI і сервера.
+
 ## Інтеграція планування #7 — 2026-11-14
 
 Код #3–#6 присутній у `nazar-jobs` від спільної бази контрактів

@@ -1,11 +1,10 @@
 import pytest
-from pydantic import ValidationError
-
-from field_shift.modules.rotations.yield_model import (
+from field_shift_science.rotations.yield_model import (
     RotationYieldModel,
     artifact_version,
     get_rotation_yield_model,
 )
+from pydantic import ValidationError
 
 
 def test_packaged_rotation_model_has_untouched_farms_and_preserves_release_evidence():

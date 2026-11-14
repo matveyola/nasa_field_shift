@@ -7,19 +7,19 @@ from urllib.parse import parse_qs, urlsplit
 from urllib.request import Request
 
 import pytest
-
-from field_shift.modules.simulation.historical import HistoricalInputError, historical_window
-from field_shift.modules.simulation.schemas import WaterSource
-from field_shift.modules.simulation.service import calculate_water_balance
-from field_shift.modules.simulation.water_balance import WaterInputs
-from field_shift.modules.weather import historical
-from field_shift.modules.weather.historical import (
+from field_shift_science.simulation.schemas import WaterSource
+from field_shift_science.simulation.water_balance import WaterInputs
+from field_shift_science.weather import historical
+from field_shift_science.weather.historical import (
     OpenMeteoHistoricalWeather,
     ReanalysisDay,
     ReanalysisSeries,
     WeatherUnavailableError,
 )
-from field_shift.modules.weather.scenarios import Scenario
+from field_shift_science.weather.scenarios import Scenario
+
+from field_shift.modules.simulation.historical import HistoricalInputError, historical_window
+from field_shift.modules.simulation.service import calculate_water_balance
 
 _START = date(2024, 8, 1)
 _END = date(2024, 8, 2)

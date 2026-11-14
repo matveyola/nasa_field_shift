@@ -4,9 +4,9 @@ import copy
 import json
 
 import pytest
+from field_shift_contracts.planning_v1 import FarmPlanningRequest, ModelCard
 from pydantic import ValidationError
 
-from field_shift.contracts.planning_v1 import FarmPlanningRequest, ModelCard
 from field_shift.modules.rotations.scenario_planning.common import digest
 from field_shift.modules.rotations.scenario_planning.execution import PlanningEngine
 from field_shift.modules.rotations.scenario_planning.selector import BoundedSelector

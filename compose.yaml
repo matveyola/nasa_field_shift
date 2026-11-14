@@ -58,7 +58,11 @@ services:
 
   api:
     <<: *api-image
-    build: ./apps/api
+    build:
+      context: ./apps/api
+      additional_contexts:
+        shared-contracts: ./packages/field-shift-contracts
+        shared-science: ./packages/field-shift-science
     environment:
       <<: *api-environment
       FIELD_SHIFT_AGENT_URL: ${FIELD_SHIFT_AGENT_URL:-}
@@ -159,7 +163,8 @@ services:
       context: ./services/crop-model
       additional_contexts:
         crop-package: ./packages/field-shift-models
-        planning-contracts: ./apps/api/src/field_shift/contracts
+        shared-contracts: ./packages/field-shift-contracts
+        shared-science: ./packages/field-shift-science
     environment:
       FIELD_SHIFT_CROP_MODEL_TOKEN: ${FIELD_SHIFT_CROP_MODEL_TOKEN:-}
     networks: [planning-internal]

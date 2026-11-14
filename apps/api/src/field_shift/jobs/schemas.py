@@ -1,12 +1,12 @@
 from datetime import UTC, date, datetime
 from typing import Any, Literal, Self
 
+from field_shift_science.fields.schemas import Season
+from field_shift_science.geo_ml.schemas import GeoSource
+from field_shift_science.weather.scenarios import Scenario
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from field_shift.jobs.models import BOUNDARY_REVISION_INPUT, JobKind, JobStatus
-from field_shift.modules.fields.schemas import Season
-from field_shift.modules.geo_ml.schemas import GeoSource
-from field_shift.modules.weather.scenarios import Scenario
 
 Analysis = Literal[
     "water_balance", "rotation_comparison", "water_forecast", "vegetation", "terrain"

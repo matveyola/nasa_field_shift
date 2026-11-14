@@ -1,5 +1,8 @@
 .env*
 .venv/
+build/
+dist/
+*.egg-info/
 **/__pycache__/
 .pytest_cache/
 .ruff_cache/
@@ -11,7 +14,6 @@ package-lock.json
 tsconfig.json
 data/
 docs/
-evals/
+evals/reports/
 examples/
-integration_stub/
 tests/

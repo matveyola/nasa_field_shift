@@ -2,8 +2,8 @@
 
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
+from field_shift_contracts.planning_v1 import PlanningError
 
-from field_shift.contracts.planning_v1 import PlanningError
 from field_shift.db import SessionDep
 from field_shift.modules.access.dependencies import require_principal
 from field_shift.modules.fields.planning_profile.service import ProfileError

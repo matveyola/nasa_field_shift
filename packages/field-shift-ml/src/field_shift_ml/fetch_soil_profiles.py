@@ -8,12 +8,13 @@ from hashlib import sha256
 from pathlib import Path
 from time import sleep
 
-from field_shift.modules.geo_ml.ssurgo import (
+from field_shift_science.geo_ml.ssurgo import (
     SDA_ENDPOINT,
     SoilProfile,
     SoilSurveyError,
     fetch_soil_profile,
 )
+
 from field_shift_ml.fetch_observations import write_atomic
 
 

@@ -6,9 +6,9 @@ from datetime import UTC, datetime, timedelta
 import numpy as np
 import pytest
 import rasterio
+from field_shift_contracts.planning_v1.field import FieldGeometry
 from rasterio.transform import from_origin
 
-from field_shift.contracts.planning_v1.field import FieldGeometry
 from field_shift.modules.fields.planning_profile.providers import (
     ProviderResult,
     check_source,
@@ -205,7 +205,8 @@ def test_cache_checks_content_reuses_assets_and_bounds_download(tmp_path, monkey
     "kind,threshold", [("wind", 10), ("frost", 0), ("heat", 30), ("heavy_rain", 20)]
 )
 def test_hazard_missing_is_not_zero(profile, kind, threshold):
-    from field_shift.contracts.planning_v1.common import DateWindow
+    from field_shift_contracts.planning_v1.common import DateWindow
+
     from field_shift.modules.fields.planning_profile.hazards import threshold_evidence
 
     window = DateWindow(start=profile.as_of.date(), end=profile.as_of.date())
@@ -215,8 +216,9 @@ def test_hazard_missing_is_not_zero(profile, kind, threshold):
 
 
 def test_actual_zero_rain_hazard(profile):
-    from field_shift.contracts.planning_v1.common import DateWindow
-    from field_shift.contracts.planning_v1.weather import DailyWeather
+    from field_shift_contracts.planning_v1.common import DateWindow
+    from field_shift_contracts.planning_v1.weather import DailyWeather
+
     from field_shift.modules.fields.planning_profile.hazards import threshold_evidence
 
     instant = profile.as_of.date()

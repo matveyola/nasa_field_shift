@@ -4,6 +4,13 @@ from urllib.parse import parse_qs, urlsplit
 
 import pytest
 from fastapi.testclient import TestClient
+from field_shift_science.geo_ml.era5_land import MoistureSourceError
+from field_shift_science.geo_ml.forecast_model import (
+    ForecastCorrection,
+    forecast_version,
+    get_forecast_correction,
+)
+from field_shift_science.geo_ml.ifs import CURRENT_MODEL_CYCLE, HORIZON, fetch_ifs_run
 from pydantic import ValidationError
 from sqlalchemy import select
 
@@ -14,13 +21,6 @@ from field_shift.jobs.models import Job
 from field_shift.jobs.worker import process_job
 from field_shift.models import metadata
 from field_shift.modules.geo_ml import forecast, refresh
-from field_shift.modules.geo_ml.era5_land import MoistureSourceError
-from field_shift.modules.geo_ml.forecast_model import (
-    ForecastCorrection,
-    forecast_version,
-    get_forecast_correction,
-)
-from field_shift.modules.geo_ml.ifs import CURRENT_MODEL_CYCLE, HORIZON, fetch_ifs_run
 from field_shift.seed import seed_demo
 
 NOW = datetime(2026, 11, 9, 6, tzinfo=UTC)

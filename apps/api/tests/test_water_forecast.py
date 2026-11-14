@@ -4,6 +4,8 @@ from types import SimpleNamespace
 
 import pytest
 from fastapi.testclient import TestClient
+from field_shift_science.simulation.root_zone_inputs import RootZoneRun, RootZoneWeatherDay
+from field_shift_science.weather.historical import WeatherUnavailableError
 from sqlalchemy import select
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -15,8 +17,6 @@ from field_shift.jobs.worker import process_job
 from field_shift.models import metadata
 from field_shift.modules.geo_ml import refresh
 from field_shift.modules.simulation import forecast
-from field_shift.modules.simulation.root_zone_inputs import RootZoneRun, RootZoneWeatherDay
-from field_shift.modules.weather.historical import WeatherUnavailableError
 from field_shift.seed import seed_demo
 
 NOW = datetime(2026, 8, 8, tzinfo=UTC)

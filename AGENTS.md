@@ -7,9 +7,15 @@
 - Web `src/features` owns user-facing behavior. Backend `modules` own application rules and their APIs. Keep shared UI and transport code in the web app's existing `shared` and `api` directories.
 - Keep agent and model adapters replaceable. Identify mock data as such. Surface soil moisture and root-zone water reserve have separate units and data contracts.
 - The API agent module owns chat, field context and evidence. The optional model inference process lives in `services/agent` with its own dependency lock and private API.
-- Offline model training and evaluation live in `packages/field-shift-ml` with a separate dependency lock. Workers load versioned artifacts from their owning API modules under the existing release gates.
+- Offline model training and evaluation live in `packages/field-shift-ml` with a separate dependency lock. Workers load versioned artifacts from their owning domain modules in `field-shift-science` under the existing release gates.
 - PostgreSQL owns job state, attempts and results. Redis delivers job identifiers. Submit work durably before publishing, acknowledge after execution, and fence writes to the current attempt.
 - When adding a worker task, document its execution bound, retry policy, idempotency and recovery behavior. Use separate queues for simulation and geospatial ML.
+
+## Python package boundaries
+
+- Follow [docs/python-packaging.md](docs/python-packaging.md) for all Python work. Shared planning contracts live in `packages/field-shift-contracts`; shared scientific calculations and immutable artifacts live in `packages/field-shift-science`. API modules retain HTTP, persistence and application orchestration.
+- Declare and install cross-project dependencies. Never inject `PYTHONPATH`, `sys.path`, sibling source directories or pytest `pythonpath`, including in tests and Docker. Use installed entry points and packaged resources; keep mutable data outside installed code.
+- Packaging, dependency, entry-point or resource changes require `python3 infra/check_python_packaging.py`, clean installed-wheel checks via `infra/verify_python_wheels.py`, and affected integration tests. Preserve separate locks and verify the production non-editable installation from outside the checkout.
 
 ## Testing and CI policy
 

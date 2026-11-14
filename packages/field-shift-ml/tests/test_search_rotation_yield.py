@@ -3,8 +3,8 @@ from dataclasses import replace
 
 import numpy as np
 import pytest
+from field_shift_science.geo_ml.ssurgo import SoilProfile
 
-from field_shift.modules.geo_ml.ssurgo import SoilProfile
 from field_shift_ml.rotation_external import KBS_COLUMNS, kbs_contrasts
 from field_shift_ml.rotation_features import (
     CLIMATE_COLUMNS,

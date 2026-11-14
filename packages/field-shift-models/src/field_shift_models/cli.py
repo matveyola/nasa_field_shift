@@ -46,8 +46,8 @@ def worker(operation, payload):
     if operation == "evaluate":
         from datetime import date
 
-        from field_shift.contracts.planning_v1.field import CandidateSequence, FieldProfileSnapshot
-        from field_shift.contracts.planning_v1.weather import WeatherScenarioSet
+        from field_shift_contracts.planning_v1.field import CandidateSequence, FieldProfileSnapshot
+        from field_shift_contracts.planning_v1.weather import WeatherScenarioSet
 
         from .engine import Parameters
         from .provider import AquaCropProvider

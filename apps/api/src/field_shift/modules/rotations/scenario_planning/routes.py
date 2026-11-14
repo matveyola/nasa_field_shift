@@ -6,14 +6,14 @@ from fastapi import APIRouter, Depends, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
-from pydantic import BeforeValidator
-
-from field_shift.contracts.planning_v1.planning import (
+from field_shift_contracts.planning_v1.planning import (
     ApplyPlanRequest,
     FarmPlanningRequest,
     PlanningError,
     ReplanRequest,
 )
+from pydantic import BeforeValidator
+
 from field_shift.db import SessionDep
 from field_shift.modules.access.dependencies import require_principal
 

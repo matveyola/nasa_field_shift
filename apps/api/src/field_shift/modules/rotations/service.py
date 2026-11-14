@@ -1,5 +1,7 @@
 from typing import cast
 
+from field_shift_science.simulation.water_balance import WaterInputs, stress_summary
+from field_shift_science.weather.scenarios import Scenario
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -16,8 +18,6 @@ from field_shift.modules.rotations.schemas import (
     RotationRead,
 )
 from field_shift.modules.simulation.service import calculate_water_balance
-from field_shift.modules.simulation.water_balance import WaterInputs, stress_summary
-from field_shift.modules.weather.scenarios import Scenario
 
 
 def get_plan_snapshot(
