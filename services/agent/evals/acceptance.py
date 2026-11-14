@@ -1,6 +1,6 @@
 """M6C canonical acceptance scenario: Poltava, no irrigation, soil moisture, two rotations under drought.
 
-    uv run python -m evals.acceptance            # writes evals/reports/m6c_acceptance.{json,md}
+    uv run python -m evals.acceptance            # writes AGENT_DATA_DIR/evals/reports/m6c_acceptance.{json,md}
 
 What runs for real: the agent's FastAPI app (auth, attestation verification, SSE), the LLM agent loop with the
 demo's scripted model (`demo_script`, the same one the browser demo uses), tool registry, grounding and
@@ -20,29 +20,32 @@ import secrets
 import sys
 import time
 from dataclasses import asdict, dataclass, field
-from pathlib import Path
 
 import httpx2
-from starlette.testclient import TestClient
-
 from agent_service.api import create_app as agent_app
 from agent_service.attestation import sign
 from agent_service.config import Settings
-from agent_service.integrations.http import HttpGeoProvider, HttpService, HttpSimulationProvider
+from agent_service.integrations.http import (
+    HttpGeoProvider,
+    HttpService,
+    HttpSimulationProvider,
+)
 from agent_service.integrations.registry import IntegrationRegistry
 from agent_service.llm.scripted import ScriptedProvider, call, demo_script, say
 from agent_service.llm_agent import LLMAgent
+from agent_service.paths import reports_directory
 from agent_service.scenarios import offer_text
+from contracts.resources import FIXTURES
 from integration_stub.app import create_app as stub_app
+from starlette.testclient import TestClient
 
-ROOT = Path(__file__).parents[1]
-REPORTS = ROOT / "evals" / "reports"
+REPORTS = reports_directory()
 TEXT = "У мене немає поливу. Покажи вологість ґрунту і порівняй дві сівозміни під час посухи."
 CHOICE = offer_text("typical", "uk")  # the reply button the server offers after the drought refusal
 
 
 def _context(name: str) -> dict:
-    return json.loads((ROOT / "contracts" / "fixtures" / f"field_context.{name}.json").read_text(encoding="utf-8"))
+    return json.loads((FIXTURES / f"field_context.{name}.json").read_text(encoding="utf-8"))
 
 
 def _body(field: str = "poltava", text: str = TEXT, request_id: str = "req_m6c_accept") -> dict:
@@ -298,14 +301,14 @@ def render(ev: Evidence) -> str:
 
 def main() -> None:
     ev = run()
-    REPORTS.mkdir(exist_ok=True)
+    REPORTS.mkdir(parents=True, exist_ok=True)
     (REPORTS / "m6c_acceptance.json").write_text(json.dumps(asdict(ev), ensure_ascii=False, indent=2) + "\n",
                                                  encoding="utf-8", newline="\n")
     (REPORTS / "m6c_acceptance.md").write_text(render(ev), encoding="utf-8", newline="\n")
     for c in ev.checks:
         print(f"{c.outcome}  {c.name}")
     failed = [c for c in ev.checks if c.outcome != "PASS"]
-    print(f"{len(ev.checks) - len(failed)}/{len(ev.checks)} PASS -> evals/reports/m6c_acceptance.md")
+    print(f"{len(ev.checks) - len(failed)}/{len(ev.checks)} PASS -> {REPORTS / 'm6c_acceptance.md'}")
     sys.exit(1 if failed else 0)
 
 

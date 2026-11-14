@@ -13,15 +13,15 @@ import sys
 import time
 from collections import Counter
 from datetime import UTC, datetime
-from pathlib import Path
 
 from agent_service.llm.provider import Usage
 from agent_service.llm_agent import LoopLimits
+from agent_service.paths import reports_directory
 
 from .cases import CASES
 from .harness import Case, run_case
 
-REPORTS = Path(__file__).parent / "reports"
+REPORTS = reports_directory()
 # Published prices (USD per million tokens: input, output incl. thinking), used only for a labelled estimate.
 # Time-sensitive: claude-opus-5-5 from the Anthropic model table cached 2026-10-06; gemini-3.8-flash from
 # https://ai.google.dev/gemini-api/docs/pricing read 2026-11-07, cached input read 2026-11-12 (intro rate through
@@ -177,7 +177,7 @@ def main() -> int:
             return 3
         cases = [c for c in cases if c.live]
     rows = asyncio.run(run_all(cases, args.provider, SMOKE_LIMITS if args.smoke else None))
-    REPORTS.mkdir(exist_ok=True)
+    REPORTS.mkdir(parents=True, exist_ok=True)
     (REPORTS / f"{args.provider}-latest.json").write_text(json.dumps(rows, ensure_ascii=False, indent=2), encoding="utf-8", newline="\n")
     (REPORTS / f"{args.provider}-latest.md").write_text(report(rows, args.provider), encoding="utf-8", newline="\n")
     passed = sum(r["passed"] for r in rows)

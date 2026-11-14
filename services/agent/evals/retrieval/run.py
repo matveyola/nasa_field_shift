@@ -15,12 +15,14 @@ import statistics
 import sys
 import time
 from datetime import UTC, datetime
+from importlib.resources import files
 from pathlib import Path
 
 from agent_service.knowledge.retrieve import KnowledgeBase, rrf
+from agent_service.paths import knowledge_index_path, reports_directory
 
-BENCHMARK = Path(__file__).parent / "benchmark.json"
-REPORTS = Path(__file__).parents[1] / "reports"
+BENCHMARK = files("evals.retrieval").joinpath("benchmark.json")
+REPORTS = reports_directory()
 CANDIDATES, RERANK_TOP, KS = 50, 20, (1, 3, 5, 10)
 
 
@@ -59,7 +61,7 @@ def _rss() -> float | None:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--index", type=Path, default=Path("data/knowledge/index/knowledge.sqlite"))
+    parser.add_argument("--index", type=Path, default=knowledge_index_path())
     parser.add_argument("--model-cache")
     parser.add_argument("--lexical-only", action="store_true")
     args = parser.parse_args()
@@ -144,7 +146,7 @@ def main() -> int:
         "models": model_info, "abstention": abstention,
         "rankings": {v: {cid: r[:10] for cid, r in rk.items()} for v, rk in runs.items()},
     }
-    REPORTS.mkdir(exist_ok=True)
+    REPORTS.mkdir(parents=True, exist_ok=True)
     (REPORTS / "retrieval-latest.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8", newline="\n")
     lines = [f"# Retrieval benchmark ({len(answerable)} answerable + {len(negatives)} unanswerable questions)", "",
              f"Index: {len(kb.chunks)} chunks, built {kb.meta.get('built_at')}; embeddings {report['embedding_model']}.", "",

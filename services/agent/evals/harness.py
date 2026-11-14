@@ -9,20 +9,19 @@ import copy
 import json
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import Any
 
 import jsonschema
-
 from agent_service.agent import TurnEvidence
 from agent_service.llm.provider import AssistantTurn, LLMProvider, ToolResults, UserText
 from agent_service.llm.scripted import ScriptedProvider
 from agent_service.llm_agent import LLMAgent, LoopLimits
+from agent_service.paths import knowledge_index_path
 from agent_service.service import AgentService
 from contracts.export import SCHEMA_PATH
 from contracts.models import AgentRequest
+from contracts.resources import FIXTURES
 
-FIXTURES = Path(__file__).parents[1] / "contracts" / "fixtures"
 _BUNDLE = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
 _EVENT_SCHEMA = jsonschema.Draft202012Validator({"$ref": "#/$defs/AgentEvent", "$defs": _BUNDLE["$defs"]})
 
@@ -146,7 +145,7 @@ def invariant_failures(run: Run) -> list[tuple[str, str]]:
     return failures
 
 
-INDEX_PATH = Path(__file__).parents[1] / "data" / "knowledge" / "index" / "knowledge.sqlite"
+INDEX_PATH = knowledge_index_path()
 _KB: Any = None
 
 

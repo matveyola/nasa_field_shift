@@ -1,1 +1,6 @@
 /data/
+
+# Local wheel and sdist build outputs
+build/
+dist/
+*.egg-info/
