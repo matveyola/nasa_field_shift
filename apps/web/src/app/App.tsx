@@ -9,7 +9,7 @@ import { RotationsPage } from '../features/rotations/RotationsPage'
 import { WaterPage } from '../features/water/WaterPage'
 import { Empty, ErrorBox, Loading } from '../shared/ui'
 import { useResource } from '../shared/useResource'
-import { parseRoute, routeAddress, type Page, type Route } from './routing'
+import { pages, parseRoute, resolveHomeRoute, routeAddress, type Page, type Route } from './routing'
 import { Shell } from './Shell'
 import { NotificationProvider } from '../features/notifications/Notifications'
 import { useAccess } from '../features/access/AccessProvider'
@@ -27,16 +27,19 @@ function loadWorkspace(signal: AbortSignal) {
 export function App() {
   const { t, language } = useLocale()
   const { canEdit } = useAccess()
-  const [route, setRoute] = useState(() => parseRoute(location.href))
+  const [addressRoute, setRoute] = useState(() => parseRoute(location.href))
   const workspace = useResource(loadWorkspace)
   const fields = workspace.data?.fields ?? noFields
   const farm = workspace.data?.farm
+  const route = resolveHomeRoute(addressRoute, fields.length > 0)
   const requestedField = fields.find(({ id }) => id === route.fieldId)
-  const missingField = route.page !== 'farm' && Boolean(route.fieldId) && !requestedField
+  const missingField = !route.home && route.page !== 'farm' && Boolean(route.fieldId) && !requestedField
   const [lastField, setLastField] = useState(lastSelectedField)
   const [setupInProgress, setSetupInProgress] = useState(pendingSetup)
   const field = missingField ? undefined : requestedField ?? fields.find(({ id }) => id === lastField) ?? fields[0]
   const scenario = scenarioOrDefault(route.scenario)
+  const selectedScenario = route.scenario ? scenario : undefined
+  const home: Route = { page: pages[0], home: true, fieldId: field?.id, scenario: selectedScenario }
   // «Польовий помічник» opens over any page; an /agent address (old links, bookmarks) opens it over Fields.
   const [assistantOpen, setAssistantOpen] = useState(() => route.page === 'agent')
   useEffect(() => {
@@ -45,15 +48,11 @@ export function App() {
     rememberSelectedField(requestedField.id)
   }, [requestedField?.id])
   useEffect(() => {
-    if (route.page !== 'agent') return
-    const address = routeAddress({ page: 'fields', fieldId: route.fieldId, scenario: route.scenario })
-    history.replaceState(null, '', address)
-    setRoute(parseRoute(address))
-    setAssistantOpen(true)
-  }, [route])
-
-  useEffect(() => {
-    function onPopState() { setRoute(parseRoute(location.href)) }
+    function onPopState() {
+      const next = parseRoute(location.href)
+      setRoute(next)
+      setAssistantOpen(next.page === 'agent')
+    }
     window.addEventListener('popstate', onPopState)
     return () => window.removeEventListener('popstate', onPopState)
   }, [])
@@ -62,12 +61,26 @@ export function App() {
     document.title = t(route.page === 'farm' ? 'Farm management' : route.page[0].toUpperCase() + route.page.slice(1)) + ' · Field Shift'
   }, [route.page, t])
 
-  const setAddress = useCallback((next: Route) => {
+  const setAddress = useCallback((next: Route, method: 'pushState' | 'replaceState' = 'pushState') => {
     const address = routeAddress(next)
     if (address === location.pathname + location.search) return
-    history.pushState(null, '', address)
+    history[method](null, '', address)
     setRoute(parseRoute(address))
   }, [])
+
+  function goHome() {
+    setAssistantOpen(false)
+    setAddress(home)
+    window.scrollTo(0, 0)
+  }
+
+  function changeAssistantOpen(open: boolean) {
+    setAssistantOpen(open)
+    const current = parseRoute(location.href)
+    if (!open && current.page === 'agent') {
+      setAddress({ page: 'fields', fieldId: current.fieldId, scenario: current.scenario }, 'replaceState')
+    }
+  }
 
   function go(page: Page, options?: { fieldId?: string; jobId?: string | null; scenario?: Scenario; addField?: boolean; forecastDay?: string; analysis?: boolean; layer?: Route['layer']; signal?: Route['signal'] }) {
     if (page === 'agent') { // the assistant opens over the current page, for the field asked about
@@ -105,11 +118,11 @@ export function App() {
     rememberSetup(id)
     setSetupInProgress(id)
     setAssistantOpen(false)
-    setAddress({ page: 'fields', fieldId: field?.id, setupId: id })
+    setAddress({ page: 'fields', fieldId: field?.id, scenario: selectedScenario, setupId: id })
     window.scrollTo(0, 0)
   }
 
-  function finishSetup(created: Field) {
+  function addCreatedField(created: Field) {
     workspace.update((current) => {
       if (current.fields.some(({ id }) => id === created.id)) return current
       return {
@@ -117,11 +130,22 @@ export function App() {
         farm: { ...current.farm, total_area_ha: current.farm.total_area_ha + created.area_ha },
       }
     })
-    setSetupInProgress(undefined)
+  }
+
+  function closeSetup(next: Route) {
+    // Back should return to the previous screen without reopening the setup.
+    setAddress(next, 'replaceState')
+    window.scrollTo(0, 0)
+  }
+
+  function finishSetup(created: Field) {
+    const current = parseRoute(location.href)
+    if (!current.setupId || current.setupId !== route.setupId) return
+    addCreatedField(created)
+    setSetupInProgress(pendingSetup())
     setLastField(created.id)
     rememberSelectedField(created.id)
-    setAddress({ page: 'rotations', fieldId: created.id, scenario: 'baseline' })
-    window.scrollTo(0, 0)
+    closeSetup({ page: 'rotations', fieldId: created.id, scenario: selectedScenario ?? 'baseline' })
   }
 
   function openFieldForecast(fieldId: string, forecastDay?: string) {
@@ -138,9 +162,12 @@ export function App() {
     setAddress({ page: route.page, fieldId: field?.id, scenario: value })
   }
 
-  function createField(fieldId: string) {
-    if (parseRoute(location.href).page === 'fields') go('fields', { fieldId })
-    workspace.reload()
+  function createField(created: Field) {
+    addCreatedField(created)
+    const current = parseRoute(location.href)
+    if (routeAddress(current) !== routeAddress(addressRoute)) return
+    const firstField = fields.length === 0
+    go(firstField ? 'rotations' : 'fields', { fieldId: created.id })
   }
 
   function updateField(updated: Field) {
@@ -164,13 +191,14 @@ export function App() {
     if (route.setupId && canEdit) content = (
       <Suspense fallback={<Loading />}>
         <FieldOnboarding key={route.setupId} id={route.setupId} fields={fields} season={season}
-          onCancel={() => go('fields')} onComplete={finishSetup} />
+          onCancel={() => closeSetup({ page: 'fields', fieldId: field?.id, scenario: selectedScenario })} onComplete={finishSetup} />
       </Suspense>
     )
     else if (missingField) content = <Empty><p>{t('The linked field is no longer available.')}</p>
       <button className="button" type="button" onClick={() => go('fields')}>{t('Open Fields')}</button></Empty>
     else if (route.page === 'fields' || route.page === 'agent') content = (
-      <FieldsPage key={season} fields={fields} selected={field} season={season} initialDrawing={route.addField} initialAnalysis={route.analysis} showNdviLayer={route.layer === 'ndvi_variability'}
+      <FieldsPage key={season + ':' + Boolean(route.addField)} fields={fields} selected={field} season={season}
+        initialDrawing={route.addField} initialAnalysis={route.analysis} showNdviLayer={route.layer === 'ndvi_variability'}
         chooseField={chooseField} onCreate={createField} onUpdate={updateField} reloadFields={workspace.reload}
         openForecast={openFieldForecast} onSetup={canEdit ? startSetup : undefined}
         setupLabel={setupInProgress ? (language === 'uk' ? 'Продовжити налаштування поля' : 'Continue field setup') : undefined} />
@@ -210,9 +238,10 @@ export function App() {
     openAnalysis={(item) => item.kind === 'water'
       ? openFieldForecast(item.fieldId, item.date)
       : go('fields', { fieldId: item.fieldId, analysis: true, layer: 'ndvi_variability' })}>
-    <Shell route={route} farmName={farm?.name} navigate={go} assistantOpen={assistantOpen} openAssistant={() => setAssistantOpen(true)}>{content}</Shell>
+    <Shell route={route} homeAddress={routeAddress(home)} farmName={farm?.name} navigate={go}
+      navigateHome={goHome} assistantOpen={assistantOpen} openAssistant={() => setAssistantOpen(true)}>{content}</Shell>
     {farm && !route.setupId && <Assistant field={missingField ? undefined : field} season={farm.season} scenario={scenario}
-      open={assistantOpen} onOpenChange={setAssistantOpen}
+      open={assistantOpen} onOpenChange={changeAssistantOpen}
       openScreen={(screen) => go(screen)}
       openVegetation={(ndvi) => go('fields', { analysis: true, layer: ndvi ? 'ndvi_variability' : undefined })}
       openForecast={(day) => { if (field) openFieldForecast(field.id, day) }} />}
