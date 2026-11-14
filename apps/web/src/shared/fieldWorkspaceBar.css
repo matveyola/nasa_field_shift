@@ -1,0 +1,37 @@
+.field-workspace-bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px;
+  min-height: 80px; padding: 14px clamp(16px, 2.1vw, 28px);
+}
+.field-workspace-back { margin-right: 8px; }
+.field-workspace-switcher { display: flex; align-items: center; gap: 18px; min-width: 0; }
+.field-workspace-switcher .icon-button { width: 40px; min-height: 40px; }
+.field-workspace-switcher .icon-button svg { width: 18px; height: 18px; }
+.field-workspace-name { font-size: 1.32rem; letter-spacing: -.02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 210px; }
+.field-workspace-crop { padding-left: 23px; border-left: 1px solid var(--line-strong); gap: 10px; white-space: nowrap; }
+.field-workspace-switcher .field-workspace-crop .crop-icon { width: 42px; height: 42px; }
+.field-workspace-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-left: auto; min-width: 0; }
+@media (min-width: 1001px) and (max-width: 1200px) {
+  .field-workspace-bar .field-workspace-back { display: none; }
+  .field-workspace-switcher { gap: 10px; }
+  .field-workspace-crop { padding-left: 12px; }
+  .field-workspace-name { font-size: 1.1rem; }
+  .field-workspace-bar { gap: 12px; padding-inline: 20px; }
+}
+@media (max-width: 1000px) {
+  .field-workspace-bar { gap: 12px; min-height: auto; padding: 10px 12px 12px; }
+  .field-workspace-bar .field-workspace-back { display: none; }
+  .field-workspace-switcher { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto 34px; gap: 8px; width: 100%; }
+  .field-workspace-switcher .icon-button { width: 34px; min-height: 38px; padding: 6px; }
+  .field-workspace-name { font-size: 1.02rem; }
+  .field-workspace-next { order: 4; }
+  .field-workspace-crop { padding: 0; border: 0; font-size: .78rem; gap: 5px; max-width: 45vw; }
+  .field-workspace-crop > span { overflow: hidden; text-overflow: ellipsis; }
+  .field-workspace-switcher .field-workspace-crop .crop-icon { width: 30px; height: 30px; }
+  .field-workspace-actions { width: 100%; margin: 0; }
+}
+@media (max-width: 350px) {
+  .field-workspace-switcher .field-workspace-crop .crop-icon { width: 22px; height: 22px; }
+  .field-workspace-crop { font-size: .69rem; }
+  .field-workspace-name { font-size: .88rem; }
+  .field-workspace-switcher { gap: 5px; }
+}

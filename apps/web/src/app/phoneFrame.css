@@ -1,0 +1,51 @@
+/* The iPhone preview (PhoneFrame.tsx): a titanium-black iPhone 15 Pro on the grey stage of the design board. */
+.phone-stage {
+  position: fixed; inset: 0; display: grid; place-items: center; overflow: hidden;
+  background: radial-gradient(120% 90% at 50% 0%, #f4f4f4 0%, #e3e3e3 70%, #dcdcdc 100%);
+}
+.phone {
+  position: relative; flex: none; width: calc(393px + 24px); height: calc(852px + 24px); padding: 12px;
+  border-radius: 66px; background: #1b1b1d;
+  box-shadow:
+    inset 0 0 0 1.5px #4a4a4f, inset 0 0 0 4px #0b0b0c,
+    0 2px 4px rgb(0 0 0 / .18), 0 30px 60px -20px rgb(0 0 0 / .45), 0 60px 120px -40px rgb(0 0 0 / .35);
+  transform-origin: center;
+}
+.phone-button { position: absolute; width: 4px; border-radius: 2px; background: #2a2a2d; box-shadow: inset 0 0 0 1px #4a4a4f; }
+.phone-button--action { left: -3px; top: 150px; height: 32px; }
+.phone-button--up { left: -3px; top: 210px; height: 62px; }
+.phone-button--down { left: -3px; top: 286px; height: 62px; }
+.phone-button--side { right: -3px; top: 240px; height: 96px; }
+.phone-screen {
+  position: relative; width: 393px; height: 852px; overflow: hidden; border-radius: 54px; background: #f2f2f2;
+  isolation: isolate;
+}
+.phone-status {
+  position: relative; z-index: 2; height: 54px; display: grid; grid-template-columns: 1fr 126px 1fr; align-items: center;
+  padding: 0 26px 0 34px; color: #0d0d0d; font: 600 16px/1 var(--font); letter-spacing: -.01em;
+  background: #f2f2f2;
+}
+.phone-time { justify-self: center; font-variant-numeric: tabular-nums; padding-top: 4px; }
+.phone-island { width: 126px; height: 37px; border-radius: 20px; background: #000; align-self: start; margin-top: 11px; }
+.phone-icons { justify-self: center; display: flex; align-items: center; gap: 6px; padding-top: 4px; }
+.phone-icons svg { display: block; }
+.phone-app {
+  position: absolute; z-index: 1; top: 54px; left: 0; width: 393px; height: calc(852px - 54px);
+  border: 0; display: block; background: #f2f2f2;
+}
+.phone-home {
+  position: absolute; z-index: 3; left: 50%; bottom: 8px; width: 139px; height: 5px; margin-left: -69.5px;
+  border-radius: 3px; background: #0d0d0d; pointer-events: none;
+}
+.phone-desktop-link {
+  position: fixed; right: 18px; bottom: 16px; padding: 8px 14px; border-radius: 999px; background: #fff;
+  color: #0d0d0d; font: 600 .78rem var(--font); text-decoration: none;
+  box-shadow: 0 1px 3px rgb(0 0 0 / .08), 0 8px 18px -6px rgb(0 0 0 / .14);
+}
+
+/* In the frame: the app keeps its tab bar clear of the home indicator (no env() safe areas in an iframe), and
+   scrolls without scrollbars, as on a phone. */
+:root.in-phone-frame { --safe-bottom: 21px; scrollbar-width: none; }
+:root.in-phone-frame *::-webkit-scrollbar { display: none; }
+/* The assistant's full-screen sheet keeps its composer above the home indicator too. */
+:root.in-phone-frame .fsa-panel--modal { padding-bottom: var(--safe-bottom); }

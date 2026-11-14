@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "types": [
+      "vite/client",
+      "node"
+    ],
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "paths": {
+      "@field-shift/agent-widget": [
+        "./src/features/assistant/agent-widget.d.ts"
+      ]
+    }
+  },
+  "include": [
+    "src",
+    "tests",
+    "vite.config.ts"
+  ]
+}
