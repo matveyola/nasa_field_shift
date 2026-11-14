@@ -1,0 +1,203 @@
+/* Phone preview page (phone.html). Light only. */
+:root {
+  color-scheme: light;
+  --ph-bg: #f3f5f2;
+  --ph-text: #15241a;
+  --ph-muted: #4f5b54; /* 6.6:1 on the page */
+  --ph-green: #1b4332;
+  --ph-line: rgb(21 36 26 / 0.3);
+  font-family: "Inter Variable", "Segoe UI", system-ui, sans-serif;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--ph-bg);
+  color: var(--ph-text);
+}
+.ph-stage {
+  display: flex;
+  flex-wrap: wrap-reverse;
+  align-items: center;
+  justify-content: center;
+  gap: 40px 56px;
+  min-height: 100dvh;
+  padding: 16px;
+}
+.ph-side {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: min(320px, 100%);
+}
+.ph-side h1 {
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.ph-side p {
+  margin: 0;
+  color: var(--ph-muted);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+.ph-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.ph-field legend {
+  margin-bottom: 6px;
+  padding: 0;
+}
+.ph-field select {
+  min-height: 40px;
+  padding: 6px 10px;
+  border: 1px solid var(--ph-line);
+  border-radius: 10px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-weight: 450;
+  font-size: 0.9375rem;
+}
+.ph-radio {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  font-size: 0.9375rem;
+  font-weight: 450;
+  cursor: pointer;
+}
+.ph-radio input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--ph-green);
+}
+.ph-restart {
+  align-self: flex-start;
+  min-height: 42px;
+  padding: 8px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ph-green);
+  color: #f2f7f3;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ph-restart:hover {
+  background: #12301f;
+}
+.ph-side :focus-visible {
+  outline: 2px solid var(--ph-green);
+  outline-offset: 2px;
+}
+.ph-note {
+  font-size: 0.8125rem !important;
+}
+
+/* the device: a generic modern phone, no brand marks */
+.ph-holder {
+  position: relative;
+  flex: none;
+}
+.ph-device {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  border-radius: 62px;
+  background: #1c1f1d;
+  box-shadow:
+    inset 0 0 0 2px #3a3f3c,
+    inset 0 0 0 5px #121413,
+    0 30px 60px -20px rgb(21 36 26 / 0.45),
+    0 10px 24px -12px rgb(21 36 26 / 0.3);
+}
+.ph-device::before,
+.ph-device::after {
+  /* side buttons */
+  content: "";
+  position: absolute;
+  width: 4px;
+  border-radius: 2px;
+  background: #2b2f2d;
+}
+.ph-device::before {
+  left: -3px;
+  top: 190px;
+  height: 64px;
+  box-shadow: 0 -72px 0 -12px #2b2f2d, 0 84px 0 0 #2b2f2d;
+}
+.ph-device::after {
+  right: -3px;
+  top: 250px;
+  height: 100px;
+}
+.ph-screen {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 48px;
+  background: #fff;
+}
+.ph-status {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 30px 0 44px;
+  color: #000;
+  font-size: 1rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.ph-island {
+  position: absolute;
+  top: 11px;
+  left: 50%;
+  width: 124px;
+  height: 36px;
+  border-radius: 20px;
+  background: #000;
+  transform: translateX(-50%);
+}
+.ph-icons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ph-icons svg {
+  fill: currentColor;
+}
+.ph-screen iframe {
+  display: block;
+  flex: none;
+  border: 0;
+  background: #fff;
+}
+.ph-home {
+  display: grid;
+  flex: none;
+  place-items: center;
+}
+.ph-home span {
+  width: 136px;
+  height: 5px;
+  border-radius: 3px;
+  background: #000;
+}

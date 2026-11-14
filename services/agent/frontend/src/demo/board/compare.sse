@@ -1,0 +1,40 @@
+event: turn.started
+data: {"event":"turn.started","turn_id":"turn_a349487e49b04cee8f2972658dac3c40"}
+id: 1
+
+event: tool.started
+data: {"event":"tool.started","call_id":"call_1","tool":"compare_rotations"}
+id: 2
+
+event: tool.finished
+data: {"event":"tool.finished","call_id":"call_1","status":"ok","latency_ms":0}
+id: 3
+
+event: tool.started
+data: {"event":"tool.started","call_id":"call_2","tool":"present_blocks"}
+id: 4
+
+event: tool.finished
+data: {"event":"tool.finished","call_id":"call_2","status":"ok","latency_ms":0}
+id: 5
+
+event: tool.started
+data: {"event":"tool.started","call_id":"call_3","tool":"propose_ui_actions"}
+id: 6
+
+event: tool.finished
+data: {"event":"tool.finished","call_id":"call_3","status":"ok","latency_ms":0}
+id: 7
+
+event: text.delta
+data: {"event":"text.delta","text":"Ось розрахунок моделі для типового кліматичного сценарію з урахуванням того, що на полі немає зрошення. Сервіс симуляції працює у тестовому режимі, тому ці показники є навчальними оцінками, а не спостереженнями реального врожаю.\n\n"}
+id: 8
+
+event: text.delta
+data: {"event":"text.delta","text":"У порівнянні адаптивний варіант довше тримає ґрунт прикритим і потребує значно менше мінерального азоту, а також показує меншу чутливість до дефіциту вологи. Ви можете відкрити повну панель порівняння, щоб роздивитися чергування культур по роках. Які культури для вас у пріоритеті або, навпаки, небажані на цьому полі?"}
+id: 9
+
+event: turn.completed
+data: {"event":"turn.completed","message":{"turn_id":"turn_a349487e49b04cee8f2972658dac3c40","locale":"uk","blocks":[{"type":"text","markdown":"Ось розрахунок моделі для типового кліматичного сценарію з урахуванням того, що на полі немає зрошення. Сервіс симуляції працює у тестовому режимі, тому ці показники є навчальними оцінками, а не спостереженнями реального врожаю.\n\nУ порівнянні адаптивний варіант довше тримає ґрунт прикритим і потребує значно менше мінерального азоту, а також показує меншу чутливість до дефіциту вологи. Ви можете відкрити повну панель порівняння, щоб роздивитися чергування культур по роках. Які культури для вас у пріоритеті або, навпаки, небажані на цьому полі?"},{"type":"table","title":"Порівняння варіантів сівозміни","columns":["Водний ризик","Ризик урожаю","Покрив ґрунту","Азот"],"rows":[{"label":"Адаптивна (горох, сорго, соя)","fact_ids":["sim.e17df73d24.rot_adaptive.water_risk","sim.e17df73d24.rot_adaptive.yield_risk","sim.e17df73d24.rot_adaptive.soil_cover_days","sim.e17df73d24.rot_adaptive.n_input"]},{"label":"Традиційна (пшениця, соняшник, кукурудза)","fact_ids":["sim.e17df73d24.rot_conventional.water_risk","sim.e17df73d24.rot_conventional.yield_risk","sim.e17df73d24.rot_conventional.soil_cover_days","sim.e17df73d24.rot_conventional.n_input"]}],"scenario":"typical"}],"facts":[{"id":"sim.e17df73d24.rot_adaptive.water_risk","domain":"rotation","label_key":"fact.rotation_water_risk","quantity":{"value":22.0,"unit":"%","uncertainty":null},"category":null,"depth_cm":null,"provenance":{"kind":"deterministic_calc","data_status":"fixture","source":null,"method":"Share of days with FAO-56 root-zone depletion above RAW; synthetic fixture value | simulation output; scenario=typical; result=cmp_2972941e575c49ac; engine=fixture-replay m0-0.1","model":null,"inputs":[],"spatial":null,"temporal":null,"retrieved_at":"2026-11-06T09:00:00Z"}},{"id":"sim.e17df73d24.rot_adaptive.yield_risk","domain":"rotation","label_key":"fact.rotation_yield_risk","quantity":{"value":15.0,"unit":"%","uncertainty":{"kind":"ci95","low":9.0,"high":23.0,"sd":null,"note":null}},"category":null,"depth_cm":null,"provenance":{"kind":"ml_estimate","data_status":"fixture","source":null,"method":"simulation | simulation output; scenario=typical; result=cmp_2972941e575c49ac; engine=fixture-replay m0-0.1","model":{"name":"yield-risk","version":"0.0-fixture","validation":null},"inputs":[],"spatial":null,"temporal":null,"retrieved_at":"2026-11-06T09:00:00Z"}},{"id":"sim.e17df73d24.rot_adaptive.soil_cover_days","domain":"rotation","label_key":"fact.rotation_soil_cover_days","quantity":{"value":290.0,"unit":"d","uncertainty":null},"category":null,"depth_cm":null,"provenance":{"kind":"deterministic_calc","data_status":"fixture","source":null,"method":"Days per year with a living crop or cover; synthetic fixture value | simulation output; scenario=typical; result=cmp_2972941e575c49ac; engine=fixture-replay m0-0.1","model":null,"inputs":[],"spatial":null,"temporal":null,"retrieved_at":"2026-11-06T09:00:00Z"}},{"id":"sim.e17df73d24.rot_adaptive.n_input","domain":"rotation","label_key":"fact.rotation_n_input","quantity":{"value":70.0,"unit":"kg/ha","uncertainty":null},"category":null,"depth_cm":null,"provenance":{"kind":"deterministic_calc","data_status":"fixture","source":null,"method":"Mean mineral N per year after legume credit; synthetic fixture value | simulation output; scenario=typical; result=cmp_2972941e575c49ac; engine=fixture-replay m0-0.1","model":null,"inputs":["f_n_credit_vetch"],"spatial":null,"temporal":null,"retrieved_at":"2026-11-06T09:00:00Z"}},{"id":"sim.e17df73d24.rot_conventional.water_risk","domain":"rotation","label_key":"fact.rotation_water_risk","quantity":{"value":41.0,"unit":"%","uncertainty":null},"category":null,"depth_cm":null,"provenance":{"kind":"deterministic_calc","data_status":"fixture","source":null,"method":"Share of days with FAO-56 root-zone depletion above RAW; synthetic fixture value | simulation output; scenario=typical; result=cmp_2972941e575c49ac; engine=fixture-replay m0-0.1","model":null,"inputs":[],"spatial":null,"temporal":null,"retrieved_at":"2026-11-06T09:00:00Z"}},{"id":"sim.e17df73d24.rot_conventional.yield_risk","domain":"rotation","label_key":"fact.rotation_yield_risk","quantity":{"value":28.0,"unit":"%","uncertainty":{"kind":"ci95","low":18.0,"high":39.0,"sd":null,"note":null}},"category":null,"depth_cm":null,"provenance":{"kind":"ml_estimate","data_status":"fixture","source":null,"method":"simulation | simulation output; scenario=typical; result=cmp_2972941e575c49ac; engine=fixture-replay m0-0.1","model":{"name":"yield-risk","version":"0.0-fixture","validation":null},"inputs":[],"spatial":null,"temporal":null,"retrieved_at":"2026-11-06T09:00:00Z"}},{"id":"sim.e17df73d24.rot_conventional.soil_cover_days","domain":"rotation","label_key":"fact.rotation_soil_cover_days","quantity":{"value":190.0,"unit":"d","uncertainty":null},"category":null,"depth_cm":null,"provenance":{"kind":"deterministic_calc","data_status":"fixture","source":null,"method":"Days per year with a living crop or cover; synthetic fixture value | simulation output; scenario=typical; result=cmp_2972941e575c49ac; engine=fixture-replay m0-0.1","model":null,"inputs":[],"spatial":null,"temporal":null,"retrieved_at":"2026-11-06T09:00:00Z"}},{"id":"sim.e17df73d24.rot_conventional.n_input","domain":"rotation","label_key":"fact.rotation_n_input","quantity":{"value":145.0,"unit":"kg/ha","uncertainty":null},"category":null,"depth_cm":null,"provenance":{"kind":"deterministic_calc","data_status":"fixture","source":null,"method":"Mean mineral N per year; synthetic fixture value | simulation output; scenario=typical; result=cmp_2972941e575c49ac; engine=fixture-replay m0-0.1","model":null,"inputs":[],"spatial":null,"temporal":null,"retrieved_at":"2026-11-06T09:00:00Z"}}],"citations":[],"constraints_proposed":[],"ui_actions":[{"id":"a1","field_context_revision":3,"trigger":"chip","label":"Відкрити порівняння","reason":"Переглянути деталі симуляції сівозмін у панелі.","action":{"type":"panel.open","panel":"comparison","ref_id":"cmp_2972941e575c49ac","scenario":"typical"}}],"warnings":[{"code":"fixture_data","detail":"Values or layers shown are synthetic demo data."}],"meta":{"provider":"gemini","model_id":"gemini-3.8-flash","prompt_version":"m2-26c0934f5a","latency_ms":9625}}}
+id: 10
+

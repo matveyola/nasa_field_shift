@@ -1,0 +1,36 @@
+event: turn.started
+data: {"event":"turn.started","turn_id":"turn_24d8a5ab71d6477485cdc106427943e3"}
+id: 1
+
+event: tool.started
+data: {"event":"tool.started","call_id":"call_1","tool":"get_season_weather"}
+id: 2
+
+event: tool.finished
+data: {"event":"tool.finished","call_id":"call_1","status":"ok","latency_ms":1484}
+id: 3
+
+event: tool.started
+data: {"event":"tool.started","call_id":"call_2","tool":"propose_constraints"}
+id: 4
+
+event: tool.finished
+data: {"event":"tool.finished","call_id":"call_2","status":"ok","latency_ms":0}
+id: 5
+
+event: tool.started
+data: {"event":"tool.started","call_id":"call_3","tool":"present_blocks"}
+id: 6
+
+event: tool.finished
+data: {"event":"tool.finished","call_id":"call_3","status":"ok","latency_ms":0}
+id: 7
+
+event: text.delta
+data: {"event":"text.delta","text":"За період від зазначеної дати сівби сої 10 травня до завершення сезону опадів виявилося значно менше, ніж культура могла використати за сприятливих умов зволоження. Водний баланс культури за сезон склався з помітним дефіцитом, тому соя відчувала нестачу вологи лише від дощів. Зверніть увагу, що цей розрахунок враховує лише опади й випаровування та не оцінює початковий запас продуктивної вологи безпосередньо у ґрунті."}
+id: 8
+
+event: turn.completed
+data: {"event":"turn.completed","message":{"turn_id":"turn_24d8a5ab71d6477485cdc106427943e3","locale":"uk","blocks":[{"type":"text","markdown":"За період від зазначеної дати сівби сої 10 травня до завершення сезону опадів виявилося значно менше, ніж культура могла використати за сприятливих умов зволоження. Водний баланс культури за сезон склався з помітним дефіцитом, тому соя відчувала нестачу вологи лише від дощів. Зверніть увагу, що цей розрахунок враховує лише опади й випаровування та не оцінює початковий запас продуктивної вологи безпосередньо у ґрунті."},{"type":"metrics","title":"Водний баланс сої за сезон","fact_ids":["season.crop_rain","season.crop_water_use","season.crop_water_balance"],"scenario":null}],"facts":[{"id":"season.crop_rain","domain":"water","label_key":"fact.precipitation_total","quantity":{"value":306.1,"unit":"mm","uncertainty":null},"category":null,"depth_cm":null,"provenance":{"kind":"weather_data","data_status":"live","source":{"provider":"Open-Meteo","product_id":"open-meteo-archive (ERA5) + recent days","version":"unverified","level":null,"doi":null,"url":"https://open-meteo.com/"},"method":"daily sums over the crop's season","model":null,"inputs":[],"spatial":null,"temporal":{"start":"2026-05-10","end":"2026-09-26","aggregation":"sum"},"retrieved_at":"2026-11-12T14:30:52.650376Z"}},{"id":"season.crop_water_use","domain":"water","label_key":"fact.crop_water_use","quantity":{"value":578.5,"unit":"mm","uncertainty":null},"category":null,"depth_cm":null,"provenance":{"kind":"deterministic_calc","data_status":"live","source":null,"method":"Випаровування з трави × коефіцієнт культури з таблиць 11 і 12 FAO-56 (соя, посів у травні: етапи 20/35/60/25 днів, коефіцієнт 0,4 → 1,15 → 0,5). Стільки води взяли б рослини без її нестачі; гібрид і густота це змінюють. Враховано лише 140 днів сезону за таблицею.","model":null,"inputs":["season.et0"],"spatial":null,"temporal":{"start":"2026-05-10","end":"2026-09-26","aggregation":"sum"},"retrieved_at":"2026-11-12T14:30:52.650376Z"}},{"id":"season.crop_water_balance","domain":"water","label_key":"fact.crop_water_balance","quantity":{"value":-272.4,"unit":"mm","uncertainty":null},"category":null,"depth_cm":null,"provenance":{"kind":"deterministic_calc","data_status":"live","source":null,"method":"Опади мінус потреба культури у воді за той самий час (без запасу води в ґрунті). Мінус означає, що дощу не вистачило і рослини брали воду з ґрунту або недоотримали її.","model":null,"inputs":["season.crop_rain","season.crop_water_use"],"spatial":null,"temporal":{"start":"2026-05-10","end":"2026-09-26","aggregation":"sum"},"retrieved_at":"2026-11-12T14:30:52.650376Z"}}],"citations":[],"constraints_proposed":[{"id":"k_previous_crop","status":"proposed","source":"farmer_text","evidence":"Сою посіяли 10 травня","confidence":null,"type":"previous_crop","value":"soybean"}],"ui_actions":[],"warnings":[],"meta":{"provider":"gemini","model_id":"gemini-3.8-flash","prompt_version":"m2-26c0934f5a","latency_ms":15890}}}
+id: 9
+

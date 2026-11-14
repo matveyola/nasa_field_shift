@@ -1,0 +1,20 @@
+event: turn.started
+data: {"event":"turn.started","turn_id":"turn_24c6c059ce4c4c3198c4484c2d8559e4"}
+id: 1
+
+event: text.delta
+data: {"event":"text.delta","text":"_Демо-режим: відповідь складено за готовими правилами, а не штучним інтелектом._\n\n"}
+id: 2
+
+event: text.delta
+data: {"event":"text.delta","text":"Порівняння сівозмін і прогноз урожаю рахує окрема програма, яку ще не підключено. Я **нічого не розраховував** і результатів не маю.\n\n"}
+id: 3
+
+event: text.delta
+data: {"event":"text.delta","text":"Можу лише вибрати варіант «посуха 2024» для майбутнього порівняння. Це ще не розрахунок."}
+id: 4
+
+event: turn.completed
+data: {"event":"turn.completed","message":{"turn_id":"turn_24c6c059ce4c4c3198c4484c2d8559e4","locale":"uk","blocks":[{"type":"text","markdown":"_Демо-режим: відповідь складено за готовими правилами, а не штучним інтелектом._\n\nПорівняння сівозмін і прогноз урожаю рахує окрема програма, яку ще не підключено. Я **нічого не розраховував** і результатів не маю.\n\nМожу лише вибрати варіант «посуха 2024» для майбутнього порівняння. Це ще не розрахунок."}],"facts":[],"citations":[],"constraints_proposed":[],"ui_actions":[{"id":"a1","field_context_revision":3,"trigger":"chip","label":"Варіант «посуха 2024» (лише вибір)","reason":null,"action":{"type":"scenario.set","scenario":"drought_2024"}}],"warnings":[{"code":"source_unavailable","detail":"Rotation simulation service is not connected in M1; nothing was simulated."}],"meta":{"provider":"deterministic-dev","model_id":"none","prompt_version":"dev-rules-0.1","latency_ms":0}}}
+id: 5
+

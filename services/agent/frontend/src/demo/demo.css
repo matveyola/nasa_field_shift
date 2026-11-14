@@ -1,0 +1,154 @@
+/* Demo host shell only. The widget brings its own styles. */
+:root {
+  color-scheme: dark;
+  /* Room the floating assistant needs (widget defaults): launcher 64 px + 24 px offset + 24 px gap at the bottom,
+     and the open desktop panel 412 px + 24 px offset + 24 px gap on the right. */
+  --launcher-clearance: calc(112px + env(safe-area-inset-bottom, 0px));
+  --panel-clearance: 460px;
+  --bg: #061520;
+  --card: #0a1f2b;
+  --line: rgb(168 232 201 / 0.12);
+  --text: #eef8f2;
+  --muted: #9db4b2;
+  --mint: #a8e8c9;
+  --warn: #f0c87e;
+  font-family: "Onest Variable", "Segoe UI", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+html { scroll-padding-bottom: var(--launcher-clearance); } /* focus and scrollIntoView stop above the launcher */
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgb(16 52 58 / 0.55), transparent 60%),
+    var(--bg);
+  color: var(--text);
+}
+.demo { display: flex; flex-direction: column; min-height: 100dvh; }
+.demo-top {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px;
+  padding: 14px 24px; border-bottom: 1px solid var(--line); background: rgb(7 24 36 / 0.7);
+}
+.demo-brand { display: flex; align-items: center; gap: 10px; }
+.demo-brand-mark { width: 28px; height: 28px; color: var(--mint); }
+.demo-brand-name { font-weight: 650; letter-spacing: -0.01em; font-size: 1.05rem; }
+.demo-pill { padding: 2px 9px; border-radius: 999px; font-size: 0.72rem; color: var(--muted); box-shadow: inset 0 0 0 1px var(--line); }
+.demo-pill--warn { color: var(--warn); box-shadow: none; outline: 1px dashed currentColor; outline-offset: -1px; }
+.demo-controls { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; }
+.demo-controls label { display: flex; flex-direction: column; gap: 3px; font-size: 0.72rem; color: var(--muted); }
+.demo-controls select, .demo-reset {
+  min-height: 36px; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--line);
+  background: #0b2531; color: var(--text); font: inherit; font-size: 0.85rem;
+}
+.demo-reset { cursor: pointer; }
+.demo-controls :focus-visible, .demo-layer:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
+.demo-grid {
+  flex: 1; display: grid; gap: 16px;
+  padding: 20px max(24px, env(safe-area-inset-right, 0px)) var(--launcher-clearance) max(24px, env(safe-area-inset-left, 0px));
+  grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr); grid-auto-rows: min-content;
+}
+.demo-card { padding: 16px 18px; border-radius: 14px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); }
+.demo-card h2 { margin: 0 0 10px; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.demo-card--map { grid-row: span 3; }
+.demo-card--log { grid-column: 1 / -1; }
+.demo-card--comparison { grid-column: 1 / -1; }
+.demo-table-wrap { overflow-x: auto; margin-top: 10px; border-radius: 6px; }
+.demo-table-wrap:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
+.demo-table { width: 100%; min-width: 36rem; border-collapse: collapse; font-size: 0.82rem; }
+.demo-table th, .demo-table td { text-align: left; padding: 8px 10px; border-top: 1px solid var(--line); vertical-align: top; }
+.demo-table thead th { color: var(--muted); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.demo-table td { font-variant-numeric: tabular-nums; }
+.demo-table small { display: block; color: var(--muted); font-size: 0.7rem; font-weight: 400; margin-top: 2px; }
+.demo-table tr[data-selected] { background: rgb(168 232 201 / 0.06); }
+.demo-table .demo-pill { margin-left: 8px; }
+.demo-warn { color: var(--warn); font-weight: 600; }
+.demo-card-head { display: flex; justify-content: space-between; align-items: baseline; }
+.demo-card-head h2 { text-transform: none; letter-spacing: 0; font-size: 1rem; color: var(--text); }
+.demo-rev { font: 500 0.75rem ui-monospace, monospace; color: var(--muted); }
+.demo-map { position: relative; border-radius: 10px; overflow: hidden; background: #071a24; box-shadow: inset 0 0 0 1px var(--line); }
+.demo-map svg { display: block; width: 100%; height: auto; }
+.demo-map--empty { display: grid; place-items: center; aspect-ratio: 640 / 420; color: var(--muted); }
+.demo-map-note { position: absolute; left: 10px; bottom: 8px; margin: 0; font-size: 0.7rem; color: var(--muted); background: rgb(7 24 36 / 0.75); padding: 2px 8px; border-radius: 6px; }
+.demo-field-outline { filter: drop-shadow(0 0 6px rgb(168 232 201 / 0.35)); }
+.demo-layers { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.demo-layer {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 6px 12px; border-radius: 999px;
+  border: 1px solid var(--line); background: transparent; color: var(--muted); font: inherit; font-size: 0.8rem; cursor: pointer;
+}
+.demo-layer[aria-pressed="true"] { color: var(--text); border-color: var(--mint); background: rgb(168 232 201 / 0.07); }
+.demo-layer-dot { width: 10px; height: 10px; border-radius: 3px; background: #556; }
+.demo-layer-dot[data-layer="l_hls_ndvi"] { background: #5fc28c; }
+.demo-layer-dot[data-layer="l_smap_rootzone"] { background: #6fb6de; }
+.demo-layer-dot[data-layer="l_sm_30m"] { background: #d7b56a; }
+.demo-layer-dot[data-layer="l_nasadem_slope"] { background: #a9b8b9; }
+.demo-layer-kind { font-size: 0.68rem; opacity: 0.7; }
+.demo-facts, .demo-conditions, .demo-log { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.demo-facts li { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; font-size: 0.85rem; }
+.demo-facts span { color: var(--muted); }
+.demo-facts strong { font-variant-numeric: tabular-nums; }
+.demo-facts em { grid-column: 1 / -1; font-style: normal; font-size: 0.72rem; color: var(--warn); }
+.demo-conditions li { display: flex; justify-content: space-between; gap: 8px; font-size: 0.85rem; }
+.demo-conditions em { font-style: normal; font-size: 0.75rem; color: var(--muted); }
+.demo-conditions li[data-status="confirmed"] em { color: var(--mint); }
+.demo-muted { color: var(--muted); font-size: 0.85rem; margin: 8px 0 0; }
+.demo-log li { display: grid; grid-template-columns: auto auto 1fr auto; gap: 10px; align-items: baseline; font-size: 0.8rem; }
+.demo-log code { color: var(--mint); font-size: 0.75rem; }
+.demo-log-time { color: var(--muted); font: 0.72rem ui-monospace, monospace; }
+.demo-log-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.demo-log li[data-outcome="rejected"] .demo-log-outcome { color: var(--warn); }
+.demo-log li[data-outcome="applied"] .demo-log-outcome { color: var(--mint); }
+/* The open panel floats over the page's right edge: on wide screens the page makes room for it instead of
+   hiding the comparison table and header controls underneath. Narrower screens keep the overlay. */
+@media (min-width: 1100px) {
+  body:has(.fsa-panel:not(.fsa-panel--modal)) :is(.demo-top, .demo-grid) { padding-right: var(--panel-clearance); }
+}
+@media (max-width: 860px) {
+  .demo-grid {
+    grid-template-columns: 1fr;
+    padding: 16px max(16px, env(safe-area-inset-right, 0px)) var(--launcher-clearance) max(16px, env(safe-area-inset-left, 0px));
+  }
+  .demo-card--map { grid-row: auto; }
+  .demo-log li { grid-template-columns: auto 1fr; }
+}
+/* Phones: values sit under their labels, so nothing important is pinned to the corner the launcher floats over. */
+@media (max-width: 640px) {
+  .demo-facts li { grid-template-columns: 1fr; }
+  .demo-conditions li { flex-direction: column; gap: 2px; }
+}
+
+/* ── White host page: the current default ─────────────────────────────────────────────────────────────
+   Everything above is the original dark host and is left untouched. Open the demo with ?host=dark to see it
+   again; to make it the default again, delete this block and restore the two <meta> values noted in
+   index.html. The assistant widget brings its own styles and is not affected either way. */
+:root:not([data-host="dark"]) {
+  color-scheme: light;
+  --bg: #ffffff;
+  --card: #ffffff;
+  --line: rgb(27 35 32 / 0.13);
+  --control-line: #7d8783; /* selects, buttons and layer toggles keep a visible edge on white */
+  --text: #1b2320;
+  --muted: #5b6662; /* 6.0:1 on white */
+  --mint: #1f6f4a; /* accent green, 6.1:1 on white */
+  --warn: #8a5a00; /* 5.9:1 on white */
+}
+:root:not([data-host="dark"]) body { background: var(--bg); }
+:root:not([data-host="dark"]) .demo-top { background: var(--bg); }
+:root:not([data-host="dark"]) :is(.demo-controls select, .demo-reset) { background: var(--bg); border-color: var(--control-line); }
+:root:not([data-host="dark"]) .demo-layer { border-color: var(--control-line); }
+:root:not([data-host="dark"]) .demo-layer[aria-pressed="true"] { border-color: var(--mint); background: rgb(31 111 74 / 0.08); }
+:root:not([data-host="dark"]) .demo-table tr[data-selected] { background: rgb(31 111 74 / 0.06); }
+/* The stand-in map: light ground, dark-green outline (CSS overrides the SVG's presentation attributes). */
+:root:not([data-host="dark"]) .demo-map { background: #f3f5f2; }
+:root:not([data-host="dark"]) .demo-map pattern path { stroke: rgb(27 35 32 / 0.07); }
+:root:not([data-host="dark"]) .demo-field-outline { stroke: var(--mint); filter: none; }
+:root:not([data-host="dark"]) .demo-map circle { stroke: var(--mint); }
+:root:not([data-host="dark"]) .demo-map circle:not([fill="none"]) { fill: var(--mint); }
+:root:not([data-host="dark"]) .demo-map text { fill: var(--muted); }
+:root:not([data-host="dark"]) .demo-map-note { background: rgb(255 255 255 / 0.88); }
+:root:not([data-host="dark"]) .demo-layer-kind { opacity: 1; } /* the dimmed tag fell below 4.5:1 on white */
+
+/* ── Blank page: the default view, only the assistant on white (App.tsx). ?host=full / ?host=dark show the host. */
+.demo-blank {
+  min-height: 100dvh;
+  background: #fff;
+}

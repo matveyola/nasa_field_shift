@@ -1,0 +1,36 @@
+event: turn.started
+data: {"event":"turn.started","turn_id":"turn_266d7c61e9b34db4a1acac5f21edbf9c"}
+id: 1
+
+event: tool.started
+data: {"event":"tool.started","call_id":"call_1","tool":"get_field_facts"}
+id: 2
+
+event: tool.finished
+data: {"event":"tool.finished","call_id":"call_1","status":"ok","latency_ms":0}
+id: 3
+
+event: tool.started
+data: {"event":"tool.started","call_id":"call_2","tool":"propose_ui_actions"}
+id: 4
+
+event: tool.finished
+data: {"event":"tool.finished","call_id":"call_2","status":"ok","latency_ms":0}
+id: 5
+
+event: tool.started
+data: {"event":"tool.started","call_id":"call_3","tool":"present_blocks"}
+id: 6
+
+event: tool.finished
+data: {"event":"tool.finished","call_id":"call_3","status":"ok","latency_ms":0}
+id: 7
+
+event: text.delta
+data: {"event":"text.delta","text":"Увімкнув на карті шар вологості ґрунту в кореневому шарі. Дані супутника за липень 2025 року показують помірний рівень вологи для кореневої зони."}
+id: 8
+
+event: turn.completed
+data: {"event":"turn.completed","message":{"turn_id":"turn_266d7c61e9b34db4a1acac5f21edbf9c","locale":"uk","blocks":[{"type":"text","markdown":"Увімкнув на карті шар вологості ґрунту в кореневому шарі. Дані супутника за липень 2025 року показують помірний рівень вологи для кореневої зони."},{"type":"metrics","title":"Вологість ґрунту","fact_ids":["f_sm_rootzone_2025_07","f_sm_30m_mean_2025_07"],"scenario":null}],"facts":[{"id":"f_sm_rootzone_2025_07","domain":"water","label_key":"fact.root_zone_soil_moisture","quantity":{"value":0.21,"unit":"m3/m3","uncertainty":null},"category":null,"depth_cm":[0,100],"provenance":{"kind":"satellite_product","data_status":"fixture","source":{"provider":"NASA NSIDC DAAC","product_id":"SPL4SMGP","version":"008","level":"L4 (model-assimilated)","doi":null,"url":null},"method":"Synthetic fixture value for development; not a real measurement.","model":null,"inputs":[],"spatial":{"resolution_m":9000.0,"note":"9 km grid; the radiometer footprint is about 33 km"},"temporal":{"start":"2025-07-01","end":"2025-07-31","aggregation":"monthly_mean"},"retrieved_at":"2026-11-06T09:00:00Z"}},{"id":"f_sm_30m_mean_2025_07","domain":"water","label_key":"fact.root_zone_soil_moisture_downscaled","quantity":{"value":0.19,"unit":"m3/m3","uncertainty":{"kind":"sd","low":null,"high":null,"sd":0.05,"note":null}},"category":null,"depth_cm":null,"provenance":{"kind":"ml_estimate","data_status":"fixture","source":null,"method":"Synthetic fixture value for development; not a real model output.","model":{"name":"smap-downscaling","version":"0.0-fixture","validation":null},"inputs":["f_sm_rootzone_2025_07"],"spatial":{"resolution_m":30.0,"note":null},"temporal":{"start":"2025-07-01","end":"2025-07-31","aggregation":"monthly_mean"},"retrieved_at":"2026-11-06T09:00:00Z"}}],"citations":[],"constraints_proposed":[],"ui_actions":[{"id":"a1","field_context_revision":3,"trigger":"auto","label":"Шар вологості ґрунту","reason":"Показати карту вологості кореневого шару ґрунту","action":{"type":"map.set_layers","layer_ids":["l_smap_rootzone"],"mode":"replace"}}],"warnings":[{"code":"fixture_data","detail":"Values or layers shown are synthetic demo data."}],"meta":{"provider":"gemini","model_id":"gemini-3.8-flash","prompt_version":"m2-26c0934f5a","latency_ms":8139}}}
+id: 9
+

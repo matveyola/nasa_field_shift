@@ -1,0 +1,24 @@
+event: turn.started
+data: {"event":"turn.started","turn_id":"turn_29c0c1e19c704efdae3cb9a1291b2433"}
+id: 1
+
+event: tool.started
+data: {"event":"tool.started","call_id":"call_1","tool":"propose_constraints"}
+id: 2
+
+event: tool.finished
+data: {"event":"tool.finished","call_id":"call_1","status":"ok","latency_ms":0}
+id: 3
+
+event: text.delta
+data: {"event":"text.delta","text":"_Демо-режим: відповідь складено за готовими правилами, а не штучним інтелектом._\n\n"}
+id: 4
+
+event: text.delta
+data: {"event":"text.delta","text":"З ваших слів я зрозумів такі умови. Підтвердіть їх або приберіть:\n- менші витрати на добрива — «менше витрачати на добрива»"}
+id: 5
+
+event: turn.completed
+data: {"event":"turn.completed","message":{"turn_id":"turn_29c0c1e19c704efdae3cb9a1291b2433","locale":"uk","blocks":[{"type":"text","markdown":"_Демо-режим: відповідь складено за готовими правилами, а не штучним інтелектом._\n\nЗ ваших слів я зрозумів такі умови. Підтвердіть їх або приберіть:\n- менші витрати на добрива — «менше витрачати на добрива»"}],"facts":[],"citations":[],"constraints_proposed":[{"id":"k_fertilizer_budget","status":"proposed","source":"farmer_text","evidence":"менше витрачати на добрива","confidence":null,"type":"fertilizer_budget","value":"low"}],"ui_actions":[{"id":"a1","field_context_revision":3,"trigger":"chip","label":"Врахувати ці умови в порівнянні","reason":null,"action":{"type":"compare.set_constraints","constraints":[{"id":"k_fertilizer_budget","status":"proposed","source":"farmer_text","evidence":"менше витрачати на добрива","confidence":null,"type":"fertilizer_budget","value":"low"}]}}],"warnings":[],"meta":{"provider":"deterministic-dev","model_id":"none","prompt_version":"dev-rules-0.1","latency_ms":0}}}
+id: 6
+

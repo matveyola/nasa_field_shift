@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Field Shift — полотно стилю</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,600&family=Onest:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+      /* Style canvas: one board that shows three proposed directions side by side.
+         Every direction is a set of tokens (CSS variables); the same chat mock is drawn with each set,
+         so the comparison is fair. Once a direction is chosen, its tokens move into widget.css. */
+
+      /* ---------------------------------------------------------------- directions (tokens) */
+      .theme-a { /* Field notebook: analogous greens on cream (recommended) */
+        --bg: #f7efe3; --surface: #fffbf5; --sunk: #efe5d3; --border: #dccfbc;
+        --text: #1f2a1f; --muted: #5c6656;
+        --primary: #2f5d34; --primary-hover: #244a29; --on-primary: #ffffff;
+        --ochre: #e8b53a; --ochre-text: #8f5a0b; --sage: #8faf6e; --accent-text: #8f5a0b;
+        --success: #3b7a3f; --warning: #8f5a0b; --danger: #b23a2a; --info: #2d6a86;
+        --user-bubble: #efe5d3; --radius: 10px;
+      }
+      .theme-b { /* Split-complementary: the same greens with a terracotta accent */
+        --bg: #f3eee6; --surface: #fbf8f3; --sunk: #ebe3d6; --border: #d9cfc1;
+        --text: #23261f; --muted: #5e625a;
+        --primary: #2f5d34; --primary-hover: #244a29; --on-primary: #ffffff;
+        --ochre: #e8b53a; --ochre-text: #8c5e0a; --sage: #8faf6e; --accent-text: #a3502b;
+        --success: #2f7a4a; --warning: #8c5e0a; --danger: #a63a2b; --info: #2d6a86;
+        --user-bubble: #ebe3d6; --radius: 8px;
+      }
+      .theme-c { /* Calm like a chat app: near-white, cream only around the beetle */
+        --bg: #ffffff; --surface: #ffffff; --sunk: #f1efe8; --border: #e5e2da;
+        --text: #171a16; --muted: #5d635a;
+        --primary: #2f5d34; --primary-hover: #244a29; --on-primary: #ffffff;
+        --ochre: #e8b53a; --ochre-text: #a36a00; --sage: #8faf6e; --accent-text: #a36a00;
+        --success: #2e7d46; --warning: #a36a00; --danger: #c0392b; --info: #2d6a86;
+        --user-bubble: #f1efe8; --radius: 12px;
+      }
+      .theme-dark { /* Dark version (works for any direction) */
+        --bg: #141813; --surface: #1c211b; --sunk: #232a22; --border: #2e352c;
+        --text: #eceae3; --muted: #a3a89c;
+        --primary: #8fc08a; --primary-hover: #a6cfa1; --on-primary: #10210f;
+        --ochre: #e8b53a; --ochre-text: #e8b53a; --sage: #8faf6e; --accent-text: #e8b53a;
+        --success: #8fc08a; --warning: #e8b53a; --danger: #f07a6a; --info: #7db7d3;
+        --user-bubble: #232a22; --radius: 10px;
+      }
+
+      /* ---------------------------------------------------------------- the board itself */
+      :root { --board: #faf6ef; --ink: #1f2a1f; --ink-muted: #5c6656; --rule: #dccfbc; }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--board); color: var(--ink); font: 16px/1.55 "Onest", system-ui, sans-serif; }
+      .board { max-width: 1320px; margin: 0 auto; padding: 48px 32px 96px; }
+      h1, h2, h3 { font-family: "Literata", Georgia, serif; font-weight: 600; letter-spacing: -0.01em; margin: 0; }
+      h1 { font-size: 44px; line-height: 1.1; }
+      h2 { font-size: 28px; margin-bottom: 6px; }
+      h3 { font-size: 19px; margin-bottom: 4px; }
+      .lead { color: var(--ink-muted); max-width: 720px; margin: 10px 0 0; }
+      .eyebrow { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); font-weight: 600; }
+      section { border-top: 1px solid var(--rule); padding-top: 28px; margin-top: 44px; }
+      .sec-head { display: flex; gap: 18px; align-items: baseline; margin-bottom: 20px; }
+      .sec-num { font-family: "Literata", serif; color: #8f5a0b; font-size: 15px; }
+      .note { font-size: 13px; color: var(--ink-muted); }
+      nav.toc { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 22px; font-size: 14px; }
+      nav.toc a { color: #2f5d34; text-decoration: none; border-bottom: 1px solid #2f5d3455; }
+
+      /* ---------------------------------------------------------------- beetle (cut from the sheet) */
+      .beetle { background: url("/src/canvas/beetle-sheet.webp") no-repeat; }
+      .beetle.side { aspect-ratio: 680 / 530; background-size: 188.2% auto; background-position: 11.67% 37.15%; }
+      .beetle.front { aspect-ratio: 330 / 315; background-size: 387.9% auto; background-position: 91.58% 8.36%; }
+      .beetle.happy { aspect-ratio: 340 / 380; background-size: 376.5% auto; background-position: 91.49% 83.5%; }
+      .hero { display: grid; grid-template-columns: 1.15fr 1fr; gap: 28px; align-items: center; }
+      .hero-art { background: #f7efe3; border: 1px solid var(--rule); border-radius: 18px; padding: 24px; }
+      .hero-art .beetle.side { width: 100%; }
+      .states { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+      .state { background: #f7efe3; border: 1px solid var(--rule); border-radius: 12px; padding: 12px 12px 10px; text-align: center; position: relative; overflow: hidden; }
+      .state .beetle.front { width: 72%; margin: 4px auto 6px; transform-origin: 50% 90%; }
+      .state b { display: block; font-size: 14px; }
+      .state span { font-size: 12px; color: var(--ink-muted); }
+      .s-idle .beetle { animation: breathe 3.5s ease-in-out infinite alternate; }
+      .s-listen .beetle { animation: listen 1.4s ease-in-out infinite alternate; }
+      .s-think .beetle { animation: think 2.4s ease-in-out infinite alternate; }
+      .s-answer .beetle { animation: answer 0.45s ease-in-out infinite alternate; }
+      .s-done .beetle { animation: hop 1.8s ease-out infinite; }
+      .s-error .beetle { animation: shake 2.2s ease-in-out infinite; }
+      .s-sleep .beetle { animation: breathe 5s ease-in-out infinite alternate; filter: saturate(0.55) brightness(0.96); }
+      .s-sleep .z { position: absolute; top: 14px; right: 22%; font: 600 15px "Literata", serif; color: #5c6656; animation: zz 3s ease-in infinite; }
+      @keyframes breathe { from { transform: scaleY(1); } to { transform: scaleY(1.018); } }
+      @keyframes listen { from { transform: translateY(0) rotate(0); } to { transform: translateY(-3px) rotate(-2deg); } }
+      @keyframes think { from { transform: rotate(-4deg); } to { transform: rotate(3deg); } }
+      @keyframes answer { from { transform: translateY(0); } to { transform: translateY(-5px); } }
+      @keyframes hop { 0%, 55%, 100% { transform: translateY(0) scale(1, 1); } 15% { transform: translateY(0) scale(1.04, 0.95); }
+                       30% { transform: translateY(-16px) scale(0.98, 1.03); } 45% { transform: translateY(0) scale(1.05, 0.94); } }
+      @keyframes shake { 0%, 40%, 100% { transform: translateX(0); } 8% { transform: translateX(-6px) rotate(-2deg); }
+                         16% { transform: translateX(6px) rotate(2deg); } 24% { transform: translateX(-4px); } 32% { transform: translateX(3px); } }
+      @keyframes zz { from { opacity: 0; transform: translate(0, 6px); } 30% { opacity: 1; } to { opacity: 0; transform: translate(10px, -14px); } }
+      @media (prefers-reduced-motion: reduce) { .state .beetle, .s-sleep .z { animation: none !important; } }
+
+      /* ---------------------------------------------------------------- directions: columns */
+      .dirs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; align-items: start; }
+      .dirs.two { grid-template-columns: repeat(2, minmax(0, 400px)); }
+      .dirs > * { min-width: 0; }
+      .dir > header { margin-bottom: 12px; min-height: 92px; }
+      .dir[data-plain] > header { min-height: 0; }
+      .dir .tag { display: inline-block; font-size: 12px; font-weight: 600; color: #fff; background: #2f5d34; border-radius: 999px; padding: 2px 10px; margin-left: 6px; vertical-align: 3px; font-family: "Onest", sans-serif; }
+      .swatches { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 0 0 14px; padding: 0; list-style: none; }
+      .swatches li { display: flex; gap: 8px; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px; font-size: 12px; color: var(--text); }
+      .swatches i { width: 26px; height: 26px; border-radius: 6px; border: 1px solid #0000001a; flex: none; }
+      .swatches small { display: block; color: var(--muted); font-size: 11px; }
+      .ok { color: var(--success); font-weight: 600; } .fill { color: var(--muted); }
+
+      /* ---------------------------------------------------------------- chat mock (drawn with the current tokens) */
+      .mock { background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+              font: 15px/1.55 "Onest", system-ui, sans-serif; max-width: 400px; }
+      .m-head { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: var(--surface); border-bottom: 1px solid var(--border); }
+      .m-avatar { width: 38px; height: 38px; border-radius: 50%; background-color: #f7efe3; border: 1px solid var(--border); flex: none; }
+      .m-head b { display: block; font-size: 15px; } .m-head small { color: var(--muted); font-size: 12px; }
+      .m-head .x { margin-left: auto; }
+      .m-field { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 13px; }
+      .m-field strong { font-weight: 600; }
+      .badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 1px 8px; border-radius: 999px; background: var(--ochre); color: #1f2a1f; margin-left: 6px; }
+      .m-field p { margin: 2px 0 0; color: var(--muted); }
+      .m-body { padding: 14px; display: grid; gap: 12px; }
+      .m-user { justify-self: end; background: var(--user-bubble); border-radius: 16px 16px 4px 16px; padding: 8px 12px; max-width: 85%; }
+      .m-answer { display: grid; gap: 10px; }
+      .m-answer p { margin: 0; }
+      .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+      .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px; }
+      .card small { display: block; color: var(--muted); font-size: 11px; line-height: 1.3; }
+      .card b { display: block; font-size: 17px; font-variant-numeric: tabular-nums; margin: 2px 0; }
+      .card em { font-style: normal; font-size: 10.5px; color: var(--muted); }
+      figure.chart { margin: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 8px 4px; }
+      figure.chart figcaption { font-size: 12px; color: var(--muted); margin-bottom: 2px; }
+      figure.chart svg { display: block; width: 100%; height: auto; }
+      .chart .grid { stroke: var(--border); stroke-width: 1; }
+      .chart .area { fill: var(--sage); opacity: 0.28; }
+      .chart .line { fill: none; stroke: var(--primary); stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
+      .chart .dot { fill: var(--primary); }
+      .chart text { fill: var(--muted); font: 8.5px "Onest", sans-serif; }
+      table.tbl { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+      .tbl caption { text-align: left; font-size: 12px; color: var(--muted); padding-bottom: 4px; }
+      .tbl th { text-align: left; font-weight: 600; font-size: 11.5px; color: var(--muted); padding: 6px 8px; border-bottom: 1px solid var(--border); }
+      .tbl td { padding: 6px 8px; border-bottom: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+      .tbl tr:last-child td { border-bottom: 0; } .tbl td.num, .tbl th.num { text-align: right; }
+      .callout { border: 1px solid var(--border); border-left: 4px solid var(--accent-text); background: var(--surface); border-radius: var(--radius); padding: 8px 10px; font-size: 13.5px; }
+      .callout b { color: var(--accent-text); }
+      .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+      .btn { font: 600 13.5px "Onest", sans-serif; border-radius: 999px; padding: 7px 14px; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; }
+      .btn.primary { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+      .btn.primary:hover { background: var(--primary-hover); }
+      .btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+      .sources { font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+      .src { border: 1px solid var(--border); border-radius: 999px; padding: 1px 8px; background: var(--surface); color: var(--text); }
+      .m-composer { display: flex; gap: 8px; align-items: center; padding: 10px 12px; border-top: 1px solid var(--border); background: var(--surface); }
+      .m-composer input { flex: 1; min-width: 0; font: 14px "Onest", sans-serif; color: var(--text); background: var(--bg); border: 1px solid var(--border); border-radius: 999px; padding: 9px 14px; }
+      .m-composer input::placeholder { color: var(--muted); }
+      .round { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--text); display: grid; place-items: center; flex: none; }
+      .round.primary { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+      .round svg { width: 18px; height: 18px; }
+
+      /* ---------------------------------------------------------------- shared system */
+      .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+      .panel { background: #fffbf5; border: 1px solid var(--rule); border-radius: 14px; padding: 18px 20px; }
+      .type-row { display: grid; grid-template-columns: 120px 1fr; gap: 12px; align-items: baseline; padding: 6px 0; border-bottom: 1px dashed var(--rule); }
+      .type-row:last-child { border-bottom: 0; }
+      .type-row code { font-size: 12px; color: var(--ink-muted); }
+      .scale { display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; }
+      .scale div { text-align: center; font-size: 12px; color: var(--ink-muted); }
+      .scale i { display: block; background: #8faf6e; margin: 0 auto 4px; }
+      .radii { display: flex; gap: 14px; flex-wrap: wrap; }
+      .radii div { width: 70px; height: 52px; border: 1.5px solid #2f5d34; background: #f7efe3; display: grid; place-items: center; font-size: 12px; }
+      .legend { display: flex; height: 28px; border-radius: 6px; overflow: hidden; border: 1px solid #24502a; }
+      .legend i { flex: 1; }
+      .legend-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-muted); margin-top: 4px; }
+      .series { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+      .series span { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+      .series i { width: 22px; height: 4px; border-radius: 2px; }
+      .motion td { padding: 4px 10px 4px 0; font-size: 14px; } .motion td:first-child { color: var(--ink-muted); }
+      .dodont { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+      .dd { border-radius: 12px; border: 1px solid var(--rule); overflow: hidden; background: #fffbf5; }
+      .dd .demo { height: 110px; display: grid; place-items: center; padding: 10px; text-align: center; font-size: 14px; }
+      .dd p { margin: 0; padding: 8px 12px 12px; font-size: 13px; }
+      .dd .verdict { font-weight: 600; display: block; margin-bottom: 2px; }
+      .yes .verdict { color: #3b7a3f; } .no .verdict { color: #b23a2a; }
+      .bad-grad { background: linear-gradient(135deg, #6d5dfc, #b26bff 55%, #ff7ad9); color: #fff; font-weight: 600; width: 100%; height: 100%; display: grid; place-items: center; border-radius: 8px; }
+      .bad-glass { background: radial-gradient(circle at 30% 30%, #9be7ff, #6d5dfc 60%, #1a1340); width: 100%; height: 100%; display: grid; place-items: center; color: #fff; border-radius: 8px; box-shadow: inset 0 0 30px #ffffff66; }
+      .good-paper { background: #f7efe3; width: 100%; height: 100%; border: 1px solid #dccfbc; border-radius: 8px; display: grid; place-items: center; color: #1f2a1f; }
+      .good-paper span { border-top: 1px solid #1f2a1f; border-bottom: 1px solid #1f2a1f; padding: 4px 10px; font-family: "Literata", serif; }
+      .good-table { width: 100%; font-size: 12px; border-collapse: collapse; }
+      .good-table td { border-bottom: 1px solid #dccfbc; padding: 3px 4px; text-align: left; } .good-table td + td { text-align: right; font-variant-numeric: tabular-nums; }
+      footer.board-foot { margin-top: 56px; font-size: 13px; color: var(--ink-muted); }
+
+      @media (max-width: 1100px) { .dirs, .dirs.two { grid-template-columns: minmax(0, 1fr); max-width: 520px; } .hero, .grid2 { grid-template-columns: 1fr; } .dodont { grid-template-columns: 1fr 1fr; } }
+      @media (max-width: 560px) { .board { padding: 28px 16px 64px; } h1 { font-size: 32px; } .states { grid-template-columns: 1fr 1fr; } .dodont { grid-template-columns: 1fr; } .cards { grid-template-columns: 1fr 1fr; } }
+    </style>
+  </head>
+  <body>
+    <main class="board">
+      <p class="eyebrow">Field Shift · чернетка для вибору · 10.11.2026</p>
+      <h1>Полотно стилю помічника</h1>
+      <p class="lead">Одна велика сторінка, на якій видно всю систему: жука, кольори, шрифти, кнопки, повідомлення,
+        таблиці й графіки. Три напрями намальовані тим самим макетом чату, щоб їх було чесно порівняти.
+        Усі числа тут вигадані, лише для прикладу.</p>
+      <nav class="toc" aria-label="Розділи">
+        <a href="#beetle">1 · Жук-захисник</a><a href="#dirs">2 · Три напрями</a><a href="#type">3 · Шрифти й розміри</a>
+        <a href="#data">4 · Дані: графіки й карта</a><a href="#dark">5 · Темна тема</a><a href="#dodont">6 · Так і не так</a>
+      </nav>
+
+      <section id="beetle">
+        <div class="sec-head"><span class="sec-num">01</span><div><h2>Жук-захисник</h2>
+          <p class="note">Єдиний «милий» елемент. Усе інше спокійне, щоб жук не губився.</p></div></div>
+        <div class="hero">
+          <div class="hero-art"><div class="beetle side" role="img" aria-label="Жук-захисник: зелений жук у шоломі з жовтим щитком"></div></div>
+          <div>
+            <div class="states">
+              <div class="state s-idle"><div class="beetle front"></div><b>Спокій</b><span>ледь дихає</span></div>
+              <div class="state s-listen"><div class="beetle front"></div><b>Слухає</b><span>трохи підводиться</span></div>
+              <div class="state s-think"><div class="beetle front"></div><b>Думає</b><span>хитає головою</span></div>
+              <div class="state s-answer"><div class="beetle front"></div><b>Відповідає</b><span>підстрибує</span></div>
+              <div class="state s-done"><div class="beetle front"></div><b>Готово</b><span>стрибок</span></div>
+              <div class="state s-error"><div class="beetle front"></div><b>Не вийшло</b><span>хитає головою</span></div>
+              <div class="state s-sleep"><div class="beetle front"></div><span class="z" aria-hidden="true">z</span><b>Спить</b><span>чат закритий</span></div>
+              <div class="state"><div class="beetle happy" style="width: 64%; margin: 0 auto 6px"></div><b>Радіє</b><span>для привітання</span></div>
+            </div>
+            <p class="note" style="margin-top: 10px">Зараз жук рухається цілим. Коли буде розрізаний на шари (тіло, голова, очі,
+              вусики), додамо кліпання й рух вусиків. Хто вмикає «менше руху» в системі, бачить нерухомі пози, а стан завжди
+              підписаний словами.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="dirs">
+        <div class="sec-head"><span class="sec-num">02</span><div><h2>Три напрями кольорів</h2>
+          <p class="note">Кольори жука лишаються в усіх трьох. Біля кольору — контраст із фоном (для тексту треба щонайменше 4,5).</p></div></div>
+        <div class="dirs">
+          <div class="dir theme-a" data-theme>
+            <header><h3>А · Польовий блокнот <span class="tag">раджу</span></h3>
+              <p class="note">Зелений, охра й шавлія на кремовому папері. Тонкі лінії замість тіней.</p></header>
+          </div>
+          <div class="dir theme-b" data-theme>
+            <header><h3>Б · Зелений з теракотою</h3>
+              <p class="note">Те саме, але теплий цегляний акцент для важливого. Трохи сміливіше.</p></header>
+          </div>
+          <div class="dir theme-c" data-theme>
+            <header><h3>В · Спокій, як у чат-програмах</h3>
+              <p class="note">Майже білий фон. Крем лише навколо жука. Найближче до звичних чатів.</p></header>
+          </div>
+        </div>
+      </section>
+
+      <section id="type">
+        <div class="sec-head"><span class="sec-num">03</span><div><h2>Шрифти, відступи, кути, рух</h2>
+          <p class="note">Onest — для всього в застосунку (є всі українські літери: і, ї, є, ґ). Literata — лише для заголовків таких сторінок, не в чаті.</p></div></div>
+        <div class="grid2">
+          <div class="panel">
+            <div class="type-row"><code>Заголовок · Literata 28</code><span style="font: 600 28px/1.2 Literata, serif">Ґрунт і волога</span></div>
+            <div class="type-row"><code>Підзаголовок · 18/600</code><span style="font-size: 18px; font-weight: 600">Що відомо про поле</span></div>
+            <div class="type-row"><code>Текст · 16/400</code><span>Вологість біля коренів за липень нижча, ніж навесні.</span></div>
+            <div class="type-row"><code>Дрібний · 13/400</code><span style="font-size: 13px; color: var(--ink-muted)">Супутник NASA SMAP, 01.07–31.07.2025</span></div>
+            <div class="type-row"><code>Число · 17/600</code><span style="font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums">0,21 м³/м³ · 38 мм · 6,9</span></div>
+          </div>
+          <div class="panel">
+            <h3>Відступи</h3>
+            <div class="scale"><div><i style="width:4px;height:4px"></i>4</div><div><i style="width:8px;height:8px"></i>8</div>
+              <div><i style="width:12px;height:12px"></i>12</div><div><i style="width:16px;height:16px"></i>16</div>
+              <div><i style="width:24px;height:24px"></i>24</div><div><i style="width:32px;height:32px"></i>32</div></div>
+            <h3 style="margin-top: 16px">Кути</h3>
+            <div class="radii"><div style="border-radius: 6px">6 · поля</div><div style="border-radius: 10px">10 · картки</div>
+              <div style="border-radius: 16px">16 · вікно</div><div style="border-radius: 999px">кнопки</div></div>
+            <h3 style="margin-top: 16px">Рух</h3>
+            <table class="motion"><tr><td>Кнопки, підказки</td><td>150 мс, плавно</td></tr><tr><td>Відкриття чату</td><td>220 мс, з легким «пружинням»</td></tr>
+              <tr><td>Дихання жука</td><td>3,5 с, туди й назад</td></tr><tr><td>Кліпання</td><td>120 мс, раз на 4–7 с</td></tr></table>
+          </div>
+        </div>
+      </section>
+
+      <section id="data">
+        <div class="sec-head"><span class="sec-num">04</span><div><h2>Дані: графіки й карта</h2>
+          <p class="note">Кольори для ліній і стовпців, і шкала «від сухого до зеленого» для карти поля.</p></div></div>
+        <div class="grid2">
+          <div class="panel">
+            <h3>Кольори ліній і стовпців</h3>
+            <div class="series"><span><i style="background:#2f5d34"></i>волога</span><span><i style="background:#2d6a86"></i>опади</span>
+              <span><i style="background:#b4532f"></i>спека</span><span><i style="background:#6b4f2a"></i>ґрунт</span>
+              <span><i style="background:#e8b53a"></i>заливка</span><span><i style="background:#8faf6e"></i>заливка</span></div>
+            <p class="note" style="margin-top: 10px">Охра й шавлія — лише для заливок з підписом, бо на кремовому вони слабко видні.</p>
+          </div>
+          <div class="panel">
+            <h3>Шкала для карти</h3>
+            <div class="legend"><i style="background:#f2ebd3"></i><i style="background:#d6e0a8"></i><i style="background:#a9c77e"></i>
+              <i style="background:#6fa25a"></i><i style="background:#3f7a3e"></i><i style="background:#24502a"></i></div>
+            <div class="legend-labels"><span>мало зелені / сухо</span><span>багато зелені / волого</span></div>
+            <p class="note" style="margin-top: 8px">Світлі ділянки на карті отримують темніший контур, щоб їх було видно.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="dark">
+        <div class="sec-head"><span class="sec-num">05</span><div><h2>Темна тема</h2>
+          <p class="note">Для роботи ввечері чи в кабіні. Зелений стає світлішим, щоб читався на темному.</p></div></div>
+        <div class="dirs two">
+          <div class="dir theme-a" data-theme data-plain><header><h3>Світла (А)</h3></header></div>
+          <div class="dir theme-dark" data-theme data-plain><header><h3>Темна</h3></header></div>
+        </div>
+      </section>
+
+      <section id="dodont">
+        <div class="sec-head"><span class="sec-num">06</span><div><h2>Так і не так</h2>
+          <p class="note">Щоб застосунок не виглядав «згенерованим штучним інтелектом».</p></div></div>
+        <div class="dodont">
+          <div class="dd no"><div class="demo"><div class="bad-grad">✨ AI-powered</div></div><p><span class="verdict">Не так</span>Фіолетові переливи, блискітки, слово «AI» на кожному кроці.</p></div>
+          <div class="dd no"><div class="demo"><div class="bad-glass">скло й сяйво</div></div><p><span class="verdict">Не так</span>Скляні панелі, сяючі кулі, неонові тіні.</p></div>
+          <div class="dd yes"><div class="demo"><div class="good-paper"><span>Поле під Полтавою</span></div></div><p><span class="verdict">Так</span>Папір, тонкі лінії, спокійний шрифт, справжні назви.</p></div>
+          <div class="dd yes"><div class="demo"><table class="good-table"><tr><td>Опади, липень</td><td>38 мм</td></tr><tr><td>Кислотність</td><td>6,9</td></tr><tr><td>Схил</td><td>3,1°</td></tr></table></div>
+            <p><span class="verdict">Так</span>Числа рівно в колонку, як у польовому журналі.</p></div>
+        </div>
+      </section>
+
+      <footer class="board-foot">Полотно — для вибору напрямку. Після вибору його кольори переїдуть у помічника, а полотно залишиться довідкою.</footer>
+    </main>
+
+    <template id="chat-mock">
+      <div class="mock">
+        <div class="m-head"><span class="m-avatar beetle front"></span><div><b>Field Intelligence</b><small>Помічник для вашого поля</small></div>
+          <button class="round x" aria-label="Закрити"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+        <div class="m-field"><strong>Демо-поле під Полтавою</strong><span class="badge">Приклад</span>
+          <p>Числа вигадані. Відповідає штучний інтелект. Він може помилятися.</p></div>
+        <div class="m-body">
+          <div class="m-user">Що відомо про моє поле?</div>
+          <div class="m-answer">
+            <p>Ось головне про ваше поле за минулий липень.</p>
+            <div class="cards">
+              <div class="card"><small>Волога біля коренів</small><b>0,21</b><em>м³/м³ · супутник</em></div>
+              <div class="card"><small>Опади за липень</small><b>38 мм</b><em>супутники NASA</em></div>
+              <div class="card"><small>Кислотність ґрунту</small><b>6,9</b><em>карта ґрунтів</em></div>
+            </div>
+            <figure class="chart"><figcaption>Волога біля коренів, березень–жовтень</figcaption>
+              <svg viewBox="0 0 300 126" role="img" aria-label="Графік: волога спадає до серпня і знову росте восени">
+                <line class="grid" x1="16" x2="292" y1="34" y2="34"/><line class="grid" x1="16" x2="292" y1="72" y2="72"/><line class="grid" x1="16" x2="292" y1="110" y2="110"/>
+                <text x="0" y="37">0,3</text><text x="0" y="75">0,2</text>
+                <path class="area" d="M20,110 L20,34 L58,43.5 L96,57.8 L134,76.8 L172,81.5 L210,91 L248,72 L286,53 L286,110 Z"/>
+                <polyline class="line" points="20,34 58,43.5 96,57.8 134,76.8 172,81.5 210,91 248,72 286,53"/>
+                <circle class="dot" cx="172" cy="81.5" r="3.5"/>
+                <text x="12" y="123">бер</text><text x="50" y="123">кві</text><text x="88" y="123">тра</text><text x="126" y="123">чер</text>
+                <text x="164" y="123">лип</text><text x="202" y="123">сер</text><text x="240" y="123">вер</text><text x="276" y="123">жов</text>
+              </svg></figure>
+            <table class="tbl"><caption>Порівняння сівозмін · тестовий розрахунок</caption>
+              <thead><tr><th>Варіант</th><th class="num">Нестача води</th><th class="num">Азот, кг/га</th></tr></thead>
+              <tbody><tr><td>Пристосована</td><td class="num">34%</td><td class="num">95</td></tr><tr><td>Звичайна</td><td class="num">51%</td><td class="num">140</td></tr></tbody></table>
+            <div class="callout"><b>Можливий заморозок</b> у ніч на четвер, до −2 °C. Прогноз погоди.</div>
+            <div class="chips"><button class="btn primary">Показати на карті</button><button class="btn">Порівняти сівозміни</button></div>
+            <div class="sources">Джерела: <span class="src">супутник NASA SMAP</span><span class="src">посібник ФАО [1]</span></div>
+          </div>
+        </div>
+        <div class="m-composer"><input aria-label="Повідомлення помічнику" placeholder="Напишіть або скажіть своє питання…" />
+          <button class="round" aria-label="Сказати голосом"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+          <button class="round primary" aria-label="Надіслати"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div>
+      </div>
+    </template>
+
+    <script>
+      // Contrast is computed from the tokens themselves, so the numbers can never disagree with the colors.
+      const lum = (hex) => {
+        const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+        return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+      };
+      const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+      const SWATCHES = [ // token, label, use (text needs 4.5; fill is decoration only)
+        ["--bg", "фон", "base"], ["--text", "текст", "text"], ["--muted", "другорядний текст", "text"], ["--primary", "головний зелений", "text"],
+        ["--accent-text", "акцент", "text"], ["--ochre", "охра (жук)", "fill"], ["--sage", "шавлія (жук)", "fill"], ["--danger", "помилка", "text"],
+      ];
+      const mock = document.getElementById("chat-mock");
+      for (const col of document.querySelectorAll("[data-theme]")) {
+        const css = getComputedStyle(col);
+        const get = (t) => css.getPropertyValue(t).trim();
+        if (!col.hasAttribute("data-plain")) {
+          const ul = document.createElement("ul");
+          ul.className = "swatches";
+          for (const [token, label, use] of SWATCHES) {
+            const hex = get(token);
+            const r = ratio(hex, get("--bg"));
+            const verdict = use === "base" ? "" : use === "fill" ? `<span class="fill">лише заливка · ${r.toFixed(1)}</span>`
+              : `<span class="${r >= 4.5 ? "ok" : ""}">${r.toFixed(1)}${r >= 4.5 ? " ✓" : ""}</span>`;
+            ul.insertAdjacentHTML("beforeend", `<li><i style="background:${hex}"></i><div>${label}<small>${hex} ${verdict}</small></div></li>`);
+          }
+          col.append(ul);
+        }
+        col.append(mock.content.cloneNode(true));
+      }
+    </script>
+  </body>
+</html>

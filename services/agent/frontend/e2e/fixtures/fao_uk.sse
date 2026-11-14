@@ -1,0 +1,24 @@
+event: turn.started
+data: {"event":"turn.started","turn_id":"turn_54c3987314544cc3b1764e03e20fb0d2"}
+id: 1
+
+event: tool.started
+data: {"event":"tool.started","call_id":"call_1","tool":"search_knowledge"}
+id: 2
+
+event: tool.finished
+data: {"event":"tool.finished","call_id":"call_1","status":"ok","latency_ms":0}
+id: 3
+
+event: text.delta
+data: {"event":"text.delta","text":"Демо-режим (не штучний інтелект): я нічого не вигадую, лише показую знайдені уривки з посібника ФАО про воду для рослин (FAO-56). Цитати — мовою оригіналу, англійською.\n\n"}
+id: 4
+
+event: text.delta
+data: {"event":"text.delta","text":"- «Chapter 8»: “When the potential energy of the soil water drops below a threshold value, the crop is said to be water stressed” [1].\n- «Water stress coefficient (Ks)»: “The effects of soil water stress on crop ET are described by reducing the value for the crop coefficient” [2]."}
+id: 5
+
+event: turn.completed
+data: {"event":"turn.completed","message":{"turn_id":"turn_54c3987314544cc3b1764e03e20fb0d2","locale":"uk","blocks":[{"type":"text","markdown":"Демо-режим (не штучний інтелект): я нічого не вигадую, лише показую знайдені уривки з посібника ФАО про воду для рослин (FAO-56). Цитати — мовою оригіналу, англійською.\n\n- «Chapter 8»: “When the potential energy of the soil water drops below a threshold value, the crop is said to be water stressed” [1].\n- «Water stress coefficient (Ks)»: “The effects of soil water stress on crop ET are described by reducing the value for the crop coefficient” [2]."}],"facts":[],"citations":[{"id":"1","chunk_id":"fao56-ch08.chapter-8-etc-under-soil-water-stress-conditions.45f45923f1","doc_id":"fao56-ch08","title":"Crop evapotranspiration - Guidelines for computing crop water requirements (FAO Irrigation and Drainage Paper 56)","publisher":"FAO","year":1998,"edition":null,"locator":{"chapter":"8","section":"Chapter 8 - ETc under soil water stress conditions","table":null,"page":null},"url":"https://www.fao.org/4/x0490e/x0490e0e.htm#chapter%208%20%20%20etc%20under%20soil%20water%20stress%20conditions","quote":"When the potential energy of the soil water drops below a threshold value, the crop is said to be water stressed.","language":"en","licence":"© FAO 1998. Non-commercial use with acknowledgement of FAO as source; no FAO endorsement implied."},{"id":"2","chunk_id":"fao56-ch08.water-stress-coefficient-ks.bacb6bcee4","doc_id":"fao56-ch08","title":"Crop evapotranspiration - Guidelines for computing crop water requirements (FAO Irrigation and Drainage Paper 56)","publisher":"FAO","year":1998,"edition":null,"locator":{"chapter":"8","section":"Water stress coefficient (Ks)","table":null,"page":null},"url":"https://www.fao.org/4/x0490e/x0490e0e.htm#water%20stress%20coefficient%20%28ks%29","quote":"The effects of soil water stress on crop ET are described by reducing the value for the crop coefficient.","language":"en","licence":"© FAO 1998. Non-commercial use with acknowledgement of FAO as source; no FAO endorsement implied."}],"constraints_proposed":[],"ui_actions":[],"warnings":[],"meta":{"provider":"scripted-llm","model_id":"scripted","prompt_version":"m2-31d6c8f763","latency_ms":31}}}
+id: 6
+

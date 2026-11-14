@@ -1,0 +1,20 @@
+event: turn.started
+data: {"event":"turn.started","turn_id":"turn_c7ec077e3aef48ad80b7d8991b497f43"}
+id: 1
+
+event: tool.started
+data: {"event":"tool.started","call_id":"call_1","tool":"propose_ui_actions"}
+id: 2
+
+event: tool.finished
+data: {"event":"tool.finished","call_id":"call_1","status":"ok","latency_ms":0}
+id: 3
+
+event: text.delta
+data: {"event":"text.delta","text":"Відкриваю екран «Погода»."}
+id: 4
+
+event: turn.completed
+data: {"event":"turn.completed","message":{"turn_id":"turn_c7ec077e3aef48ad80b7d8991b497f43","locale":"uk","blocks":[{"type":"text","markdown":"Відкриваю екран «Погода»."}],"facts":[],"citations":[],"constraints_proposed":[],"ui_actions":[{"id":"a1","field_context_revision":3,"trigger":"auto","label":"Відкрити погоду","reason":"Перехід до розділу погоди за запитом фермера","action":{"type":"app.open_screen","screen_id":"weather"}}],"warnings":[],"meta":{"provider":"gemini","model_id":"gemini-3.8-flash","prompt_version":"m2-26c0934f5a","latency_ms":3484}}}
+id: 5
+

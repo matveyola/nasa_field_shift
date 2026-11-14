@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Field Shift — напрям «Пульт техніки»</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+      /* Direction A, "machine console": the chosen look drawn as a board before it moves into widget.css.
+         Rules: cool grey-white, ink text, one green for actions, harvest yellow only to mark what is selected,
+         colour inside data only from data scales; 1px borders, no shadows, 6px corners; numbers in mono. */
+      :root {
+        --board: #e6e8e3; --panel: #f6f7f4; --surface: #ffffff; --sunk: #eceee9;
+        --border: #d3d7cd; --rule: #e2e5de; --ink: #1b1f1a; --muted: #565d53;
+        --green: #2f5d34; --green-hover: #244a29; --on-green: #ffffff;
+        --signal: #d9a400; --warn: #8a5a00; --danger: #b3261e; --cold: #2b5f8a;
+        --dry: #9a7440; --lush: #3f7d3a;
+        --r: 6px; --r-win: 10px;
+        --sans: "IBM Plex Sans", system-ui, sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--board); color: var(--ink); font: 15px/1.5 var(--sans); }
+      .board { max-width: 1280px; margin: 0 auto; padding: 44px 32px 96px; }
+      h1 { font-size: 36px; line-height: 1.15; margin: 0; font-weight: 600; letter-spacing: -0.01em; }
+      h2 { font-size: 22px; margin: 0 0 4px; font-weight: 600; }
+      .lead { color: var(--muted); max-width: 760px; margin: 10px 0 0; }
+      .meta { font: 13px var(--mono); color: var(--muted); margin: 0 0 10px; }
+      section { border-top: 1px solid var(--border); padding-top: 26px; margin-top: 40px; }
+      .note { font-size: 13px; color: var(--muted); max-width: 760px; margin: 0 0 18px; }
+
+      /* ---------------------------------------------------------------- the panel */
+      .row3 { display: grid; grid-template-columns: repeat(3, minmax(0, 380px)); gap: 24px; align-items: start; }
+      .win { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r-win); overflow: hidden; display: flex; flex-direction: column; min-height: 720px; }
+      .cap { font: 13px var(--mono); color: var(--muted); margin: 0 0 8px; }
+      .head { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: var(--surface); border-bottom: 1px solid var(--border); }
+      .stamp { width: 26px; height: 26px; color: var(--green); flex: none; }
+      .head b { font-weight: 600; font-size: 15px; }
+      .head span { color: var(--muted); font-size: 13px; margin-left: 2px; }
+      .x { margin-left: auto; width: 32px; height: 32px; border: 0; background: none; color: var(--muted); font-size: 20px; border-radius: var(--r); cursor: pointer; }
+      .x:hover { background: var(--sunk); }
+      .field { display: flex; align-items: center; gap: 8px; padding: 9px 14px; border-bottom: 1px solid var(--border); font-size: 13.5px; }
+      .field i { width: 8px; height: 8px; background: var(--signal); flex: none; } /* the selected field: the one place yellow appears */
+      .field b { white-space: nowrap; }
+      .field .gray { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+      .tag { white-space: nowrap; margin-left: auto; font: 12px var(--mono); border: 1px solid var(--border); border-radius: 4px; padding: 0 6px; color: var(--muted); background: var(--surface); }
+      .body { padding: 16px 14px; display: grid; gap: 14px; align-content: start; flex: 1; }
+      p { margin: 0; }
+      .verdict { font-weight: 600; font-size: 16px; line-height: 1.4; }
+      .user { justify-self: end; max-width: 85%; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 7px 11px; }
+      .steps { font: 12.5px var(--mono); color: var(--muted); }
+      .steps summary { cursor: pointer; list-style: none; }
+      .steps summary::before { content: "▸ "; }
+      .steps[open] summary::before { content: "▾ "; }
+      .steps ol { margin: 6px 0 0; padding: 0; list-style: none; display: grid; gap: 2px; }
+      .steps li { display: flex; gap: 8px; } .steps li em { margin-left: auto; font-style: normal; }
+      .steps .now { color: var(--ink); }
+      .bar { height: 2px; background: var(--rule); overflow: hidden; margin-top: 6px; }
+      .bar::after { content: ""; display: block; height: 100%; width: 35%; background: var(--signal); animation: run 1.6s ease-in-out infinite alternate; }
+      @keyframes run { from { transform: translateX(0); } to { transform: translateX(190%); } }
+      @media (prefers-reduced-motion: reduce) { .bar::after { animation: none; width: 100%; opacity: 0.5; } }
+      sup.ref { font: 11px var(--mono); color: var(--green); padding-left: 1px; }
+
+      /* readout: label / value / unit, like a gauge row, not a "hero number" card */
+      .readout { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); }
+      .readout > div { display: grid; grid-template-columns: 1fr auto 52px; gap: 8px; align-items: baseline; padding: 8px 11px; border-top: 1px solid var(--rule); }
+      .readout > div:first-child { border-top: 0; }
+      .readout .v { font: 500 16px var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+      .readout .u { font: 12px var(--mono); color: var(--muted); }
+      .readout .l small { display: block; color: var(--muted); font-size: 12px; }
+      .readout .title { display: block; padding: 7px 11px; font-size: 13px; color: var(--muted); border-bottom: 1px solid var(--rule); }
+
+      .sources { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 8px; display: grid; gap: 2px; }
+      .sources b { font: 500 11px var(--mono); color: var(--green); margin-right: 4px; }
+      .actions { display: flex; flex-wrap: wrap; gap: 6px; }
+      .btn { font: 500 14px var(--sans); border-radius: var(--r); padding: 7px 12px; border: 1px solid var(--border); background: var(--surface); color: var(--ink); cursor: pointer; }
+      .btn:hover { border-color: var(--ink); }
+      .btn.go { background: var(--green); border-color: var(--green); color: var(--on-green); }
+      .btn.go:hover { background: var(--green-hover); }
+      .btn:focus-visible, .ask button:focus-visible, .x:focus-visible { outline: 2px solid var(--signal); outline-offset: 1px; }
+      .linkish { font-size: 13px; color: var(--muted); }
+      .linkish a { color: var(--green); }
+
+      /* follow-up questions: list rows, not pills */
+      .ask { border-top: 1px solid var(--rule); }
+      .ask button { display: flex; width: 100%; gap: 8px; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--rule); padding: 9px 2px; font: 14px var(--sans); color: var(--ink); cursor: pointer; }
+      .ask button::after { content: "→"; margin-left: auto; color: var(--muted); }
+      .ask button:hover { background: var(--sunk); }
+      .ask .lbl { font-size: 13px; color: var(--muted); margin: 0 0 2px; }
+
+      .intro { display: grid; grid-template-columns: 44px 1fr; gap: 10px; align-items: center; }
+      .intro img { width: 44px; height: auto; }
+
+      table.t { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); font-size: 13.5px; }
+      .t caption { text-align: left; color: var(--muted); font-size: 13px; padding-bottom: 4px; }
+      .t th { text-align: right; font-weight: 500; color: var(--muted); font-size: 12px; padding: 6px 8px; border-bottom: 1px solid var(--border); }
+      .t th:first-child, .t td:first-child { text-align: left; }
+      .t td { padding: 6px 8px; border-bottom: 1px solid var(--rule); text-align: right; font: 13.5px var(--mono); font-variant-numeric: tabular-nums; }
+      .t td:first-child { font-family: var(--sans); }
+      .t tr:last-child td { border-bottom: 0; }
+      .t .frost { color: var(--cold); font-weight: 500; }
+
+      .bars { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 8px 11px; display: grid; gap: 7px; }
+      .bars .lbl { color: var(--muted); font-size: 13px; }
+      .bars div { display: grid; grid-template-columns: 96px 1fr 52px; gap: 8px; align-items: center; font-size: 13px; }
+      .bars i { display: block; height: 10px; background: var(--dry); }
+      .bars i.b { background: var(--lush); }
+      .bars span { font: 13px var(--mono); text-align: right; }
+
+      .warn { display: grid; grid-template-columns: 22px 1fr; gap: 8px; background: var(--surface); border: 1px solid #c9a24c; border-radius: var(--r); padding: 9px 11px; }
+      .warn svg { width: 20px; height: 20px; color: var(--warn); }
+      .warn b { display: block; }
+      .warn small { color: var(--muted); font-size: 12.5px; }
+
+      .compose { display: flex; gap: 6px; padding: 10px 12px; border-top: 1px solid var(--border); background: var(--surface); }
+      .compose input { flex: 1; min-width: 0; font: 14.5px var(--sans); border: 1px solid var(--border); border-radius: var(--r); padding: 8px 10px; background: var(--panel); color: var(--ink); }
+      .compose input::placeholder { color: var(--muted); }
+      .sq { width: 38px; height: 38px; border-radius: var(--r); border: 1px solid var(--border); background: var(--surface); color: var(--ink); display: grid; place-items: center; flex: none; }
+      .sq.go { background: var(--green); border-color: var(--green); color: #fff; }
+      .sq svg { width: 18px; height: 18px; }
+
+      /* ---------------------------------------------------------------- palette, type, before/after, do/don't */
+      .sw { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; padding: 0; margin: 0; list-style: none; }
+      .sw li { display: flex; gap: 10px; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 8px; font-size: 13px; }
+      .sw i { width: 30px; height: 30px; border-radius: 4px; border: 1px solid #0000001f; flex: none; }
+      .sw small { display: block; font: 11.5px var(--mono); color: var(--muted); }
+      .ok { color: var(--lush); }
+      .two { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 380px) 1fr; gap: 24px; align-items: start; }
+      .shot { width: 100%; border: 1px solid var(--border); border-radius: var(--r-win); display: block; }
+      ul.why { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 14px; }
+      .type { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 14px 16px; display: grid; gap: 8px; }
+      .type div { display: grid; grid-template-columns: 190px 1fr; gap: 10px; align-items: baseline; border-bottom: 1px solid var(--rule); padding-bottom: 6px; }
+      .type div:last-child { border: 0; }
+      .type code { font: 12px var(--mono); color: var(--muted); }
+      .dd { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+      .dd > div { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 10px 12px; font-size: 13.5px; display: grid; gap: 4px; align-content: start; }
+      .dd .y { color: var(--lush); font-weight: 600; } .dd .n { color: var(--danger); font-weight: 600; }
+      .launch { display: flex; gap: 28px; align-items: center; flex-wrap: wrap; }
+      .launch figure { margin: 0; text-align: center; font-size: 12.5px; color: var(--muted); }
+      .lb { width: 60px; height: 60px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); display: grid; place-items: center; margin: 0 auto 6px; }
+      .lb img { width: 46px; }
+      .lb.sq2 { border-radius: 14px; }
+      .big-stamp { width: 60px; height: 60px; color: var(--green); margin: 0 auto 6px; display: block; }
+
+      @media (max-width: 1180px) { .row3 { grid-template-columns: repeat(2, minmax(0, 380px)); } .two { grid-template-columns: minmax(0, 380px); } }
+      @media (max-width: 820px) { .row3 { grid-template-columns: minmax(0, 1fr); } .board { padding: 28px 16px 64px; } h1 { font-size: 28px; } .win { min-height: 0; } }
+    </style>
+  </head>
+  <body>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <!-- The beetle as a one-colour decal: a stamp on a machine panel, drawn from the mascot's silhouette. -->
+      <symbol id="stamp" viewBox="0 0 32 32">
+        <g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12.5 8.5 9.5 3.5M19.5 8.5l3-5" /><circle cx="9.2" cy="3.2" r="1.2" fill="currentColor" /><circle cx="22.8" cy="3.2" r="1.2" fill="currentColor" />
+          <path d="M8 15a8 7 0 0 1 16 0v4a8 9 0 0 1-16 0z" />
+          <path d="M11 15.5h10v3.5a5 4 0 0 1-10 0z" fill="currentColor" fill-opacity=".14" />
+          <circle cx="13.6" cy="17" r=".9" fill="currentColor" /><circle cx="18.4" cy="17" r=".9" fill="currentColor" />
+          <path d="M8.2 20 5 22M23.8 20l3.2 2M8.6 24.5 6 27.5M23.4 24.5l2.6 3" />
+        </g>
+      </symbol>
+      <symbol id="mic" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0 0 14 0M12 18v3" /></g></symbol>
+      <symbol id="send" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></symbol>
+      <symbol id="tri" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3 2 20h20z" /><path d="M12 10v4M12 17v.5" stroke-linecap="round" /></g></symbol>
+    </svg>
+
+    <main class="board">
+      <p class="meta">Field Shift · напрям А «Пульт техніки» · чернетка 11.11.2026 · усі числа вигадані</p>
+      <h1>Помічник як прилад, а не як чат-бот</h1>
+      <p class="lead">Холодний сіро-білий фон, чорнильний текст, один зелений для дій. Жовтий лише позначає вибране.
+        Тонкі рамки без тіней, кути 6 px, числа моноширинним шрифтом, як на табло. Колір у даних береться тільки зі
+        шкал (сухо → волого). Жук лишається на кнопці й на порожньому екрані, а в шапці стоїть його одноколірний штамп.</p>
+
+      <!-- ============================================================ 1. three states of the panel -->
+      <section>
+        <h2>1 · Вікно помічника</h2>
+        <p class="note">Три стани одного вікна: порожнє, відповідь і відповідь із даними, поки помічник ще працює.</p>
+        <div class="row3">
+
+          <div>
+            <p class="cap">Порожнє: коротко про поле замість привітання</p>
+            <div class="win">
+              <div class="head"><svg class="stamp"><use href="#stamp" /></svg><b>Field Intelligence</b><span>помічник поля</span><button class="x" aria-label="Закрити">×</button></div>
+              <div class="field"><i></i><b>Демо-поле під Полтавою</b><span class="gray">· 42 га · кукурудза</span><span class="tag">демо-числа</span></div>
+              <div class="body">
+                <div class="intro"><img src="/src/widget/ui/beetle.webp" alt="" /><p>Я бачу дані цього поля, погоду й поради ФАО та НААН. Ось що зараз відомо:</p></div>
+                <div class="readout">
+                  <span class="title">Липень 2025 · супутники NASA</span>
+                  <div><span class="l">Волога біля коренів</span><span class="v">0,21</span><span class="u">м³/м³</span></div>
+                  <div><span class="l">Опади за місяць</span><span class="v">38</span><span class="u">мм</span></div>
+                  <div><span class="l">Стан посівів<small>найкращий за сезон, з 1</small></span><span class="v">0,78</span><span class="u"></span></div>
+                </div>
+                <div class="ask">
+                  <p class="lbl">Можна запитати</p>
+                  <button>Чи вистачає дощу кукурудзі?</button>
+                  <button>Яка погода на тиждень для обприскування?</button>
+                  <button>Які сівозміни менше залежать від дощу?</button>
+                </div>
+              </div>
+              <div class="compose"><input placeholder="Запитайте про поле…" aria-label="Питання помічнику" />
+                <button class="sq" aria-label="Сказати голосом"><svg><use href="#mic" /></svg></button>
+                <button class="sq go" aria-label="Надіслати"><svg><use href="#send" /></svg></button></div>
+            </div>
+          </div>
+
+          <div>
+            <p class="cap">Відповідь: спершу висновок, джерела номерами</p>
+            <div class="win">
+              <div class="head"><svg class="stamp"><use href="#stamp" /></svg><b>Field Intelligence</b><span>помічник поля</span><button class="x" aria-label="Закрити">×</button></div>
+              <div class="field"><i></i><b>Демо-поле під Полтавою</b><span class="gray">· 42 га</span><span class="tag">демо-числа</span></div>
+              <div class="body">
+                <p class="user">Сою посіяли 10 травня. Чи вистачало їй дощу?</p>
+                <details class="steps"><summary>3 кроки · 8 с</summary>
+                  <ol><li>✓ Погода від дня сівби<em>2,1 с</em></li><li>✓ Потреба сої у воді за ФАО<em>0,1 с</em></li><li>✓ Відповідь<em>5,6 с</em></li></ol></details>
+                <p class="verdict">Ні, дощу бракувало: соя недоотримала близько 350 мм за сезон.</p>
+                <div class="readout">
+                  <span class="title">10 травня — 26 вересня 2026</span>
+                  <div><span class="l">Випало дощу</span><span class="v">414,7</span><span class="u">мм</span></div>
+                  <div><span class="l">Потреба сої у воді</span><span class="v">766,1</span><span class="u">мм</span></div>
+                  <div><span class="l">Нестача</span><span class="v">−351,4</span><span class="u">мм</span></div>
+                </div>
+                <p>Рослини брали воду з ґрунту або терпіли посуху.<sup class="ref">1</sup> Запас вологи в ґрунті тут не враховано, тож
+                  це не норма поливу.<sup class="ref">2</sup></p>
+                <div class="actions"><button class="btn go">Показати вологу на карті</button><button class="btn">Порівняти сівозміни</button></div>
+                <div class="sources">
+                  <span><b>1</b>Архів погоди Open-Meteo, 10.05–26.09.2026</span>
+                  <span><b>2</b>Посібник ФАО «Потреба культур у воді», таблиці 11 і 12</span>
+                </div>
+                <p class="linkish"><a href="#">Зберегти звіт для агронома</a></p>
+              </div>
+              <div class="compose"><input placeholder="Запитайте про поле…" aria-label="Питання помічнику" />
+                <button class="sq" aria-label="Сказати голосом"><svg><use href="#mic" /></svg></button>
+                <button class="sq go" aria-label="Надіслати"><svg><use href="#send" /></svg></button></div>
+            </div>
+          </div>
+
+          <div>
+            <p class="cap">Дані: таблиця, порівняння, попередження</p>
+            <div class="win">
+              <div class="head"><svg class="stamp"><use href="#stamp" /></svg><b>Field Intelligence</b><span>помічник поля</span><button class="x" aria-label="Закрити">×</button></div>
+              <div class="field"><i></i><b>Демо-поле під Полтавою</b><span class="gray">· 42 га</span><span class="tag">демо-числа</span></div>
+              <div class="body">
+                <p class="user">Коли можна обприскувати цього тижня?</p>
+                <p class="verdict">Найкраще в середу з 6 до 10 ранку. У ніч на четвер можливий заморозок.</p>
+                <table class="t"><caption>Прогноз на 4 дні · Open-Meteo</caption>
+                  <thead><tr><th>День</th><th>Ніч, °C</th><th>День, °C</th><th>Дощ, мм</th><th>Вітер, м/с</th></tr></thead>
+                  <tbody>
+                    <tr><td>Вівторок</td><td>4</td><td>13</td><td>2,4</td><td>6</td></tr>
+                    <tr><td>Середа</td><td>2</td><td>11</td><td>0</td><td>3</td></tr>
+                    <tr><td>Четвер</td><td class="frost">−2 ▼</td><td>8</td><td>0</td><td>2</td></tr>
+                    <tr><td>Пʼятниця</td><td>1</td><td>10</td><td>0,6</td><td>4</td></tr>
+                  </tbody></table>
+                <div class="warn"><svg><use href="#tri" /></svg><div><b>Можливий заморозок у ніч на четвер</b><small>До −2 °C. Прогноз може змінитися.</small></div></div>
+                <div class="bars"><span class="lbl">Нестача води, тестовий розрахунок</span>
+                  <div>Пристосована<i class="b" style="width: 52%"></i><span>34 %</span></div>
+                  <div>Звичайна<i style="width: 78%"></i><span>51 %</span></div>
+                </div>
+                <div class="steps"><ol><li>✓ Прогноз погоди<em>0,8 с</em></li><li class="now">· Складаю відповідь…<em>3 с</em></li></ol><div class="bar"></div></div>
+              </div>
+              <div class="compose"><input placeholder="Запитайте про поле…" aria-label="Питання помічнику" />
+                <button class="sq" aria-label="Сказати голосом"><svg><use href="#mic" /></svg></button>
+                <button class="sq go" aria-label="Надіслати"><svg><use href="#send" /></svg></button></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ 2. before / after -->
+      <section>
+        <h2>2 · Зараз і після</h2>
+        <p class="note">Ліворуч справжній знімок нинішньої відповіді Gemini. Праворуч те саме питання в новому вигляді.</p>
+        <div class="two">
+          <div><p class="cap">Зараз</p><img class="shot" src="/src/canvas/now-answer.jpg" alt="Нинішня відповідь: довгий текст зі списками й дужками біля кожного числа" /></div>
+          <div>
+            <p class="cap">Пульт</p>
+            <div class="win" style="min-height:0">
+              <div class="head"><svg class="stamp"><use href="#stamp" /></svg><b>Field Intelligence</b><span>помічник поля</span><button class="x" aria-label="Закрити">×</button></div>
+              <div class="field"><i></i><b>Демо-поле під Полтавою</b><span class="gray">· 42 га</span><span class="tag">демо-числа</span></div>
+              <div class="body">
+                <p class="user">Що відомо про моє поле?</p>
+                <p class="verdict">Посіви росли добре, але в липні було сухувато.</p>
+                <div class="readout">
+                  <span class="title">Липень 2025 · супутники NASA<sup class="ref">1</sup></span>
+                  <div><span class="l">Стан посівів, найкращий за сезон</span><span class="v">0,78</span><span class="u">з 1</span></div>
+                  <div><span class="l">Опади за місяць</span><span class="v">38</span><span class="u">мм</span></div>
+                  <div><span class="l">Волога біля коренів</span><span class="v">0,21</span><span class="u">м³/м³</span></div>
+                  <div><span class="l">Випаровування</span><span class="v">165</span><span class="u">мм</span></div>
+                </div>
+                <p>Випарувалося більше води, ніж випало дощу. Поливу немає, тому варто думати про сівозміни, що менше залежать від дощу.</p>
+                <div class="sources"><span><b>1</b>NASA: SMAP (волога), GPM (опади), Landsat і Sentinel (посіви)</span></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <p class="cap">Що змінилося</p>
+            <ul class="why">
+              <li>Перший рядок відповідає на питання. Пояснення йдуть після нього.</li>
+              <li>Числа стоять у табло, а текст пояснює, що вони означають, і не повторює їх.</li>
+              <li>Джерело записано один раз унизу, з номером. Біля кожного числа його більше немає.</li>
+              <li>«Демо-числа» написано один раз, у смужці поля.</li>
+              <li>Немає жирних підзаголовків із двокрапкою і вкладених списків.</li>
+              <li>Немає «таблеток»: позначки прямокутні й лише там, де потрібні.</li>
+              <li>Хід роботи згортається в один рядок «3 кроки · 8 с». Технічних «помилок» фермер не бачить.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ 3. palette -->
+      <section>
+        <h2>3 · Кольори</h2>
+        <p class="note">Контраст рахується з самих кольорів відносно фону вікна. Для тексту потрібно щонайменше 4,5.</p>
+        <ul class="sw" id="sw"></ul>
+      </section>
+
+      <!-- ============================================================ 4. type and beetle -->
+      <section>
+        <h2>4 · Шрифт і жук</h2>
+        <div class="two" style="grid-template-columns: minmax(0, 560px) 1fr">
+          <div class="type">
+            <div><code>IBM Plex Sans 600 · 16</code><span style="font-weight:600;font-size:16px">Ні, дощу бракувало: соя недоотримала воду.</span></div>
+            <div><code>IBM Plex Sans 400 · 15</code><span>Рослини брали воду з ґрунту. Ґ, ї, є, ʼ на місці.</span></div>
+            <div><code>IBM Plex Sans 400 · 13</code><span style="font-size:13px;color:var(--muted)">Архів погоди Open-Meteo, 10.05–26.09.2026</span></div>
+            <div><code>IBM Plex Mono 500 · 16</code><span style="font:500 16px var(--mono)">414,7 · 766,1 · −351,4</span></div>
+          </div>
+          <div class="launch">
+            <figure><div class="lb"><img src="/src/widget/ui/beetle.webp" alt="" /></div>Кнопка: жук як є</figure>
+            <figure><div class="lb sq2"><img src="/src/widget/ui/beetle.webp" alt="" /></div>або квадратніша кнопка</figure>
+            <figure><svg class="big-stamp"><use href="#stamp" /></svg>Штамп у шапці</figure>
+            <p class="note" style="max-width:320px;margin:0">Об'ємний жук з'являється лише на кнопці, на порожньому екрані й у повідомленні
+              про збій. Біля кожної відповіді його немає. Штамп — моя чернетка з силуету вашого жука. Якщо хочете, згенеруйте
+              плоский одноколірний варіант тим самим інструментом, що й жука.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ 5. do / don't -->
+      <section>
+        <h2>5 · Так і не так</h2>
+        <div class="dd">
+          <div><span class="y">Так</span>Тонка рамка, кути 6 px, без тіні.<span class="n">Не так</span>М'яка тінь і кути 20+ px.</div>
+          <div><span class="y">Так</span>Число моноширинним праворуч, одиниця сірим поруч.<span class="n">Не так</span>Велике «героїчне» число в окремій картці.</div>
+          <div><span class="y">Так</span>Висновок першим рядком.<span class="n">Не так</span>«**Вологість:** …» жирними підзаголовками.</div>
+          <div><span class="y">Так</span>Джерела номерами внизу.<span class="n">Не так</span>Дужки з джерелом біля кожного числа.</div>
+          <div><span class="y">Так</span>Жовтий лише як позначка вибраного.<span class="n">Не так</span>Кольорова смужка збоку картки.</div>
+          <div><span class="y">Так</span>Питання-підказки рядками зі стрілкою.<span class="n">Не так</span>Хмара заокруглених «таблеток».</div>
+          <div><span class="y">Так</span>Кроки роботи і час.<span class="n">Не так</span>Три стрибучі крапки чи блискітки.</div>
+          <div><span class="y">Так</span>Попередження в рамці зі значком.<span class="n">Не так</span>Жовта заливка на пів екрана.</div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const lum = (hex) => {
+        const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+        return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+      };
+      const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+      const css = getComputedStyle(document.documentElement);
+      const get = (t) => css.getPropertyValue(t).trim();
+      const SW = [ // token, name, text (needs 4.5) or fill
+        ["--panel", "фон вікна", "base"], ["--surface", "картки, поле вводу", "base"], ["--border", "рамки", "fill"],
+        ["--ink", "текст", "text"], ["--muted", "другорядний текст", "text"], ["--green", "дії, посилання", "text"],
+        ["--signal", "позначка вибраного", "fill"], ["--warn", "попередження", "text"], ["--danger", "помилка", "text"],
+        ["--cold", "мороз у таблиці", "text"], ["--dry", "сухо (дані)", "fill"], ["--lush", "волого (дані)", "fill"],
+      ];
+      const ul = document.getElementById("sw");
+      for (const [t, name, use] of SW) {
+        const hex = get(t), r = ratio(hex, get("--panel"));
+        const v = use === "base" ? "" : use === "fill" ? ` · заливка ${r.toFixed(1)}` : ` · <span class="${r >= 4.5 ? "ok" : ""}">${r.toFixed(1)}${r >= 4.5 ? " ✓" : " ✗"}</span>`;
+        ul.insertAdjacentHTML("beforeend", `<li><i style="background:${hex}"></i><div>${name}<small>${hex}${v}</small></div></li>`);
+      }
+    </script>
+  </body>
+</html>

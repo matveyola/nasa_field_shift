@@ -1,0 +1,32 @@
+event: turn.started
+data: {"event":"turn.started","turn_id":"turn_553dff9c922e447b937cbbadcec4becf"}
+id: 1
+
+event: tool.started
+data: {"event":"tool.started","call_id":"call_1","tool":"get_field_facts"}
+id: 2
+
+event: tool.finished
+data: {"event":"tool.finished","call_id":"call_1","status":"ok","latency_ms":14}
+id: 3
+
+event: tool.started
+data: {"event":"tool.started","call_id":"call_2","tool":"present_blocks"}
+id: 4
+
+event: tool.finished
+data: {"event":"tool.finished","call_id":"call_2","status":"ok","latency_ms":0}
+id: 5
+
+event: text.delta
+data: {"event":"text.delta","text":"Для вашого поля доступні супутникові дані щодо ґрунту, рельєфу, опадів та стану рослинності.\n\n"}
+id: 6
+
+event: text.delta
+data: {"event":"text.delta","text":"Ґрунт на полі близький до нейтрального за кислотністю та містить помірну кількість глини, а саме поле має невеликий схил. За супутниковими спостереженнями за липень 2025 року, запаси вологи в кореневмісному шарі були помірними, хоча опадів за цей місяць випало небагато, а втрати вологи на випаровування становили **165 мм** (розрахунок). У період із березня по жовтень 2025 року рослинний покрив досягав високого розвитку."}
+id: 7
+
+event: turn.completed
+data: {"event":"turn.completed","message":{"turn_id":"turn_553dff9c922e447b937cbbadcec4becf","locale":"uk","blocks":[{"type":"text","markdown":"Для вашого поля доступні супутникові дані щодо ґрунту, рельєфу, опадів та стану рослинності.\n\nҐрунт на полі близький до нейтрального за кислотністю та містить помірну кількість глини, а саме поле має невеликий схил. За супутниковими спостереженнями за липень 2025 року, запаси вологи в кореневмісному шарі були помірними, хоча опадів за цей місяць випало небагато, а втрати вологи на випаровування становили **165 мм** (розрахунок). У період із березня по жовтень 2025 року рослинний покрив досягав високого розвитку."},{"type":"metrics","title":"Основні показники поля","fact_ids":["f_ph_0_30","f_clay_0_30","f_slope_mean","f_sm_rootzone_2025_07","f_precip_2025_07","f_ndvi_peak_2025"],"scenario":null}],"facts":[{"id":"f_et0_2025_07","domain":"climate","label_key":"fact.reference_et0","quantity":{"value":165.0,"unit":"mm","uncertainty":null},"category":null,"depth_cm":null,"provenance":{"kind":"deterministic_calc","data_status":"fixture","source":null,"method":"FAO-56 Penman-Monteith (Eq. 6), daily, summed; synthetic fixture value","model":null,"inputs":["power_t2m","power_rh2m","power_ws2m","power_allsky_sfc_sw_dwn"],"spatial":null,"temporal":{"start":"2025-07-01","end":"2025-07-31","aggregation":"sum"},"retrieved_at":"2026-11-06T09:00:00Z"}},{"id":"f_ph_0_30","domain":"soil","label_key":"fact.soil_ph","quantity":{"value":6.9,"unit":"[pH]","uncertainty":{"kind":"range","low":6.4,"high":7.3,"sd":null,"note":"Q05-Q95"}},"category":null,"depth_cm":[0,30],"provenance":{"kind":"satellite_product","data_status":"fixture","source":{"provider":"ISRIC","product_id":"SoilGrids phh2o","version":"2.0","level":null,"doi":null,"url":null},"method":"Synthetic fixture value for development; not a real measurement.","model":null,"inputs":[],"spatial":{"resolution_m":250.0,"note":null},"temporal":null,"retrieved_at":"2026-11-06T09:00:00Z"}},{"id":"f_clay_0_30","domain":"soil","label_key":"fact.soil_clay","quantity":{"value":290.0,"unit":"g/kg","uncertainty":null},"category":null,"depth_cm":[0,30],"provenance":{"kind":"satellite_product","data_status":"fixture","source":{"provider":"ISRIC","product_id":"SoilGrids clay","version":"2.0","level":null,"doi":null,"url":null},"method":"Synthetic fixture value for development; not a real measurement.","model":null,"inputs":[],"spatial":{"resolution_m":250.0,"note":null},"temporal":null,"retrieved_at":"2026-11-06T09:00:00Z"}},{"id":"f_slope_mean","domain":"terrain","label_key":"fact.slope_mean","quantity":{"value":3.1,"unit":"deg","uncertainty":null},"category":null,"depth_cm":null,"provenance":{"kind":"satellite_product","data_status":"fixture","source":{"provider":"NASA LP DAAC","product_id":"NASADEM_SC","version":"001","level":null,"doi":null,"url":null},"method":"Synthetic fixture value for development; not a real measurement.","model":null,"inputs":[],"spatial":{"resolution_m":30.0,"note":null},"temporal":null,"retrieved_at":"2026-11-06T09:00:00Z"}},{"id":"f_sm_rootzone_2025_07","domain":"water","label_key":"fact.root_zone_soil_moisture","quantity":{"value":0.21,"unit":"m3/m3","uncertainty":null},"category":null,"depth_cm":[0,100],"provenance":{"kind":"satellite_product","data_status":"fixture","source":{"provider":"NASA NSIDC DAAC","product_id":"SPL4SMGP","version":"008","level":"L4 (model-assimilated)","doi":null,"url":null},"method":"Synthetic fixture value for development; not a real measurement.","model":null,"inputs":[],"spatial":{"resolution_m":9000.0,"note":"9 km grid; the radiometer footprint is about 33 km"},"temporal":{"start":"2025-07-01","end":"2025-07-31","aggregation":"monthly_mean"},"retrieved_at":"2026-11-06T09:00:00Z"}},{"id":"f_precip_2025_07","domain":"water","label_key":"fact.precipitation_total","quantity":{"value":38.0,"unit":"mm","uncertainty":null},"category":null,"depth_cm":null,"provenance":{"kind":"satellite_product","data_status":"fixture","source":{"provider":"NASA GES DISC","product_id":"GPM_3IMERGDF","version":"07","level":"L3 (Final, daily)","doi":null,"url":null},"method":"Synthetic fixture value for development; not a real measurement.","model":null,"inputs":[],"spatial":{"resolution_m":11000.0,"note":"0.1 degree grid"},"temporal":{"start":"2025-07-01","end":"2025-07-31","aggregation":"sum"},"retrieved_at":"2026-11-06T09:00:00Z"}},{"id":"f_ndvi_peak_2025","domain":"vegetation","label_key":"fact.ndvi_peak","quantity":{"value":0.78,"unit":"1","uncertainty":null},"category":null,"depth_cm":null,"provenance":{"kind":"satellite_product","data_status":"fixture","source":{"provider":"NASA LP DAAC","product_id":"HLSS30_VI","version":"002","level":null,"doi":null,"url":null},"method":"Synthetic fixture value for development; not a real measurement.","model":null,"inputs":[],"spatial":{"resolution_m":30.0,"note":null},"temporal":{"start":"2025-03-01","end":"2025-10-31","aggregation":"max"},"retrieved_at":"2026-11-06T09:00:00Z"}}],"citations":[],"constraints_proposed":[],"ui_actions":[],"warnings":[{"code":"fixture_data","detail":"Values or layers shown are synthetic demo data."}],"meta":{"provider":"gemini","model_id":"gemini-3.8-flash","prompt_version":"m2-26c0934f5a","latency_ms":7500}}}
+id: 8
+

@@ -1,0 +1,24 @@
+event: turn.started
+data: {"event":"turn.started","turn_id":"turn_ff0ed5e7416f41ea969930884022669b"}
+id: 1
+
+event: tool.started
+data: {"event":"tool.started","call_id":"call_1","tool":"search_knowledge"}
+id: 2
+
+event: tool.finished
+data: {"event":"tool.finished","call_id":"call_1","status":"ok","latency_ms":15}
+id: 3
+
+event: text.delta
+data: {"event":"text.delta","text":"За рекомендаціями Інституту сільського господарства Полісся для Житомирської області, оптимальні строки сівби озимої пшениці припадають на 15–25 вересня [1]. \n\n"}
+id: 4
+
+event: text.delta
+data: {"event":"text.delta","text":"Науковці зазначають, що надто рання сівба створює небезпеку переростання рослин і випрівання, а запізнення із сівбою знижує їхню стійкість до зимових морозів [1]."}
+id: 5
+
+event: turn.completed
+data: {"event":"turn.completed","message":{"turn_id":"turn_ff0ed5e7416f41ea969930884022669b","locale":"uk","blocks":[{"type":"text","markdown":"За рекомендаціями Інституту сільського господарства Полісся для Житомирської області, оптимальні строки сівби озимої пшениці припадають на 15–25 вересня [1]. \n\nНауковці зазначають, що надто рання сівба створює небезпеку переростання рослин і випрівання, а запізнення із сівбою знижує їхню стійкість до зимових морозів [1]."}],"facts":[],"citations":[{"id":"1","chunk_id":"naas-polissia-2026.page-36.ca73b47d89","doc_id":"naas-polissia-2026","title":"Підготовка та проведення посіву озимих сільськогосподарських культур в агроформуваннях Житомирської області в умовах 2026 року (науково-практичні рекомендації; Полісся, Житомирська обл.)","publisher":"Інститут сільського господарства Полісся НААН","year":2026,"edition":null,"locator":{"chapter":null,"section":"На дерново-підзолистих кислих ґрунтах Полісся обов'язковою","table":null,"page":36},"url":"https://www.isgpnaan.org/upload/rekomendatsii-posiv-2026.pdf#page=36","quote":"Оптимізація параметрів сівби Необхідно суворо витримувати строки сівби: для ріпаку – 15–25 серпня, для озимої пшениці, жита та тритикале – 15–25 вересня, для озимого ячменю –20 вересня – 5 жовтня.","language":"uk","licence":"Рекомендації установи НААН у відкритому доступі; коротка цитата з посиланням на джерело."}],"constraints_proposed":[],"ui_actions":[],"warnings":[],"meta":{"provider":"gemini","model_id":"gemini-3.8-flash","prompt_version":"m2-26c0934f5a","latency_ms":6844}}}
+id: 6
+

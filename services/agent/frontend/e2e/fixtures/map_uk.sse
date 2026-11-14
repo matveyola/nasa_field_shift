@@ -1,0 +1,28 @@
+event: turn.started
+data: {"event":"turn.started","turn_id":"turn_625040bd496e4a459eb09a045f7ee092"}
+id: 1
+
+event: tool.started
+data: {"event":"tool.started","call_id":"call_1","tool":"propose_ui_actions"}
+id: 2
+
+event: tool.finished
+data: {"event":"tool.finished","call_id":"call_1","status":"ok","latency_ms":0}
+id: 3
+
+event: text.delta
+data: {"event":"text.delta","text":"_Демо-режим: відповідь складено за готовими правилами, а не штучним інтелектом._\n\n"}
+id: 4
+
+event: text.delta
+data: {"event":"text.delta","text":"Пропоную показати на карті: «вологість ґрунту (супутник)» (супутник NASA SMAP; **демо-дані, не справжній вимір**).\n\n"}
+id: 5
+
+event: text.delta
+data: {"event":"text.delta","text":"Ще можна показати: «вологість ґрунту детально (оцінка)» (комп’ютерна оцінка, не прямий вимір; точність ще не перевірена; **демо-дані, не справжній вимір**)."}
+id: 6
+
+event: turn.completed
+data: {"event":"turn.completed","message":{"turn_id":"turn_625040bd496e4a459eb09a045f7ee092","locale":"uk","blocks":[{"type":"text","markdown":"_Демо-режим: відповідь складено за готовими правилами, а не штучним інтелектом._\n\nПропоную показати на карті: «вологість ґрунту (супутник)» (супутник NASA SMAP; **демо-дані, не справжній вимір**).\n\nЩе можна показати: «вологість ґрунту детально (оцінка)» (комп’ютерна оцінка, не прямий вимір; точність ще не перевірена; **демо-дані, не справжній вимір**)."}],"facts":[],"citations":[],"constraints_proposed":[],"ui_actions":[{"id":"a1","field_context_revision":3,"trigger":"auto","label":"Вологість ґрунту (супутник)","reason":null,"action":{"type":"map.set_layers","layer_ids":["l_smap_rootzone"],"mode":"replace"}},{"id":"a2","field_context_revision":3,"trigger":"chip","label":"Вологість ґрунту детально (оцінка)","reason":null,"action":{"type":"map.set_layers","layer_ids":["l_sm_30m"],"mode":"replace"}}],"warnings":[{"code":"fixture_data","detail":"Map layers proposed here are synthetic fixtures."}],"meta":{"provider":"deterministic-dev","model_id":"none","prompt_version":"dev-rules-0.1","latency_ms":14}}}
+id: 7
+
