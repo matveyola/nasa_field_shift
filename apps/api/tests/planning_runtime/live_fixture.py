@@ -29,7 +29,8 @@ def install_synthetic(factory):
         for c in ["Maize", "Wheat"]
     ]
     profiles = []
-    for field_id in ["F-01", "F-02"]:
+    for index, field_id in enumerate(["F-01", "F-02"]):
+        profile_time = now - timedelta(minutes=3 - index)
         with factory() as session:
             field = session.get(Field, field_id)
             p = copy.deepcopy(source["field_profile"])
@@ -39,7 +40,7 @@ def install_synthetic(factory):
                 geometry={**field.geometry, "crs": "EPSG:4326"},
                 geometry_revision=field.boundary_revision,
                 area_ha=field.area_ha,
-                as_of=now.isoformat(),
+                as_of=profile_time.isoformat(),
                 land_status="arable",
                 hazards=[],
             )
@@ -68,9 +69,9 @@ def install_synthetic(factory):
             )
             for s in p["sources"]:
                 s.update(
-                    available_at=now.isoformat(),
-                    acquired_at=now.isoformat(),
-                    retrieved_at=now.isoformat(),
+                    available_at=profile_time.isoformat(),
+                    acquired_at=profile_time.isoformat(),
+                    retrieved_at=profile_time.isoformat(),
                     kind="synthetic",
                     quality="valid",
                     coverage_fraction=1.0,

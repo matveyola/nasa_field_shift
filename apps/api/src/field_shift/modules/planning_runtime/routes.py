@@ -50,8 +50,18 @@ def bootstrap(session: SessionDep, principal=Depends(require_principal)):
 
 
 @workspace_router.post("/fields/{field_id}/initialize")
-def initialize(field_id: str, session: SessionDep, principal=Depends(require_principal)):
-    return invoke(session, lambda: service.initialize_profile(session, principal, field_id))
+def initialize(
+    field_id: str,
+    session: SessionDep,
+    refresh_boundary: bool = False,
+    principal=Depends(require_principal),
+):
+    return invoke(
+        session,
+        lambda: service.initialize_profile(
+            session, principal, field_id, refresh_boundary=refresh_boundary
+        ),
+    )
 
 
 @workspace_router.get("/farms/{farm_id}/runs/{run_id}/evidence")

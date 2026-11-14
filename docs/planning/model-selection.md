@@ -12,7 +12,7 @@ WOFOST72 water-limited classic as a challenger. Keep the existing
 based on conversion/operating fit and verified installed terms, not field
 accuracy: no independent yield observations were provided.
 
-The committed [CPU report](../../packages/field-shift-models/reports/cpu-v1.json)
+The committed [CPU report](../../packages/field-shift-models/reports/cpu-v2.json)
 records installed code/license checksums, input/parameter/output hashes,
 measured CPU/wall time and peak RSS for Maize and Barley under controlled
 wet/dry forcing. Each run is synthetic. Different bundled soil/crop parameters
@@ -124,3 +124,14 @@ Dockerfile, root image inputs or public transport wiring. Empirical calibration,
 independent field/year accuracy, local adapter promotion and EO extraction/
 quality evaluation remain unexecuted for lack of real labels and pinned imagery.
 Issue #4 must not be treated as a scientifically validated local model release.
+
+
+### Profile chronology correction
+
+`cpu-v1.json` remains the immutable pre-integration report. `cpu-v2.json` records
+the adapter correction allowing an older immutable profile with a later weather
+issue; future profiles still fail. All four benchmark input hashes and numerical
+season outputs remain identical. Adapter, evaluation and state-reference hashes
+change because they intentionally include source identity. CI checks v2 against
+the current source without relaxing checksum or numeric comparisons. This change
+does not add observed validation or promote the baseline.

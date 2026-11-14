@@ -277,3 +277,55 @@ def test_evaluation_uses_pinned_weather_issue_not_later_submission_clock(farm_da
     assert not candidate_errors(later, candidates[0], evaluations[0])
     future = evaluations[0].model_copy(update={"as_of": later.as_of + timedelta(seconds=1)})
     assert any(r.code == "evaluation_scope" for r in candidate_errors(later, candidates[0], future))
+
+
+def test_runtime_capped_candidates_cannot_prove_infeasibility(farm_data, monkeypatch):
+    from types import SimpleNamespace
+
+    from field_shift.modules.planning_runtime.calendars import mark_search_coverage
+    from field_shift.modules.rotations.suitability.engine import SuitabilityEngine
+
+    farm_data[0]["resources"] = [
+        dict(constraint_id="budget", season=2027, budget=2000.0, currency="USD", irrigation_m3=None)
+    ]
+    request, known, evidence = validated(farm_data)
+    suitability = SuitabilityEngine(
+        SimpleNamespace(version=request.rulebook_version, rules=[]), region_for=lambda _: "region"
+    )
+    monkeypatch.setattr(
+        suitability,
+        "evaluate",
+        lambda field, crop, *args, **kwargs: next(
+            c.assessments[0]
+            for c in known
+            if c.field_id == field.field_id and c.assignments[0].crop == crop
+        ),
+    )
+    for cap in (1, 2):
+        limited = request.model_copy(
+            update={
+                "solver_limits": request.solver_limits.model_copy(
+                    update={"max_candidates_per_field": cap}
+                )
+            }
+        )
+        candidates = suitability.candidates(limited)
+        evaluations = [
+            next(
+                e
+                for e in evidence
+                if e.field_snapshot_id == c.field_snapshot_id
+                and e.seasons[0].crop == c.assignments[0].crop
+            ).model_copy(update={"sequence_id": c.sequence_id})
+            for c in candidates
+        ]
+        comparison = mark_search_coverage(
+            BoundedSelector().compare(limited, candidates, evaluations), limited
+        )
+        if cap == 1:
+            assert not comparison.alternatives
+            assert comparison.solver_status == "limit_reached"
+            assert comparison.diagnostics[0].code == "candidate_generation_limit"
+        else:
+            assert comparison.alternatives
+            assert comparison.solver_status == "optimal"

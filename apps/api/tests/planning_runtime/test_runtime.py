@@ -260,3 +260,61 @@ def test_calendars_only_narrow_permitted_dates_and_preserve_commitments(example,
     adapter.candidates(request)
     assert candidate.assessments[0].status == "ineligible"
     assert candidate.assessments[0].reasons[-1].code == "calendar_outside_rules"
+
+
+@pytest.mark.parametrize("defect", ["hash", "request", "farm", "weather", "rules", "artifacts"])
+def test_rejected_worker_results_finish_as_failed(factory, installed_inputs, example, defect):
+    import copy
+
+    bundle, _ = installed_inputs
+    install(factory, bundle)
+    run = submit(factory, bundle)
+    comparison = copy.deepcopy(example["comparison"])
+    comparison.update(
+        request_id=run.request.request_id,
+        farm_id=run.request.farm_id,
+        input_sha256=run.input_sha256,
+        scenario_set_id=run.request.weather.scenario_set_id,
+        rulebook_version=run.request.rulebook_version,
+    )
+    keys = {
+        "hash": "input_sha256",
+        "request": "request_id",
+        "farm": "farm_id",
+        "weather": "scenario_set_id",
+        "rules": "rulebook_version",
+    }
+    if defect in keys:
+        comparison[keys[defect]] = "f" * 64 if defect == "hash" else "other"
+    payload = {"comparison": comparison, "artifacts": {}}
+    if defect == "artifacts":
+        del payload["artifacts"]
+    process_planning(factory, run.run_id, runner=lambda *_: payload)
+    with factory() as session:
+        row = session.get(PlanningRunRow, run.run_id)
+        assert row.status == "failed"
+        assert row.payload["comparison"] is None and row.payload["error"]
+        assert row.artifacts is None and row.lease_until is None
+
+
+def test_boundary_refresh_requires_explicit_action_and_archives_old_profile(
+    factory, installed_inputs
+):
+    from field_shift.modules.fields.models import Field
+    from field_shift.modules.fields.planning_profile.service import ProfileRepository
+
+    bundle, _ = installed_inputs
+    old = bundle.template.fields[0]
+    with factory.begin() as session:
+        session.get(Field, "F-01").boundary_revision += 1
+    with factory.begin() as session, pytest.raises(PlanningFailure, match="Boundary"):
+        service.initialize_profile(session, ADMIN, "F-01")
+    with factory.begin() as session:
+        fresh = service.initialize_profile(session, ADMIN, "F-01", refresh_boundary=True)
+        assert fresh.geometry_revision == old.geometry_revision + 1
+        assert fresh.profile_revision == old.profile_revision + 1
+        assert fresh.land_status == "unknown" and fresh.soil == [] and fresh.water_state is None
+        assert fresh.missing_data
+    with factory.begin() as session:
+        assert ProfileRepository(session).get_snapshot("1", "F-01", old.snapshot_id) == old
+        assert service.initialize_profile(session, ADMIN, "F-01", refresh_boundary=True) == fresh

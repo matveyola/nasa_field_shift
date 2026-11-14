@@ -76,3 +76,40 @@ class CalendarSuitability(SuitabilityEngine):
                     )
                 )
         return candidates
+
+
+def candidate_coverage(request):
+    """A generates a bounded prefix, which cannot prove full-farm infeasibility."""
+    result = {}
+    for profile in request.fields:
+        locked = {a.season for a in request.locks if a.field_id == profile.field_id}
+        free_seasons = sum(
+            y not in locked
+            for y in range(request.start_season, request.start_season + request.season_count)
+        )
+        total = len(request.enabled_crops) ** free_seasons
+        result[profile.field_id] = {
+            "combinations": total,
+            "limit": request.solver_limits.max_candidates_per_field,
+            "complete": total <= request.solver_limits.max_candidates_per_field,
+        }
+    return result
+
+
+def mark_search_coverage(comparison, request):
+    limited = [key for key, row in candidate_coverage(request).items() if not row["complete"]]
+    if not limited:
+        return comparison
+    diagnostic = reason(
+        "candidate_generation_limit",
+        "Candidate generation reached its per-field limit. An unsearched plan may be better "
+        "or feasible; increase the limit or reduce scope before drawing a final conclusion.",
+        "solver_limits.max_candidates_per_field",
+        "assumption",
+    )
+    return comparison.model_copy(
+        update={
+            "solver_status": "limit_reached",
+            "diagnostics": [diagnostic, *comparison.diagnostics][:100],
+        }
+    )

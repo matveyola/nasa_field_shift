@@ -6,6 +6,7 @@ from sqlalchemy import select
 
 from field_shift.contracts.planning_v1 import FieldProfileSnapshot, ProfileWriteRequest
 from field_shift.modules.fields.models import Field
+from field_shift.modules.fields.planning_profile.models import ProfileSnapshot
 from field_shift.modules.fields.planning_profile.service import ProfileError, ProfileRepository
 from field_shift.modules.rotations.scenario_planning.common import canonical, reason
 from field_shift.modules.rotations.scenario_planning.models import PlanningCommitment
@@ -99,7 +100,7 @@ class RuntimeService(RunService):
             result.update(status=getattr(exc, "code", "stale"), reason=str(exc))
         return result
 
-    def initialize_profile(self, session, principal, field_id):
+    def initialize_profile(self, session, principal, field_id, *, refresh_boundary=False):
         self.scope(session, principal, str(principal.farm_id), write=True)
         field = session.scalar(
             select(Field)
@@ -109,10 +110,22 @@ class RuntimeService(RunService):
         if field is None:
             raise PlanningFailure("not_found", "Field is inaccessible")
         repo = ProfileRepository(session)
+        expected_revision = None
         try:
             return repo.latest(str(principal.farm_id), field_id)
         except ProfileError as exc:
-            if exc.code != "not_found":
+            if exc.code == "stale" and refresh_boundary:
+                # Keep the old snapshot for replay; changed geography invalidates its inputs.
+                expected_revision = session.scalar(
+                    select(ProfileSnapshot.revision)
+                    .where(
+                        ProfileSnapshot.field_id == field_id,
+                        ProfileSnapshot.farm_id == principal.farm_id,
+                    )
+                    .order_by(ProfileSnapshot.revision.desc())
+                    .limit(1)
+                )
+            elif exc.code != "not_found":
                 raise PlanningFailure(exc.code, exc.message) from exc
         from uuid import uuid4
 
@@ -158,7 +171,9 @@ class RuntimeService(RunService):
         return repo.write(
             str(principal.farm_id),
             field_id,
-            ProfileWriteRequest(request_id=str(uuid4()), expected_revision=None, profile=profile),
+            ProfileWriteRequest(
+                request_id=str(uuid4()), expected_revision=expected_revision, profile=profile
+            ),
         )
 
 

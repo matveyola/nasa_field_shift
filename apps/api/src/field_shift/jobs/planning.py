@@ -11,7 +11,7 @@ from time import monotonic
 
 from sqlalchemy import or_, select
 
-from field_shift.contracts.planning_v1 import FarmPlanComparison
+from field_shift.contracts.planning_v1 import FarmPlanComparison, PlanningRun
 from field_shift.modules.planning_runtime.models import PlanningDelivery
 from field_shift.modules.planning_runtime.service import service
 from field_shift.modules.rotations.scenario_planning.common import canonical, reason
@@ -120,8 +120,12 @@ def process_planning(factory, identifier, *, runner=execute_child):
         result = runner(factory, run)
         comparison = FarmPlanComparison.model_validate_json(canonical(result["comparison"]))
         artifacts = result["artifacts"]
-        if comparison.input_sha256 != run.input_sha256:
-            raise ValueError("Worker result input identity mismatch")
+        # Validate the full immutable identity before entering the persistence boundary.
+        success = run.model_dump(mode="json")
+        success.update(
+            status="succeeded", comparison=comparison.model_dump(mode="json"), error=None
+        )
+        PlanningRun.model_validate_json(canonical(success))
     except Exception as exc:
         failure = reason(
             type(exc).__name__,
@@ -140,7 +144,7 @@ def process_planning(factory, identifier, *, runner=execute_child):
             session,
             run.run_id,
             run.attempt,
-            comparison=comparison,
+            comparison=comparison if failure is None else None,
             artifacts=artifacts if failure is None else None,
             error=failure,
         )

@@ -7,12 +7,16 @@ from field_shift.config import get_settings
 from field_shift.contracts.planning_v1 import ModelCard
 from field_shift.db import build_session_factory
 from field_shift.modules.fields.planning_profile.service import ProfileRepository
-from field_shift.modules.planning_runtime.calendars import CalendarSuitability
+from field_shift.modules.planning_runtime.calendars import (
+    CalendarSuitability,
+    candidate_coverage,
+    mark_search_coverage,
+)
 from field_shift.modules.planning_runtime.inputs import decode_bundle
 from field_shift.modules.planning_runtime.models import PlanningBundle
 from field_shift.modules.planning_runtime.service import service
 from field_shift.modules.planning_runtime.transport import RemoteCropProvider
-from field_shift.modules.rotations.scenario_planning.common import canonical
+from field_shift.modules.rotations.scenario_planning.common import canonical, digest
 from field_shift.modules.rotations.scenario_planning.execution import PlanningEngine
 from field_shift.modules.rotations.scenario_planning.models import PlanningRunRow
 
@@ -31,7 +35,11 @@ def execute(session, identifier):
         CalendarSuitability(bundle),
         RemoteCropProvider(bundle, card),
     )
-    comparison, artifacts = engine.execute(service.read(row).request)
+    request = service.read(row).request
+    comparison, artifacts = engine.execute(request)
+    comparison = mark_search_coverage(comparison, request)
+    artifacts["candidate_coverage"] = candidate_coverage(request)
+    artifacts["sha256"] = digest({k: v for k, v in artifacts.items() if k != "sha256"})
     return {"comparison": comparison.model_dump(mode="json"), "artifacts": artifacts}
 
 

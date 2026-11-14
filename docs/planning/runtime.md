@@ -15,7 +15,9 @@ an explicit test-database flag. Do not run that installer on a real farm databas
 ## Inputs and supported computation
 
 1. Create/edit a profile for each registered field. Geometry and area come from
-   the registered field. Unknown history, soil or water remain unknown.
+   the registered field. Unknown history, soil or water remain unknown. After
+   a boundary edit, explicitly create a new profile from the setup screen; the
+   old snapshot remains archived and geography-dependent inputs need review.
 2. Obtain permitted, dated weather trajectories, reviewed regional crop rules,
    crop parameters and soil hydraulics. Preserve their origin and availability
    time. Long horizons are scenarios, not daily weather predictions years ahead.
@@ -39,6 +41,9 @@ The baseline adapter is AquaCrop-OSPy 3.1.0 for generic Maize, Wheat and Barley
 repeated crops/calendars; **mixed rotations abstain**. PCSE remains an offline
 challenger, not an automatically selected production fallback. A supported crop
 name does not imply validated performance in a region or cultivar.
+
+An immutable profile may predate the weather issue; a profile from after the
+issue is rejected without rewriting its historical timestamp.
 
 OSPy requires exact operation dates. `calendars` supplies `field_id`, `crop`,
 `season`, `sowing_date`, `harvest_date`, `source`, `available_at`. The adapter only
@@ -98,6 +103,11 @@ committed before acknowledgement. Cancellation prevents results from being
 published and terminates the execution child; a private evaluation already in
 flight remains independently bounded by its 60-second limit. Deterministic
 model/input errors are terminal; create a new request after fixing the cause.
+
+Per-field candidate generation is bounded. If it enumerates only a prefix, the
+comparison reports `limit_reached`, even when that prefix contains no feasible
+plan; it cannot claim full infeasibility or global optimality. Admissible found
+alternatives remain available with the limitation and coverage evidence.
 
 The version vector includes exact profile/geometry revisions, full weather
 issue/cycle/lead content, rules, crop/cultivar parameters, model identity and

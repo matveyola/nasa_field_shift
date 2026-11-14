@@ -137,8 +137,8 @@ class AquaCropProvider:
             or candidate.field_id != profile.field_id
         ):
             raise ValueError("Candidate/profile scope mismatch")
-        if profile.as_of != weather.as_of:
-            raise ValueError("Profile and weather must share the planning as_of")
+        if profile.as_of > weather.as_of:
+            raise ValueError("Profile as_of was unavailable at the weather issue time")
         traces = []
         for scenario in weather.scenarios:
             found = [t for t in scenario.traces if t.field_snapshot_id == profile.snapshot_id]
