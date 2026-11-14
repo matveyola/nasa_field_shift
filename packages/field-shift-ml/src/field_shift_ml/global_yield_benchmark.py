@@ -164,12 +164,19 @@ def metrics(actual: list[float], predicted: list[float]) -> dict:
         raise ValueError("Metrics require finite predictions and labels")
     error = p - y
     denominator = float(np.sum((y - y.mean()) ** 2))
+    # The mean of identical nonbinary decimals can round away from the value,
+    # producing a tiny positive denominator even though target variance is zero.
+    constant_target = bool(np.all(y == y[0]))
     return dict(
         n=len(y),
         mae=float(np.mean(np.abs(error))),
         rmse=float(np.sqrt(np.mean(error**2))),
         bias=float(np.mean(error)),
-        r2=(float(1 - np.sum(error**2) / denominator) if len(y) >= 2 and denominator > 0 else None),
+        r2=(
+            float(1 - np.sum(error**2) / denominator)
+            if len(y) >= 2 and not constant_target and denominator > 0
+            else None
+        ),
     )
 
 

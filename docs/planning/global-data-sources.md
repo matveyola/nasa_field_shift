@@ -86,7 +86,10 @@ seed 7. Scaling/vectorization fit only training rows. Selection minimizes eligib
 selected member of each model family; **do not pick a different winner using test
 errors**. Reports contain full fit/selection/test membership, each prediction,
 feature/source hashes, bias, MAE, RMSE, R², state/crop results, and physical-site/
-year/crop macro errors. Null R² means insufficient or constant targets.
+year/crop macro errors. Null R² means insufficient or constant targets. A reporting
+correction detects identical decimal targets before variance arithmetic, avoiding
+spurious enormous negative R² from floating-point rounding. The report was
+regenerated with the same frozen protocol, memberships, selected models and predictions.
 
 Temporal 2015 results below use the candidate selected solely on 2013 labels.
 All errors are dry t/ha. Plot rows are not independent weather samples.

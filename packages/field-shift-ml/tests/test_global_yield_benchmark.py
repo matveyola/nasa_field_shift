@@ -58,6 +58,15 @@ def test_metrics_bias_r2_and_site_macro_count():
     assert summary["site_year_crop_macro"]["n_groups"] == 1
 
 
+@pytest.mark.parametrize("target,prediction", [(0.1, 0.2), (3.5941, 5.0), (0.1, 0.1)])
+def test_identical_decimal_targets_have_undefined_r2(target, prediction):
+    result = bench.metrics([target] * 3, [prediction] * 3)
+    assert result["r2"] is None
+    assert result["mae"] == pytest.approx(abs(prediction - target))
+    assert result["rmse"] == pytest.approx(abs(prediction - target))
+    assert result["bias"] == pytest.approx(prediction - target)
+
+
 @pytest.mark.parametrize("candidate", bench.CANDIDATES)
 def test_models_fit_only_explicit_training_membership(candidate):
     rows = panel()
