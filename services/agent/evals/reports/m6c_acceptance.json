@@ -1,0 +1,404 @@
+{
+  "target": "agent app + HTTP adapters (real code) -> CONTRACT STUB in process (synthetic, NOT a teammate service); host backend = reference signer; model = demo scripted model",
+  "integrations": {
+    "geo": {
+      "configured": "http",
+      "connected": true,
+      "service_mode": "stub",
+      "implementation": "fieldshift-contract-stub 0.1",
+      "contract_version": "0.1",
+      "field_profile": true
+    },
+    "simulation": {
+      "configured": "http",
+      "connected": true,
+      "service_mode": "stub",
+      "implementation": "fieldshift-contract-stub 0.1",
+      "contract_version": "0.1",
+      "compare_rotations": true,
+      "scenarios": [
+        "typical"
+      ]
+    },
+    "demo_mode": true,
+    "degraded": false,
+    "live_services": []
+  },
+  "turns": [
+    {
+      "text": "У мене немає поливу. Покажи вологість ґрунту і порівняй дві сівозміни під час посухи.",
+      "field_id": "demo-poltava-01",
+      "request_id": "req_m6c_accept",
+      "latency_ms": 157,
+      "tool_calls": [
+        {
+          "tool": "propose_constraints",
+          "status": "ok"
+        },
+        {
+          "tool": "get_field_facts",
+          "status": "ok"
+        },
+        {
+          "tool": "propose_ui_actions",
+          "status": "ok"
+        },
+        {
+          "tool": "compare_rotations",
+          "status": "error"
+        }
+      ],
+      "warnings": [
+        "fixture_data",
+        "source_unavailable"
+      ],
+      "facts": [
+        {
+          "id": "f_sm_rootzone_2025_07",
+          "kind": "satellite_product",
+          "data_status": "fixture"
+        },
+        {
+          "id": "f_precip_2025_07",
+          "kind": "satellite_product",
+          "data_status": "fixture"
+        },
+        {
+          "id": "f_sm_30m_mean_2025_07",
+          "kind": "ml_estimate",
+          "data_status": "fixture"
+        }
+      ],
+      "constraints_proposed": [],
+      "ui_actions": [
+        {
+          "trigger": "auto",
+          "revision": 3,
+          "type": "map.set_layers",
+          "layer_ids": [
+            "l_smap_rootzone"
+          ],
+          "mode": "replace"
+        }
+      ],
+      "offers": [
+        "Порівняй сівозміни для варіанту: типові умови.",
+        "Ні, не потрібно"
+      ],
+      "answer_excerpt": "Демо-режим (не штучний інтелект): показую лише те, що знайшлося в даних.\n«немає поливу» — це вже підтверджено для поля, нову умову не пропоную.\nДані про воду на вашому полі:\n- Вологість ґрунту біля коренів: **0,21 м³/м³** (супутник NASA SMAP; 01.07–31.07.2025; демо-дані, не справжній вимір)\n- Сума опадів: **38 мм** (супутники NASA GPM; 01.07–31.07.2025; демо-дані, не справжній вимір)\n- Вологість ґрунту біля коренів (детально): **0,19 м³/м³ ± 0,05** (комп’ютерна оцінка, не вимір; точність ще не перевірена; 01.07–31.07.2025; демо-дані, не справжній вимір)\nПропоную показати на карті вологість ґрунту (супутник NASA SMAP).\n\nДля варіанту «посуха (як у 2024)» порівняння сівозмін не розраховано."
+    },
+    {
+      "text": "Порівняй сівозміни для варіанту: типові умови.",
+      "field_id": "demo-poltava-01",
+      "request_id": "req_m6c_accept",
+      "latency_ms": 50,
+      "tool_calls": [
+        {
+          "tool": "compare_rotations",
+          "status": "ok"
+        },
+        {
+          "tool": "propose_ui_actions",
+          "status": "ok"
+        },
+        {
+          "tool": "present_blocks",
+          "status": "ok"
+        }
+      ],
+      "warnings": [
+        "fixture_data"
+      ],
+      "facts": [
+        {
+          "id": "sim.bb758a8572.rot_adaptive.water_risk",
+          "kind": "deterministic_calc",
+          "data_status": "fixture",
+          "scenario": "typical"
+        },
+        {
+          "id": "sim.bb758a8572.rot_adaptive.soil_cover_days",
+          "kind": "deterministic_calc",
+          "data_status": "fixture",
+          "scenario": "typical"
+        },
+        {
+          "id": "sim.bb758a8572.rot_adaptive.n_input",
+          "kind": "deterministic_calc",
+          "data_status": "fixture",
+          "scenario": "typical"
+        },
+        {
+          "id": "sim.bb758a8572.rot_adaptive.yield_risk",
+          "kind": "ml_estimate",
+          "data_status": "fixture",
+          "scenario": "typical"
+        },
+        {
+          "id": "sim.bb758a8572.rot_conventional.water_risk",
+          "kind": "deterministic_calc",
+          "data_status": "fixture",
+          "scenario": "typical"
+        },
+        {
+          "id": "sim.bb758a8572.rot_conventional.soil_cover_days",
+          "kind": "deterministic_calc",
+          "data_status": "fixture",
+          "scenario": "typical"
+        },
+        {
+          "id": "sim.bb758a8572.rot_conventional.n_input",
+          "kind": "deterministic_calc",
+          "data_status": "fixture",
+          "scenario": "typical"
+        },
+        {
+          "id": "sim.bb758a8572.rot_conventional.yield_risk",
+          "kind": "ml_estimate",
+          "data_status": "fixture",
+          "scenario": "typical"
+        }
+      ],
+      "constraints_proposed": [],
+      "ui_actions": [
+        {
+          "trigger": "chip",
+          "revision": 3,
+          "type": "panel.open",
+          "panel": "comparison",
+          "ref_id": "cmp_f87e609e63674159",
+          "scenario": "typical"
+        }
+      ],
+      "offers": [],
+      "answer_excerpt": "Демо-режим (не штучний інтелект). Окрема програма розрахувала сівозміни для варіанту «типові умови». Це розрахунок, а не справжній урожай, і числа поки **вигадані для перевірки**.\n- **Адаптивна сівозміна** (місце 1): озимий горох → сорго → озиме жито з викою (покривна культура) → соя. Ризик нестачі води **22%** (розрахунок сівозміни, варіант «типові умови»; демо-дані, не справжній вимір); ґрунт укритий рослинами **290 днів** (розрахунок сівозміни, варіант «типові умови»; демо-дані, не справжній вимір); азот у розрахунку **70 кг/га** (розрахунок сівозміни, варіант «типові умови»; демо-дані, не справжній вимір); ризик для врожаю **15% (9–23)** (розрахунок сівозміни, варіант «типові умови»; ком"
+    },
+    {
+      "text": "У мене немає поливу. Покажи вологість ґрунту і порівняй дві сівозміни під час посухи.",
+      "field_id": "demo-mykolaiv-01",
+      "request_id": "req_m6c_accept",
+      "latency_ms": 38,
+      "tool_calls": [
+        {
+          "tool": "propose_constraints",
+          "status": "ok"
+        },
+        {
+          "tool": "get_field_facts",
+          "status": "ok"
+        },
+        {
+          "tool": "propose_ui_actions",
+          "status": "ok"
+        },
+        {
+          "tool": "compare_rotations",
+          "status": "error"
+        }
+      ],
+      "warnings": [
+        "fixture_data",
+        "source_unavailable"
+      ],
+      "facts": [
+        {
+          "id": "f_precip_2025_07",
+          "kind": "satellite_product",
+          "data_status": "fixture"
+        }
+      ],
+      "constraints_proposed": [
+        {
+          "id": "k_irrigation_available",
+          "status": "proposed"
+        }
+      ],
+      "ui_actions": [],
+      "offers": [
+        "Порівняй сівозміни для варіанту: типові умови.",
+        "Ні, не потрібно"
+      ],
+      "answer_excerpt": "Демо-режим (не штучний інтелект): показую лише те, що знайшлося в даних.\nПропоную умову за вашими словами «немає поливу». Вона не збережеться, доки ви не підтвердите її в застосунку.\nДані про воду на вашому полі:\n- Сума опадів: **9 мм** (супутники NASA GPM; 01.07–31.07.2025; демо-дані, не справжній вимір)\nКарти вологості для цього поля немає, тому карту не змінюю.\n\nДля варіанту «посуха (як у 2024)» порівняння сівозмін не розраховано."
+    }
+  ],
+  "checks": [
+    {
+      "name": "geo profile via HTTP adapter",
+      "expected": "geo connected, service_mode stub",
+      "observed": "{\"connected\": true, \"service_mode\": \"stub\"}",
+      "outcome": "PASS"
+    },
+    {
+      "name": "turn 1 completes",
+      "expected": "message",
+      "observed": "message",
+      "outcome": "PASS"
+    },
+    {
+      "name": "constraint not duplicated",
+      "expected": "irrigation already confirmed -> no proposal",
+      "observed": "[]",
+      "outcome": "PASS"
+    },
+    {
+      "name": "water facts keep provenance",
+      "expected": "satellite product + ML estimate, both labelled demo; ML not an observation",
+      "observed": "[[\"ml_estimate\", \"fixture\"], [\"satellite_product\", \"fixture\"]]",
+      "outcome": "PASS"
+    },
+    {
+      "name": "drought refused, nothing else run",
+      "expected": "one compare_rotations (error); no simulation values; no panel chip",
+      "observed": "calls=[{\"tool\": \"compare_rotations\", \"status\": \"error\"}], sim facts=0",
+      "outcome": "PASS"
+    },
+    {
+      "name": "unavailable scenario explained",
+      "expected": "answer names the drought scenario as not computed",
+      "observed": "said",
+      "outcome": "PASS"
+    },
+    {
+      "name": "alternative offered, not run",
+      "expected": "server offers «Порівняй сівозміни для варіанту: типові умови.» as a reply button",
+      "observed": "[\"Порівняй сівозміни для варіанту: типові умови.\", \"Ні, не потрібно\"]",
+      "outcome": "PASS"
+    },
+    {
+      "name": "safe map action",
+      "expected": "SMAP layer, auto, revision 3",
+      "observed": "[{\"trigger\": \"auto\", \"revision\": 3, \"type\": \"map.set_layers\", \"layer_ids\": [\"l_smap_rootzone\"], \"mode\": \"replace\"}]",
+      "outcome": "PASS"
+    },
+    {
+      "name": "no live claim",
+      "expected": "no live / real-time wording",
+      "observed": "clean",
+      "outcome": "PASS"
+    },
+    {
+      "name": "chosen scenario runs",
+      "expected": "typical comparison computed; every value scenario=typical",
+      "observed": "scenarios=['typical']",
+      "outcome": "PASS"
+    },
+    {
+      "name": "panel action names its scenario",
+      "expected": "panel.open chip with ref_id and scenario typical",
+      "observed": "[{\"trigger\": \"chip\", \"revision\": 3, \"type\": \"panel.open\", \"panel\": \"comparison\", \"ref_id\": \"cmp_f87e609e63674159\", \"scenario\": \"typical\"}]",
+      "outcome": "PASS"
+    },
+    {
+      "name": "synthetic labelled",
+      "expected": "fixture values, fixture_data warning, 'вигадані для перевірки' in text",
+      "observed": "warnings=['fixture_data']",
+      "outcome": "PASS"
+    },
+    {
+      "name": "no drought wording next to typical values",
+      "expected": "answer of turn 2 never names drought",
+      "observed": "clean",
+      "outcome": "PASS"
+    },
+    {
+      "name": "constraint proposed, not saved",
+      "expected": "k_irrigation_available proposed (status proposed)",
+      "observed": "[{\"id\": \"k_irrigation_available\", \"status\": \"proposed\"}]",
+      "outcome": "PASS"
+    },
+    {
+      "name": "no map action without a layer",
+      "expected": "no map.set_layers; text says the map is unchanged",
+      "observed": "[]",
+      "outcome": "PASS"
+    },
+    {
+      "name": "no host attestation (direct client)",
+      "expected": "HTTP 403 (only accepts requests signed)",
+      "observed": "HTTP 403: This service only accepts requests signed by the host backend.",
+      "outcome": "PASS"
+    },
+    {
+      "name": "attestation for another field (unauthorized field)",
+      "expected": "HTTP 403 (field_mismatch)",
+      "observed": "HTTP 403: Context attestation refused: field_mismatch.",
+      "outcome": "PASS"
+    },
+    {
+      "name": "mismatched field revision",
+      "expected": "HTTP 403 (revision_mismatch)",
+      "observed": "HTTP 403: Context attestation refused: revision_mismatch.",
+      "outcome": "PASS"
+    },
+    {
+      "name": "expired attestation (replay)",
+      "expected": "HTTP 403 (expired)",
+      "observed": "HTTP 403: Context attestation refused: expired.",
+      "outcome": "PASS"
+    },
+    {
+      "name": "invalid comparison id",
+      "expected": "panel.open with an invented id is dropped",
+      "observed": "ui_actions=0",
+      "outcome": "PASS"
+    },
+    {
+      "name": "late result after field switch",
+      "expected": "the Poltava result cannot be opened in a Mykolaiv turn",
+      "observed": "ui_actions=0",
+      "outcome": "PASS"
+    },
+    {
+      "name": "model substitutes typical for drought",
+      "expected": "refused (scenario_not_requested): no simulation values",
+      "observed": "sim facts=0",
+      "outcome": "PASS"
+    },
+    {
+      "name": "simulation service unavailable",
+      "expected": "turn completes, no simulation values, no comparison panel",
+      "observed": "sim facts=0, panel actions=0",
+      "outcome": "PASS"
+    },
+    {
+      "name": "expired simulation result",
+      "expected": "turn completes, no simulation values, no comparison panel",
+      "observed": "sim facts=0, panel actions=0",
+      "outcome": "PASS"
+    },
+    {
+      "name": "provider returns another scenario",
+      "expected": "turn completes, no simulation values, no comparison panel",
+      "observed": "sim facts=0, panel actions=0",
+      "outcome": "PASS"
+    }
+  ],
+  "compatibility": {
+    "agent_api": {
+      "verified_locally": true,
+      "evidence": "this run (signed SSE turns) + pytest"
+    },
+    "geo_provider": {
+      "verified_against_contract_stub": true,
+      "verified_against_teammate_service": false,
+      "blocked": "no_service"
+    },
+    "simulation_provider": {
+      "verified_against_contract_stub": true,
+      "verified_against_teammate_service": false,
+      "blocked": "no_service"
+    },
+    "host_action_adapter": {
+      "verified_locally": "demo host only (Playwright e2e)",
+      "verified_against_teammate_service": false,
+      "blocked": "no_service (real host app)"
+    },
+    "anthropic_provider": {
+      "verified_live": false,
+      "blocked": "no_credentials"
+    },
+    "fao_rag": {
+      "verified_locally": "not tested in this run (evals.run covers the lexical index)"
+    }
+  }
+}

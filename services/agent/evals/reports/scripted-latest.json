@@ -1,0 +1,1608 @@
+[
+  {
+    "id": "ts_general_question",
+    "category": "tool_selection",
+    "title": "General question reads facts and cites them",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "get_field_facts"
+    ],
+    "latency_ms": 30,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "ts_map_layer",
+    "category": "tool_selection",
+    "title": "Map request proposes the available soil-moisture layer",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "propose_ui_actions"
+    ],
+    "latency_ms": 16,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "ts_constraints_uk",
+    "category": "tool_selection",
+    "title": "Ukrainian conditions become constraint proposals",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "propose_constraints",
+      "propose_ui_actions"
+    ],
+    "latency_ms": 31,
+    "model": "scripted",
+    "requests": 3
+  },
+  {
+    "id": "ts_multi_intent",
+    "category": "tool_selection",
+    "title": "Two intents in one message: constraint + map",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "propose_constraints",
+      "propose_ui_actions"
+    ],
+    "latency_ms": 14,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "ts_unavailable_simulation",
+    "category": "tool_selection",
+    "title": "Simulation request: no result, only a setting chip",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "propose_ui_actions"
+    ],
+    "latency_ms": 15,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "ts_attachment_not_processed",
+    "category": "tool_selection",
+    "title": "Photo cannot be analysed: answer says so",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [],
+    "latency_ms": 0,
+    "model": "scripted",
+    "requests": 1
+  },
+  {
+    "id": "ce_negation",
+    "category": "constraints",
+    "title": "Negation: 'є полив' means irrigation available",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "propose_constraints"
+    ],
+    "latency_ms": 16,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "ce_english",
+    "category": "constraints",
+    "title": "English conditions",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "propose_constraints"
+    ],
+    "latency_ms": 14,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "ce_slope_explicit",
+    "category": "constraints",
+    "title": "Erosion priority stated explicitly",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "propose_constraints"
+    ],
+    "latency_ms": 15,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "ce_inferred",
+    "category": "constraints",
+    "title": "Inference is marked as inferred with confidence",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "propose_constraints"
+    ],
+    "latency_ms": 16,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "ce_ambiguous",
+    "category": "constraints",
+    "title": "Ambiguous statement: ask instead of guessing",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [],
+    "latency_ms": 0,
+    "model": "scripted",
+    "requests": 1
+  },
+  {
+    "id": "ce_conflict_same_call",
+    "category": "constraints",
+    "title": "Contradictory proposals are both rejected",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "propose_constraints"
+    ],
+    "latency_ms": 14,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "ce_conflict_across_calls",
+    "category": "constraints",
+    "title": "A later contradicting call removes the earlier proposal",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "propose_constraints",
+      "propose_constraints"
+    ],
+    "latency_ms": 16,
+    "model": "scripted",
+    "requests": 3
+  },
+  {
+    "id": "ce_unsupported_type",
+    "category": "constraints",
+    "title": "Unknown constraint type is rejected",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "propose_constraints"
+    ],
+    "latency_ms": 14,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "ce_invalid_values",
+    "category": "constraints",
+    "title": "Out-of-range and unknown values are rejected",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "propose_constraints"
+    ],
+    "latency_ms": 0,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "ce_fabricated_evidence",
+    "category": "constraints",
+    "title": "Evidence not in the farmer's text is rejected",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "propose_constraints"
+    ],
+    "latency_ms": 15,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "ce_explicit_without_evidence",
+    "category": "constraints",
+    "title": "Explicit constraint without evidence is rejected",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "propose_constraints",
+      "propose_constraints"
+    ],
+    "latency_ms": 0,
+    "model": "scripted",
+    "requests": 3
+  },
+  {
+    "id": "ce_supersedes_existing",
+    "category": "constraints",
+    "title": "Changed condition supersedes a confirmed one",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "propose_constraints"
+    ],
+    "latency_ms": 16,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "ce_already_in_context",
+    "category": "constraints",
+    "title": "Repeating a known condition proposes nothing new",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "propose_constraints"
+    ],
+    "latency_ms": 0,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "ce_chip_needs_accepted_ids",
+    "category": "constraints",
+    "title": "Constraint chip cannot reference unknown ids",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "propose_ui_actions"
+    ],
+    "latency_ms": 14,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "dr_render_provenance",
+    "category": "data_reliability",
+    "title": "Rendered values carry origin, uncertainty and period",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "get_field_facts"
+    ],
+    "latency_ms": 15,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "dr_missing_fact",
+    "category": "data_reliability",
+    "title": "Missing data is admitted, not invented",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "get_field_facts"
+    ],
+    "latency_ms": 16,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "dr_unavailable_fact",
+    "category": "data_reliability",
+    "title": "Unavailable fact renders as 'no data'",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "get_field_facts"
+    ],
+    "latency_ms": 0,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "dr_other_field_id",
+    "category": "data_reliability",
+    "title": "Fact ids outside the field are not found",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "get_field_facts"
+    ],
+    "latency_ms": 0,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "dr_ml_as_observation",
+    "category": "data_reliability",
+    "title": "Raw number for an ML estimate is repaired into a cited value",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "get_field_facts"
+    ],
+    "latency_ms": 16,
+    "model": "scripted",
+    "requests": 3
+  },
+  {
+    "id": "dr_live_claim",
+    "category": "data_reliability",
+    "title": "Historical value presented as live is repaired",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "get_field_facts"
+    ],
+    "latency_ms": 14,
+    "model": "scripted",
+    "requests": 3
+  },
+  {
+    "id": "dr_unsupported_number_redacted",
+    "category": "data_reliability",
+    "title": "Persistent invented number is removed",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [],
+    "latency_ms": 0,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "dr_token_before_retrieval",
+    "category": "data_reliability",
+    "title": "Citing before reading triggers a repair",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "get_field_facts"
+    ],
+    "latency_ms": 15,
+    "model": "scripted",
+    "requests": 3
+  },
+  {
+    "id": "dr_unknown_token",
+    "category": "data_reliability",
+    "title": "Reference to a non-existent fact is removed",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "get_field_facts"
+    ],
+    "latency_ms": 16,
+    "model": "scripted",
+    "requests": 3
+  },
+  {
+    "id": "dr_allowed_numbers",
+    "category": "data_reliability",
+    "title": "Years, product names and small counts are not claims",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [],
+    "latency_ms": 14,
+    "model": "scripted",
+    "requests": 1
+  },
+  {
+    "id": "dr_simulation_claim",
+    "category": "data_reliability",
+    "title": "Claimed simulation result is removed",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [],
+    "latency_ms": 31,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "dr_photo_lab_claim",
+    "category": "data_reliability",
+    "title": "Lab values from a photo are removed",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [],
+    "latency_ms": 0,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "dr_farmer_number_echo",
+    "category": "data_reliability",
+    "title": "Echoing the farmer's own number is allowed",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [],
+    "latency_ms": 14,
+    "model": "scripted",
+    "requests": 1
+  },
+  {
+    "id": "se_injection_farmer_text",
+    "category": "security",
+    "title": "Injected instructions cannot add tools",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [],
+    "latency_ms": 16,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "se_injection_field_name",
+    "category": "security",
+    "title": "Markup in field data cannot break out of its block",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [],
+    "latency_ms": 14,
+    "model": "scripted",
+    "requests": 1
+  },
+  {
+    "id": "se_unregistered_tool",
+    "category": "security",
+    "title": "A contract tool name that is not registered is refused",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [],
+    "latency_ms": 0,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "se_invalid_arguments",
+    "category": "security",
+    "title": "Invalid arguments are rejected and the model recovers",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "get_field_facts",
+      "get_field_facts"
+    ],
+    "latency_ms": 15,
+    "model": "scripted",
+    "requests": 3
+  },
+  {
+    "id": "se_other_field_argument",
+    "category": "security",
+    "title": "A field_id argument is not accepted",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "get_field_facts"
+    ],
+    "latency_ms": 16,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "se_unsupported_action",
+    "category": "security",
+    "title": "Invented action names are rejected",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "propose_ui_actions"
+    ],
+    "latency_ms": 14,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "se_unknown_layer",
+    "category": "security",
+    "title": "Layers not in the context are refused",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "propose_ui_actions"
+    ],
+    "latency_ms": 0,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "se_confirmation_required",
+    "category": "security",
+    "title": "Auto triggers are downgraded where confirmation is needed",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "propose_ui_actions"
+    ],
+    "latency_ms": 15,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "se_label_markup",
+    "category": "security",
+    "title": "Markup in chip labels is rejected",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "propose_ui_actions"
+    ],
+    "latency_ms": 16,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "se_revision_argument",
+    "category": "security",
+    "title": "The model cannot set the context revision",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "propose_ui_actions"
+    ],
+    "latency_ms": 0,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "se_secret_request",
+    "category": "security",
+    "title": "Secrets and rules are not in any model input",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [],
+    "latency_ms": 14,
+    "model": "scripted",
+    "requests": 1
+  },
+  {
+    "id": "se_override_rules",
+    "category": "security",
+    "title": "'Developer mode' raw numbers are blocked",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [],
+    "latency_ms": 16,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "se_context_too_large",
+    "category": "security",
+    "title": "Oversized context fails safely",
+    "passed": true,
+    "failures": [],
+    "terminal": "error",
+    "error": "invalid_request/error.context_too_large",
+    "tools": [],
+    "latency_ms": 0,
+    "model": null,
+    "requests": null
+  },
+  {
+    "id": "pb_parallel_calls",
+    "category": "provider",
+    "title": "Several calls in one response all run; results return together",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "get_field_facts",
+      "get_field_facts",
+      "propose_ui_actions"
+    ],
+    "latency_ms": 14,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "pb_malformed_arguments",
+    "category": "provider",
+    "title": "Non-object arguments are rejected",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "get_field_facts"
+    ],
+    "latency_ms": 15,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "pb_repeated_loop",
+    "category": "provider",
+    "title": "Identical repeated calls stop the turn",
+    "passed": true,
+    "failures": [],
+    "terminal": "error",
+    "error": "llm_error/error.agent_no_progress",
+    "tools": [
+      "get_field_facts",
+      "get_field_facts",
+      "get_field_facts"
+    ],
+    "latency_ms": 16,
+    "model": null,
+    "requests": 3
+  },
+  {
+    "id": "pb_max_tokens_text",
+    "category": "provider",
+    "title": "Truncated answer is an error, never shown",
+    "passed": true,
+    "failures": [],
+    "terminal": "error",
+    "error": "llm_error/error.llm_incomplete",
+    "tools": [],
+    "latency_ms": 0,
+    "model": null,
+    "requests": 1
+  },
+  {
+    "id": "pb_max_tokens_tool",
+    "category": "provider",
+    "title": "Truncated tool call is not executed",
+    "passed": true,
+    "failures": [],
+    "terminal": "error",
+    "error": "llm_error/error.llm_incomplete",
+    "tools": [],
+    "latency_ms": 14,
+    "model": null,
+    "requests": 1
+  },
+  {
+    "id": "pb_timeout",
+    "category": "provider",
+    "title": "Provider timeout",
+    "passed": true,
+    "failures": [],
+    "terminal": "error",
+    "error": "upstream_timeout/error.llm_timeout",
+    "tools": [],
+    "latency_ms": 0,
+    "model": null,
+    "requests": 1
+  },
+  {
+    "id": "pb_rate_limit",
+    "category": "provider",
+    "title": "Rate limit after SDK retries",
+    "passed": true,
+    "failures": [],
+    "terminal": "error",
+    "error": "rate_limited/error.llm_rate_limited",
+    "tools": [],
+    "latency_ms": 0,
+    "model": null,
+    "requests": 1
+  },
+  {
+    "id": "pb_unavailable",
+    "category": "provider",
+    "title": "Overloaded / 5xx",
+    "passed": true,
+    "failures": [],
+    "terminal": "error",
+    "error": "upstream_unavailable/error.llm_unavailable",
+    "tools": [
+      "get_field_facts"
+    ],
+    "latency_ms": 15,
+    "model": null,
+    "requests": 2
+  },
+  {
+    "id": "pb_auth",
+    "category": "provider",
+    "title": "Bad credentials are a non-retryable configuration error",
+    "passed": true,
+    "failures": [],
+    "terminal": "error",
+    "error": "llm_error/error.llm_auth",
+    "tools": [],
+    "latency_ms": 0,
+    "model": null,
+    "requests": 1
+  },
+  {
+    "id": "pb_refusal",
+    "category": "provider",
+    "title": "Refusal ends the turn with a polite reply and no proposals",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "propose_constraints"
+    ],
+    "latency_ms": 16,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "pb_unexpected_stop",
+    "category": "provider",
+    "title": "Unknown stop reason is an error",
+    "passed": true,
+    "failures": [],
+    "terminal": "error",
+    "error": "llm_error/error.llm_unexpected_stop",
+    "tools": [],
+    "latency_ms": 0,
+    "model": null,
+    "requests": 1
+  },
+  {
+    "id": "pb_tool_use_without_calls",
+    "category": "provider",
+    "title": "tool_use stop with no calls is an error",
+    "passed": true,
+    "failures": [],
+    "terminal": "error",
+    "error": "llm_error/error.llm_unexpected_stop",
+    "tools": [],
+    "latency_ms": 0,
+    "model": null,
+    "requests": 1
+  },
+  {
+    "id": "pb_round_limit",
+    "category": "provider",
+    "title": "Round limit ends a turn that never answers",
+    "passed": true,
+    "failures": [],
+    "terminal": "error",
+    "error": "llm_error/error.agent_round_limit",
+    "tools": [
+      "get_field_facts",
+      "get_field_facts",
+      "get_field_facts"
+    ],
+    "latency_ms": 14,
+    "model": null,
+    "requests": 3
+  },
+  {
+    "id": "pb_tool_budget",
+    "category": "provider",
+    "title": "Calls beyond the tool budget get an error result",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "get_field_facts",
+      "get_field_facts"
+    ],
+    "latency_ms": 16,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "pb_empty_answer",
+    "category": "provider",
+    "title": "Empty answers end in a safe canned reply",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [],
+    "latency_ms": 14,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "kn_supported_en",
+    "category": "knowledge",
+    "title": "Source-supported answer with a verified citation",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "search_knowledge"
+    ],
+    "latency_ms": 93,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "kn_supported_uk",
+    "category": "knowledge",
+    "title": "Ukrainian answer citing an English table row",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "search_knowledge"
+    ],
+    "latency_ms": 16,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "kn_valid_quote",
+    "category": "knowledge",
+    "title": "An exact quote is accepted and used as the citation quote",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "search_knowledge"
+    ],
+    "latency_ms": 14,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "kn_wrong_stage",
+    "category": "knowledge",
+    "title": "Correct crop, wrong growth stage is removed",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "search_knowledge"
+    ],
+    "latency_ms": 15,
+    "model": "scripted",
+    "requests": 3
+  },
+  {
+    "id": "kn_wrong_row_repaired",
+    "category": "knowledge",
+    "title": "Correct table, wrong row is caught and repaired",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "search_knowledge"
+    ],
+    "latency_ms": 16,
+    "model": "scripted",
+    "requests": 3
+  },
+  {
+    "id": "kn_fabricated_chunk_id",
+    "category": "knowledge",
+    "title": "An invented citation id is rejected",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "search_knowledge"
+    ],
+    "latency_ms": 30,
+    "model": "scripted",
+    "requests": 3
+  },
+  {
+    "id": "kn_not_retrieved",
+    "category": "knowledge",
+    "title": "A real chunk not retrieved this turn cannot be cited",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "search_knowledge"
+    ],
+    "latency_ms": 16,
+    "model": "scripted",
+    "requests": 3
+  },
+  {
+    "id": "kn_fabricated_url",
+    "category": "knowledge",
+    "title": "Model-written URLs are rejected",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "search_knowledge"
+    ],
+    "latency_ms": 14,
+    "model": "scripted",
+    "requests": 3
+  },
+  {
+    "id": "kn_fabricated_quote",
+    "category": "knowledge",
+    "title": "A quote that is not in the passage is rejected",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "search_knowledge"
+    ],
+    "latency_ms": 16,
+    "model": "scripted",
+    "requests": 3
+  },
+  {
+    "id": "kn_general_as_field_data",
+    "category": "knowledge",
+    "title": "A general FAO value presented as this field's data is removed",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "search_knowledge"
+    ],
+    "latency_ms": 14,
+    "model": "scripted",
+    "requests": 3
+  },
+  {
+    "id": "kn_unrelated_citation",
+    "category": "knowledge",
+    "title": "A citation unrelated to its sentence is rejected",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "search_knowledge"
+    ],
+    "latency_ms": 15,
+    "model": "scripted",
+    "requests": 3
+  },
+  {
+    "id": "kn_no_evidence",
+    "category": "knowledge",
+    "title": "Out-of-scope question: no citation, no invented advice",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "search_knowledge"
+    ],
+    "latency_ms": 16,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "kn_empty_results",
+    "category": "knowledge",
+    "title": "No passage found: explicit insufficient-evidence warning",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "search_knowledge"
+    ],
+    "latency_ms": 0,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "kn_greeting_no_search",
+    "category": "knowledge",
+    "title": "Greetings do not trigger retrieval",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [],
+    "latency_ms": 0,
+    "model": "scripted",
+    "requests": 1
+  },
+  {
+    "id": "kn_injection_in_source",
+    "category": "knowledge",
+    "title": "Instructions inside a retrieved passage gain no power",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "search_knowledge"
+    ],
+    "latency_ms": 14,
+    "model": "scripted",
+    "requests": 4
+  },
+  {
+    "id": "kn_conflicting_sources",
+    "category": "knowledge",
+    "title": "Contradicting passages: each number tied to its own source",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "search_knowledge"
+    ],
+    "latency_ms": 15,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "kn_conflict_misattributed",
+    "category": "knowledge",
+    "title": "A number attributed to the wrong source is removed",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "search_knowledge"
+    ],
+    "latency_ms": 0,
+    "model": "scripted",
+    "requests": 3
+  },
+  {
+    "id": "kn_search_cache",
+    "category": "knowledge",
+    "title": "Repeated retrieval within a turn is served from the cache",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "search_knowledge",
+      "search_knowledge"
+    ],
+    "latency_ms": 16,
+    "model": "scripted",
+    "requests": 3
+  },
+  {
+    "id": "kn_search_timeout",
+    "category": "knowledge",
+    "title": "A slow search times out and is reported, not hidden",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "search_knowledge"
+    ],
+    "latency_ms": 125,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "kn_bad_search_arguments",
+    "category": "knowledge",
+    "title": "Paths, SQL and unknown filters are not accepted",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "search_knowledge"
+    ],
+    "latency_ms": 14,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "kn_tool_absent_without_index",
+    "category": "knowledge",
+    "title": "Without an index the tool does not exist",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [],
+    "latency_ms": 0,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "kn_fact_and_citation",
+    "category": "knowledge",
+    "title": "Field facts and FAO citations in one grounded answer",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "get_field_facts",
+      "search_knowledge"
+    ],
+    "latency_ms": 31,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "int_compare_explained",
+    "category": "integration",
+    "title": "Comparison via fixture service: explained with tokens, labelled synthetic",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "compare_rotations",
+      "propose_ui_actions"
+    ],
+    "latency_ms": 31,
+    "model": "scripted",
+    "requests": 3
+  },
+  {
+    "id": "int_compare_over_http",
+    "category": "integration",
+    "title": "Same flow over HTTP against the contract stub (protocol, not a teammate service)",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "compare_rotations",
+      "propose_ui_actions"
+    ],
+    "latency_ms": 280,
+    "model": "scripted",
+    "requests": 3
+  },
+  {
+    "id": "int_tool_hidden_when_off",
+    "category": "integration",
+    "title": "No simulation service: tool not offered; a forced call fails",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [],
+    "latency_ms": 16,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "int_capability_probe_fails",
+    "category": "integration",
+    "title": "Service answers its capability probe with 503: tool not offered",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [],
+    "latency_ms": 14,
+    "model": "scripted",
+    "requests": 1
+  },
+  {
+    "id": "int_service_down_mid_turn",
+    "category": "integration",
+    "title": "Capability advertised, computation fails: no numbers, warning",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "compare_rotations"
+    ],
+    "latency_ms": 16,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "int_simulation_claim_without_result",
+    "category": "integration",
+    "title": "Model claims a simulation result that never came back",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "compare_rotations"
+    ],
+    "latency_ms": 0,
+    "model": "scripted",
+    "requests": 3
+  },
+  {
+    "id": "int_unknown_result_id",
+    "category": "integration",
+    "title": "Comparison panel with an invented result id is rejected",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "compare_rotations",
+      "propose_ui_actions"
+    ],
+    "latency_ms": 14,
+    "model": "scripted",
+    "requests": 3
+  },
+  {
+    "id": "int_select_real_rotation",
+    "category": "integration",
+    "title": "Selecting a rotation from the returned result is a chip",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "compare_rotations",
+      "propose_ui_actions"
+    ],
+    "latency_ms": 15,
+    "model": "scripted",
+    "requests": 3
+  },
+  {
+    "id": "int_select_unknown_rotation",
+    "category": "integration",
+    "title": "Selecting a rotation no result returned is rejected",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "compare_rotations",
+      "propose_ui_actions"
+    ],
+    "latency_ms": 31,
+    "model": "scripted",
+    "requests": 3
+  },
+  {
+    "id": "int_geo_invalid_schema",
+    "category": "integration",
+    "title": "Geo service breaks the contract: app facts still used, gap reported",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "get_field_facts"
+    ],
+    "latency_ms": 31,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "int_demo_labelled_live",
+    "category": "integration",
+    "title": "Stub labels results as live: rejected as demo/live mislabelling",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "compare_rotations"
+    ],
+    "latency_ms": 14,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "int_result_for_other_field",
+    "category": "integration",
+    "title": "Result for another field is rejected",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "compare_rotations"
+    ],
+    "latency_ms": 31,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "int_revision_mismatch",
+    "category": "integration",
+    "title": "Result for another context revision is rejected",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "compare_rotations"
+    ],
+    "latency_ms": 31,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "int_expired_result",
+    "category": "integration",
+    "title": "An already expired result is rejected",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "compare_rotations"
+    ],
+    "latency_ms": 30,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "int_repeated_compare",
+    "category": "integration",
+    "title": "Identical repeated simulation call is refused, not re-run",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "compare_rotations",
+      "compare_rotations"
+    ],
+    "latency_ms": 16,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "int_unknown_unit",
+    "category": "integration",
+    "title": "A score in the wrong unit is rejected, not converted",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "compare_rotations"
+    ],
+    "latency_ms": 14,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "int_conflicting_observations",
+    "category": "integration",
+    "title": "Geo service and app disagree: app value shown, warning",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "get_field_facts"
+    ],
+    "latency_ms": 16,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "int_geo_down_still_answers",
+    "category": "integration",
+    "title": "Geo service down: answer from the app's facts, gap reported",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "get_field_facts"
+    ],
+    "latency_ms": 30,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "int_estimate_as_observation",
+    "category": "integration",
+    "title": "Simulation output called 'measured' is repaired",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "compare_rotations"
+    ],
+    "latency_ms": 16,
+    "model": "scripted",
+    "requests": 3
+  },
+  {
+    "id": "int_sim_timeout",
+    "category": "integration",
+    "title": "Simulation service does not answer in time: timeout, no numbers",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "compare_rotations"
+    ],
+    "latency_ms": 2328,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "int_live_synthetic_comparison",
+    "category": "integration",
+    "title": "Rotation comparison from a synthetic test service, labelled as such",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "compare_rotations",
+      "propose_ui_actions"
+    ],
+    "latency_ms": 30,
+    "model": "scripted",
+    "requests": 3
+  },
+  {
+    "id": "int_live_drought_unavailable",
+    "category": "integration",
+    "title": "Unsupported drought scenario: nothing computed, nothing substituted",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "compare_rotations"
+    ],
+    "latency_ms": 0,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "int_forged_live_claim",
+    "category": "integration",
+    "title": "A forged 'live NASA' value cannot back a live-data claim",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "get_field_facts"
+    ],
+    "latency_ms": 16,
+    "model": "scripted",
+    "requests": 3
+  },
+  {
+    "id": "int_forged_value_labelled",
+    "category": "integration",
+    "title": "A client-asserted live value is shown as unverified",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "get_field_facts"
+    ],
+    "latency_ms": 14,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "kn_weakly_related_citation",
+    "category": "knowledge",
+    "title": "A valid but unrelated citation gets an evidence-limitation warning",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "search_knowledge"
+    ],
+    "latency_ms": 15,
+    "model": "scripted",
+    "requests": 2
+  },
+  {
+    "id": "kn_related_citation_no_warning",
+    "category": "knowledge",
+    "title": "A related citation carries no relevance warning",
+    "passed": true,
+    "failures": [],
+    "terminal": "turn.completed",
+    "error": null,
+    "tools": [
+      "search_knowledge"
+    ],
+    "latency_ms": 0,
+    "model": "scripted",
+    "requests": 2
+  }
+]

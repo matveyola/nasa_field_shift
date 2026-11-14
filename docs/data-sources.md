@@ -1,0 +1,26 @@
+# Field Shift data sources
+
+| Input | Source | Use |
+| --- | --- | --- |
+| U.S. aerial imagery | [USGS The National Map imagery service](https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer), primarily USDA NAIP in the contiguous U.S. | Leaflet basemap. The local fallback for the demonstration area is an actual georeferenced crop from the USGS service. |
+| Streets | [OpenStreetMap](https://www.openstreetmap.org/copyright) | Alternate interactive basemap with visible attribution. |
+| Field boundaries | Three manually traced agricultural outlines near Bondurant, Iowa | Georeferenced GeoJSON demonstration boundaries. Farm and crop names are examples. New boundaries come from user-drawn map coordinates. |
+| Historical rain, reference evapotranspiration, and antecedent soil moisture | [Copernicus ERA5](https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels) via the [Open-Meteo historical archive](https://open-meteo.com/en/docs/historical-weather-api) | Daily rainfall and ET₀ drive the root-zone balance. Previous-day reanalysis moisture by depth initializes the balance unless a starting reserve is supplied. The weather grid is 0.25°. |
+| Surface soil moisture | [Copernicus ERA5-Land](https://doi.org/10.24381/cds.e2161bac) via the Open-Meteo archive | Daily mean of 24 hourly values for the top 0–7 cm. Stored with the date, units, grid center, requested coordinates, and 0.1° grid footprint. |
+| Five-day moisture forecast | [ECMWF IFS HRES](https://open-meteo.com/en/docs/single-runs-api) | The previous day's 00 UTC initialization, leads 1–5, about 9 km. Provides the top 0–7 cm moisture, precipitation, and reference ET₀. |
+| Five-day root-zone water forecast | [ECMWF IFS HRES](https://open-meteo.com/en/docs/single-runs-api) and [FAO-56](https://www.fao.org/4/X0490E/x0490e0e.htm) | Initialization-day moisture in three depth layers supplies the opening reserve. The FAO-56 balance uses five days of predicted liquid rain and reference ET₀. |
+| Root-zone model measurements | [USDA SCAN](https://www.nrcs.usda.gov/resources/data-and-reports/soil-climate-analysis-network) | Integrates concurrent soil probe measurements to 1 m. The independent farm-site comparison uses a common reference loam and maize parameterization. |
+| Rotation grain yield | [USDA Sustainable Corn CAP](https://doi.org/10.15482/USDA.ADC/1411953) | Pairs measured maize yields against continuous maize under comparable site, year and management conditions. |
+| Soil survey properties | [USDA SSURGO](https://www.nrcs.usda.gov/resources/data-and-reports/soil-survey-geographic-database-ssurgo) | The dominant component and horizon containing 5 cm at the sampled point. Used with ERA5-Land and sensor observations for the v2 archive correction. |
+| Dated optical imagery | [Sentinel-2 L2A](satellite-imagery.md) | True-color scene cropped to the field area, with acquisition date and tile cloud metadata. |
+| Sensor-trained surface soil moisture | [NOAA USCRN and USDA SCAN](moisture-observations.md), with ERA5-Land predictors | Daily modeled volumetric water content at approximately 5 cm. The model retains the 0.1° input footprint and publishes its version and prediction interval. |
+| Crop coefficients and water stress method | [FAO-56 crop coefficients](https://www.fao.org/4/x0490e/x0490e0b.htm) and [root-zone balance](https://www.fao.org/4/X0490E/x0490e0e.htm) | Parameterized calculation for maize, soybean, and wheat. The prototype assumes loam field capacity and wilting point, fixed crop rooting depths and mid-season coefficients. The job preserves these assumptions and the selected weather. |
+| Crop sequence, irrigation and flowering interval | Field and planning records plus optional simulation inputs | The Year 1 rotation comparison replays one historical weather period for both crops. Flowering-specific metrics require a supplied flowering interval. |
+
+The archive provides reanalysis estimates at a regional scale. The aerial image describes visible terrain at a different scale. A field polygon selects the regional moisture grid cell, and the application keeps the full grid footprint. Neither the image nor its visible land cover determines the moisture estimate.
+
+Water results include the daily original and scenario-adjusted rainfall, ET₀, modeled reserve and losses, and the model’s provenance. A drier scenario changes rain by a documented multiplier. It represents a hypothetical change to a historical period. The Year 1 comparison uses identical archive weather, soil assumptions and irrigation for both plans. Crop-specific root depth can produce different initial reserve in millimeters for the same antecedent moisture profile.
+
+The Water and Fields tools retain explicitly labeled demo modes. Fields separates the trained estimate, raw regional ERA5-Land moisture, and demo layers. Water uses the physical FAO-56 calculation. Field-specific calibration would require local soil characteristics, planting dates, management records, and measured moisture or water-balance observations.
+
+The free Open-Meteo endpoint is for non-commercial use under the [provider terms](https://open-meteo.com/en/terms). An optional `OPEN_METEO_API_KEY` selects the official customer archive endpoint. No archive credential is sent to the browser.

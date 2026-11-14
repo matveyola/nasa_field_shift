@@ -1,0 +1,169 @@
+{
+  "target": "agent app + HTTP adapters (real code) -> CONTRACT STUB in process (synthetic, NOT a teammate service); host backend = reference signer; model = fixed script",
+  "request_id": "req_m6b_accept",
+  "latency_ms": 171,
+  "integrations": {
+    "geo": {
+      "configured": "http",
+      "connected": true,
+      "service_mode": "stub",
+      "implementation": "fieldshift-contract-stub 0.1",
+      "contract_version": "0.1",
+      "field_profile": true
+    },
+    "simulation": {
+      "configured": "http",
+      "connected": true,
+      "service_mode": "stub",
+      "implementation": "fieldshift-contract-stub 0.1",
+      "contract_version": "0.1",
+      "compare_rotations": true,
+      "scenarios": [
+        "typical"
+      ]
+    },
+    "demo_mode": true,
+    "degraded": false,
+    "live_services": []
+  },
+  "tool_calls": [
+    {
+      "tool": "propose_constraints",
+      "status": "ok"
+    },
+    {
+      "tool": "get_field_facts",
+      "status": "ok"
+    },
+    {
+      "tool": "propose_ui_actions",
+      "status": "ok"
+    },
+    {
+      "tool": "compare_rotations",
+      "status": "error"
+    },
+    {
+      "tool": "compare_rotations",
+      "status": "error"
+    }
+  ],
+  "warnings": [
+    "fixture_data",
+    "source_unavailable"
+  ],
+  "facts": [
+    {
+      "id": "f_sm_rootzone_2025_07",
+      "kind": "satellite_product",
+      "data_status": "fixture"
+    }
+  ],
+  "constraints_proposed": [],
+  "ui_actions": [
+    {
+      "type": "map.set_layers",
+      "trigger": "auto",
+      "revision": 3
+    }
+  ],
+  "answer_excerpt": "Те, що поливу немає, уже підтверджено в умовах поля; нову умову не додаю.\nВологість кореневої зони: **0,21 m³/m³** (SPL4SMGP v008; 2025-07-01…2025-07-31; демо-дані) (тестовий сервіс, синтетичні значення).\nШар вологості SMAP запропоновано на карті.\nСценарій посухи сервіс моделювання не пропонує, тому посуху не розраховано. Нижче — порівняння лише для типових умов, не для посухи.\n\nПорівняння сівозмін не розраховано.",
+  "checks": [
+    {
+      "name": "turn completes",
+      "expected": "turn.completed",
+      "observed": "turn.completed",
+      "outcome": "PASS"
+    },
+    {
+      "name": "geo profile via HTTP adapter",
+      "expected": "geo connected, service_mode stub",
+      "observed": "{\"connected\": true, \"service_mode\": \"stub\"}",
+      "outcome": "PASS"
+    },
+    {
+      "name": "constraint not duplicated",
+      "expected": "irrigation_available already confirmed -> no new proposal",
+      "observed": "proposed=[]",
+      "outcome": "PASS"
+    },
+    {
+      "name": "drought scenario refused from declared capabilities",
+      "expected": "first compare_rotations: error",
+      "observed": "[{\"tool\": \"compare_rotations\", \"status\": \"error\"}, {\"tool\": \"compare_rotations\", \"status\": \"error\"}]",
+      "outcome": "FAIL"
+    },
+    {
+      "name": "limitation explained",
+      "expected": "answer says drought was not computed",
+      "observed": "said",
+      "outcome": "PASS"
+    },
+    {
+      "name": "synthetic comparison labelled",
+      "expected": "sim facts data_status fixture + fixture_data warning + 'синтетичні' in text",
+      "observed": "0 sim facts, statuses=[], warnings=['fixture_data', 'source_unavailable']",
+      "outcome": "FAIL"
+    },
+    {
+      "name": "no live claim",
+      "expected": "no 'live'/'в реальному часі'/'зараз' claims in the text",
+      "observed": "clean",
+      "outcome": "PASS"
+    },
+    {
+      "name": "UI actions bound to field revision",
+      "expected": "map.set_layers + panel.open chip with result ref, revision 3",
+      "observed": "[{\"type\": \"map.set_layers\", \"trigger\": \"auto\", \"revision\": 3}]",
+      "outcome": "FAIL"
+    },
+    {
+      "name": "no host attestation (direct client)",
+      "expected": "HTTP 403 (only accepts requests signed)",
+      "observed": "HTTP 403: This service only accepts requests signed by the host backend.",
+      "outcome": "PASS"
+    },
+    {
+      "name": "attestation for another field (unauthorized field)",
+      "expected": "HTTP 403 (field_mismatch)",
+      "observed": "HTTP 403: Context attestation refused: field_mismatch.",
+      "outcome": "PASS"
+    },
+    {
+      "name": "mismatched field revision",
+      "expected": "HTTP 403 (revision_mismatch)",
+      "observed": "HTTP 403: Context attestation refused: revision_mismatch.",
+      "outcome": "PASS"
+    },
+    {
+      "name": "expired attestation (replay)",
+      "expected": "HTTP 403 (expired)",
+      "observed": "HTTP 403: Context attestation refused: expired.",
+      "outcome": "PASS"
+    },
+    {
+      "name": "invalid comparison id",
+      "expected": "panel.open with an invented id is dropped",
+      "observed": "ui_actions=0",
+      "outcome": "PASS"
+    },
+    {
+      "name": "late result after field switch",
+      "expected": "the Poltava result cannot be opened in a Mykolaiv turn",
+      "observed": "ui_actions=0",
+      "outcome": "PASS"
+    },
+    {
+      "name": "simulation service unavailable",
+      "expected": "turn completes, no simulation values, no comparison panel",
+      "observed": "sim facts=0, panel actions=0",
+      "outcome": "PASS"
+    },
+    {
+      "name": "expired simulation result",
+      "expected": "turn completes, no simulation values, no comparison panel",
+      "observed": "sim facts=0, panel actions=0",
+      "outcome": "PASS"
+    }
+  ]
+}
