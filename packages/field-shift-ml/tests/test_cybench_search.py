@@ -252,3 +252,188 @@ def test_actual_candidate_families_run_on_small_inputs(tmp_path, family):
 def test_timeout_is_failure_not_a_partial_selection():
     with pytest.raises(TimeoutError, match="incomplete"):
         search.timeout_handler(None, None)
+
+
+def forbid_boundary_call(*_args, **_kwargs):
+    raise AssertionError("path rejection must precede content reads, prediction and writes")
+
+
+@pytest.mark.parametrize("alias", ["same", "dotdot", "symlink", "hardlink"])
+def test_direct_evaluate_preserves_selection_when_prediction_aliases_it(
+    tmp_path, monkeypatch, alias
+):
+    selection = tmp_path / "selection.json"
+    original = b'{"immutable": "selection evidence"}\n'
+    selection.write_bytes(original)
+    if alias == "same":
+        prediction = selection
+    elif alias == "dotdot":
+        (tmp_path / "sub").mkdir()
+        prediction = tmp_path / "sub" / ".." / "selection.json"
+    else:
+        prediction = tmp_path / "predictions.csv"
+        if alias == "symlink":
+            prediction.symlink_to(selection)
+        else:
+            prediction.hardlink_to(selection)
+    monkeypatch.setattr(search, "load_selection", forbid_boundary_call)
+    monkeypatch.setattr(search, "predict", forbid_boundary_call)
+    with pytest.raises(ValueError, match="artifact paths|already exists"):
+        search.evaluate(None, selection, prediction)
+    assert selection.read_bytes() == prediction.read_bytes() == original
+
+
+def test_direct_evaluate_rejects_existing_unrelated_predictions_before_loading(
+    tmp_path, monkeypatch
+):
+    prediction = tmp_path / "old.csv"
+    prediction.write_text("existing prediction evidence")
+    monkeypatch.setattr(search, "load_selection", forbid_boundary_call)
+    with pytest.raises(ValueError, match="already exists"):
+        search.evaluate(None, tmp_path / "selection.json", prediction)
+    assert prediction.read_text() == "existing prediction evidence"
+
+
+@pytest.mark.parametrize("existing", ["csv", "sidecar", "raw_csv", "raw_receipt", "dangling_link"])
+def test_direct_prepare_rejects_existing_destinations_before_source_reads(
+    tmp_path, monkeypatch, existing
+):
+    output = tmp_path / "prepared.csv"
+    data_root = tmp_path / "data"
+    if existing.startswith("raw_"):
+        folder = data_root / "maize" / "US"
+        folder.mkdir(parents=True)
+        output = folder / (
+            "yield_maize_US.csv" if existing == "raw_csv" else "yield_maize_US.manifest.json"
+        )
+    protected = output.with_suffix(".json") if existing == "sidecar" else output
+    if existing == "dangling_link":
+        protected.symlink_to(tmp_path / "missing")
+    else:
+        protected.write_text("original data or evidence")
+    monkeypatch.setattr(base, "verify_member", forbid_boundary_call)
+    with pytest.raises(ValueError, match="artifact paths|already exists"):
+        search.prepare(data_root, output, "unused")
+    if existing == "dangling_link":
+        assert protected.is_symlink() and not protected.exists()
+        assert not (tmp_path / "missing").exists()
+    else:
+        assert protected.read_text() == "original data or evidence"
+
+
+def test_prepare_csv_json_sidecar_collision_fails_before_reads(tmp_path, monkeypatch):
+    output = tmp_path / "prepared.json"
+    monkeypatch.setattr(base, "verify_member", forbid_boundary_call)
+    with pytest.raises(ValueError, match="artifact paths"):
+        search.prepare(tmp_path / "data", output, "unused")
+    assert not output.exists()
+
+
+@pytest.mark.parametrize(
+    "pair",
+    [
+        ("selection", "predictions"),
+        ("selection", "output"),
+        ("predictions", "output"),
+        ("protocol", "selection"),
+        ("protocol", "predictions"),
+        ("protocol", "output"),
+        ("prepared", "selection"),
+        ("prepared", "predictions"),
+        ("prepared", "output"),
+        ("prepared_metadata", "selection"),
+        ("prepared_metadata", "predictions"),
+        ("prepared_metadata", "output"),
+        ("protocol", "prepared"),
+        ("protocol", "prepared_metadata"),
+    ],
+)
+@pytest.mark.parametrize("alias", ["same", "dotdot", "symlink", "hardlink"])
+def test_cli_run_rejects_all_artifact_alias_roles_before_reads(tmp_path, monkeypatch, pair, alias):
+    paths = {
+        name: tmp_path / f"{name}.json"
+        for name in ("protocol", "selection", "predictions", "output")
+    }
+    paths["prepared"] = tmp_path / "prepared.csv"
+    paths["prepared_metadata"] = paths["prepared"].with_suffix(".json")
+    first, second = pair
+    # The prepared sidecar is derived, so alias the other role to that fixed path.
+    if second in {"prepared", "prepared_metadata"}:
+        first, second = second, first
+    target = paths[first]
+    if alias in {"symlink", "hardlink"}:
+        target.write_text("protected original")
+        if alias == "symlink":
+            paths[second].symlink_to(target)
+        else:
+            paths[second].hardlink_to(target)
+    elif alias == "dotdot":
+        (tmp_path / "sub").mkdir()
+        paths[second] = tmp_path / "sub" / ".." / target.name
+    else:
+        paths[second] = target
+    snapshots = {p: p.read_bytes() for p in set(paths.values()) if p.exists()}
+    monkeypatch.setattr(search, "check_protocol", forbid_boundary_call)
+    monkeypatch.setattr(search, "tune", forbid_boundary_call)
+    monkeypatch.setattr(search, "predict", forbid_boundary_call)
+    args = ["run"]
+    for name in ("protocol", "prepared", "selection", "predictions", "output"):
+        args.extend(["--" + name, str(paths[name])])
+    with pytest.raises(ValueError, match="artifact paths|already exists"):
+        search.main(args)
+    assert all(p.read_bytes() == value for p, value in snapshots.items())
+    assert all(not p.exists() for p in set(paths.values()) - set(snapshots))
+
+
+def test_cli_prepare_protects_protocol_and_checks_before_content_reads(tmp_path, monkeypatch):
+    protocol = tmp_path / "prepared.json"
+    protocol.write_text("frozen protocol")
+    monkeypatch.setattr(search, "check_protocol", forbid_boundary_call)
+    with pytest.raises(ValueError, match="artifact paths|already exists"):
+        search.main(
+            [
+                "prepare",
+                "--protocol",
+                str(protocol),
+                "--prepared",
+                str(tmp_path / "prepared.csv"),
+                "--data-root",
+                str(tmp_path / "data"),
+            ]
+        )
+    assert protocol.read_text() == "frozen protocol"
+    assert not (tmp_path / "prepared.csv").exists()
+
+
+def test_missing_destinations_through_symlinked_parent_are_aliases(tmp_path, monkeypatch):
+    directory = tmp_path / "real"
+    directory.mkdir()
+    alias = tmp_path / "alias"
+    alias.symlink_to(directory, target_is_directory=True)
+    monkeypatch.setattr(search, "check_protocol", forbid_boundary_call)
+    with pytest.raises(ValueError, match="artifact paths"):
+        search.main(
+            [
+                "run",
+                "--protocol",
+                str(tmp_path / "protocol.json"),
+                "--prepared",
+                str(tmp_path / "prepared.csv"),
+                "--selection",
+                str(directory / "selection.json"),
+                "--predictions",
+                str(alias / "selection.json"),
+                "--output",
+                str(tmp_path / "report.json"),
+            ]
+        )
+    assert list(directory.iterdir()) == []
+
+
+def test_exclusive_json_writer_does_not_replace_a_file_created_after_validation(tmp_path):
+    path = tmp_path / "result.json"
+    search.validate_artifact_paths({"output": path}, new=("output",))
+    path.write_text("created by another writer")
+    with pytest.raises(FileExistsError):
+        search.write_new_json(path, {"new": "result"})
+    assert path.read_text() == "created by another writer"

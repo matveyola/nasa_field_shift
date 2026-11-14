@@ -6,7 +6,9 @@ The previous [cross-country benchmark](cybench-global-benchmark.md), its source 
 
 ## Frozen protocol and data scope
 
-The complete protocol is embedded in [the search report](../../packages/field-shift-ml/reports/cybench-search-v1.json). Protocol SHA256: `966f2b75db8b054f4f37753fbe60e7c6173a4a1d4fc694988a1e60efae014b27`. It was saved before fitting this real-data search. Candidate order, grids, splits, score, failure policy and resource limits were declared before any new test errors were inspected.
+The current report is **v2**, a re-execution after fixing artifact-path collisions. It uses exactly the original protocol, features, 22 candidates, splits and selection method. Version 2 changes path validation and recorded source identity, not the model-selection experiment. The [original v1 report](../../packages/field-shift-ml/reports/cybench-search-v1.json) is preserved byte-for-byte and belongs to source revision `8f52afeab0eb8f6f74956566f5be970b7def9980`.
+
+The complete protocol is embedded in [the search report](../../packages/field-shift-ml/reports/cybench-search-v2.json). Protocol SHA256: `966f2b75db8b054f4f37753fbe60e7c6173a4a1d4fc694988a1e60efae014b27`. It was saved before fitting this real-data search. Candidate order, grids, splits, score, failure policy and resource limits were declared before any new test errors were inspected.
 
 The source is [CY-Bench dataset v1.10](https://zenodo.org/records/17279151), using the same complete US maize yield, soil, location and meteorological ZIP members as the previous benchmark. Every source is rechecked against its recorded SHA256, CRC32 and size; source ranges and compressed hashes are included in the report. The complete archive MD5 remains unverified because the acquisition used selected complete members, not the full archive.
 
@@ -18,7 +20,7 @@ USDA NASS is the yield source, with public/CC0 status declared by the upstream c
 | 2022 | 1,543 | 1,485 | 31 | 27 |
 | 2023 | 1,461 | 1,408 | 31 | 22 |
 
-The chronological track has 4,338 eligible observations. The spatial outer track has 203, 211 and 212 observations by year (626 total), from states US-01, US-10, US-22, US-24, US-27 and US-29. These are administrative region-years, not independent farms. No eligible outer label is zero; finite zeros in historical training are retained. The report records exclusions and zero counts for every year, plus the groups included in every fold. The raw public labels and coverage counts had already been inventoried. Only the new prediction errors were held until selection was frozen; this is not an externally sealed benchmark.
+The chronological track has 4,338 eligible observations. The spatial outer track has 203, 211 and 212 observations by year (626 total), from states US-01, US-10, US-22, US-24, US-27 and US-29. These are administrative region-years, not independent farms. No eligible outer label is zero; finite zeros in historical training are retained. The report records exclusions and zero counts for every year, plus the groups included in every fold. The raw public labels and coverage counts had already been inventoried. In the original v1 experiment, prediction errors were held until selection was frozen; this was not an externally sealed benchmark. V2 replays the already-opened test years solely to verify the path-safety correction, without changing any selection choice or rule. It adds no new untouched holdout.
 
 France maize and wheat end in 2020 in the cached release. There are no French 2021–2023 labels here, and this search makes no new French accuracy claim.
 
@@ -70,7 +72,7 @@ The entire inner score table and selected identities are persisted with an immut
 
 ## Measured outcomes
 
-The immutable selection SHA256 is `d92be285d068f5d1bbee6ccc4e0c0aa99028f7285da4e5cc89246dfa59357585`. All 176 inner fits completed before it was persisted, at 220.602 seconds. The subsequent 36 final fits completed without a failed candidate, skipped fold or resource-limit event. Reported outer errors were inspected only after this complete run.
+The immutable selection SHA256 is `6ad9dd9d94ee0f92d01d33b91bf8b1d2bbb4ee085614d6c3b0f9071b6a3d1a7d`. All 176 inner fits completed before it was persisted, at 222.618 seconds. The subsequent 36 final fits completed without a failed candidate, skipped fold or resource-limit event. V2 repeats the already-opened v1 test years with unchanged choices and rules; its errors are reported as numerical reproduction, not as a new blinded validation.
 
 The table reports each inner-selected family configuration, not whichever configuration would look best after inspecting test errors. Inner score is mean yearly RMSE; outer RMSE/MAE/R² pool observations within a track. These are distinct aggregations.
 
@@ -95,7 +97,7 @@ The spatial selection, HGB, attains RMSE 2.010 t/ha and **negative R² (−0.037
 
 All per-year scores, train/test state groups, bias and NRMSE are retained in the report, including negative R². This experiment supports a chronological US-maize diagnostic with measurable baseline improvement and a substantially weaker geographic-transfer result. No significance interval or calibrated forecast interval was estimated, and the observations are clustered by state and year.
 
-The full fit/evaluation phase took 308.682 seconds (309.213 seconds for the external command), below the 1,200-second cap. Peak resident memory was 300.9 MiB; the separate 2 GiB address-space limit was enforced without a limit event. These timing and memory figures exclude the earlier feature-preparation process.
+The full fit/evaluation phase took 309.868 seconds (310.328 seconds for the external command), below the 1,200-second cap. Peak resident memory was 306.7 MiB; the separate 2 GiB address-space limit was enforced without a limit event. These timing and memory figures exclude the earlier feature-preparation process.
 
 ## Why this is not a published SOTA comparison
 
@@ -113,7 +115,7 @@ Use the installed ML package and existing verified US member cache. No network a
 
 ```bash
 export CYBENCH_SEARCH_PYTHON=/absolute/path/to/installed/ml/environment/bin/python
-export CYBENCH_SEARCH_CACHE=/absolute/path/on/disk/cybench-search-v1
+export CYBENCH_SEARCH_CACHE=/absolute/path/on/disk/cybench-search-v2
 export CYBENCH_DATA=/absolute/path/on/disk/cybench/selected/cybench-data
 export OPENBLAS_NUM_THREADS=2 OMP_NUM_THREADS=2
 cd /tmp
@@ -124,13 +126,25 @@ timeout --signal=TERM --kill-after=5s 1200s "$CYBENCH_SEARCH_PYTHON" -I -m field
 
 The module enforces a 2 GiB address-space limit and a 20-minute wall alarm; the command also supplies an external 20-minute timeout. Native and forest parallelism are limited to two threads in one process. All 212 fits run serially at the candidate/fold level. Preparation streams the daily source file and has its own equivalent process bound. Neither raw data nor per-observation predictions nor fitted estimators are committed.
 
-There is no automatic retry and no queued production worker. Existing protocol/selection files cannot be replaced with different contents. Existing result/prediction paths are rejected so a failed replay cannot masquerade as a prior successful output. A failed outer evaluation can leave partial predictions and an already valid inner selection; its nonzero exit and absent completed report mean the experiment is incomplete. Replays use new result/prediction paths and preserve earlier evidence. Rebuilding the installed wheel is required after source changes, since prepared metadata binds the exact module bytes.
+There is no automatic retry and no queued production worker. Existing protocol/selection files cannot be replaced with different contents. Before reading inputs, fitting, or writing, the CLI checks all named protocol, prepared CSV/JSON sidecar, selection, prediction and report roles for canonical aliases (`..`, symlinks and existing hardlinks). Preparation and direct evaluation also enforce their own path guards. Prepared CSV/sidecar, predictions and reports must use new destinations; existing files and dangling links are rejected. Exclusive output creation prevents truncating a file created after validation. These checks also protect existing raw source files and receipts if mistakenly supplied as outputs. A failed outer evaluation can leave partial predictions and an already valid inner selection; its nonzero exit and absent completed report mean the experiment is incomplete. Independent replays use a new cache directory, including a new selection path, and preserve earlier evidence. Rebuilding the installed wheel is required after source changes, since prepared metadata binds the exact module bytes.
 
+
+## Path correction and numerical reproducibility
+
+The original CLI allowed fresh artifact roles to name the same file: for example, `--selection` and `--predictions` could coincide. Evaluation read the saved JSON and then opened that path as CSV, destroying the selection evidence; report-path aliases could likewise overwrite selection or prediction evidence. A prepared CSV ending in `.json` could collide with its own metadata sidecar. The original distinct-path measured run was unaffected, but the CLI defect blocked code acceptance. V2 rejects these cases before content reads or fitting and does not overwrite existing destinations.
+
+Independent checks accepted the corrected source/test content: 263 ML tests, affected lint/format and packaging guard passed. An additional 65 independently written path cases passed under both the existing and a fresh non-editable wheel environment. An AST comparison confirmed that the candidate/protocol definitions and numerical operations were unchanged; only path guards, argument validation and exclusive output creation changed. The author then executed all 212 fits under the corrected source identity. Final committed artifact/integration acceptance is a separate step.
+
+Exact artifact identity and numerical reproduction are different checks. The original independent 212-fit replay preserved every model choice and fold membership but differed in 450 of 29,784 predictions by at most 5.3291e−15 t/ha; 58 report floats differed by at most 3.5527e−15. Its original selection hash was `d92be285d068f5d1bbee6ccc4e0c0aa99028f7285da4e5cc89246dfa59357585` and its independent replay hash was `cf6e19fc384de80dbb5cf81d66eb77c17be0b4c664cc1a742fcd8ea880aeb764`. Neither was rewritten to force equality.
+
+The corrected-source v2 re-execution has the same protocol and prepared-data bytes as v1, and the same candidates, winners, rows and fold memberships. Comparing v1 and v2 found 536 last-bit prediction differences (maximum 5.329e-15 t/ha) and 67 report-float differences (maximum 7.105e-15), excluding timing/resource fields. The observed differences are consistent with two-thread forest prediction accumulation; no values were rounded or substituted. They are below the independent numerical comparison's absolute tolerance of 1e−10. Source identities and derived hashes legitimately differ and are retained separately. This numerical tolerance does not permit changes to protocol, model choices, memberships or source bytes.
+
+Original v1 report-file SHA256: `9e00d5cf9624bce619069fc8f5de1f289fa1ab35cf412126ff3ea56a95220311`. Current v2 report-file SHA256: `6f2a6fb6731e6c6ed0f45cac42bf03b6fe693eeea66c6fce53fc7a28304d4d7e`. The current report's source, protocol, selection, feature and prediction identities remain exact hashes of their respective artifacts.
 
 ## Verification and provenance
 
-The non-editable installed ML wheel was executed under `python -I` from `/tmp`. All 193 ML tests pass, including 22 new tests covering every estimator family, rolling cutoffs, exclusion of opened/test outcomes from selection, state separation, zero/missing labels, incomplete weather, immutable selection, tampering, failed candidates and timeout behavior. Affected Ruff and formatting checks and the Python packaging guard pass. No test or expectation was weakened. Independent verification and final integration are separate acceptance steps.
+The non-editable installed ML wheel was executed under `python -I` from `/tmp`. All 263 ML tests pass, including 92 search tests: the 22 original scientific/protocol tests and 70 path-regression cases. They cover every estimator family, rolling cutoffs, exclusion of opened/test outcomes from selection, state separation, zero/missing labels, incomplete weather, immutable selection, tampering, failed candidates, timeout behavior and artifact-path protection. The first 68 new path cases were demonstrated failing against the original installed code before the fix. Affected Ruff and formatting checks and the Python packaging guard pass. No test or expectation was weakened. Independent verification and final integration are separate acceptance steps.
 
-Search module SHA256: `36b45d1f139ecfe72a62de0908a294f0871e9b8896f117278e8939bcbab03476`. Preserved baseline module SHA256: `047b6f8f2506de19884b9ff21e3b82935fbfb247eb7775aa8004b8819ea74292`. Prepared data SHA256: `d48b636de478c4530f3199dac4bb21cd0a386d271660ccfa6965065d784c67aa`. Per-observation prediction SHA256: `93de1c210983dc5cb77d2cfe7385a76624d018d19b392ace1a239071c61d6336`. The report embeds these identities and each raw member identity.
+Search module SHA256: `ae6aaba11ead42a47c1e54963645dfe35439c38f1d3ca4d0bd113bdb11747654`. Preserved baseline module SHA256: `047b6f8f2506de19884b9ff21e3b82935fbfb247eb7775aa8004b8819ea74292`. Prepared data SHA256: `d48b636de478c4530f3199dac4bb21cd0a386d271660ccfa6965065d784c67aa`. Per-observation prediction SHA256: `baf5244132bdab4770c2a0308598226bccc5a48a85f0b4647cc5c4fd3a6f52b4`. The report embeds these identities and each raw member identity.
 
 No source in the earlier benchmark, dependency manifest/lock, public API contract or serving path changed. Historical reports remain intact. Raw inputs, prepared data, frozen protocol/selection files, per-observation predictions and execution logs remain in the explicit external research cache.

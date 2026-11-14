@@ -250,7 +250,77 @@ def weather_counts(path: Path, regions: set[str]) -> tuple[dict, dict, dict]:
     return annual, recent, dict(counts)
 
 
+def validate_artifact_paths(paths: dict[str, Path], *, new: tuple[str, ...] = ()) -> None:
+    """Reject canonical aliases and existing destinations before content access.
+
+    resolve handles relative segments and symlinks, including dangling targets;
+    inode identity additionally catches distinct hardlink names. Exclusive creates
+    at the write boundaries prevent overwriting files created after this check.
+    """
+    resolved: dict[Path, str] = {}
+    inodes: dict[tuple[int, int], str] = {}
+    for role, path in paths.items():
+        canonical = path.resolve()
+        if canonical in resolved:
+            raise ValueError(f"artifact paths must be distinct: {resolved[canonical]} and {role}")
+        resolved[canonical] = role
+        try:
+            stat = path.stat()
+        except FileNotFoundError:
+            continue
+        inode = stat.st_dev, stat.st_ino
+        if inode in inodes:
+            raise ValueError(f"artifact paths must be distinct: {inodes[inode]} and {role}")
+        inodes[inode] = role
+    for role in new:
+        if os.path.lexists(paths[role]):
+            raise ValueError(f"artifact destination already exists: {role}: {paths[role]}")
+
+
+def source_paths(data_root: Path) -> dict[str, Path]:
+    folder = data_root / "maize" / "US"
+    members = {k: folder / f"{k}_maize_US.csv" for k in ("yield", "soil", "location", "meteo")}
+    return {
+        **members,
+        **{f"{k}_receipt": p.with_suffix(".manifest.json") for k, p in members.items()},
+    }
+
+
+def write_new_json(path: Path, value: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("x") as stream:
+        stream.write(json.dumps(value, indent=2, sort_keys=True, allow_nan=False) + "\n")
+
+
+def validate_cli_paths(args: argparse.Namespace) -> None:
+    paths = {
+        name: value
+        for name in ("protocol", "prepared", "selection", "predictions", "output", "data_root")
+        if (value := getattr(args, name)) is not None
+    }
+    if args.prepared is not None:
+        paths["prepared_metadata"] = args.prepared.with_suffix(".json")
+    if args.data_root is not None:
+        paths.update(
+            {f"source_{name}": path for name, path in source_paths(args.data_root).items()}
+        )
+    new = (
+        ("prepared", "prepared_metadata")
+        if args.command == "prepare"
+        else (("predictions", "output") if args.command == "run" else ())
+    )
+    validate_artifact_paths(paths, new=new)
+
+
 def prepare(data_root: Path, output: Path, protocol_hash: str) -> dict:
+    validate_artifact_paths(
+        {
+            "prepared": output,
+            "prepared_metadata": output.with_suffix(".json"),
+            **{f"source_{name}": path for name, path in source_paths(data_root).items()},
+        },
+        new=("prepared", "prepared_metadata"),
+    )
     folder = data_root / "maize" / "US"
     paths = {k: folder / f"{k}_maize_US.csv" for k in ("yield", "soil", "location", "meteo")}
     sources = {k: base.verify_member(p) for k, p in paths.items()}
@@ -262,7 +332,7 @@ def prepare(data_root: Path, output: Path, protocol_hash: str) -> dict:
     annual, recent, counts = weather_counts(paths["meteo"], {r["adm_id"] for r in rows})
     eligible, zeros, excluded = Counter(), Counter(), defaultdict(Counter)
     output.parent.mkdir(parents=True, exist_ok=True)
-    with output.open("w", newline="") as stream:
+    with output.open("x", newline="") as stream:
         writer = csv.writer(stream)
         writer.writerow(["adm_id", "year", "group", "yield", *base.FEATURES])
         for row in rows:
@@ -294,7 +364,7 @@ def prepare(data_root: Path, output: Path, protocol_hash: str) -> dict:
         "excluded_by_year": dict(excluded),
         "features_sha256": base.file_digest(output)[0],
     }
-    base.write_json(output.with_suffix(".json"), metadata)
+    write_new_json(output.with_suffix(".json"), metadata)
     return metadata
 
 
@@ -482,11 +552,14 @@ def load_selection(path: Path, panel: Panel) -> tuple[dict, str]:
 
 
 def evaluate(panel: Panel, selection_path: Path, predictions_path: Path) -> dict:
+    validate_artifact_paths(
+        {"selection": selection_path, "predictions": predictions_path}, new=("predictions",)
+    )
     selection, selection_hash = load_selection(selection_path, panel)
     by_id = {c["id"]: c for c in CANDIDATES}
     fits, results, pooled = 0, [], defaultdict(lambda: ([], []))
     predictions_path.parent.mkdir(parents=True, exist_ok=True)
-    with predictions_path.open("w", newline="") as stream:
+    with predictions_path.open("x", newline="") as stream:
         writer = csv.writer(stream)
         writer.writerow(
             [
@@ -558,27 +631,28 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--predictions", type=Path)
     parser.add_argument("--output", type=Path)
     args = parser.parse_args(argv)
+    if args.command != "freeze" and args.prepared is None:
+        parser.error("--prepared is required")
+    if args.command == "prepare" and args.data_root is None:
+        parser.error("--data-root is required")
+    if args.command == "run" and any(
+        v is None for v in (args.selection, args.predictions, args.output)
+    ):
+        parser.error("--selection, --predictions and --output are required")
+    validate_cli_paths(args)
     if args.command == "freeze":
         print(freeze(args.protocol))
         return 0
     digest = check_protocol(args.protocol)
-    if args.prepared is None:
-        parser.error("--prepared is required")
     bound = PROTOCOL["bounds"]["address_space_bytes"]
     resource.setrlimit(resource.RLIMIT_AS, (bound, bound))
     signal.signal(signal.SIGALRM, timeout_handler)
     signal.alarm(PROTOCOL["bounds"]["wall_seconds"])
     started = time.monotonic()
     if args.command == "prepare":
-        if args.data_root is None:
-            parser.error("--data-root is required")
         result = prepare(args.data_root, args.prepared, digest)
         print(json.dumps(result["eligible_by_year"], sort_keys=True))
         return 0
-    if any(v is None for v in (args.selection, args.predictions, args.output)):
-        parser.error("--selection, --predictions and --output are required")
-    if args.output.exists() or args.predictions.exists():
-        parser.error("output/predictions already exist; choose new paths for a replay")
     panel = load_panel(args.prepared)
     with threadpool_limits(limits=2):
         selected = tune(panel)
@@ -603,7 +677,7 @@ def main(argv: list[str] | None = None) -> int:
         "elapsed_seconds": time.monotonic() - started,
         "peak_rss_kib_linux": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
     }
-    base.write_json(args.output, report)
+    write_new_json(args.output, report)
     signal.alarm(0)
     print(
         f"completed {selected['inner_fit_count']} inner and {result['outer_fit_count']} outer fits",
