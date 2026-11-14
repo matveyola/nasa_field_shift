@@ -3,7 +3,7 @@
 ## Project boundaries
 
 - The Python backend is a modular monolith in `apps/api`. Keep application rules in their owning domain and HTTP endpoints thin.
-- The React application lives in `apps/web`. Maintain distinct Fields, Water, Agent, Rotations and Farm routes. Share selected field, season and scenario across routes.
+- The React application lives in `apps/web`. Use five user-facing destinations: Fields, Strategies, Agent, Analytics and Farm. Keep Water and rotation diagnostics inside Analytics, preserve legacy URLs through contextual routing, and keep the existing assistant as the central action. Share selected field, season and scenario across destinations.
 - Web `src/features` owns user-facing behavior. Backend `modules` own application rules and their APIs. Keep shared UI and transport code in the web app's existing `shared` and `api` directories.
 - Keep agent and model adapters replaceable. Identify mock data as such. Surface soil moisture and root-zone water reserve have separate units and data contracts.
 - The API agent module owns chat, field context and evidence. The optional model inference process lives in `services/agent` with its own dependency lock and private API.
