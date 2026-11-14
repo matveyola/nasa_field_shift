@@ -5,32 +5,32 @@ type HelpLanguage = 'en' | 'uk'
 
 export const spectralHelp = {
   ndvi: {
-    en: 'NDVI shows how strongly green vegetation stands out in the image. Compare parts of the same field or follow how the crop changes over time. It is a unitless index and cannot tell you why an area looks different.',
-    uk: 'NDVI показує, наскільки виразно на знімку виділяється зелена рослинність. Допомагає порівняти ділянки поля або простежити зміни посіву за сезон. Індекс не має одиниць і не пояснює причину відмінностей.',
+    en: 'See where green crops stand out in the satellite image and how they change over the season. Check unusual spots in the field to find out why. NDVI is unitless.',
+    uk: 'Подивіться, де зелена рослинність краще виділяється на знімку і як посів змінюється за сезон. Незвичні ділянки огляньте в полі, щоб з’ясувати причину. NDVI не має одиниць.',
   },
   msavi: {
-    en: 'MSAVI shows vegetation while reducing the influence of exposed soil. Use it to compare areas where the crop has not closed its rows yet. The index is unitless and does not measure soil moisture.',
-    uk: 'MSAVI показує рослинність, зменшуючи вплив відкритого ґрунту на показник. Допомагає порівняти ділянки, де посів ще не зімкнув рядки. Індекс не має одиниць і не вимірює вологість ґрунту.',
+    en: 'Compare young crops while bare soil is still visible between the rows. MSAVI reduces the effect of bare soil on the reading. It is unitless and does not measure soil moisture.',
+    uk: 'Порівняйте сходи, поки між рядами ще видно землю. MSAVI зменшує вплив відкритого ґрунту на показник. Він не має одиниць і не вимірює вологість ґрунту.',
   },
   ndre: {
-    en: 'NDRE uses a different part of the light spectrum to show variation in green crops. Compare areas of the same crop at a similar growth stage to decide where to scout. The index is unitless and does not diagnose a nutrient shortage.',
-    uk: 'NDRE використовує іншу частину спектра світла, щоб показати відмінності в зеленому посіві. Порівнюйте ділянки однієї культури на схожій стадії росту, щоб вибрати місця для огляду. Індекс не має одиниць і не діагностує дефіцит поживних речовин.',
+    en: 'Spot differences in crops that have filled out. Compare the same crop at a similar stage of growth. NDRE is unitless. Check the crop in the field before deciding whether it needs fertiliser.',
+    uk: 'Знайдіть відмінності там, де посів уже загустився. Порівнюйте ділянки з тією самою культурою на схожій стадії росту. NDRE не має одиниць. Перш ніж вирішувати, чи потрібне добриво, огляньте рослини.',
   },
   reci: {
-    en: 'RECI uses reflected light as a clue about chlorophyll in the crop. Use differences within the field to choose where to scout. The index is unitless and does not give a measured chlorophyll concentration.',
-    uk: 'RECI дає непряму оцінку хлорофілу в посіві за відбитим світлом. За відмінностями в межах поля можна вибрати місця для огляду. Індекс не має одиниць і не дає виміряної концентрації хлорофілу.',
+    en: 'Use unusual readings to pick spots to check in the field. RECI gives a clue about chlorophyll, the substance that makes leaves green. It is a unitless estimate.',
+    uk: 'Виберіть місця для огляду, де показник відрізняється. RECI дає підказку про хлорофіл, речовину, що надає листю зеленого кольору. Показник не має одиниць.',
   },
   mcari: {
-    en: 'MCARI highlights differences in how strongly crop chlorophyll absorbs light. Use it to find areas to check in the field. It is unitless, and exposed soil or sparse crop cover can affect the reading.',
-    uk: 'MCARI підкреслює відмінності в тому, як хлорофіл посіву поглинає світло. Допомагає знайти ділянки для огляду. Індекс не має одиниць, а на значення можуть впливати відкритий ґрунт або розріджений посів.',
+    en: 'Use differences in the reading from green leaves to choose where to check the crop. MCARI responds to chlorophyll. Bare soil and sparse plants can affect this unitless reading.',
+    uk: 'За відмінностями в показнику виберіть місця для огляду посіву. MCARI реагує на хлорофіл у листі. Відкритий ґрунт і рідкі сходи можуть впливати на цей показник. Він не має одиниць.',
   },
   ndmi: {
-    en: 'NDMI uses reflected light to show differences associated with moisture in the crop canopy. Use it to choose where to check the crop. It is a unitless index and does not measure soil moisture.',
-    uk: 'NDMI показує за відбитим світлом відмінності, пов’язані з вологою рослинного покриву. Допомагає вибрати ділянки для огляду посіву. Індекс не має одиниць і не вимірює вологість ґрунту.',
+    en: 'Find spots where plants may be drier and check them in the field. NDMI is unitless and does not measure soil moisture.',
+    uk: 'Знайдіть місця, де рослини можуть бути сухішими, і перевірте їх у полі. NDMI не має одиниць і не вимірює вологість ґрунту.',
   },
   ndwi: {
-    en: 'NDWI highlights areas that may be open water in the image. Use it to decide where to check for standing water. It is a unitless index and does not measure soil moisture or water depth.',
-    uk: 'NDWI виділяє на знімку ділянки, де може бути відкрита вода. Допомагає вибрати місця для перевірки застою води. Індекс не має одиниць і не вимірює вологість ґрунту чи глибину води.',
+    en: 'See where there may be open water on the satellite image, then check those areas in the field. NDWI is unitless and does not measure soil moisture or water depth.',
+    uk: 'Знайдіть на знімку ділянки, де може стояти вода, і перевірте їх у полі. NDWI не має одиниць і не вимірює вологість ґрунту чи глибину води.',
   },
 } satisfies Record<SpectralIndex, Record<HelpLanguage, string>>
 
@@ -38,29 +38,29 @@ export const fieldHelp = {
   en: {
     scene: {
       title: 'Satellite date and coverage',
-      description: 'The date is when the satellite captured the image. Coverage is the share of the field with usable pixels, so check it before comparing dates. Clouds, shadows and missing pixels are excluded. Smoothing or zooming changes how the map looks without adding detail.',
+      description: 'Before comparing dates, check how much of the field has usable data in each image. Coverage leaves out clouds, shadows and gaps. Zooming in or smoothing the map adds no new detail.',
     },
     variation: {
       title: 'Within-field variation',
-      description: 'The colors show which observed areas have lower, similar or higher NDVI than the field median. Use them to choose places to inspect. The percentage refers to the observed area. The map shows no value in transparent areas.',
+      description: 'Use the colours to choose where to check the crop. They show where NDVI is lower, close to, or higher than the middle value for the field. The percentage covers only the area with usable data. Blank spots have no value shown.',
     },
     terrain: {
       title: 'Terrain directions',
-      description: 'Arrows show the direction of steepest descent so you can pick places to check on the ground. Slope is expressed as a percent (metres of drop per 100 m horizontally) and elevation in metres. Small furrows may be too fine for the model. Arrows cannot confirm runoff or flooding.',
+      description: 'Follow the arrows to see which way the ground slopes. A 5% slope drops 5 m over 100 m horizontally. Height is shown in metres. Check small furrows and actual water flow in the field.',
     },
   },
   uk: {
     scene: {
       title: 'Дата знімка й покриття',
-      description: 'Дата показує, коли супутник зробив знімок. Покриття — частка поля з придатними пікселями, яку варто перевірити перед порівнянням дат. Хмари, тіні й пікселі без даних відкидаються. Згладжування чи масштабування змінює вигляд карти без додавання деталей.',
+      description: 'Перед порівнянням дат подивіться, для якої частини поля є дані на кожному знімку. Хмари, тіні й прогалини не входять до покриття. Збільшення чи згладжування карти не додає деталей.',
     },
     variation: {
       title: 'Відмінності в межах поля',
-      description: 'Кольори показують, де NDVI нижчий, близький або вищий за медіану поля. За ними можна вибрати місця для огляду. Відсоток стосується лише спостереженої площі. На прозорих ділянках карта не показує значень.',
+      description: 'За кольорами виберіть місця для огляду посіву. Вони показують, де NDVI нижчий, близький або вищий за серединне значення для поля. Відсоток стосується лише ділянок із придатними даними. На прозорих ділянках значень не показано.',
     },
     terrain: {
       title: 'Напрямки схилів',
-      description: 'Стрілки показують напрямок найкрутішого спуску й допомагають вибрати місця для огляду. Нахил виражають у відсотках (метри спуску на 100 м по горизонталі), висоту — у метрах. Дрібних борозен модель може не бачити. Стрілки не підтверджують стік або затоплення.',
+      description: 'Стрілки показують, у який бік іде схил. Нахил 5% означає спуск на 5 м за 100 м по горизонталі. Висоту показано в метрах. Дрібні борозни й те, куди насправді тече вода, перевірте в полі.',
     },
   },
 } satisfies Record<HelpLanguage, Record<string, { title: string; description: string }>>
@@ -74,11 +74,11 @@ export function sceneHelpMetadata(language: HelpLanguage, metadata: {
   const { source, date, coveragePercent, analysisResolutionMetres } = metadata
   return [
     { label: uk ? 'Джерело' : 'Source', value: source?.trim() || unknown },
-    { label: uk ? 'Дата знімка' : 'Acquisition date', value: date && Number.isFinite(Date.parse(date))
+    { label: uk ? 'Дата знімка' : 'Image date', value: date && Number.isFinite(Date.parse(date))
       ? new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeZone: 'UTC' }).format(new Date(date)) : unknown },
-    { label: uk ? 'Придатне покриття' : 'Usable coverage', value: coveragePercent != null && coveragePercent >= 0 && coveragePercent <= 100
+    { label: uk ? 'Частина поля з даними' : 'Field area with usable data', value: coveragePercent != null && coveragePercent >= 0 && coveragePercent <= 100
       ? `${number(coveragePercent, 1, locale)}%` : unknown },
-    { label: uk ? 'Крок сітки аналізу' : 'Analysis grid spacing', value: analysisResolutionMetres != null && Number.isFinite(analysisResolutionMetres) && analysisResolutionMetres > 0
+    { label: uk ? 'Розмір комірки розрахунку' : 'Analysis cell size', value: analysisResolutionMetres != null && Number.isFinite(analysisResolutionMetres) && analysisResolutionMetres > 0
       ? `${number(analysisResolutionMetres, 1, locale)} ${uk ? 'м' : 'm'}` : unknown },
   ]
 }

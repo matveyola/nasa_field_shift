@@ -9,10 +9,10 @@ test('every available spectral index has bilingual help and water indices distin
     assert.match(help.en, /unitless/)
     assert.match(help.uk, /не має одиниць/)
   }
-  assert.match(spectralHelp.ndmi.en, /crop canopy/)
-  assert.match(spectralHelp.ndmi.uk, /волог[оюи]+ рослинного покриву/)
+  assert.match(spectralHelp.ndmi.en, /plants may be drier/)
+  assert.match(spectralHelp.ndmi.uk, /рослини можуть бути сухішими/)
   assert.match(spectralHelp.ndwi.en, /open water/)
-  assert.match(spectralHelp.ndwi.uk, /відкрит[аої]+ вода/)
+  assert.match(spectralHelp.ndwi.uk, /може стояти вода/)
   for (const { en, uk } of [spectralHelp.ndmi, spectralHelp.ndwi]) {
     assert.match(en, /does not measure soil moisture/)
     assert.match(uk, /не вимірює вологість ґрунту/)

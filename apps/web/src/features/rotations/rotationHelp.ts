@@ -5,21 +5,21 @@ export const rotationHelp = {
   en: {
     scenario: {
       title: 'scenario',
-      description: 'A scenario asks what would happen with the selected crop sequence and rainfall assumptions. A historical simulation uses past weather to compare plans under the same conditions. A forecast uses weather expected in the coming days. Both depend on the input data and model assumptions.',
+      description: 'Choose a rainfall setting to compare your crop plans. The historical comparison uses past weather for all plans. A forecast uses the weather expected in the coming days, so the result can change.',
     },
     yieldChange: {
       title: 'yield change and prediction interval',
-      description: 'The model estimates how much more or less grain a crop sequence might yield than continuous maize, in t/ha. Use the prediction interval to see the uncertainty around that change. Missing estimates leave the change unknown.',
+      description: 'See how the estimated yield compares with growing maize every year. A plus means more grain and a minus means less, in t/ha. The prediction interval shows how far results could vary. Without an estimate the difference is unknown.',
     },
   },
   uk: {
     scenario: {
       title: 'сценарій',
-      description: 'Сценарій показує, що могло б статися за вибраної послідовності культур і припущень про опади. Історична симуляція порівнює плани в однакових умовах минулої погоди. Прогноз використовує очікувану погоду на найближчі дні. Обидва розрахунки залежать від вхідних даних і припущень моделі.',
+      description: 'Виберіть варіант опадів, щоб порівняти плани сівозміни. Для історичного порівняння беруть ту саму минулу погоду для всіх планів. Прогноз бере очікувану погоду на найближчі дні, тож результат може змінитися.',
     },
     yieldChange: {
       title: 'зміна врожайності та інтервал прогнозу',
-      description: 'Модель оцінює, наскільки більше або менше зерна може дати послідовність культур порівняно з беззмінною кукурудзою, у т/га. Інтервал прогнозу показує невизначеність цієї зміни. Якщо оцінки бракує, зміна невідома.',
+      description: 'Порівняйте оцінку врожайності з варіантом, де кукурудза росте щороку. Плюс означає більше зерна, мінус — менше, у т/га. Інтервал прогнозу показує, наскільки результат може відрізнятися від оцінки. Якщо оцінки немає, різниця невідома.',
     },
   },
 } satisfies Record<'en' | 'uk', Record<RotationHelpTopic, HelpEntry>>

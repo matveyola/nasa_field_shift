@@ -7,7 +7,7 @@ test('water help distinguishes a near-surface ratio from water available to root
   assert.match(waterHelp.en.surfaceMoisture.description, /m³\/m³/)
   assert.match(waterHelp.uk.surfaceMoisture.description, /м³\/м³/)
   assert.match(waterHelp.en.rootZoneReserve.description, /\bmm\b/)
-  assert.match(waterHelp.uk.rootZoneReserve.description, /\sмм\s/)
+  assert.match(waterHelp.uk.rootZoneReserve.description, /\sмм[.\s]/)
   for (const { rootZoneReserve } of Object.values(waterHelp)) {
     assert.doesNotMatch(rootZoneReserve.description, /[mм]³\/[mм]³/)
   }
@@ -26,8 +26,8 @@ test('water help uses supplied source and depth and distinguishes unavailable me
 })
 
 test('rotation help distinguishes weather bases and treats missing yield as unknown', () => {
-  assert.match(rotationHelp.en.scenario.description, /historical simulation uses past weather.*forecast uses weather expected/i)
-  assert.match(rotationHelp.uk.scenario.description, /Історична симуляція.*минулої погоди.*Прогноз.*очікувану погоду/)
-  assert.match(rotationHelp.en.yieldChange.description, /t\/ha.*prediction interval.*missing estimates.*unknown/i)
-  assert.match(rotationHelp.uk.yieldChange.description, /т\/га.*інтервал прогнозу.*бракує.*невідома/i)
+  assert.match(rotationHelp.en.scenario.description, /historical comparison uses past weather.*forecast uses the weather expected/i)
+  assert.match(rotationHelp.uk.scenario.description, /історичного порівняння.*минулу погоду.*Прогноз.*очікувану погоду/)
+  assert.match(rotationHelp.en.yieldChange.description, /plus means more grain.*minus means less.*t\/ha.*prediction interval.*unknown/i)
+  assert.match(rotationHelp.uk.yieldChange.description, /плюс означає більше зерна.*мінус.*менше.*т\/га.*інтервал прогнозу.*невідома/i)
 })
