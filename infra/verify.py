@@ -46,6 +46,51 @@ def build_plan(root: Path, mode: str = "fast", build: bool = False) -> list[Chec
 
     add("widget contract freshness", "services/agent/frontend", "npm", "run", "check:validators")
     add("agent contract TypeScript", "services/agent", "npm", "run", "check:ts")
+    add(
+        "planning contract freshness",
+        "apps/api",
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "-m",
+        "field_shift.contracts.planning_v1.export",
+        "--check",
+    )
+    add("planning JSON contracts", ".", "node", "contracts/planning-v1/check.mjs")
+    add(
+        "planning contract TypeScript",
+        ".",
+        "node",
+        "apps/web/node_modules/typescript/bin/tsc",
+        "-p",
+        "contracts/planning-v1/tsconfig.json",
+    )
+    add(
+        "private crop runtime lint",
+        "apps/api",
+        "uv",
+        "run",
+        "--no-sync",
+        "ruff",
+        "check",
+        "--config",
+        "pyproject.toml",
+        "../../services/crop-model/crop_runtime",
+    )
+    add(
+        "private crop runtime format",
+        "apps/api",
+        "uv",
+        "run",
+        "--no-sync",
+        "ruff",
+        "format",
+        "--check",
+        "--config",
+        "pyproject.toml",
+        "../../services/crop-model/crop_runtime",
+    )
     if build:
         add("web production build", "apps/web", "npm", "run", "build")
         add("widget production build", "services/agent/frontend", "npm", "run", "build")
