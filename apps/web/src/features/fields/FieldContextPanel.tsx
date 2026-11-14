@@ -1,0 +1,158 @@
+import { CheckCircleIcon, ChevronLeftIcon, ChevronRightIcon, ExclamationTriangleIcon, SparklesIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from 'react'
+import { api } from '../../api/client'
+import type { Field } from '../../api/contracts'
+import { CropIcon } from '../../shared/CropIcon'
+import { useLocale } from '../../shared/locale'
+import { useResource } from '../../shared/useResource'
+import { FieldWaterAssistant } from '../agent/FieldWaterAssistant'
+import { getCurrentWaterOutlook } from '../water/waterOutlook'
+import type { VegetationResult } from '../../api/analytics'
+import { FieldVegetationSignal } from '../agent/FieldVegetationSignal'
+import './fieldAnalytics.css' // the Overview / Field analysis switch lives here, before the analysis panel loads
+
+type Props = {
+  field: Field
+  canSwitch: boolean
+  onStep: (direction: -1 | 1) => void
+  surface?: { value: number; date: string; provider: string }
+  openForecast: (fieldId: string, day?: string) => void
+  surfaceForecastOpen: boolean
+  onSheetPosition: (fieldId: string, top?: number) => void
+  children: ReactNode
+  analysis: (inspectMap: () => void) => ReactNode
+  vegetation?: VegetationResult
+  initialAnalysis?: boolean
+  mapFirst?: boolean
+}
+
+export function FieldContextPanel({ field, canSwitch, onStep, surface, openForecast, surfaceForecastOpen, onSheetPosition, children, analysis, vegetation, initialAnalysis, mapFirst }: Props) {
+  const { t, number, crop } = useLocale()
+  return <aside id="field-context-panel" className="field-context-panel" aria-label={t('Selected field')}>
+      <header className="field-context-heading">
+        <p className="field-context-overline">{t('Selected field')}</p>
+        <div className="field-context-switcher">
+          <button type="button" className="icon-button" aria-label={t('Previous field')} disabled={!canSwitch} onClick={() => onStep(-1)}>
+            <ChevronLeftIcon aria-hidden="true" />
+          </button>
+          <h2 title={field.name}>{field.name}</h2>
+          <button type="button" className="icon-button" aria-label={t('Next field')} disabled={!canSwitch} onClick={() => onStep(1)}>
+            <ChevronRightIcon aria-hidden="true" />
+          </button>
+        </div>
+        <p className="field-context-crop"><CropIcon crop={field.crop} /><span>{crop(field.crop)} · {number(field.area_ha)} {t('ha')}</span></p>
+      </header>
+    <FieldContextSheet key={`${field.id}:${field.boundary_revision}`} field={field} surface={surface}
+      openForecast={openForecast} surfaceForecastOpen={surfaceForecastOpen} onSheetPosition={onSheetPosition}
+      analysis={analysis} vegetation={vegetation} initialAnalysis={initialAnalysis} mapFirst={mapFirst}>
+      {children}
+    </FieldContextSheet>
+  </aside>
+}
+
+function FieldContextSheet({ field, surface, openForecast, surfaceForecastOpen, onSheetPosition, children, analysis, vegetation, initialAnalysis, mapFirst }: Omit<Props, 'canSwitch' | 'onStep'>) {
+  const { t, number, shortDate } = useLocale()
+  const load = useCallback((signal: AbortSignal) => api.waterForecast(field.id, signal), [field.id])
+  const saved = useResource(load, 5 * 60 * 1000)
+  const outlook = getCurrentWaterOutlook(saved.data, field.id, new Date().toISOString().slice(0, 10))
+  const [expanded, setExpanded] = useState(Boolean(initialAnalysis && !mapFirst))
+  const [view, setView] = useState<'overview' | 'analysis'>(initialAnalysis ? 'analysis' : 'overview')
+  const [analysisOpened, setAnalysisOpened] = useState(Boolean(initialAnalysis))
+  const [mobile, setMobile] = useState(() => matchMedia('(max-width: 1000px)').matches)
+  const trigger = useRef<HTMLButtonElement>(null)
+  const close = useRef<HTMLButtonElement>(null)
+  const wasExpanded = useRef(false)
+  const restoreFocus = useRef(true)
+  const sheetId = useId()
+  const sheet = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    setView(initialAnalysis ? 'analysis' : 'overview')
+    if (initialAnalysis) setExpanded(!mapFirst)
+  }, [initialAnalysis, mapFirst])
+
+  useEffect(() => {
+    if (view === 'analysis') setAnalysisOpened(true)
+  }, [view])
+
+  useEffect(() => {
+    if (!mobile || !expanded || !sheet.current) return
+    const measure = () => onSheetPosition(field.id, sheet.current?.getBoundingClientRect().top)
+    const observer = new ResizeObserver(measure)
+    observer.observe(sheet.current)
+    window.addEventListener('resize', measure)
+    measure()
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', measure)
+      onSheetPosition(field.id)
+    }
+  }, [mobile, expanded, field.id, onSheetPosition])
+
+  useEffect(() => {
+    const query = matchMedia('(max-width: 1000px)')
+    const update = () => setMobile(query.matches)
+    query.addEventListener('change', update)
+    return () => query.removeEventListener('change', update)
+  }, [])
+
+  useEffect(() => {
+    if (expanded && mobile) close.current?.focus({ preventScroll: true })
+    else if (wasExpanded.current && mobile && restoreFocus.current) trigger.current?.focus({ preventScroll: true })
+    wasExpanded.current = expanded
+  }, [expanded, mobile])
+
+  useEffect(() => {
+    if (surfaceForecastOpen) {
+      restoreFocus.current = false
+      setExpanded(false)
+    }
+  }, [surfaceForecastOpen])
+
+  function closeSheet() {
+    restoreFocus.current = true
+    setExpanded(false)
+  }
+
+  const risk = outlook.kind === 'shortage'
+  const summary = outlook.kind === 'unavailable' ? t('Open field assistant')
+    : t(risk ? 'Water shortage expected' : 'No water shortage expected')
+
+  return (
+      <div ref={sheet} className={'field-context-sheet' + (expanded ? ' is-expanded' : '')}
+        onKeyDown={(event) => { if (event.key === 'Escape' && expanded && mobile) { event.stopPropagation(); closeSheet() } }}>
+        <span className="field-sheet-handle" aria-hidden="true" />
+        <button type="button" ref={trigger} className={'field-sheet-trigger is-' + outlook.kind}
+          aria-expanded={expanded} aria-controls={sheetId} onClick={() => { restoreFocus.current = true; setExpanded(true) }}>
+          {risk ? <ExclamationTriangleIcon aria-hidden="true" /> : outlook.kind === 'clear' ? <CheckCircleIcon aria-hidden="true" /> : <SparklesIcon aria-hidden="true" />}
+          <span><strong>{summary}</strong><small>{risk ? t('From') + ' ' + shortDate(outlook.firstShortage.date) : field.name}</small></span>
+          <ChevronRightIcon aria-hidden="true" />
+        </button>
+        <div id={sheetId} className="field-sheet-body" inert={mobile && !expanded}>
+          <button ref={close} type="button" className="icon-button field-sheet-close" aria-label={t('Close field assistant')} onClick={closeSheet}>
+            <XMarkIcon aria-hidden="true" />
+          </button>
+          <div className="field-context-view" role="group" aria-label={t('Field panel view')}>
+            <button type="button" aria-pressed={view === 'overview'} onClick={() => setView('overview')}>{t('Overview')}</button>
+            <button type="button" aria-pressed={view === 'analysis'} onClick={() => setView('analysis')}>{t('Field analysis')}</button>
+          </div>
+          <div hidden={view !== 'overview'}>
+          <div className="field-context-overview">
+            <dl>
+              <div><dt>{t('Surface moisture')}</dt><dd>{surface ? <>{number(surface.value, 3)} <small>{t('m³/m³')}</small></> : t('Unavailable')}</dd></div>
+              <div><dt>{t('Root-zone reserve')}</dt><dd>{outlook.kind !== 'unavailable' ? <>{number(outlook.firstDay.reserve_mm)} <small>{t('mm')}</small></> : t('Unavailable')}</dd></div>
+            </dl>
+            {surface && <p>{t('Surface moisture')} · <time dateTime={surface.date}>{shortDate(surface.date)}</time> · {surface.provider}</p>}
+            {outlook.kind !== 'unavailable' && <p>{t('Root-zone reserve')} · <time dateTime={outlook.firstDay.date}>{shortDate(outlook.firstDay.date)}</time> · FAO-56</p>}
+          </div>
+          <FieldWaterAssistant field={field} forecast={saved} outlook={outlook} openForecast={openForecast} />
+          <FieldVegetationSignal data={vegetation} openAnalysis={() => setView('analysis')} />
+          <div className="field-context-tools">{children}</div>
+          </div>
+          {(analysisOpened || view === 'analysis') && (
+            <div hidden={view !== 'analysis'}>{analysis(() => { if (mobile) closeSheet() })}</div>
+          )}
+        </div>
+      </div>
+  )
+}

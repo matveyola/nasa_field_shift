@@ -1,0 +1,315 @@
+.fields-content .real-map {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  font-family: inherit;
+  background-color: var(--sunken);
+  background-image: linear-gradient(#fff8 1px, transparent 1px), linear-gradient(90deg, #fff8 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+.fields-content .real-map.is-drawing,
+.fields-content .real-map.is-drawing .leaflet-grab { cursor: crosshair; }
+.fields-content .real-map .leaflet-container,
+.fields-content .real-map .leaflet-control-attribution { font-family: inherit; }
+.fields-content .real-map .leaflet-control-attribution {
+  padding: 1px 6px;
+  border-radius: var(--r-sm) 0 0 0;
+  background: rgb(255 255 255 / .9);
+  color: var(--ink-2);
+  max-width: calc(100vw - 22px);
+  text-align: right;
+}
+.fields-content .real-map .leaflet-control-attribution a { color: var(--ink); text-decoration: underline; }
+.fields-content .map-place-label {
+  pointer-events: none;
+}
+.fields-content .map-place-text {
+  position: absolute;
+  inset: 0 auto auto 0;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  padding: 4px 9px;
+  border-radius: var(--r-pill);
+  background: var(--card);
+  color: var(--ink);
+  font-size: .8rem;
+  font-weight: 650;
+  box-shadow: var(--shadow-float);
+}
+.fields-content .map-place-label-selected .map-place-text {
+  background: var(--sheen), var(--black);
+  color: #fff;
+  box-shadow: var(--shadow-btn);
+  font-size: .9rem;
+}
+.fields-content .map-controls, .fields-content .field-summary {
+  position: absolute;
+  z-index: 2;
+  bottom: 28px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: var(--shadow-float);
+}
+.fields-content .map-tools { z-index: 3; pointer-events: none; }
+.fields-content .map-tools > * { pointer-events: auto; }
+.fields-content .map-controls { right: 12px; display: grid; padding: 2px; }
+.fields-content .field-summary {
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 4px 4px 12px;
+  max-width: min(340px, calc(100% - 74px));
+}
+.field-summary-details { min-width: 0; padding-inline: 3px; }
+.field-summary-name {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
+}
+.field-summary-details p { color: var(--ink-2); font-size: .75rem; }
+.field-summary-details .crop-icon { width: 16px; height: 16px; }
+.fields-content .field-summary .icon-button { flex: 0 0 36px; }
+.fields-content :is(.map-controls, .field-summary) .icon-button {
+  min-height: 36px;
+  width: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: inherit;
+  background: transparent;
+  box-shadow: none;
+}
+.fields-content :is(.map-controls, .field-summary) .icon-button:hover:not(:disabled) { background: var(--sunken); box-shadow: none; }
+.fields-content :is(.map-controls, .field-summary) .icon-button svg { width: 18px; height: 18px; }
+.map-layer-picker { position: relative; justify-self: start; z-index: 1; }
+.map-layer-trigger {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 38px;
+  padding: 5px 14px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: var(--shadow-float);
+  font-size: .86rem;
+  font-weight: 650;
+  cursor: pointer;
+  list-style: none;
+}
+.map-layer-trigger::-webkit-details-marker { display: none; }
+.map-layer-trigger svg:first-child { width: 17px; height: 17px; }
+.map-layer-trigger svg:last-child { width: 12px; height: 12px; }
+.map-layer-picker[open] .map-layer-trigger svg:last-child { transform: rotate(180deg); }
+.map-layer-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: min(18rem, calc(100vw - 40px));
+  max-height: min(25rem, 62dvh);
+  overflow-y: auto;
+  overscroll-behavior: none;
+  padding: 14px;
+  border: 0;
+  border-radius: var(--r-card);
+  background: var(--card);
+  box-shadow: var(--shadow-float);
+}
+.map-layer-heading { margin: 0 0 7px; color: var(--ink-2); font-size: .76rem; font-weight: 650; }
+.map-basemap-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.map-basemap-option {
+  display: grid;
+  gap: 6px;
+  padding: 4px 4px 7px;
+  border: 0;
+  border-radius: var(--r-md);
+  background: var(--sunken);
+  color: var(--ink);
+  font-size: .84rem;
+  font-weight: 650;
+}
+.map-basemap-option:hover:not(:disabled) { background: var(--sunken-2); }
+.map-basemap-option[aria-pressed="true"] { background: var(--sheen), var(--black); color: #fff; box-shadow: var(--shadow-btn); }
+.map-layer-option:hover:not(:has(input:disabled)), .map-layer-option:has(input:checked) { background: var(--sunken); }
+.map-layer-option:has(input:checked) { font-weight: 600; }
+.map-basemap-preview { position: relative; height: 54px; overflow: hidden; border-radius: var(--r-btn); }
+.map-preview-aerial { background: #506b3c url('/bondurant-usgs-aerial.webp') center 45% / cover; }
+.map-preview-street {
+  background-color: #dfe7d5;
+  background-image:
+    linear-gradient(148deg, transparent 42%, #fffaf0 43% 48%, transparent 49%),
+    linear-gradient(25deg, transparent 45%, #fffaf0 46% 52%, transparent 53%),
+    linear-gradient(100deg, transparent 64%, #f9f4e9 65% 69%, transparent 70%),
+    linear-gradient(8deg, #c7d9b8 21%, #e9e7db 22% 71%, #d1dfc4 72%);
+}
+.map-basemap-option .map-basemap-check {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 19px;
+  height: 19px;
+  padding: 3px;
+  border-radius: 50%;
+  background: var(--black);
+  color: #fff;
+  box-shadow: 0 0 0 2px #fff;
+}
+.map-overlay-options { display: grid; gap: 3px; margin-top: 14px; }
+.map-overlay-options .map-layer-heading { margin-bottom: 4px; }
+.map-layer-option {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) 16px;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 40px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: var(--r-btn);
+  background: transparent;
+  text-align: left;
+  font-size: .82rem;
+  cursor: pointer;
+}
+.map-layer-option:has(input:disabled) { cursor: default; opacity: .58; }
+.map-layer-option input { width: 16px; height: 16px; margin: 0; accent-color: var(--black); cursor: inherit; }
+.map-layer-option svg { width: 16px; height: 16px; }
+.map-layer-swatch { width: 12px; height: 12px; justify-self: center; border: 1px solid var(--line-strong); border-radius: 3px; }
+/* the swatches mirror the map overlays: dashed white (records), dashed black (model), solid white (planted area) */
+.map-swatch-historical { background: #fff; border: 1.5px dashed var(--ink); }
+.map-swatch-ml { background: var(--black); border: 1.5px dashed var(--black); }
+.map-swatch-demo { background: linear-gradient(90deg, #fbee8a, #5db395, #1e6ca2, #1f427b); }
+.map-swatch-planting { background: #fff; border-color: var(--ink-3); }
+.map-satellite-option { margin-top: 7px; background: var(--screen); }
+.fields-content .map-fallback {
+  max-width: min(360px, 100%);
+  margin: 0;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: var(--r-md);
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: var(--shadow-float);
+  font-size: .78rem;
+  overflow-wrap: anywhere;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+.fields-content .map-fallback button { min-height: 36px; }
+.field-map-card { min-width: 0; border: 0; border-radius: var(--r-card); background: var(--card); box-shadow: var(--shadow-card); }
+.field-assistant-slot { min-width: 0; }
+@media (min-width: 1120px) {
+  .fields-content--with-assistant { grid-template-columns: minmax(0, 1fr) clamp(250px, 22vw, 320px); align-items: start; }
+  .fields-content--with-assistant > * { grid-column: 1 / -1; }
+  .fields-content--with-assistant > .field-map-card { grid-column: 1; }
+  .fields-content--with-assistant > .field-assistant-slot { grid-column: 2; }
+}
+.field-map-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; }
+.field-map-heading h2 { font-size: 1.08rem; letter-spacing: -.015em; }
+.field-map-heading h2:focus { outline: 0; }
+.field-map-heading .field-editor-actions { justify-content: flex-end; }
+.field-search-status {
+  display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: 6px 12px;
+  padding: 9px 16px; background: var(--sunken); color: var(--ink); font-size: .84rem;
+}
+.field-search-status .button { min-height: 36px; font-size: .8rem; }
+.field-editor-suggestion { color: var(--ink); font-size: .83rem; font-weight: 600; }
+.field-suggestion-review {
+  display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: 7px 14px;
+}
+.field-suggestion-review .control { min-width: 0; max-width: 100%; }
+.field-suggestion-review select { min-width: 0; }
+:is(.field-map-heading, .map-inspector, .field-area-strip, .field-geometry-editor) .button { min-height: 36px; font-size: .8rem; }
+:is(.field-map-heading, .map-inspector, .field-area-strip, .field-geometry-editor) .button svg { width: 16px; height: 16px; }
+.field-area-strip {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 7px 15px;
+  padding: 10px 16px; background: var(--screen); border-bottom: 1px solid var(--line);
+}
+.field-planting-summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 3px 8px; font-size: .8rem; }
+.field-planting-summary span { color: var(--ink-2); }
+.field-area-saved { flex-basis: 100%; color: var(--ink); }
+.field-geometry-editor { display: grid; gap: 10px; padding: 16px; }
+.field-editor-summary { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.field-editor-summary p, .field-editor-summary small, .field-editor-instructions { color: var(--ink-2); font-size: .82rem; }
+.field-editor-summary strong { display: block; margin-block: 1px; font-size: 1.5rem; letter-spacing: -.02em; color: var(--ink); }
+.field-coverage-switch {
+  display: flex; flex-wrap: wrap; gap: 3px; padding: 3px; border: 0; border-radius: var(--r-pill); background: var(--sunken);
+}
+.field-coverage-switch button {
+  border: 0; padding: 6px 12px; min-height: 35px; background: transparent; color: var(--ink-2); border-radius: var(--r-pill);
+  font-size: .83rem; font-weight: 600;
+}
+.field-coverage-switch button[aria-pressed="true"] { background: var(--sheen), var(--black); color: #fff; box-shadow: var(--shadow-btn); }
+.field-editor-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.field-editor-actions:empty { display: none; }
+.field-editor-coordinates { padding: 8px 0 3px; font-size: .82rem; color: var(--ink-2); }
+.field-editor-coordinates summary { width: fit-content; cursor: pointer; font-weight: 600; }
+.field-editor-coordinates form { display: grid; justify-items: start; gap: 8px; margin-top: 8px; }
+.field-editor-coordinates label { display: grid; gap: 4px; width: min(100%, 36rem); }
+.field-editor-coordinates textarea { max-width: 100%; width: 100%; resize: vertical; }
+.fields-content .field-map-card .map-frame {
+  min-height: clamp(350px, 55dvh, 570px); border-radius: 0; border-width: 0; box-shadow: none;
+}
+.field-map-card .map-layer-panel { max-height: min(25rem, 43dvh); }
+.map-inspector {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px 14px;
+  padding: 12px 16px;
+}
+.map-inspector-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.map-settings-panel {
+  grid-column: 1 / -1; padding: 10px 0 2px; border-top: 1px solid var(--line);
+}
+.map-settings-panel:not([hidden]) { display: grid; gap: 9px; justify-items: start; }
+.map-layer-label { color: var(--ink-2); font-size: .82rem; }
+.fields-content .map-details { display: flex; align-items: start; flex-wrap: wrap; gap: 9px 20px; min-width: 0; }
+.fields-content .map-details:empty { display: none; }
+.moisture-layer-detail { min-width: 0; overflow-wrap: anywhere; }
+.moisture-layer-detail h3 {
+  display: flex; align-items: center; gap: 6px; margin: 0 0 4px; color: var(--ink-2); font-size: .74rem;
+}
+.moisture-layer-detail h3 .map-layer-swatch { flex: 0 0 12px; }
+.current-moisture h3 { color: var(--ink); }
+.fields-content .map-details .map-legend { box-shadow: none; border: 0; background: transparent; padding: 0; }
+.fields-content .map-details .map-legend:has(i) { min-width: min(240px, 100%); }
+.fields-content .regional-legend > p { margin: 0 0 3px; }
+.fields-content .regional-legend strong { color: var(--ink); }
+.fields-content .satellite-scene { max-width: min(340px, calc(100vw - 44px)); }
+.fields-content .satellite-scene .button { min-height: 36px; }
+.fields-content .satellite-date { width: fit-content; }
+.fields-content .moisture-detail { display: block; margin-top: 3px; overflow-wrap: anywhere; }
+.fields-content .moisture-stale { color: var(--ink); font-weight: 650; }
+.fields-content .map-loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--ink-2);
+  background: var(--sunken);
+}
+.fields-content .moisture-request { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.fields-content .moisture-request .control > input[type="date"] { min-width: 8.5rem; }
+.fields-content .moisture-request small { flex-basis: 100%; }
+@media (max-width: 540px) {
+  .fields-content .field-summary { left: 8px; bottom: 33px; }
+  .fields-content .map-controls { right: 8px; bottom: 33px; }
+  .fields-content .real-map .leaflet-control-scale { margin-bottom: 92px; }
+  .fields-content .map-place-label:not(.map-place-label-selected) { display: none; }
+  .fields-content .real-map .leaflet-control-attribution { font-size: 9px; }
+}
+@media (max-width: 780px) {
+  .map-inspector { grid-template-columns: minmax(0, 1fr); }
+  .field-map-heading, .map-inspector, .field-area-strip, .field-geometry-editor { padding-inline: 12px; }
+  .fields-content .field-map-card .map-frame { min-height: clamp(350px, 57dvh, 475px); }
+}
+@media (pointer: coarse) {
+  .fields-content :is(.map-controls, .field-summary) .icon-button { min-height: 40px; width: 40px; }
+  .fields-content .field-summary .icon-button { flex-basis: 40px; }
+}

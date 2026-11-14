@@ -1,0 +1,20 @@
+.seasonal-weather-panel > details > summary { cursor: pointer; }
+.seasonal-weather-panel > details > summary strong { margin: 0 .5rem; font-size: .96rem; font-weight: 600; letter-spacing: -.015em; }
+.seasonal-weather-panel > details > summary span { color: var(--ink-2); font-size: .73rem; }
+.seasonal-weather-totals, .seasonal-weather-day-readout { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 12px 0; }
+.seasonal-weather-totals > div, .seasonal-weather-day-readout > div { min-width: 0; padding: 10px 12px; background: var(--screen); border-radius: var(--r-md); }
+.seasonal-weather-panel dt, .seasonal-weather-totals small { color: var(--ink-2); font-size: .68rem; }
+.seasonal-weather-panel dd { margin: 4px 0 0; font-size: .82rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.seasonal-weather-base, .seasonal-weather-day { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 12px; font-size: .74rem; }
+.seasonal-weather-base select { min-height: 34px; padding: 4px 12px; font-weight: 600; background: var(--card); border: 0; border-radius: var(--r-pill); box-shadow: var(--shadow-float); }
+.seasonal-weather-day { align-items: stretch; flex-direction: column; }
+.seasonal-weather-day input { width: 100%; }
+.seasonal-weather-chart { margin: 15px 0 0; }
+.seasonal-weather-chart figcaption { display: flex; justify-content: space-between; align-items: baseline; gap: 7px; font-size: .75rem; }
+.seasonal-weather-chart figcaption span { color: var(--ink-2); font-size: .66rem; white-space: nowrap; }
+.seasonal-weather-chart svg { display: block; width: 100%; }
+.seasonal-weather-chart text { fill: var(--ink-3); font: 9px var(--font); }
+.seasonal-weather-chart-hit { cursor: crosshair; }
+.seasonal-weather-chart-key { list-style: none; display: flex; gap: 12px; flex-wrap: wrap; padding: 0; margin: 2px 0 8px; font-size: .65rem; color: var(--ink-2); }
+.seasonal-weather-chart-key li { display: flex; align-items: center; gap: 5px; }
+.seasonal-weather-chart-key i { width: 12px; height: 3px; border-radius: var(--r-pill); }

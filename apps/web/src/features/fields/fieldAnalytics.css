@@ -1,0 +1,96 @@
+.field-context-view { display: flex; gap: 3px; padding: 4px; margin: 5px 0 18px; border-radius: var(--r-pill); background: var(--sunken); }
+.field-context-view button { flex: 1; min-height: 36px; padding: 8px 10px; border: 0; border-radius: var(--r-pill); background: transparent; color: var(--ink-2); font-size: .79rem; font-weight: 600; cursor: pointer; transition: background-color 120ms var(--ease-out), color 120ms var(--ease-out); }
+.field-context-view button:not([aria-pressed="true"]):hover { color: var(--ink); }
+.field-context-view button[aria-pressed="true"] { background: var(--sheen), var(--black); color: #fff; box-shadow: var(--shadow-btn); }
+.field-analysis-panel { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; min-width: 0; }
+.field-analysis-panel > section { min-width: 0; }
+.field-analysis-panel > section + section { border-top: 1px solid var(--line); padding-top: 19px; }
+.field-analysis-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.field-analysis-heading h3 { font-size: .96rem; letter-spacing: -.015em; }
+.field-analysis-heading svg { width: 20px; height: 20px; }
+.ndvi-season select { min-height: 34px; padding: 5px 12px; font-size: .78rem; font-weight: 600; background: var(--card); border: 0; border-radius: var(--r-pill); box-shadow: var(--shadow-float); }
+.analysis-description { margin-top: 6px; color: var(--ink-2); font-size: .74rem; line-height: 1.5; }
+.analysis-empty { padding: 16px 14px; margin: 12px 0; background: var(--screen); border-radius: var(--r-md); color: var(--ink-2); font-size: .78rem; line-height: 1.5; }
+.ndvi-current { display: flex; gap: 12px; justify-content: space-between; align-items: center; margin: 20px 0 9px; }
+.ndvi-current > strong { font-size: 2.1rem; font-weight: 600; letter-spacing: -.045em; color: var(--ink); font-variant-numeric: tabular-nums; }
+.ndvi-current strong small { font-size: .67rem; font-weight: 500; letter-spacing: 0; margin-left: 6px; color: var(--ink-2); }
+.ndvi-current > div { display: grid; gap: 4px; font-size: .7rem; text-align: right; }
+.ndvi-current > div span { color: var(--ink-2); }
+.seasonal-ndvi-chart { margin: 0; }
+.seasonal-ndvi-chart svg { width: 100%; display: block; overflow: visible; }
+.seasonal-ndvi-chart text { font: 10px var(--font); fill: var(--ink-3); }
+.seasonal-ndvi-chart figcaption { display: flex; flex-wrap: wrap; gap: 7px 12px; font-size: .63rem; color: var(--ink-2); }
+.seasonal-ndvi-chart figcaption span { display: flex; align-items: center; gap: 5px; }
+.seasonal-ndvi-chart figcaption i { width: 13px; height: 3px; border-radius: var(--r-pill); background: var(--series-1); }
+.seasonal-ndvi-chart figcaption i.ndvi-range { height: 8px; border-radius: 2px; background: var(--sunken-2); }
+.ndvi-observation-dates { display: flex; gap: 6px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; padding: 12px 0 7px; }
+.ndvi-observation-dates button { flex: 0 0 auto; min-height: 32px; padding: 6px 12px; border: 0; border-radius: var(--r-pill); font-size: .68rem; font-weight: 600; color: var(--ink-2); background: var(--sunken); cursor: pointer; transition: background-color 120ms var(--ease-out); }
+.ndvi-observation-dates button:not([aria-pressed="true"]):hover { background: var(--sunken-2); color: var(--ink); }
+.ndvi-observation-dates button[aria-pressed="true"] { color: #fff; background: var(--sheen), var(--black); }
+.ndvi-point-target { cursor: pointer; }
+.ndvi-comparison { margin-top: 14px; padding: 12px 14px; background: var(--screen); border-radius: var(--r-md); }
+.ndvi-comparison label { display: grid; gap: 5px; font-size: .74rem; color: var(--ink-2); }
+.ndvi-comparison select { width: 100%; min-height: 38px; padding: 5px 12px; font: inherit; color: var(--ink); background: var(--card); border: 0; border-radius: var(--r-btn); box-shadow: inset 0 0 0 1px var(--line-control); }
+.ndvi-comparison-values { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 10px 0 0; font-size: .69rem; }
+.ndvi-comparison-values dt { color: var(--ink-2); }
+.ndvi-comparison-values dd { margin: 4px 0 0; font-weight: 600; }
+.ndvi-map-switch { display: flex; gap: 3px; padding: 3px; margin-bottom: 9px; border-radius: var(--r-pill); background: var(--sunken); }
+.ndvi-map-switch button, .ndvi-retry { pointer-events: auto; font-size: .69rem; font-weight: 600; min-height: 36px; padding: 4px 12px; cursor: pointer; border: 0; border-radius: var(--r-pill); background: transparent; color: var(--ink-2); }
+.ndvi-map-switch button { flex: 1; }
+.ndvi-map-switch button[aria-pressed="true"] { color: #fff; background: var(--sheen), var(--black); }
+.ndvi-retry { margin-top: 6px; background: var(--card); color: var(--ink); box-shadow: var(--shadow-float); }
+.ndvi-scale { gap: 5px 9px; }
+.analysis-footnote, .analysis-source { display: block; font-size: .65rem; line-height: 1.6; color: var(--ink-2); margin-top: 10px; }
+.analysis-source { text-decoration-color: var(--line-strong); text-underline-offset: 3px; }
+.field-analysis-panel .analysis-refresh, .field-analysis-panel .analysis-map-toggle { width: 100%; margin-top: 12px; min-height: 40px; padding: 8px 12px; font-size: .74rem; }
+/* secondary actions: white pills; a map layer that is on: black */
+.field-analysis-panel .button.subtle.analysis-refresh, .field-analysis-panel .button.subtle.analysis-map-toggle { background: var(--card); box-shadow: var(--shadow-float); }
+.field-analysis-panel .button.subtle.analysis-refresh:not(:disabled):hover, .field-analysis-panel .button.subtle.analysis-map-toggle:not(:disabled):hover { box-shadow: var(--shadow-card-hover); }
+.button.analysis-map-toggle[aria-pressed="true"], .field-analysis-panel .button.subtle.analysis-map-toggle[aria-pressed="true"],
+.field-analysis-panel .button.subtle.analysis-map-toggle[aria-pressed="true"]:not(:disabled):hover { background: var(--sheen), var(--black); color: #fff; box-shadow: var(--shadow-btn); }
+.analysis-quality { margin-top: 13px; font-size: .68rem; color: var(--ink-2); }
+.analysis-quality summary { cursor: pointer; padding-block: 5px; font-weight: 600; color: var(--ink); }
+.analysis-quality ul { list-style: none; padding: 6px 0; margin: 0; }
+.analysis-quality li { display: flex; justify-content: space-between; gap: 10px; padding: 5px 0; border-bottom: 1px solid var(--line); }
+.analysis-quality p { font-size: .65rem; line-height: 1.5; margin-top: 6px; }
+.heterogeneity-value { display: flex; align-items: center; gap: 13px; margin: 15px 0; }
+.heterogeneity-value strong { font-size: 1.8rem; line-height: 1; font-weight: 600; letter-spacing: -.04em; color: var(--ink); }
+.heterogeneity-value strong small { font-size: .9rem; margin-left: 2px; }
+.heterogeneity-value > span { font-size: .74rem; line-height: 1.45; max-width: 140px; color: var(--ink-2); }
+.heterogeneity-legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: .67rem; }
+.heterogeneity-legend span { display: flex; align-items: center; gap: 6px; }
+.heterogeneity-legend i { width: 10px; height: 10px; border-radius: 3px; }
+/* zone colours are data (the heterogeneity map's scale, analyticsMapLayers.ts), not chrome */
+.zone-low, .map-swatch-heterogeneity { background: #c19548; }
+.zone-typical { background: #a0b58d; }
+.zone-high { background: #2b5940; }
+/* the terrain arrows: a white line with a black casing (analyticsMapLayers.ts) */
+.map-swatch-terrain { background: #fff; box-shadow: inset 0 0 0 2px var(--black); }
+.terrain-readout { display: flex; gap: 24px; margin-top: 13px; }
+.terrain-readout dt { font-size: .67rem; color: var(--ink-2); }
+.terrain-readout dd { margin: 4px 0 0; font-size: .92rem; font-weight: 600; }
+/* "Помічник поля": a white card like the assistant widget's; an inspection cue gets a black edge */
+.field-vegetation-signal { border: 0; border-radius: var(--r-card); padding: 14px 16px; margin: 12px 0; background: var(--card); box-shadow: var(--shadow-card); }
+.field-vegetation-signal.is-inspect { box-shadow: var(--shadow-card), inset 0 0 0 1.5px var(--ink); }
+.field-vegetation-signal h3 { font-size: .88rem; font-weight: 600; letter-spacing: -.01em; }
+.field-vegetation-signal p { margin-top: 6px; font-size: .75rem; line-height: 1.5; color: var(--ink-2); }
+.field-vegetation-signal button { margin-top: 12px; padding: 7px 14px; display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: var(--r-pill); background: var(--card); color: var(--ink); box-shadow: var(--shadow-float); font-size: .76rem; font-weight: 600; cursor: pointer; min-height: 36px; transition: box-shadow 120ms var(--ease-out), transform 120ms var(--ease-out); }
+.field-vegetation-signal button:hover { box-shadow: var(--shadow-card-hover); }
+.field-vegetation-signal button:active { transform: scale(.97); }
+.field-vegetation-signal button:focus-visible { box-shadow: var(--focus); }
+.field-vegetation-signal svg { width: 16px; height: 16px; }
+.map-analytics-legend { position: absolute; z-index: 5; top: 18px; right: 18px; max-width: 238px; border-radius: var(--r-md); padding: 10px 12px; background: var(--card); border: 0; box-shadow: var(--shadow-float); pointer-events: none; }
+.map-analytics-legend strong { display: block; font-size: .76rem; margin-bottom: 7px; }
+.map-analytics-legend small { display: block; font-size: .62rem; color: var(--ink-2); margin-top: 7px; }
+@media (max-width: 1000px) {
+  .field-context-view { margin-right: 34px; margin-top: 10px; }
+  .field-analysis-panel { padding-bottom: 8px; }
+  .map-analytics-legend { top: 62px; right: 12px; padding: 8px 10px; max-width: 220px; }
+  .map-analytics-legend .heterogeneity-legend { gap: 7px; font-size: .61rem; }
+  .ndvi-observation-dates button { min-height: 38px; }
+}
+.spectral-panel select { width: 100%; min-width: 0; }
+.spectral-formula { overflow-wrap: anywhere; }
+.boundary-history .field-area-strip { display: grid; gap: .75rem; }
+.boundary-version { display: grid; gap: .5rem; padding: .75rem 0; border-top: 1px solid var(--line); }
+.boundary-version span, .boundary-version a { font-size: .8rem; overflow-wrap: anywhere; }
