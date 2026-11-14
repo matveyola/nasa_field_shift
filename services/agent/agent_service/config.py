@@ -196,5 +196,5 @@ class Settings(BaseModel):
             if value is None or value == "":
                 continue
             raw[name] = [o.strip() for o in value.split(",") if o.strip()] if name == "cors_origins" else value
-        raw.setdefault("rag_index_path", str(knowledge_index_path(environ)))
+        raw["rag_index_path"] = str(knowledge_index_path(environ))
         return cls.model_validate(raw)

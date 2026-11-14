@@ -29,11 +29,14 @@ def knowledge_directory(environ: Mapping[str, str] | None = None) -> Path:
 def knowledge_index_path(environ: Mapping[str, str] | None = None) -> Path:
     env = os.environ if environ is None else environ
     explicit = env.get("AGENT_RAG_INDEX_PATH")
-    return (
+    path = (
         Path(explicit).expanduser()
         if explicit
         else knowledge_directory(env) / "index" / "knowledge.sqlite"
     )
+    if not path.is_absolute():
+        raise ValueError("AGENT_RAG_INDEX_PATH must be absolute (a leading ~ is expanded)")
+    return path
 
 
 def reports_directory(environ: Mapping[str, str] | None = None) -> Path:

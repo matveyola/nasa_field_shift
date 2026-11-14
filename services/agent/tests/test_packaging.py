@@ -5,6 +5,7 @@ import os
 import subprocess
 import sys
 from importlib.resources import files
+from pathlib import Path
 
 import pytest
 from agent_service.config import Settings
@@ -109,6 +110,23 @@ def test_explicit_data_and_index_configuration_is_shared_with_settings(tmp_path)
 def test_relative_data_override_is_rejected():
     with pytest.raises(ValueError, match="must be absolute"):
         data_directory({"AGENT_DATA_DIR": "./data"})
+
+
+def test_home_index_override_is_expanded_consistently(tmp_path, monkeypatch):
+    env = {"AGENT_RAG_INDEX_PATH": "~/knowledge.sqlite"}
+    expected = Path.home() / "knowledge.sqlite"
+    monkeypatch.chdir(tmp_path)
+    assert knowledge_index_path(env) == expected
+    assert Settings.from_env(env).rag_index_path == str(expected)
+
+
+@pytest.mark.parametrize("value", ["knowledge.sqlite", "./data/index.sqlite", "../index.sqlite"])
+def test_relative_index_override_is_rejected(value):
+    env = {"AGENT_RAG_INDEX_PATH": value}
+    with pytest.raises(ValueError, match="AGENT_RAG_INDEX_PATH must be absolute"):
+        knowledge_index_path(env)
+    with pytest.raises(ValueError, match="AGENT_RAG_INDEX_PATH must be absolute"):
+        Settings.from_env(env)
 
 
 def test_eval_outputs_use_configured_writable_state(tmp_path):
