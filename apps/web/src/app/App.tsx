@@ -34,7 +34,7 @@ export function App() {
   const [assistantOpen, setAssistantOpen] = useState(() => route.page === 'agent')
   useEffect(() => {
     if (route.page !== 'agent') return
-    const address = routeAddress({ page: 'fields', fieldId: route.fieldId, scenario: route.scenario })
+    const address = routeAddress({ ...route, page: 'fields' })
     history.replaceState(null, '', address)
     setRoute(parseRoute(address))
     setAssistantOpen(true)
@@ -59,7 +59,7 @@ export function App() {
 
   function go(page: Page, options?: { fieldId?: string; jobId?: string | null; scenario?: Scenario; addField?: boolean; forecastDay?: string; analysis?: boolean; layer?: Route['layer']; signal?: Route['signal'] }) {
     if (page === 'agent') { // the assistant opens over the current page, for the field asked about
-      if (options?.fieldId && options.fieldId !== field?.id) setAddress({ page: route.page, fieldId: options.fieldId, scenario })
+      if (options?.fieldId && options.fieldId !== field?.id) setAddress({ ...route, fieldId: options.fieldId, scenario })
       setAssistantOpen(true)
       return
     }

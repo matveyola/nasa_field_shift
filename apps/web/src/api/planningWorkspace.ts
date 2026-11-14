@@ -26,6 +26,6 @@ export async function planningEvidence(farm: string, run: string, signal: AbortS
   const result = await planningTransport<PlanningEvidence>(`/planning-workspace/farms/${encodeURIComponent(farm)}/runs/${encodeURIComponent(run)}/evidence`, { signal })
   return { candidates: result.candidates.map(v => decode('candidate', v)), evaluations: result.evaluations.map(v => decode('evaluation', v)) }
 }
-export function initializePlanningProfile(field: string): Promise<FieldProfileSnapshot> {
-  return planningTransport(`/planning-workspace/fields/${encodeURIComponent(field)}/initialize`, { method: 'POST' })
+export function initializePlanningProfile(field: string, refreshBoundary = false): Promise<FieldProfileSnapshot> {
+  return planningTransport(`/planning-workspace/fields/${encodeURIComponent(field)}/initialize${refreshBoundary ? "?refresh_boundary=true" : ""}`, { method: 'POST' })
 }

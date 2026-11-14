@@ -4,6 +4,8 @@ const uk: Record<string, string> = {
   'Compare plans': 'Порівняння планів', 'Evidence': 'Обґрунтування', 'Unknown': 'Невідомо',
   'Synthetic demonstration — not measured accuracy': 'Синтетична демонстрація — не виміряна точність',
   'Field': 'Поле', 'Season': 'Сезон', 'Scenario': 'Сценарій', 'Goal': 'Ціль',
+  'Refresh confirmed commitments before replanning': 'Оновіть підтверджені рішення перед повторним розрахунком',
+  'Retry commitment refresh': 'Повторити оновлення рішень',
   'Reference scenario margin': 'Маржа в опорному сценарії', 'Worst tested margin': 'Маржа за найгіршим перевіреним сценарієм',
   'Water demand': 'Потреба у воді', 'Available crops': 'Доступні культури', 'Three seasons': 'Три сезони',
   'Resources': 'Ресурси', 'Budget': 'Бюджет', 'Currency': 'Валюта', 'Irrigation limit (m³)': 'Ліміт поливу (м³)',

@@ -42,10 +42,12 @@ export function PlanningPage({ fieldId, season, trajectory, onContext }: {
       cropOptions={boot.crop_options} currentProfiles={boot.profiles} locale={language}
       context={{ fieldId, season, trajectoryId: trajectory ?? request.weather.scenarios[0]?.trajectory_id ?? '' }}
       onContextChange={next => onContext(next.fieldId, next.season, next.trajectoryId)}
-      loadEvidence={loadEvidence} onProfileSaved={data.reload} onApplied={() => {
+      loadEvidence={loadEvidence} onProfileSaved={data.reload} onApplied={async signal => {
         setApplied(true)
-        void planningBootstrap(new AbortController().signal).then(next => data.update(() => next))
-          .catch(e => setError(e instanceof Error ? e.message : 'Refresh inputs before replanning'))
+        const next = await planningBootstrap(signal)
+        if (!next.request) throw new Error(next.reason)
+        data.update(() => next)
+        return next.request
       }} />
       : <>
         <h1>{uk ? 'Підготовка планування' : 'Planning setup'}</h1>
@@ -53,12 +55,12 @@ export function PlanningPage({ fieldId, season, trajectory, onContext }: {
         <p>{boot.status}: {boot.reason}</p>
         <button className="button" onClick={data.reload}>{uk ? 'Перевірити дані' : 'Refresh inputs'}</button>
         {boot.missing_profiles.map(field => <article key={field.field_id}><h2>{field.name}</h2>
-          {field.code === 'not_found' ? <button disabled={busy} className="button" onClick={async () => {
+          {['not_found', 'stale'].includes(field.code) ? <button disabled={busy} className="button" onClick={async () => {
             setBusy(true); setError('')
-            try { await initializePlanningProfile(field.field_id); data.reload() }
+            try { await initializePlanningProfile(field.field_id, field.code === 'stale'); data.reload() }
             catch (e) { setError(e instanceof Error ? e.message : 'Profile unavailable') }
             finally { setBusy(false) }
-          }}>{uk ? 'Створити паспорт поля' : 'Create field profile'}</button> : <p>{uk ? 'Межі поля змінилися. Оновіть паспорт і пов’язані джерела даних.' : 'Field boundary changed. Refresh the profile and linked inputs.'}</p>}</article>)}
+          }}>{field.code === 'stale' ? (uk ? 'Створити паспорт для нових меж — дані треба перевірити знову' : 'Create profile for new boundary — inputs need review') : (uk ? 'Створити паспорт поля' : 'Create field profile')}</button> : <p>{uk ? 'Межі поля змінилися. Оновіть паспорт і пов’язані джерела даних.' : 'Field boundary changed. Refresh the profile and linked inputs.'}</p>}</article>)}
         {boot.profiles.map(profile => <FieldProfileEditor key={profile.snapshot_id} profile={profile} locale={language} busy={busy} onSave={edit} />)}
       </>}
   </section>

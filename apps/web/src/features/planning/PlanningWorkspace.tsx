@@ -25,7 +25,7 @@ export interface PlanningWorkspaceProps {
   /** Integration #7 resolves existing candidate/evaluation IDs; no invented HTTP endpoint. */
   loadEvidence?: (run: PlanningRun, signal: AbortSignal) => Promise<PlanningEvidence>
   onProfileSaved?: (profile: FieldProfileSnapshot) => void
-  onApplied?: () => void
+  onApplied?: (signal: AbortSignal) => Promise<FarmPlanningRequest>
   clock?: () => Date
 }
 const defaultClock = () => new Date()
@@ -48,6 +48,8 @@ function WorkspaceSession({ initialRequest, initialRun, currentProfiles, cropOpt
   const [previous, setPrevious] = useState<PlanAlternative>()
   const [dirty, setDirty] = useState(false)
   const [busy, setBusy] = useState(false)
+  const [needsCommitments, setNeedsCommitments] = useState(false)
+  const [confirmedLocks, setConfirmedLocks] = useState(() => clone(initialRequest.locks))
   const [error, setError] = useState('')
   const [errorReasons, setErrorReasons] = useState<Reason[]>([])
   const [notice, setNotice] = useState('')
@@ -68,6 +70,7 @@ function WorkspaceSession({ initialRequest, initialRun, currentProfiles, cropOpt
     if (next === knownLocks.current) return
     knownLocks.current = next
     // Server-confirmed commitments survive apply → replan in the same workspace.
+    setConfirmedLocks(clone(initialRequest.locks))
     setDraft(old => ({ ...old, locks: clone(initialRequest.locks) }))
     setDirty(true); setConfirm(false)
   }, [initialRequest.locks])
@@ -127,7 +130,7 @@ function WorkspaceSession({ initialRequest, initialRun, currentProfiles, cropOpt
     if (pendingSubmit.current?.fingerprint !== fingerprint) pendingSubmit.current = { fingerprint, request: prepareRequest(draft, selectedFields, crypto.randomUUID(), clock()) }
     const request = pendingSubmit.current.request
     const next = run ? await api.replan({ schema_version: '1.0.0', previous_run_id: run.run_id, request,
-      preserve_commitment_ids: request.locks.map(l => l.commitment_id!).filter(Boolean) }, signal) : await api.submit(request, signal)
+      preserve_commitment_ids: [...new Set([...initialRequest.locks, ...confirmedLocks, ...run.request.locks].map(l => l.commitment_id!).filter(Boolean))] }, signal) : await api.submit(request, signal)
     if (signal.aborted) return
     setPrevious(selected); setRun(next)
     setDraft({ ...clone(next.request), fields: clone(profiles), weather: clone(initialRequest.weather) })
@@ -146,6 +149,14 @@ function WorkspaceSession({ initialRequest, initialRun, currentProfiles, cropOpt
       setDirty(true); setNotice('Profile saved'); onProfileSaved?.(saved)
     })
   }
+  async function refreshCommitments(signal: AbortSignal) {
+    if (!onApplied) throw new Error('Refresh confirmed commitments before replanning')
+    const fresh = await onApplied(signal)
+    if (signal.aborted) return
+    setConfirmedLocks(clone(fresh.locks))
+    setDraft(old => ({ ...old, locks: clone(fresh.locks) }))
+    setNeedsCommitments(false); setDirty(true)
+  }
   async function apply(signal: AbortSignal) {
     if (!run || !selected || !checked || dirty || staleRun(run, latestProfiles, initialRequest.weather, clock())) throw new Error('Stale report — refresh inputs and replan')
     const key = `${run.run_id}/${selected.alternative_id}/${run.input_sha256}`
@@ -156,7 +167,8 @@ function WorkspaceSession({ initialRequest, initialRun, currentProfiles, cropOpt
       setError(`${t('Application failed')}: ${t(result.status)}. ${result.reasons.map(r => r.message).join(' ')}`)
       return
     }
-    setConfirm(false); setNotice('Plan applied'); onApplied?.()
+    setConfirm(false); setNotice('Plan applied'); setNeedsCommitments(true)
+    if (onApplied) await refreshCommitments(signal)
   }
   const changeDraft = (value: FarmPlanningRequest) => { setDraft(value); setDirty(true); setNotice(''); setConfirm(false) }
   return <main className="planning-workspace" lang={locale}>
@@ -174,8 +186,11 @@ function WorkspaceSession({ initialRequest, initialRun, currentProfiles, cropOpt
     {stale && <p className="pl-error" role="status">{t('Stale report — refresh inputs and replan')}</p>}
     <FieldDataCards fields={profiles} weather={initialRequest.weather} selected={context.fieldId} onSelect={fieldId => onContextChange({ ...context, fieldId })} locale={locale} />
     {active && <details><summary>{t('Field profile')}</summary><FieldProfileEditor key={active.snapshot_id} profile={active} locale={locale} busy={busy} onSave={saveProfile} /></details>}
-    <PlanSettings draft={draft} selectedFields={selectedFields} cropOptions={cropOptions} locale={locale} busy={busy}
-      lockedAtStart={run?.request.locks ?? initialRequest.locks} onChange={changeDraft} onFields={ids => { setSelectedFields(ids); setDirty(true); setConfirm(false) }} onSubmit={() => void operation(submit)} replan={!!run} />
+    {needsCommitments && <p role="status">{t('Refresh confirmed commitments before replanning')}
+      {onApplied && <button className="button" disabled={busy} onClick={() => void operation(refreshCommitments)}>{t('Retry commitment refresh')}</button>}
+    </p>}
+    <PlanSettings draft={draft} selectedFields={selectedFields} cropOptions={cropOptions} locale={locale} busy={busy || needsCommitments}
+      lockedAtStart={[...initialRequest.locks, ...confirmedLocks, ...(run?.request.locks ?? [])]} onChange={changeDraft} onFields={ids => { setSelectedFields(ids); setDirty(true); setConfirm(false) }} onSubmit={() => void operation(submit)} replan={!!run} />
     <section className="pl-card"><div className="pl-row"><h2 role="status" aria-live="polite">{t(runLabel(run))}</h2>
       <button className="button subtle" disabled={busy} onClick={() => void operation(async signal => {
         const results = await api.list(initialRequest.farm_id, signal); if (!signal.aborted) setSavedRuns(results)
@@ -189,7 +204,7 @@ function WorkspaceSession({ initialRequest, initialRun, currentProfiles, cropOpt
       }}><option value="">—</option>{savedRuns.map(r => <option key={r.run_id} value={r.run_id}>{r.run_id} · {r.created_at}</option>)}</Select>}
       {run?.error && <Reasons reasons={[run.error]} />}
       {run && <PlanComparison run={run} evidence={evidence} locale={locale} context={context} onContext={onContextChange} alternativeId={alternativeId} onAlternative={id => { setAlternativeId(id); setConfirm(false) }} previous={previous} />}
-      <button className="button primary" disabled={busy || dirty || stale || run?.status !== 'succeeded' || !selected || !['optimal', 'feasible', 'limit_reached'].includes(run?.comparison?.solver_status ?? '')}
+      <button className="button primary" disabled={busy || needsCommitments || dirty || stale || run?.status !== 'succeeded' || !selected || !['optimal', 'feasible', 'limit_reached'].includes(run?.comparison?.solver_status ?? '')}
         onClick={() => setConfirm(true)}>{t('Apply selected plan')}</button>
     </section>
     <dialog ref={dialog} className="pl-dialog" aria-labelledby={dialogTitle} onCancel={event => { event.preventDefault(); setConfirm(false) }}><h2 id={dialogTitle}>{t('Confirm application')}</h2>
