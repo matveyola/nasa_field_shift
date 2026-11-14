@@ -87,6 +87,7 @@ def test_no_l3_fallback_never_imports_optional_dependency(monkeypatch):
     assert output.status == "available"
     assert output.mode == "raw_era5_fallback"
     assert output.value_m3_m3 == 0.24
+    assert output.target_depth_cm == (0, 7)
     assert output.research_interval_m3_m3 is None
 
 
@@ -190,6 +191,7 @@ def test_zero_surface_moisture_is_preserved_in_raw_reference():
     output = HistoricalSurfaceAdapter().estimate(replace(request, era5=rows))
     assert output.status == "available"
     assert output.value_m3_m3 == 0.0
+    assert output.target_depth_cm == (0, 7)
 
 
 def test_bad_soil_and_missing_soil_do_not_invent_trained_features():

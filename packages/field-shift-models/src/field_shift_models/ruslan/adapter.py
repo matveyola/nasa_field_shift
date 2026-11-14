@@ -127,6 +127,7 @@ class HistoricalSurfaceAdapter:
                 available,
                 value_m3_m3=level,
                 source_sha256=sources,
+                target_depth_cm=(0, 7),
             )
         prediction, low, high = self._predict(features, level, amplitude)
         if not all(math.isfinite(v) for v in (prediction, low, high)):

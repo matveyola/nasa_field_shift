@@ -80,7 +80,9 @@ The transform preserves the original 17-feature order and anomaly arithmetic:
 ERA5-Land 0–7 cm surface and 7–28 cm subsurface layers, recent 3/7-day surface statistics,
 past-season product climatologies, SMAP L3 anomaly and retrieval age, season,
 temperature, and SSURGO sand/clay/organic matter at 5 cm. The target remains 0–5 cm
-research surface moisture; the input ERA5 layer depth is not relabeled. Current
+research surface moisture. Output `target_depth_cm` identifies the returned
+quantity: `(0, 5)` for the learned correction and `(0, 7)` for raw ERA5 fallback.
+The fallback is not a conversion to the model's 0–5 cm target. Current
 year values never enter climatology. At least 30 finite past-season observations
 and positive variance are required per used product. Unavailable L4 features stay
 NaN: the pinned final training report had zero matching L4 rows. No L4 capability
@@ -139,3 +141,12 @@ The repository packaging guard currently reports two inherited path overrides in
 `test_audit_public_crop_data.py`, introduced by the prerequisite accuracy branch.
 They are outside this lane's ownership and were reported to the parent for repair;
 this checkpoint does not claim that repository-wide guard passed.
+
+### Depth metadata correction
+
+Independent review reproduced a raw ERA5 fallback carrying the model's 0–5 cm
+default depth, although its unchanged value represents the ERA5 0–7 cm layer.
+The fallback now explicitly reports `(0, 7)`. Regression assertions cover the
+nonzero and genuine-zero fallback paths; the real learned-model test retains
+`(0, 5)`. Numerical predictions, artifacts and original research evidence are
+unchanged. This corrects output metadata and does not add empirical validation.
