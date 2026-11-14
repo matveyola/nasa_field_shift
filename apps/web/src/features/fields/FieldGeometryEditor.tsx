@@ -91,7 +91,10 @@ export function FieldGeometryEditor({
       </div>
       {draft.suggestion && <div className="field-suggestion-review">
         <p className="field-editor-suggestion" role="status">
-          {t(draft.suggestion.source === 'aerial' ? 'Suggested from USGS aerial imagery.' : 'Suggested from Sentinel-2 imagery.')}
+          {draft.suggestion.source === 'model' ? 'Delineate Anything v2'
+            : t(draft.suggestion.source === 'aerial' ? 'Suggested from USGS aerial imagery.' : 'Suggested from Sentinel-2 imagery.')}
+          {draft.suggestion.imageryDate && <> · <time dateTime={draft.suggestion.imageryDate}>{date(draft.suggestion.imageryDate)}</time></>}
+          {draft.suggestion.imagerySource && <> · {draft.suggestion.imagerySource}</>}
           {draft.suggestion.preview?.acquiredAt && (
             <> · <time dateTime={draft.suggestion.preview.acquiredAt}>{date(draft.suggestion.preview.acquiredAt)}</time></>
           )}

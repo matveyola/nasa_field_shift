@@ -11,6 +11,7 @@ from field_shift.modules.access.models import (
 from field_shift.modules.agent.models import Conversation, Message
 from field_shift.modules.farm.models import Farm, Observation
 from field_shift.modules.fields.models import Field
+from field_shift.modules.onboarding.models import FieldSetup
 from field_shift.modules.precision.models import PrecisionPlan
 from field_shift.modules.rotations.models import RotationPreference
 
@@ -26,6 +27,7 @@ __all__ = [
     "Conversation",
     "Farm",
     "Field",
+    "FieldSetup",
     "Message",
     "Observation",
     "RotationPreference",

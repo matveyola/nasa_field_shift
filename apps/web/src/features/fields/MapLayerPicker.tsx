@@ -8,7 +8,6 @@ export type MapLayer = MoistureSource | 'boundaries' | 'forecast' | 'planting' |
 
 type Props = {
   basemap: BasemapId
-  aerialAvailable: boolean
   layers: ReadonlyArray<{ id: MapLayer; label: string }>
   activeLayers: ReadonlySet<MapLayer>
   satelliteActive: boolean
@@ -21,7 +20,7 @@ type Props = {
 const basemapIds: BasemapId[] = ['aerial', 'street']
 
 export function MapLayerPicker({
-  basemap, aerialAvailable, layers, activeLayers, satelliteActive, satelliteAvailable,
+  basemap, layers, activeLayers, satelliteActive, satelliteAvailable,
   onBasemap, onLayer, onSatellite,
 }: Props) {
   const { t } = useLocale()
@@ -61,8 +60,6 @@ export function MapLayerPicker({
             {basemapIds.map((id) => (
               <button key={id} type="button" className="map-basemap-option"
                 aria-pressed={id === basemap}
-                disabled={id === 'aerial' && !aerialAvailable}
-                title={id === 'aerial' && !aerialAvailable ? t('Aerial imagery is unavailable here') : undefined}
                 onClick={() => { onBasemap(id); close() }}>
                 <span className={'map-basemap-preview map-preview-' + id} aria-hidden="true">
                   {id === basemap && <CheckIcon className="map-basemap-check" />}

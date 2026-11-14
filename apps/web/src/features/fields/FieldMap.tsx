@@ -4,12 +4,13 @@ import { MinusIcon, PlusIcon, ViewfinderCircleIcon } from '@heroicons/react/24/o
 import * as L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import type { Field, MoistureLayer, Position } from '../../api/contracts'
-import { basemaps, coordinateFromMap, demoAerialBounds, type BasemapId } from './basemaps'
+import { basemaps, coordinateFromMap, demoAerialBounds, usgsAttribution, type BasemapId } from './basemaps'
 import { moistureColor } from './geometry'
 import { useMapGeometryEditor, type EditMode } from './mapGeometryEditor'
 import type { SatelliteRaster } from './satelliteRaster'
 import type { SpectralIndex, TerrainResult, VegetationResult } from '../../api/analytics'
 import { useAnalyticsMapLayers } from './analyticsMapLayers'
+import { useDetailedImagery, usePlaceLabels } from './mapImagery'
 import type { PreparedContour } from '../../api/boundaries'
 import type { MapWindow } from './PreparedContoursPanel'
 
@@ -35,6 +36,7 @@ type Props = {
   showPlanting?: boolean
   newBoundary?: boolean
   suggestionSeed?: Position
+  locationMarker?: Position
   suggestBoundary?: (position: Position, fieldId?: string) => void
   reportSuggestionCenter?: (position: Position) => void
   basemap: BasemapId
@@ -47,6 +49,10 @@ type Props = {
   adoptContour?: (contour: PreparedContour) => void
   contourFocus?: Position
   onViewport?: (window: MapWindow) => void
+  /** Explicit navigation for setup; ordinary field views keep their existing automatic fit. */
+  viewportRequest?: { key: string; bounds: [[number, number], [number, number]]; maxZoom?: number }
+    | { key: string; center: Position; zoom: number }
+  autoFitFields?: boolean
 }
 
 function fitFields(map: L.Map, fields: Field[], editPoints?: Position[]) {
@@ -63,12 +69,14 @@ function fitFields(map: L.Map, fields: Field[], editPoints?: Position[]) {
 export default function FieldMap({
   fields, selected, layers, showBoundaries, satellite, points, drawing, basemap, retryTiles, chooseField, addPoint,
   onBasemapFailure, onBasemapReady, editMode, editLocked, appendVertices, activeVertex, selectVertex, moveVertex, insertVertex,
-  showPlanting, newBoundary, suggestionSeed, suggestBoundary, reportSuggestionCenter,
+  showPlanting, newBoundary, suggestionSeed, locationMarker, suggestBoundary, reportSuggestionCenter,
   bottomOcclusion = 0, vegetation, terrain, vegetationIndex,
   preparedContours, adoptContour, contourFocus, onViewport,
+  viewportRequest, autoFitFields = true,
 }: Props) {
   const { t } = useLocale()
   const host = useRef<HTMLDivElement>(null)
+  const detailedImageryVisible = useRef(false)
   const [map, setMap] = useState<L.Map>()
   const viewBeforeSheet = useRef<{ fieldId: string; center: L.LatLng; zoom: number } | undefined>(undefined)
   const selectedId = selected?.id
@@ -143,8 +151,20 @@ export default function FieldMap({
   }, [])
 
   useEffect(() => {
-    if (map) fitFields(map, fields)
-  }, [map, fields])
+    if (map && autoFitFields) fitFields(map, fields)
+  }, [map, fields, autoFitFields])
+
+  useEffect(() => {
+    if (!map || !viewportRequest) return
+    if ('center' in viewportRequest) {
+      const [longitude, latitude] = viewportRequest.center
+      map.setView([latitude, longitude], viewportRequest.zoom, { animate: false })
+    } else {
+      map.fitBounds(viewportRequest.bounds, {
+        animate: false, padding: [24, 24], maxZoom: viewportRequest.maxZoom ?? 12,
+      })
+    }
+  }, [map, viewportRequest])
 
   useEffect(() => {
     if (!map) return
@@ -187,6 +207,7 @@ export default function FieldMap({
     const provider = basemaps[basemap]
     const localBounds = L.latLngBounds(demoAerialBounds)
     let localAerial: L.ImageOverlay | undefined
+    let pendingLocalUpdate: ReturnType<typeof setTimeout> | undefined
     function hasLocalAerial() {
       return basemap === 'aerial' && map!.getZoom() >= 12 && localBounds.contains(map!.getCenter())
     }
@@ -194,7 +215,8 @@ export default function FieldMap({
       if (!map) return
       if (hasLocalAerial() && !localAerial) {
         localAerial = L.imageOverlay('/bondurant-usgs-aerial.webp', localBounds, {
-          pane: 'tilePane', zIndex: 0, interactive: false, alt: 'USGS aerial image of the Bondurant demo area',
+          pane: 'tilePane', zIndex: 3, interactive: false, alt: 'USGS aerial image of the Bondurant demo area',
+          attribution: usgsAttribution,
         }).addTo(map)
       } else if (!hasLocalAerial() && localAerial) {
         localAerial.remove()
@@ -202,9 +224,13 @@ export default function FieldMap({
       }
     }
     syncLocalAerial()
-    map.on('moveend', syncLocalAerial)
+    function queueLocalAerial() {
+      clearTimeout(pendingLocalUpdate)
+      pendingLocalUpdate = setTimeout(syncLocalAerial, 0)
+    }
+    map.on('moveend', queueLocalAerial)
     const tiles = L.tileLayer(provider.url, {
-      attribution: provider.attribution, maxNativeZoom: provider.maxNativeZoom, maxZoom: 19,
+      attribution: provider.attribution, maxNativeZoom: provider.maxNativeZoom, maxZoom: 19, zIndex: 0,
       updateWhenIdle: true, keepBuffer: 1,
     })
     let successful = 0
@@ -218,25 +244,31 @@ export default function FieldMap({
     }
     function loadComplete() {
       clearTimeout(timeout)
-      if (errors > 0 && successful === 0) signalFailure(basemap, hasLocalAerial())
+      if (errors > 0 && successful === 0 && !detailedImageryVisible.current) {
+        signalFailure(basemap, hasLocalAerial())
+      }
     }
     function startLoading() {
       successful = 0
       errors = 0
       clearTimeout(timeout)
       timeout = setTimeout(() => {
-        if (successful === 0) signalFailure(basemap, hasLocalAerial())
+        if (successful === 0 && !detailedImageryVisible.current) signalFailure(basemap, hasLocalAerial())
       }, 8000)
     }
     tiles.on('loading', startLoading).on('tileload', tileLoaded)
       .on('tileerror', () => { errors += 1 }).on('load', loadComplete).addTo(map)
     return () => {
       clearTimeout(timeout)
+      clearTimeout(pendingLocalUpdate)
       tiles.remove().off()
-      map.off('moveend', syncLocalAerial)
+      map.off('moveend', queueLocalAerial)
       localAerial?.remove()
     }
   }, [map, basemap, retryTiles])
+
+  useDetailedImagery(map, basemap === 'aerial' && !satellite, retryTiles, detailedImageryVisible, onBasemapReady)
+  usePlaceLabels(map, basemap === 'aerial')
 
   useEffect(() => {
     if (!map || !satellite) return
@@ -244,7 +276,7 @@ export default function FieldMap({
     const overlay = L.imageOverlay(satellite.url, satellite.bounds, {
       pane: 'satellitePane', interactive: false,
       alt: aerial ? 'USGS aerial imagery used for the field outline' : 'Sentinel-2 true-color field imagery',
-      attribution: aerial ? basemaps.aerial.attribution
+      attribution: aerial ? usgsAttribution
         : '<a href="https://registry.opendata.aws/sentinel-2-l2a-cogs/">Copernicus Sentinel-2</a>',
     }).addTo(map)
     if (suggesting && map.getZoom() < 14) map.fitBounds(satellite.bounds, { maxZoom: 15, animate: false })
@@ -291,14 +323,17 @@ export default function FieldMap({
   }, [map, fields, selectedId, editing, editMode, showBoundaries, suggesting, bottomOcclusion])
 
   useEffect(() => {
-    if (!map || !suggestionSeed) return
-    const [longitude, latitude] = suggestionSeed
-    const marker = L.circleMarker([latitude, longitude], {
+    const point = suggestionSeed ?? locationMarker
+    if (!map || !point) return
+    // Match the visible world copy when navigating on either side of the antimeridian.
+    const [longitude, latitude] = point
+    const nearestLongitude = longitude + 360 * Math.round((map.getCenter().lng - longitude) / 360)
+    const marker = L.circleMarker([latitude, nearestLongitude], {
       pane: 'geometryDraftPane', radius: 7, weight: 2, color: '#ffffff',
-      fillColor: '#0d0d0d', fillOpacity: 1, interactive: false,
+      fillColor: suggestionSeed ? '#0d0d0d' : '#347757', fillOpacity: 1, interactive: false,
     }).addTo(map)
     return () => { marker.remove() }
-  }, [map, suggestionSeed])
+  }, [map, suggestionSeed, locationMarker, viewportRequest])
 
   useEffect(() => {
     if (!map || !planting || (!showPlanting && editMode !== 'boundary') || editMode === 'planting') return

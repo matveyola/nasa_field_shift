@@ -59,7 +59,7 @@ def _lock_field(session: Session, field_id: str, boundary_revision: int) -> tupl
     return field, season
 
 
-def create_field(session: Session, payload: FieldCreate) -> Field:
+def create_field(session: Session, payload: FieldCreate, *, commit: bool = True) -> Field:
     sequence = session.execute(
         update(Farm)
         .where(Farm.id == FARM_ID)
@@ -80,7 +80,8 @@ def create_field(session: Session, payload: FieldCreate) -> Field:
     session.add(field)
     session.flush()
     record_boundary(session, field, field.season, field.geometry, field.area_ha, "created")
-    session.commit()
+    if commit:
+        session.commit()
     return field
 
 

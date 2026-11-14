@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
-import { ArrowPathIcon, ArrowRightIcon, CheckCircleIcon, PencilSquareIcon } from '@heroicons/react/24/outline'
+import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
+import { ArrowPathIcon, ArrowRightIcon, CheckCircleIcon, PencilSquareIcon, PlusIcon } from '@heroicons/react/24/outline'
 import { api } from '../../api/client'
 import type { Field, FieldContext, HistoricalRotationComparison, Job, Rotations, Scenario } from '../../api/contracts'
+import { onboardingApi } from '../../api/onboarding'
 import { CropIcon } from '../../shared/CropIcon'
 import { FieldWorkspaceBar } from '../../shared/FieldWorkspaceBar'
 import { cropInput, useLocale } from '../../shared/locale'
@@ -13,6 +14,7 @@ import { RotationYieldPanel } from './RotationYieldPanel'
 import { RotationComparison } from './RotationComparison'
 import { FarmRotationPlanner } from './FarmRotationPlanner'
 import { useAccess } from '../access/AccessProvider'
+import { OnboardingPlan } from '../onboarding/OnboardingPlan'
 import './rotations.css'
 
 type Props = {
@@ -24,13 +26,16 @@ type Props = {
   openWater: () => void
   chooseField: (id: string) => void
   openFields: () => void
+  onAddField?: () => void
 }
 
-export function RotationsPage({ field, fields, context: { field_id, season, scenario }, irrigationAvailable, chooseScenario, openWater, chooseField, openFields }: Props) {
+export function RotationsPage({ field, fields, context: { field_id, season, scenario }, irrigationAvailable, chooseScenario, openWater, chooseField, openFields, onAddField }: Props) {
   const { t, crop, date } = useLocale()
   const { canEdit } = useAccess()
   const load = useCallback((signal: AbortSignal) => api.rotations({ field_id, season, scenario }, signal), [field_id, season, scenario])
   const rotations = useResource(load)
+  const loadSetup = useCallback((signal: AbortSignal) => onboardingApi.field(field_id, signal), [field_id])
+  const fieldSetup = useResource(loadSetup)
   const [selectedId, setSelectedId] = useState<string>()
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -105,13 +110,19 @@ export function RotationsPage({ field, fields, context: { field_id, season, scen
   return (
     <div className="page-body rotations-page">
       <PageHeading title="Rotations" season={season} dataLabel={result ? 'Historical reanalysis' : 'Demo data'} />
-      <FieldWorkspaceBar field={field} fields={fields} chooseField={chooseField} openFields={openFields} disabled={saving}>
+      <FieldWorkspaceBar field={field} fields={fields} chooseField={chooseField} openFields={openFields} disabled={saving} directSelection>
+        {onAddField && <button className="button" type="button" disabled={saving} onClick={onAddField}>
+          <PlusIcon aria-hidden="true" />{t('Add field')}
+        </button>}
         <fieldset className="rotation-context-options" disabled={saving}>
           <ScenarioSelect value={scenario} onChange={chooseScenario} />
           <span className="rotation-irrigation">{irrigationAvailable ? t('No irrigation applied') : t('No irrigation')}</span>
         </fieldset>
       </FieldWorkspaceBar>
       <div className="rotations-workspace">
+        {fieldSetup.error && <ErrorBox message={fieldSetup.error} retry={fieldSetup.reload} />}
+        {fieldSetup.data?.demo_plan && <OnboardingPlan setup={fieldSetup.data} />}
+        {!fieldSetup.pending && <RotationTools fold={Boolean(fieldSetup.data?.demo_plan)}>
         <FarmRotationPlanner season={season} onApplied={rotations.reload} />
         {create.error && <ErrorBox message={create.error} />}
         {jobId && <JobStatus job={current.job} error={current.error} />}
@@ -207,9 +218,19 @@ export function RotationsPage({ field, fields, context: { field_id, season, scen
             </div>
           </>
         )}
+        </RotationTools>}
       </div>
     </div>
   )
+}
+
+function RotationTools({ fold, children }: { fold: boolean; children: ReactNode }) {
+  const { language } = useLocale()
+  if (!fold) return <>{children}</>
+  return <details className="advanced-rotation-tools">
+    <summary>{language === 'uk' ? 'Інші інструменти планування' : 'Other planning tools'}</summary>
+    {children}
+  </details>
 }
 
 function matchComparison(job: Job | undefined, context: FieldContext, plans: Rotations | undefined): HistoricalRotationComparison | undefined {

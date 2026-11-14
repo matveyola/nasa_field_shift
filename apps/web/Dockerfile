@@ -6,6 +6,7 @@ COPY package.json package-lock.json ./
 RUN npm ci
 COPY --from=agent-widget . /src/services/agent/frontend/src/widget
 COPY . .
+ARG VITE_MAPTILER_KEY
 RUN npm run build
 
 FROM nginx:1.28-alpine

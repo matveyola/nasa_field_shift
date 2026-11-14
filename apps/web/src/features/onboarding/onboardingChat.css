@@ -1,0 +1,86 @@
+.onboarding-chat {
+  width: min(100%, 56rem);
+  margin-inline: auto;
+  display: grid;
+  gap: 1rem;
+  padding: clamp(1rem, 3vw, 2rem);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--card);
+  box-shadow: var(--shadow-card);
+}
+.onboarding-chat-header {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding-bottom: .875rem;
+  border-bottom: 1px solid var(--line);
+}
+.onboarding-chat-header p { color: var(--ink-2); font-size: .875rem; overflow-wrap: anywhere; }
+.onboarding-chat-mark {
+  display: grid;
+  place-items: center;
+  flex: 0 0 2.75rem;
+  height: 2.75rem;
+  background: var(--ink);
+  color: var(--card);
+  border-radius: var(--r-md);
+}
+.onboarding-chat-mark svg { width: 1.375rem; height: 1.375rem; }
+.onboarding-chat-messages, .onboarding-chat-exchange, .onboarding-chat-reply { display: grid; gap: .625rem; }
+.onboarding-chat-prompt, .onboarding-chat-answer {
+  width: fit-content;
+  max-width: min(100%, 42rem);
+  padding: .65rem .9rem;
+  border-radius: var(--r-md);
+  overflow-wrap: anywhere;
+}
+.onboarding-chat-prompt { background: var(--screen); }
+.onboarding-chat-question { font-weight: 550; }
+.onboarding-chat-answer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .25rem .75rem;
+  justify-self: end;
+  border: 1px solid var(--line);
+}
+.onboarding-answer-edit {
+  min-height: 2rem;
+  padding: 0 .25rem;
+  border: 0;
+  background: transparent;
+  color: var(--ink-2);
+  font-size: .82rem;
+  text-decoration: underline;
+  text-underline-offset: .15em;
+}
+.onboarding-chat-options, .onboarding-chat-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem;
+}
+.onboarding-chat-options .button { min-height: 44px; text-align: left; }
+.onboarding-chat-options .button.subtle { border: 1px solid var(--line-control); }
+.onboarding-chat-footer .primary { margin-inline-start: auto; }
+.onboarding-chat-composer {
+  display: flex;
+  gap: .5rem;
+  align-items: stretch;
+}
+.onboarding-chat-composer input {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  padding: .55rem .85rem;
+  border: 1px solid var(--line-control);
+  border-radius: var(--r-btn);
+  background: var(--screen);
+}
+.onboarding-chat-composer .button { flex: 0 0 44px; justify-content: center; padding: 0; }
+.onboarding-chat-invalid { color: var(--danger); }
+@media (max-width: 520px) {
+  .onboarding-chat-footer { align-items: stretch; flex-direction: column; }
+  .onboarding-chat-footer .button { justify-content: center; margin-inline: 0; }
+}

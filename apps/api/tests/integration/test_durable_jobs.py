@@ -81,6 +81,55 @@ def submit(client, key):
     return response.json()
 
 
+def test_simultaneous_onboarding_completion_creates_one_field(database):
+    from field_shift.modules.fields.models import Field
+    from field_shift.modules.onboarding.models import FieldSetup
+    from field_shift.modules.onboarding.schemas import SetupInputs
+    from field_shift.modules.onboarding.service import complete_setup, save_setup
+
+    _, factory = database
+    setup_id = uuid4()
+    with factory() as session:
+        before = set(session.scalars(select(Field.id)))
+        save_setup(
+            session,
+            setup_id,
+            SetupInputs.model_validate(
+                {
+                    "country_code": "UA",
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [30.4, 50.2],
+                                [30.401, 50.2],
+                                [30.401, 50.201],
+                                [30.4, 50.2],
+                            ]
+                        ],
+                    },
+                    "history": [],
+                    "allowed_crops": ["Soy", "Wheat"],
+                    "irrigation": None,
+                    "priority": "soil",
+                }
+            ),
+        )
+    barrier = Barrier(2)
+
+    def complete(_):
+        with factory() as session:
+            barrier.wait(timeout=5)
+            return complete_setup(session, setup_id).field.id
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        field_ids = list(executor.map(complete, range(2)))
+    assert field_ids[0] == field_ids[1]
+    with factory() as session:
+        assert set(session.scalars(select(Field.id))) - before == {field_ids[0]}
+        assert session.get(FieldSetup, str(setup_id)).field_id == field_ids[0]
+
+
 def test_forecast_cache_coalesces_loads_between_redis_clients():
     redis_url = os.environ.get("FIELD_SHIFT_TEST_REDIS_URL")
     if not redis_url:
