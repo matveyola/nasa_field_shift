@@ -12,11 +12,11 @@ from field_shift_contracts.planning_v1.models import (
     SequenceEvaluation,
 )
 
-from .engine import Parameters, RejectedInput, run_engine
+from .engine import NATIVE_CROP_NAMES, Parameters, RejectedInput, run_engine
 from .provenance import digest, distribution_manifest
 
 VERSION = "ospy-adapter-0.1.0"
-SUPPORTED = ("Maize", "Wheat", "Barley")
+SUPPORTED = tuple(NATIVE_CROP_NAMES)
 
 
 def reason(code, message):
@@ -80,7 +80,8 @@ class AquaCropProvider:
                     "adapter": VERSION,
                     "crops": SUPPORTED,
                     "generic_crop_parameters": {
-                        c: vars(Crop(c, planting_date="04/01")) for c in SUPPORTED
+                        c: vars(Crop(NATIVE_CROP_NAMES[c], planting_date="04/01"))
+                        for c in SUPPORTED
                     },
                     "hydraulics": {k: vars(v) for k, v in sorted(hydraulics.items())},
                     "footprint": footprint,

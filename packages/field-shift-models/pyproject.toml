@@ -19,7 +19,7 @@ ruslan = ["lightgbm==4.6.0"]
 field-shift-models = "field_shift_models.cli:main"
 
 [dependency-groups]
-dev = ["pytest==9.2.0", "ruff==0.17.4"]
+dev = ["pytest==9.2.0", "ruff==0.17.4", "lightgbm==4.6.0"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

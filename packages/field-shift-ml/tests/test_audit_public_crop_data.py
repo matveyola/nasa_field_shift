@@ -6,10 +6,8 @@ import os
 import subprocess
 import sys
 import zipfile
-from pathlib import Path
 
 import pytest
-
 from field_shift_ml.audit_public_crop_data import REQUIRED, audit, dry_yield_kg_ha
 
 
@@ -187,13 +185,16 @@ def test_portable_cli_requires_explicit_paths_and_protects_sources(tmp_path):
         "--output",
         str(output),
     ]
-    env = {**os.environ, "PYTHONPATH": str(Path(__file__).resolve().parents[1] / "src")}
-    result = subprocess.run(command, env=env, text=True, capture_output=True, check=False)
+    env = {k: v for k, v in os.environ.items() if k != "PYTHONPATH"}
+    result = subprocess.run(
+        command, env=env, cwd=tmp_path, text=True, capture_output=True, check=False
+    )
     assert result.returncode == 0, result.stderr
     assert json.loads(output.read_text())["yield_sites"] == 1
     result = subprocess.run(
         command[:-1] + [str(tmp_path / "ardn-agro.csv")],
         env=env,
+        cwd=tmp_path,
         text=True,
         capture_output=True,
         check=False,

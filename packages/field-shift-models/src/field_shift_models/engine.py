@@ -7,6 +7,15 @@ import numpy as np
 import pandas as pd
 from aquacrop import AquaCropModel, Crop, InitialWaterContent, IrrigationManagement, Soil
 
+# Exact names in the pinned upstream crop dictionary; no substitution across species.
+NATIVE_CROP_NAMES = {
+    "Maize": "Maize",
+    "Wheat": "Wheat",
+    "Barley": "Barley",
+    "Soy": "Soybean",
+    "Sunflower": "Sunflower",
+}
+
 
 class RejectedInput(ValueError):
     def __init__(self, status, code, message):
@@ -141,7 +150,9 @@ def run_engine(profile, assignments, days, parameters, *, crop_wp=None):
             "insufficient_data", "soil", "Hydraulics required for each soil horizon"
         )
     crop = Crop(
-        first.crop.crop_id, planting_date=sow.strftime("%m/%d"), harvest_date=end.strftime("%m/%d")
+        NATIVE_CROP_NAMES[first.crop.crop_id],
+        planting_date=sow.strftime("%m/%d"),
+        harvest_date=end.strftime("%m/%d"),
     )
     if crop_wp is not None:
         if not np.isfinite(crop_wp) or crop_wp <= 0:

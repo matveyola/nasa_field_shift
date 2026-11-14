@@ -319,7 +319,7 @@ jobs:
       - run: uv sync --project apps/api --locked --extra dev
       - run: uv sync --project packages/field-shift-models --locked --python 3.12
       - run: packages/field-shift-models/.venv/bin/python -m pytest -q packages/field-shift-models/tests
-      - run: packages/field-shift-models/.venv/bin/python -m field_shift_models.cli benchmark --check packages/field-shift-models/reports/cpu-v3.json
+      - run: packages/field-shift-models/.venv/bin/python -m field_shift_models.cli benchmark --check packages/field-shift-models/reports/cpu-v4.json
       - run: npm ci --prefix apps/web && npm ci --prefix services/agent && npm ci --prefix services/agent/frontend
       - run: apps/api/.venv/bin/python -m field_shift_contracts.planning_v1.export --repo-root . --check
       - run: node contracts/planning-v1/check.mjs && apps/web/node_modules/.bin/tsc -p contracts/planning-v1/tsconfig.json

@@ -77,7 +77,12 @@ def test_private_payload_bound_precedes_execution():
 
 
 @pytest.mark.parametrize(
-    "previous,current", [("cpu-v1.json", "cpu-v2.json"), ("cpu-v2.json", "cpu-v3.json")]
+    "previous,current",
+    [
+        ("cpu-v1.json", "cpu-v2.json"),
+        ("cpu-v2.json", "cpu-v3.json"),
+        ("cpu-v3.json", "cpu-v4.json"),
+    ],
 )
 def test_packaging_and_chronology_preserve_frozen_baseline_numerics(previous, current):
     import json

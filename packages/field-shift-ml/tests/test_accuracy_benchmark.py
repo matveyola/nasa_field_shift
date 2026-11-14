@@ -5,10 +5,8 @@ import json
 import math
 import subprocess
 import sys
-from pathlib import Path
 
 import pytest
-
 from field_shift_ml.accuracy_benchmark import canonical_sha, evaluate, evaluate_files
 
 
@@ -406,16 +404,14 @@ def test_files_cli_hashes_duplicate_json_keys_and_no_input_overwrite(tmp_path):
         "--output",
         str(output),
     ]
-    environment = {
-        **__import__("os").environ,
-        "PYTHONPATH": str(Path(__file__).resolve().parents[1] / "src"),
-    }
+    environment = {k: v for k, v in __import__("os").environ.items() if k != "PYTHONPATH"}
     result = subprocess.run(
         command,
         capture_output=True,
         text=True,
         check=False,
         env=environment,
+        cwd=tmp_path,
     )
     assert result.returncode == 0, result.stderr
     assert json.loads(output.read_text()) == report
@@ -425,6 +421,7 @@ def test_files_cli_hashes_duplicate_json_keys_and_no_input_overwrite(tmp_path):
         text=True,
         check=False,
         env=environment,
+        cwd=tmp_path,
     )
     assert result.returncode != 0
     assert "Output must not overwrite" in result.stderr

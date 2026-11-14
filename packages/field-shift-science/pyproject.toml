@@ -16,6 +16,8 @@ where = ["src"]
 "field_shift_science.simulation" = ["artifacts/*.json"]
 "field_shift_science.rotations" = ["artifacts/*.json"]
 
+"field_shift_science.layered_water" = ["NOTICE.md", "source-receipt.json"]
+
 [tool.ruff]
 target-version = "py311"
 line-length = 100

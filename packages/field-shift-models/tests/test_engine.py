@@ -7,11 +7,10 @@ from datetime import date
 import numpy as np
 import pytest
 from field_shift_contracts.planning_v1.models import ModelCard, SequenceEvaluation
-from pydantic import ValidationError
-
 from field_shift_models.engine import Parameters, RejectedInput, forcing_frame, run_engine
 from field_shift_models.fixtures import synthetic_inputs
 from field_shift_models.provider import AquaCropProvider
+from pydantic import ValidationError
 
 
 def revise(model, change):
@@ -307,3 +306,31 @@ def test_preexisting_profile_accepts_later_weather_without_rewriting_time():
     future = p.model_copy(update={"as_of": later.as_of + timedelta(hours=1)})
     with pytest.raises(ValueError, match="unavailable at the weather issue"):
         provider.evaluate(future, c, later)
+
+
+@pytest.mark.parametrize("crop", ["Soy", "Sunflower"])
+def test_pinned_native_crop_profiles_are_calculated_without_species_substitution(crop):
+    from aquacrop import Crop
+    from field_shift_models.engine import NATIVE_CROP_NAMES
+
+    p, candidate, weather, hydraulics = synthetic_inputs(crop=crop)
+    actual = AquaCropProvider({p.snapshot_id: hydraulics})
+    card = actual.model_card()
+    assert crop in {c.crop_id for c in card.supported_crops}
+    upstream = Crop(NATIVE_CROP_NAMES[crop], planting_date="04/01")
+    assert upstream.Name == ("Soybean" if crop == "Soy" else "Sunflower")
+    result = actual.evaluate(p, candidate, weather)
+    assert result.applicability == "baseline"
+    season = result.seasons[0]
+    assert season.crop.crop_id == crop and season.status == "available"
+    assert np.isfinite(season.yield_t_ha.value) and season.yield_t_ha.value >= 0
+    assert season.root_zone_reserve_mm.value >= 0
+    assert card.validated_scope is None and card.promotion == "baseline_only"
+
+
+@pytest.mark.parametrize("crop", ["Rapeseed", "Peas", "Rice"])
+def test_missing_native_profiles_stay_unsupported(crop):
+    p, candidate, weather, hydraulics = synthetic_inputs(crop=crop)
+    result = AquaCropProvider({p.snapshot_id: hydraulics}).evaluate(p, candidate, weather)
+    assert result.seasons[0].status == "unsupported"
+    assert result.seasons[0].yield_t_ha.value is None
