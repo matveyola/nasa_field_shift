@@ -1,0 +1,731 @@
+{
+  "binding_version": "1.0.0",
+  "purpose": "Frozen controlled test parameters and capability gates; not validated agronomy or executed domain tests.",
+  "parameters": {
+    "wire-v1": {
+      "contract_version": "1.0.0",
+      "missing_value": null,
+      "finite_numbers_only": true,
+      "data_kind": "synthetic_contract"
+    },
+    "cold-sowing-v1": {
+      "production_system": "outdoor",
+      "purpose": "new_sowing",
+      "require_unfrozen_soil": true,
+      "calendar_and_crop_rules": "must be supplied by A; absent evidence yields insufficient_data"
+    },
+    "thermal-time-v1": {
+      "kind": "synthetic_test_profiles_not_real_cultivars",
+      "base_temperature_c": 5,
+      "early_profile_degree_days": 600,
+      "late_profile_degree_days": 2000,
+      "formula": "sum(max(0, (tmin+tmax)/2 - base))",
+      "window": [
+        "2027-05-15",
+        "2027-09-01"
+      ],
+      "agronomist_reviewed": false
+    },
+    "missing-evidence-v1": {
+      "unknown_is_not_zero": true,
+      "missing_evidence_status": "insufficient_data",
+      "missing_model_status": "unsupported",
+      "outside_validated_footprint_status": "out_of_domain",
+      "continent_name_is_not_a_crop_rule": true
+    },
+    "deficit-water-v1": {
+      "scope": "controlled deficit-only invariants, not a yield response model",
+      "capacity_unit": "mm",
+      "irrigation_unit": "mm",
+      "opening_fraction": 1,
+      "include_cost_of_irrigation": true,
+      "yield_response_from_stress_days": false,
+      "crop_parameters": "adapter must supply a pinned crop profile before domain execution"
+    },
+    "paddy-gate-v1": {
+      "missing_engine_capability_status": "unsupported",
+      "managed_water_is_not_hazardous_flood": true,
+      "impact_requires": [
+        "depth",
+        "duration",
+        "crop_stage",
+        "validated_cultivar_profile"
+      ],
+      "no_default_inundation_yield_factor": true
+    },
+    "identity-v1": {
+      "same_version_and_seed": true,
+      "same_input_snapshots": true,
+      "absolute_tolerance": 1e-09,
+      "distance_alone_does_not_force_different_predictions": true
+    },
+    "solar-conventions-v1": {
+      "crs": "EPSG:4326",
+      "coordinate_order": "longitude,latitude",
+      "aspect": "clockwise_from_true_north",
+      "flat_aspect": null,
+      "timestamp_zone": "UTC",
+      "slope_deg": 20,
+      "aspects_deg": [
+        0,
+        180
+      ],
+      "reference": "pvlib version pinned by A before execution",
+      "angle_absolute_tolerance_deg": 0.01,
+      "yield_multiplier": null
+    },
+    "issue-time-v1": {
+      "require_available_at_lte_as_of": true,
+      "preserve": [
+        "cycle_at",
+        "issued_at",
+        "lead_days",
+        "model_version"
+      ],
+      "reanalysis_is_historical_forecast": false
+    },
+    "holdout-v1": {
+      "disjoint_groups": [
+        "farm_group_ids",
+        "grid_group_ids"
+      ],
+      "future_year_holdout": "evaluation protocol must record year ordering and geographic buffer",
+      "fit_transforms_on": "fit only",
+      "synthetic_labels_are_empirical": false
+    },
+    "economics-v1": {
+      "metric": "gross_margin",
+      "formula": "price_per_t * yield_t_ha - variable_cost_per_ha",
+      "unknown_inputs_result": null,
+      "budget_below_locked_cost": "infeasible",
+      "silently_unlock": false,
+      "uncalibrated_probability_weights": null
+    },
+    "evidence-fidelity-v1": {
+      "preserve_numeric_values": true,
+      "preserve_units_and_intervals": true,
+      "null_margin_remains_null": true,
+      "auto_apply": false,
+      "guaranteed_profit": false
+    }
+  },
+  "cases": [
+    {
+      "case_id": "G01",
+      "owner": "A",
+      "parameters": [
+        "cold-sowing-v1"
+      ],
+      "required_capabilities": [
+        "frozen_soil"
+      ],
+      "predicates": [
+        {
+          "id": "G01.1",
+          "invariant_index": 0,
+          "text": "When valid cold/ice evidence is present, no enabled outdoor grain crop is recommended; cite hard limiting factors.",
+          "execution_status": "pending_domain_implementation"
+        },
+        {
+          "id": "G01.2",
+          "invariant_index": 1,
+          "text": "Yield and gross margin are null/not_applicable rather than invented zeros or positive values.",
+          "execution_status": "pending_domain_implementation"
+        },
+        {
+          "id": "G01.3",
+          "invariant_index": 2,
+          "text": "If climate evidence is unavailable, return insufficient_data, not a continent-based rule.",
+          "execution_status": "pending_domain_implementation"
+        }
+      ],
+      "domain_implementation_version": null,
+      "agronomist_reviewed": false
+    },
+    {
+      "case_id": "G02",
+      "owner": "A",
+      "parameters": [
+        "missing-evidence-v1"
+      ],
+      "required_capabilities": [],
+      "predicates": [
+        {
+          "id": "G02.1",
+          "invariant_index": 0,
+          "text": "Return insufficient_data with missing-source reasons; do not infer weather from the coordinate label.",
+          "execution_status": "pending_domain_implementation"
+        }
+      ],
+      "domain_implementation_version": null,
+      "agronomist_reviewed": false
+    },
+    {
+      "case_id": "G03",
+      "owner": "A+B",
+      "parameters": [
+        "thermal-time-v1"
+      ],
+      "required_capabilities": [
+        "phenology"
+      ],
+      "predicates": [
+        {
+          "id": "G03.1",
+          "invariant_index": 0,
+          "text": "Evaluate crop/cultivar thermal-time and frost constraints using the supplied test profiles.",
+          "execution_status": "pending_domain_implementation"
+        },
+        {
+          "id": "G03.2",
+          "invariant_index": 1,
+          "text": "Do not assert that every crop is impossible solely because latitude is high.",
+          "execution_status": "pending_domain_implementation"
+        },
+        {
+          "id": "G03.3",
+          "invariant_index": 2,
+          "text": "Missing cultivar validation yields unsupported/experimental with reasons, not a guaranteed harvest.",
+          "execution_status": "pending_domain_implementation"
+        }
+      ],
+      "domain_implementation_version": null,
+      "agronomist_reviewed": false
+    },
+    {
+      "case_id": "G04",
+      "owner": "A+B",
+      "parameters": [
+        "cold-sowing-v1"
+      ],
+      "required_capabilities": [
+        "frozen_soil",
+        "winter"
+      ],
+      "predicates": [
+        {
+          "id": "G04.1",
+          "invariant_index": 0,
+          "text": "Frozen-soil and insufficient growing-window rules prevent new sowing for the enabled test crops.",
+          "execution_status": "pending_domain_implementation"
+        },
+        {
+          "id": "G04.2",
+          "invariant_index": 1,
+          "text": "Distinguish sowing feasibility from a calibrated overwintering model.",
+          "execution_status": "pending_domain_implementation"
+        }
+      ],
+      "domain_implementation_version": null,
+      "agronomist_reviewed": false
+    },
+    {
+      "case_id": "G05",
+      "owner": "B+C",
+      "parameters": [
+        "deficit-water-v1"
+      ],
+      "required_capabilities": [
+        "root_zone_water"
+      ],
+      "predicates": [
+        {
+          "id": "G05.1",
+          "invariant_index": 0,
+          "text": "Close the daily water balance and report deficit days.",
+          "execution_status": "pending_domain_implementation"
+        },
+        {
+          "id": "G05.2",
+          "invariant_index": 1,
+          "text": "Do not recommend an irrigation-dependent plan when available irrigation is zero.",
+          "execution_status": "pending_domain_implementation"
+        }
+      ],
+      "domain_implementation_version": null,
+      "agronomist_reviewed": false
+    },
+    {
+      "case_id": "G06",
+      "owner": "B+C",
+      "parameters": [
+        "deficit-water-v1"
+      ],
+      "required_capabilities": [
+        "root_zone_water",
+        "irrigation"
+      ],
+      "predicates": [
+        {
+          "id": "G06.1",
+          "invariant_index": 0,
+          "text": "For the same crop/parameters under a deficit-only fixture, feasible supplemental irrigation cannot increase deficit days.",
+          "execution_status": "pending_domain_implementation"
+        },
+        {
+          "id": "G06.2",
+          "invariant_index": 1,
+          "text": "Account for irrigation availability and costs; do not promise that margin must increase.",
+          "execution_status": "pending_domain_implementation"
+        }
+      ],
+      "domain_implementation_version": null,
+      "agronomist_reviewed": false
+    },
+    {
+      "case_id": "G07",
+      "owner": "A",
+      "parameters": [
+        "missing-evidence-v1"
+      ],
+      "required_capabilities": [],
+      "predicates": [
+        {
+          "id": "G07.1",
+          "invariant_index": 0,
+          "text": "Evaluate each crop against its own climate/calendar/history profile.",
+          "execution_status": "pending_domain_implementation"
+        },
+        {
+          "id": "G07.2",
+          "invariant_index": 1,
+          "text": "An eligible crop is not a promise of positive profit or support for every hybrid.",
+          "execution_status": "pending_domain_implementation"
+        }
+      ],
+      "domain_implementation_version": null,
+      "agronomist_reviewed": false
+    },
+    {
+      "case_id": "G08",
+      "owner": "A+B",
+      "parameters": [
+        "deficit-water-v1"
+      ],
+      "required_capabilities": [
+        "root_zone_water",
+        "fertility"
+      ],
+      "predicates": [
+        {
+          "id": "G08.1",
+          "invariant_index": 0,
+          "text": "Fertility does not bypass water constraints or turn missing fertility modeling into a yield bonus.",
+          "execution_status": "pending_domain_implementation"
+        },
+        {
+          "id": "G08.2",
+          "invariant_index": 1,
+          "text": "Report unsupported fertility response if the selected engine lacks it.",
+          "execution_status": "pending_domain_implementation"
+        }
+      ],
+      "domain_implementation_version": null,
+      "agronomist_reviewed": false
+    },
+    {
+      "case_id": "G09",
+      "owner": "A+B",
+      "parameters": [
+        "paddy-gate-v1"
+      ],
+      "required_capabilities": [
+        "paddy",
+        "yield"
+      ],
+      "predicates": [
+        {
+          "id": "G09.1",
+          "invariant_index": 0,
+          "text": "Require a documented rice/paddy-capable model and applicable cultivar inputs.",
+          "execution_status": "pending_domain_implementation"
+        },
+        {
+          "id": "G09.2",
+          "invariant_index": 1,
+          "text": "If unsupported, return unsupported; never substitute an upland wheat bucket as a rice model.",
+          "execution_status": "pending_domain_implementation"
+        },
+        {
+          "id": "G09.3",
+          "invariant_index": 2,
+          "text": "Do not use Asia as a suitability feature or equate managed shallow water with hazardous inundation.",
+          "execution_status": "pending_domain_implementation"
+        }
+      ],
+      "domain_implementation_version": null,
+      "agronomist_reviewed": false
+    },
+    {
+      "case_id": "G10",
+      "owner": "A+B",
+      "parameters": [
+        "paddy-gate-v1"
+      ],
+      "required_capabilities": [
+        "paddy",
+        "irrigation"
+      ],
+      "predicates": [
+        {
+          "id": "G10.1",
+          "invariant_index": 0,
+          "text": "Do not recommend rice solely because the field is in Asia.",
+          "execution_status": "pending_domain_implementation"
+        },
+        {
+          "id": "G10.2",
+          "invariant_index": 1,
+          "text": "Explain deficit/management limitations or missing applicable model.",
+          "execution_status": "pending_domain_implementation"
+        }
+      ],
+      "domain_implementation_version": null,
+      "agronomist_reviewed": false
+    },
+    {
+      "case_id": "G11",
+      "owner": "A+B",
+      "parameters": [
+        "paddy-gate-v1"
+      ],
+      "required_capabilities": [
+        "inundation"
+      ],
+      "predicates": [
+        {
+          "id": "G11.1",
+          "invariant_index": 0,
+          "text": "Do not mark all flooding beneficial for rice.",
+          "execution_status": "pending_domain_implementation"
+        },
+        {
+          "id": "G11.2",
+          "invariant_index": 1,
+          "text": "Use depth, duration, stage and validated cultivar tolerance when supported; otherwise mark impact unsupported.",
+          "execution_status": "pending_domain_implementation"
+        }
+      ],
+      "domain_implementation_version": null,
+      "agronomist_reviewed": false
+    },
+    {
+      "case_id": "G12",
+      "owner": "A+B",
+      "parameters": [
+        "identity-v1"
+      ],
+      "required_capabilities": [],
+      "predicates": [
+        {
+          "id": "G12.1",
+          "invariant_index": 0,
+          "text": "Identical feature snapshots and model version/seed produce identical deterministic predictions within declared numerical tolerance.",
+          "execution_status": "pending_domain_implementation"
+        },
+        {
+          "id": "G12.2",
+          "invariant_index": 1,
+          "text": "Do not manufacture differences from field ID or claim sub-grid weather precision.",
+          "execution_status": "pending_domain_implementation"
+        }
+      ],
+      "domain_implementation_version": null,
+      "agronomist_reviewed": false
+    },
+    {
+      "case_id": "G13",
+      "owner": "B",
+      "parameters": [
+        "deficit-water-v1"
+      ],
+      "required_capabilities": [
+        "root_zone_water"
+      ],
+      "predicates": [
+        {
+          "id": "G13.1",
+          "invariant_index": 0,
+          "text": "Under this controlled deficit-only water-balance fixture, larger initial available storage does not produce earlier stress.",
+          "execution_status": "pending_domain_implementation"
+        },
+        {
+          "id": "G13.2",
+          "invariant_index": 1,
+          "text": "Do not transfer this ordering to all soils/weather/real crop yields without evidence.",
+          "execution_status": "pending_domain_implementation"
+        }
+      ],
+      "domain_implementation_version": null,
+      "agronomist_reviewed": false
+    },
+    {
+      "case_id": "G14",
+      "owner": "A+B",
+      "parameters": [
+        "identity-v1"
+      ],
+      "required_capabilities": [],
+      "predicates": [
+        {
+          "id": "G14.1",
+          "invariant_index": 0,
+          "text": "Do not force prediction divergence solely because locations are far apart.",
+          "execution_status": "pending_domain_implementation"
+        },
+        {
+          "id": "G14.2",
+          "invariant_index": 1,
+          "text": "Out-of-domain status may differ if a learned adapter has a documented geographic gate.",
+          "execution_status": "pending_domain_implementation"
+        }
+      ],
+      "domain_implementation_version": null,
+      "agronomist_reviewed": false
+    },
+    {
+      "case_id": "G15",
+      "owner": "A",
+      "parameters": [
+        "solar-conventions-v1"
+      ],
+      "required_capabilities": [
+        "solar_geometry"
+      ],
+      "predicates": [
+        {
+          "id": "G15.1",
+          "invariant_index": 0,
+          "text": "Compare solar geometry with a trusted pvlib reference and declared angle conventions.",
+          "execution_status": "pending_domain_implementation"
+        },
+        {
+          "id": "G15.2",
+          "invariant_index": 1,
+          "text": "Do not use a universal northern/southern-aspect yield multiplier.",
+          "execution_status": "pending_domain_implementation"
+        },
+        {
+          "id": "G15.3",
+          "invariant_index": 2,
+          "text": "Separate shortwave on a surface from validated crop-canopy response.",
+          "execution_status": "pending_domain_implementation"
+        }
+      ],
+      "domain_implementation_version": null,
+      "agronomist_reviewed": false
+    },
+    {
+      "case_id": "G16",
+      "owner": "A",
+      "parameters": [
+        "missing-evidence-v1"
+      ],
+      "required_capabilities": [],
+      "predicates": [
+        {
+          "id": "G16.1",
+          "invariant_index": 0,
+          "text": "Reject open-field crop planning on ocean/non-arable geometry using land evidence; report a structured reason.",
+          "execution_status": "pending_domain_implementation"
+        }
+      ],
+      "domain_implementation_version": null,
+      "agronomist_reviewed": false
+    },
+    {
+      "case_id": "G17",
+      "owner": "A+B+C+D",
+      "parameters": [
+        "wire-v1"
+      ],
+      "required_capabilities": [],
+      "predicates": [
+        {
+          "id": "G17.1",
+          "invariant_index": 0,
+          "text": "Preserve zero rainfall; retain missing data as null.",
+          "execution_status": "pending_domain_implementation"
+        },
+        {
+          "id": "G17.2",
+          "invariant_index": 1,
+          "text": "Never convert missing soil moisture to dry soil or zero economic return.",
+          "execution_status": "pending_domain_implementation"
+        }
+      ],
+      "domain_implementation_version": null,
+      "agronomist_reviewed": false
+    },
+    {
+      "case_id": "G18",
+      "owner": "A+B+C",
+      "parameters": [
+        "issue-time-v1"
+      ],
+      "required_capabilities": [],
+      "predicates": [
+        {
+          "id": "G18.1",
+          "invariant_index": 0,
+          "text": "Reject unavailable future labels/imagery as planning predictors.",
+          "execution_status": "pending_domain_implementation"
+        },
+        {
+          "id": "G18.2",
+          "invariant_index": 1,
+          "text": "Pair hindcasts with the same issuance, lead and model cycle; final reanalysis is not a historical forecast.",
+          "execution_status": "pending_domain_implementation"
+        }
+      ],
+      "domain_implementation_version": null,
+      "agronomist_reviewed": false
+    },
+    {
+      "case_id": "G19",
+      "owner": "B",
+      "parameters": [
+        "holdout-v1"
+      ],
+      "required_capabilities": [],
+      "predicates": [
+        {
+          "id": "G19.1",
+          "invariant_index": 0,
+          "text": "Keep whole farms and overlapping weather-grid/geographic groups out of other partitions.",
+          "execution_status": "pending_domain_implementation"
+        },
+        {
+          "id": "G19.2",
+          "invariant_index": 1,
+          "text": "Fit imputation/scaling/feature selection only on training folds; leave calibration and test untouched.",
+          "execution_status": "pending_domain_implementation"
+        }
+      ],
+      "domain_implementation_version": null,
+      "agronomist_reviewed": false
+    },
+    {
+      "case_id": "G20",
+      "owner": "A+B",
+      "parameters": [
+        "missing-evidence-v1"
+      ],
+      "required_capabilities": [],
+      "predicates": [
+        {
+          "id": "G20.1",
+          "invariant_index": 0,
+          "text": "Return unsupported or experimental/out_of_domain with the applicable fallback.",
+          "execution_status": "pending_domain_implementation"
+        },
+        {
+          "id": "G20.2",
+          "invariant_index": 1,
+          "text": "No trained prediction is labeled locally validated solely because the crop species matches.",
+          "execution_status": "pending_domain_implementation"
+        }
+      ],
+      "domain_implementation_version": null,
+      "agronomist_reviewed": false
+    },
+    {
+      "case_id": "G21",
+      "owner": "C+D",
+      "parameters": [
+        "economics-v1"
+      ],
+      "required_capabilities": [],
+      "predicates": [
+        {
+          "id": "G21.1",
+          "invariant_index": 0,
+          "text": "With missing economics, margin is unavailable, not zero or LLM-generated.",
+          "execution_status": "pending_domain_implementation"
+        },
+        {
+          "id": "G21.2",
+          "invariant_index": 1,
+          "text": "A conflict with a mandatory locked decision yields infeasible diagnostics; never silently unlock.",
+          "execution_status": "pending_domain_implementation"
+        }
+      ],
+      "domain_implementation_version": null,
+      "agronomist_reviewed": false
+    },
+    {
+      "case_id": "G22",
+      "owner": "A+D",
+      "parameters": [
+        "paddy-gate-v1"
+      ],
+      "required_capabilities": [
+        "inundation"
+      ],
+      "predicates": [
+        {
+          "id": "G22.1",
+          "invariant_index": 0,
+          "text": "EFI is not a probability of crop loss.",
+          "execution_status": "pending_domain_implementation"
+        },
+        {
+          "id": "G22.2",
+          "invariant_index": 1,
+          "text": "River warnings do not imply a precise field flood depth; report unsupported inundation impact when hydraulic data are missing.",
+          "execution_status": "pending_domain_implementation"
+        }
+      ],
+      "domain_implementation_version": null,
+      "agronomist_reviewed": false
+    },
+    {
+      "case_id": "G23",
+      "owner": "C+D",
+      "parameters": [
+        "evidence-fidelity-v1"
+      ],
+      "required_capabilities": [],
+      "predicates": [
+        {
+          "id": "G23.1",
+          "invariant_index": 0,
+          "text": "Preserve numeric values, units, intervals and abstention reasons exactly.",
+          "execution_status": "pending_domain_implementation"
+        },
+        {
+          "id": "G23.2",
+          "invariant_index": 1,
+          "text": "Do not generate guaranteed profit, fabricated confidence or autonomous plan application.",
+          "execution_status": "pending_domain_implementation"
+        }
+      ],
+      "domain_implementation_version": null,
+      "agronomist_reviewed": false
+    },
+    {
+      "case_id": "G24",
+      "owner": "A+B+C+D",
+      "parameters": [
+        "wire-v1"
+      ],
+      "required_capabilities": [],
+      "predicates": [
+        {
+          "id": "G24.1",
+          "invariant_index": 0,
+          "text": "Passing these cases proves invariants and contract behavior only.",
+          "execution_status": "pending_domain_implementation"
+        },
+        {
+          "id": "G24.2",
+          "invariant_index": 1,
+          "text": "Release requires an independent real-field/year benchmark; no accuracy score is derived from these cases.",
+          "execution_status": "pending_domain_implementation"
+        }
+      ],
+      "domain_implementation_version": null,
+      "agronomist_reviewed": false
+    }
+  ]
+}
