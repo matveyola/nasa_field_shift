@@ -6,6 +6,11 @@ confirmation action atomically replaces Plan A and makes it the main plan for th
 selected fields and planning period. Actual current crops and geometries are not
 rewritten by a future plan.
 
+The [standalone scenario API](../research/rotation-handoff/README.md) contains
+the Sutherland replays and the [handoff for UI and assistant developers](../research/rotation-handoff/UI_AND_ASSISTANT.md).
+Run it from its own directory. Its climate routes require Ruslan's water-balance
+engine. The main application has a separate farm planner and API.
+
 ## Inputs and rules
 
 - Up to 30 fields, seven named crops, and three consecutive planning seasons.

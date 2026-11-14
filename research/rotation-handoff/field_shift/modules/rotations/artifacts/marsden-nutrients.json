@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "region": "US-IA",
+  "crops": {
+    "maize_grain": {
+      "p2o5_kg_per_t": 5.71428571,
+      "k2o_kg_per_t": 3.92857143,
+      "yield_moisture_pct": 15,
+      "source_url": "https://store.extension.iastate.edu/product/pm1688-pdf",
+      "source_table": "PM 1688, February 2023, Table 2, printed page 4",
+      "source_row": "Corn",
+      "source_scope": "iowa_extension_reference",
+      "published_unit": "lb per bushel",
+      "published_yield_unit_weight_lb": 56,
+      "published_p2o5": 0.32,
+      "published_k2o": 0.22
+    },
+    "sunflower": {
+      "p2o5_kg_per_t": 7.5,
+      "k2o_kg_per_t": 6.5,
+      "yield_moisture_pct": 10,
+      "source_url": "https://store.extension.iastate.edu/product/pm1688-pdf",
+      "source_table": "PM 1688, February 2023, Table 2, printed page 4",
+      "source_row": "Sunflower",
+      "source_scope": "iowa_extension_reference",
+      "published_unit": "lb per 100 lb seed",
+      "published_yield_unit_weight_lb": 100,
+      "published_p2o5": 0.75,
+      "published_k2o": 0.65
+    },
+    "soybeans": {
+      "p2o5_kg_per_t": 12.0,
+      "k2o_kg_per_t": 20.0,
+      "yield_moisture_pct": 13,
+      "source_url": "https://store.extension.iastate.edu/product/pm1688-pdf",
+      "source_table": "PM 1688, February 2023, Table 2, printed page 4",
+      "source_row": "Soybean",
+      "source_scope": "iowa_extension_reference",
+      "published_unit": "lb per bushel",
+      "published_yield_unit_weight_lb": 60,
+      "published_p2o5": 0.72,
+      "published_k2o": 1.2
+    },
+    "oats": {
+      "p2o5_kg_per_t": 9.0625,
+      "k2o_kg_per_t": 5.9375,
+      "yield_moisture_pct": 13,
+      "source_url": "https://store.extension.iastate.edu/product/pm1688-pdf",
+      "source_table": "PM 1688, February 2023, Table 2, printed page 4",
+      "source_row": "Oat",
+      "source_scope": "iowa_extension_reference",
+      "published_unit": "lb per bushel",
+      "published_yield_unit_weight_lb": 32,
+      "published_p2o5": 0.29,
+      "published_k2o": 0.19
+    },
+    "wheat_winter_frozen": {
+      "p2o5_kg_per_t": 9.16666667,
+      "k2o_kg_per_t": 4.5,
+      "yield_moisture_pct": 12,
+      "source_url": "https://store.extension.iastate.edu/product/pm1688-pdf",
+      "source_table": "PM 1688, February 2023, Table 2, printed page 4",
+      "source_row": "Wheat",
+      "source_scope": "iowa_extension_reference",
+      "published_unit": "lb per bushel",
+      "published_yield_unit_weight_lb": 60,
+      "published_p2o5": 0.55,
+      "published_k2o": 0.27
+    },
+    "wheat_winter_nonfrozen": {
+      "p2o5_kg_per_t": 9.16666667,
+      "k2o_kg_per_t": 4.5,
+      "yield_moisture_pct": 12,
+      "source_url": "https://store.extension.iastate.edu/product/pm1688-pdf",
+      "source_table": "PM 1688, February 2023, Table 2, printed page 4",
+      "source_row": "Wheat",
+      "source_scope": "iowa_extension_reference",
+      "published_unit": "lb per bushel",
+      "published_yield_unit_weight_lb": 60,
+      "published_p2o5": 0.55,
+      "published_k2o": 0.27
+    },
+    "wheat_spring": {
+      "p2o5_kg_per_t": 9.16666667,
+      "k2o_kg_per_t": 4.5,
+      "yield_moisture_pct": 12,
+      "source_url": "https://store.extension.iastate.edu/product/pm1688-pdf",
+      "source_table": "PM 1688, February 2023, Table 2, printed page 4",
+      "source_row": "Wheat",
+      "source_scope": "iowa_extension_reference",
+      "published_unit": "lb per bushel",
+      "published_yield_unit_weight_lb": 60,
+      "published_p2o5": 0.55,
+      "published_k2o": 0.27
+    }
+  },
+  "historical_soil_test": {
+    "sample_date": "2002-11-08",
+    "depth_top_cm": 0,
+    "depth_bottom_cm": 20,
+    "bray_1_extractable_p_mg_kg": 31,
+    "ammonium_acetate_extractable_k_mg_kg": 167,
+    "source_url": "https://doi.org/10.2134/agronj2007.0222",
+    "source_locator": "Liebman et al. 2008, p. 601, Experimental Site, Rotation Systems, and Crop Management",
+    "scope": "Historical site means at trial establishment; not used as current soil chemistry."
+  },
+  "references": [
+    {
+      "name": "USDA NASS price program standard grain weights",
+      "source_url": "https://www.nass.usda.gov/Surveys/Guide_to_NASS_Surveys/Prices/Price_Program_Methodology_v10.pdf",
+      "table": "Standard weight/moisture",
+      "columns": [
+        "CROP",
+        "MOISTURE%",
+        "POUNDS",
+        "UNIT"
+      ],
+      "scope": "Bushel weight conversion. The moisture for the removal coefficient comes from PM 1688 and can differ."
+    },
+    {
+      "name": "Nutrients in soil water under three rotational cropping systems, Iowa, USA",
+      "source_url": "https://doi.org/10.1016/j.agee.2014.01.025",
+      "table": "Table 1: nutrient additions; Table 3: estimated nutrient removal via crop harvest; soil-water samples from 2004–2011.",
+      "columns": [
+        "rotation treatment",
+        "crop phase",
+        "nitrate-nitrogen concentration (mg NO3-N/L)",
+        "phosphorus concentration (mg P/L)"
+      ],
+      "scope": "Historic Marsden corn–soybean and longer diversified trials. Site context only. Soil-water concentrations do not quantify current soil nutrient stock or fertilizer need."
+    },
+    {
+      "name": "Marsden at-planting soil laboratory tests, Gina Nichols",
+      "source_url": "https://raw.githubusercontent.com/vanichols/maRsden/master/data-raw/soil_tests/mrs_nutrients18.csv",
+      "table": "mrs_nutrients18.csv",
+      "columns": [
+        "year",
+        "date",
+        "doy",
+        "plot_id",
+        "depth_cm",
+        "msmt",
+        "value"
+      ],
+      "scope": "2018-05-16, 0–30, 30–60 and 60–90 cm; msmt identifies the assay (including p_bray, p_m3, p_olsen, k, wetk, n03_n, ph and om). Contains repeated rows, and assay-dependent units and methods. Historical research context only."
+    },
+    {
+      "name": "Marsden soil mineral nitrogen, Gina Nichols",
+      "source_url": "https://raw.githubusercontent.com/vanichols/maRsden/master/data-raw/soiln/tidy-soilN-marsden.csv",
+      "table": "tidy-soilN-marsden.csv",
+      "columns": [
+        "year",
+        "site",
+        "plot",
+        "trt",
+        "date",
+        "depth",
+        "crop",
+        "NO3_ppm",
+        "NH4_ppm",
+        "NO3_kg",
+        "NH4_kg",
+        "NO3_lbs"
+      ],
+      "scope": "54 observed entries on four dates from 2018-05-16 to 2018-09-27, research plot and layer specific. Historical research context only."
+    }
+  ]
+}

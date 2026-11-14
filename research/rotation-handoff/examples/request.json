@@ -1,0 +1,5 @@
+{
+  "field_id": "marsden_demo",
+  "rotation_ids": ["marsden-a", "marsden-b"],
+  "scenarios": ["baseline", "drought", "heat"]
+}
