@@ -453,3 +453,38 @@ def test_opening_snow_and_freeze_history_are_explicit_and_conserved():
     assert run.max_balance_error_mm < 1e-6
     with pytest.raises(ValueError, match="preceding"):
         replace(p, prior_tmean_c=())
+
+
+def test_archive_availability_cannot_precede_completed_observation_days():
+    from field_shift_models.seasonal import historical_scenarios
+
+    archives, source = archive_inputs()
+    unavailable = source.model_copy(
+        update={
+            "acquired_at": datetime(2019, 1, 1, tzinfo=UTC),
+            "available_at": datetime(2019, 1, 2, tzinfo=UTC),
+        }
+    )
+    with pytest.raises(ValueError, match="availability precedes"):
+        historical_scenarios(
+            archives=archives,
+            source=unavailable,
+            source_years=[2020],
+            start=date(2028, 4, 1),
+            end=date(2028, 9, 30),
+            as_of=datetime(2027, 4, 1, tzinfo=UTC),
+        )
+
+
+def test_explicit_analogue_cannot_claim_availability_before_observations():
+    from field_shift_models.global_water import compare
+
+    document = json_document()
+    scenario = document["scenarios"][0]
+    scenario["kind"] = "historical_analogue"
+    scenario["stationary_climate_assumption"] = True
+    scenario["available_at"] = "2019-01-02T00:00:00Z"
+    for i, row in enumerate(scenario["weather"]):
+        row["source_date"] = (date(2020, 4, 1) + timedelta(days=i)).isoformat()
+    with pytest.raises(ValueError, match="availability precedes"):
+        compare(document)

@@ -19,6 +19,9 @@ experiment has no automatic production promotion or crop-yield output.
 
 None of these cells establishes independently validated global yield accuracy.
 Generic crop coefficients cannot be substituted for a local cultivar calibration.
+Upstream OSPy does contain `PaddyRice` presets. Our adapter does not yet have a
+reviewed bund/ponding/irrigation contract for them; this is a management-adapter
+gap, not absence of every possible rice model.
 A registered crop and a mathematically executable water scenario are distinct.
 
 ## Continuous water experiment
@@ -67,7 +70,8 @@ recommendation. Price/cost assumptions must remain in the owning economic planne
 `field_shift_models.seasonal.historical_scenarios` maps complete historical weather
 members into a future window up to3years. All fields share each member's original
 years, preserving observed spatial co-variation. Source dates, checksums and issue
-availability remain recorded. Future observations, duplicate/gapped days, impossible
+availability remain recorded. Source availability must follow completion of all
+original daily observations, not merely precede the planning issue time. Future observations, duplicate/gapped days, impossible
 leap-day starts and partial members fail. Leap-day differences use a continuous
 source-day sequence, not independent month-by-month resampling.
 

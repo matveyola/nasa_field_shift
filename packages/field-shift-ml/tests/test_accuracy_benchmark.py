@@ -7,6 +7,7 @@ import subprocess
 import sys
 
 import pytest
+
 from field_shift_ml.accuracy_benchmark import canonical_sha, evaluate, evaluate_files
 
 

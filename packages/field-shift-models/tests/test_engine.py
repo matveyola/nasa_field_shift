@@ -7,10 +7,11 @@ from datetime import date
 import numpy as np
 import pytest
 from field_shift_contracts.planning_v1.models import ModelCard, SequenceEvaluation
+from pydantic import ValidationError
+
 from field_shift_models.engine import Parameters, RejectedInput, forcing_frame, run_engine
 from field_shift_models.fixtures import synthetic_inputs
 from field_shift_models.provider import AquaCropProvider
-from pydantic import ValidationError
 
 
 def revise(model, change):
@@ -311,6 +312,7 @@ def test_preexisting_profile_accepts_later_weather_without_rewriting_time():
 @pytest.mark.parametrize("crop", ["Soy", "Sunflower"])
 def test_pinned_native_crop_profiles_are_calculated_without_species_substitution(crop):
     from aquacrop import Crop
+
     from field_shift_models.engine import NATIVE_CROP_NAMES
 
     p, candidate, weather, hydraulics = synthetic_inputs(crop=crop)

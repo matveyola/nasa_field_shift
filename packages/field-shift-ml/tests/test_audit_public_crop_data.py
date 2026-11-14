@@ -8,6 +8,7 @@ import sys
 import zipfile
 
 import pytest
+
 from field_shift_ml.audit_public_crop_data import REQUIRED, audit, dry_yield_kg_ha
 
 

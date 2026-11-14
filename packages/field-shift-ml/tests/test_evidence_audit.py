@@ -2,6 +2,7 @@
 
 import copy
 import json
+from importlib.resources import files
 from pathlib import Path
 
 import pytest
@@ -17,7 +18,7 @@ from field_shift_ml.audit_model_evidence import (
 )
 
 REPORTS = Path(__file__).parents[1] / "src/field_shift_ml/evaluations"
-ARTIFACTS = Path(__file__).parents[3] / "apps/api/src/field_shift/modules"
+ARTIFACTS = files("field_shift_science")
 
 
 def test_equal_farm_rmse_is_not_mean_of_rmse():

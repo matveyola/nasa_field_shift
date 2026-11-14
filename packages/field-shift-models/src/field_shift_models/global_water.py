@@ -9,7 +9,7 @@ from __future__ import annotations
 import argparse
 import json
 from dataclasses import asdict
-from datetime import date, datetime
+from datetime import UTC, date, datetime, time, timedelta
 from pathlib import Path
 
 from field_shift_science.layered_water.planting import CalendarParameters
@@ -90,6 +90,12 @@ def compare(document):
             wx.append(WeatherDay(**values))
         if any((b - a).days != 1 for a, b in zip(source_dates, source_dates[1:])):
             raise ValueError("Analogue members must preserve complete chronological weather")
+        if source_dates:
+            complete_at = datetime.combine(
+                source_dates[-1] + timedelta(days=1), time.min, tzinfo=UTC
+            )
+            if available < complete_at:
+                raise ValueError("Source availability precedes its completed observations")
         dates = [d.date for d in wx]
         if expected_dates is None:
             expected_dates = dates

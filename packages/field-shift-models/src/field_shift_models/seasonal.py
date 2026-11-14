@@ -7,7 +7,7 @@ share each member's source years, preserving observed spatial co-variation.
 
 from collections.abc import Mapping
 from dataclasses import dataclass
-from datetime import date, datetime, timedelta
+from datetime import UTC, date, datetime, time, timedelta
 
 from field_shift_contracts.planning_v1.common import DateWindow, SourceRecord
 from field_shift_contracts.planning_v1.weather import (
@@ -62,6 +62,9 @@ def historical_scenarios(
         original_end = original_start + timedelta(days=length - 1)
         if original_end >= as_of.date():
             raise ValueError("Every historical source day must precede issue time")
+        complete_at = datetime.combine(original_end + timedelta(days=1), time.min, tzinfo=UTC)
+        if source.available_at < complete_at:
+            raise ValueError("Historical source availability precedes its completed observations")
         traces = []
         for field_id, archive in sorted(archives.items()):
             if archive.field_snapshot_id != field_id or archive.source_id != source.id:
