@@ -107,3 +107,17 @@ The CY-Bench experiment is implemented and frozen independently in branch `nazar
 [IRRI ORYZA](https://sites.google.com/a/irri.org/oryza2000/) specifically covers rice, including water and nitrogen limitations. Version3 is the released line;3.5 is explicitly a testing pre-release. The official site describes calibration across18varieties/15Asian locations. That is published scope, not evidence for our fields. Distribution and constituent rights must be checked separately before adoption; downloadable is not sufficient evidence of an unrestricted reusable source license. No ORYZA score was measured here.
 
 The installed OSPy dictionary also contains `PaddyRice`. Our rice abstention reflects absent paddy management/ponding parameters and validation in the current adapter, not a claim that AquaCrop has no rice profile. Enabling rice by renaming another crop or using an upland water bucket would misrepresent its production system.
+
+## Further tabular challengers reviewed on 2026-11-15
+
+The executed 22-configuration search is a bounded comparison, not an exhaustive search over all tabular methods. These additional implementations remain unmeasured on our crop targets:
+
+| Candidate | Primary-source finding | Decision in this checkpoint |
+| --- | --- | --- |
+| [LightGBM 4.7.0](https://github.com/lightgbm-org/LightGBM/releases/tag/v4.7.0) | Newer upstream release than the audited historical adapter's locked 4.6.0. | Preserve the original model's reproduced dependency; no silent upgrade or new yield score. A new challenger requires its own pinned experiment. |
+| [XGBoost 3.4.2](https://github.com/dmlc/xgboost/releases/tag/v3.4.2) | A current gradient-boosting implementation; not equivalent to sklearn HGB. | No local fit or accuracy claim. Adding it after inspecting the current test cannot establish a fresh independent comparison. |
+| [CatBoost 1.2.10](https://github.com/catboost/catboost/releases/tag/v1.2.10) | Current release supports another tree-boosting implementation. | Same held-out evaluation requirement; its reputation is not evidence of crop/region superiority. |
+| [TabICLv2](https://github.com/soda-inria/tabicl) | Provides regression checkpoint `tabicl-regressor-v2-20260212.ckpt`, CPU/device selection and offloading; repository license is BSD-3-Clause with separately identified derived code. | Interesting pretrained in-context challenger. Exact checkpoint rights/hash, local memory/runtime and issue-time crop tests still need verification; no weights downloaded or score measured here. |
+| [TabPFN 3.5 / Fast](https://github.com/PriorLabs/TabPFN) | The official README distinguishes Apache-2.0 code from noncommercial model weights and account/license acceptance; CPU guidance limits ordinary runs to moderate row counts. | Not adopted as an unrestricted commercial model, and no external inference/data upload or gated weight acquisition was performed. |
+
+A later candidate search must freeze the target, input availability, source rights, tuning budget and new evaluation evidence. Reusing already opened test errors can provide a labeled diagnostic, not a new sealed SOTA result. These catalog entries do not expand executed coverage or change the preselected winners.

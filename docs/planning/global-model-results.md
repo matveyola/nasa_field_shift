@@ -31,6 +31,14 @@ The US [ARDN/NASA POWER diagnostic](global-data-sources.md) includes 3,751 calen
 
 Sources are public and retrieved without service credentials: NASA POWER, USDA/ARDN, and source-rights-filtered CY-Bench France/US. NASA inputs are coarse gridded weather, not field sensors. Raw caches remain outside Git with acquisition receipts and checksums. The source registry documents additional candidates; a catalog entry does not mean its data were acquired, fitted or validated.
 
+## Fresh-year US parameter search
+
+The separate [US search](cybench-search.md) freezes 22 candidates, four rolling 2014–2017 inner folds and 2021–2023 outer tests. A selection hash is persisted before outer errors.176 inner fits plus 36 final fits ran under the two-thread/2GiB/20-minute bound. Public labels were inventoried; no externally sealed holdout is claimed.
+
+The preselected chronological Extra Trees model gives RMSE 1.7109 t/ha, MAE 1.3814 and R² 0.5185 on 4,338 eligible observations, versus trend RMSE 2.5354. The preselected spatial HGB gives RMSE 2.0101, MAE 1.6579 and R² −0.0372 on 626 held-out-state observations, versus trend 2.0866. That negative R² and the weak spatial transfer remain failures of the broader accuracy ambition. Extra Trees scores better on the spatial outer test, but switching to it after seeing that test would invalidate the predeclared choice; no such switch or production promotion occurred.
+
+The published CY-Bench baseline tables use another dataset version, in-season predictors and different temporal splits/aggregation. They are illustrative reference results, not a matched SOTA score for this long-lead task. No universal or operational claim follows from this bounded search.
+
 ## Geographic and season behavior
 
 The [six-location execution cases](global-water-experiments.md) use actual NASA weather at Kyiv, Rio, Singapore, Sahara, Antarctica and La Paz. Controlled soil/crop assumptions isolate weather and cannot rank species. Ice abstains, unconfirmed arable land remains unknown and rice remains unsupported. Passing these cases proves code behavior, not a yield error or a guarantee that a fertile field can grow every crop. Solar radiation, latitude and hemisphere affect supplied forcing/calendars, but do not replace agronomic suitability evidence.
