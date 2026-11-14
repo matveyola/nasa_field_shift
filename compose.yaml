@@ -2,7 +2,10 @@ name: field-shift
 
 x-api-image: &api-image
   image: ${API_IMAGE:-field-shift-api:local}
+  networks: [default, planning-internal]
   environment: &api-environment
+    FIELD_SHIFT_CROP_MODEL_URL: ${FIELD_SHIFT_CROP_MODEL_URL:-http://crop-model:8001}
+    FIELD_SHIFT_CROP_MODEL_TOKEN: ${FIELD_SHIFT_CROP_MODEL_TOKEN:-}
     POSTGRES_HOST: postgres
     POSTGRES_USER: ${POSTGRES_USER:-field_shift}
     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-field_shift_local}
@@ -134,6 +137,48 @@ services:
     stop_grace_period: ${WORKER_STOP_GRACE_PERIOD:-150s}
     restart: unless-stopped
 
+  worker-planning:
+    <<: *api-image
+    command: ["celery", "-A", "field_shift.jobs.celery_app:app", "worker", "-Q", "planning", "-n", "planning@%h", "--concurrency=1", "--loglevel=INFO"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    init: true
+    mem_limit: 1536m
+    cpus: 1.0
+    pids_limit: 96
+    stop_grace_period: 340s
+    restart: unless-stopped
+
+  crop-model:
+    profiles: [crop-model]
+    image: ${CROP_MODEL_IMAGE:-field-shift-crop-model:local}
+    build:
+      context: ./services/crop-model
+      additional_contexts:
+        crop-package: ./packages/field-shift-models
+        planning-contracts: ./apps/api/src/field_shift/contracts
+    environment:
+      FIELD_SHIFT_CROP_MODEL_TOKEN: ${FIELD_SHIFT_CROP_MODEL_TOKEN:-}
+    networks: [planning-internal]
+    read_only: true
+    tmpfs: ["/tmp:size=128m,mode=1777"]
+    mem_limit: 2304m
+    cpus: 1.0
+    pids_limit: 64
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    init: true
+    healthcheck:
+      test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://localhost:8001/health', timeout=3).close()"]
+      interval: 10s
+      timeout: 4s
+      retries: 6
+      start_period: 10s
+    restart: unless-stopped
+
   worker-geo-ml:
     <<: *api-image
     command: ["celery", "-A", "field_shift.jobs.celery_app:app", "worker", "-Q", "geo_ml", "-n", "geo-ml@%h", "--concurrency=1", "--loglevel=INFO"]
@@ -188,6 +233,7 @@ services:
     build:
       context: ./apps/web
       additional_contexts:
+        planning-contracts: ./contracts/planning-v1
         agent-widget: ./services/agent/frontend/src/widget  # «Польовий помічник», built into the web app
     image: ${WEB_IMAGE:-field-shift-web:local}
     ports:
@@ -200,3 +246,7 @@ services:
 volumes:
   postgres-data:
   redis-data:
+
+networks:
+  planning-internal:
+    internal: true

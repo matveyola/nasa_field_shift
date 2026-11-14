@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, nazar-jobs]
   pull_request:
   workflow_dispatch:
 
@@ -24,6 +24,7 @@ jobs:
       web: ${{ steps.detect.outputs.web }}
       integration: ${{ steps.detect.outputs.integration }}
       ml: ${{ steps.detect.outputs.ml }}
+      planning: ${{ steps.detect.outputs.planning }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -48,7 +49,10 @@ jobs:
             /^(apps\/web\/|services\/agent\/frontend\/src\/widget\/|\.github\/workflows\/ci\.yml)/ { web = 1 }
             /^(apps\/api\/(src\/|tests\/integration\/|migrations\/|alembic\.ini|pyproject\.toml|uv\.lock|Dockerfile)|compose\.yaml|infra\/|\.github\/workflows\/ci\.yml)/ { integration = 1 }
             /^(packages\/field-shift-ml\/|apps\/api\/src\/field_shift\/modules\/(crops|fields|geo_ml|rotations|simulation|weather)\/|\.github\/workflows\/ci\.yml$)/ { ml = 1 }
+            /^(contracts\/planning-v1\/|packages\/field-shift-models\/|services\/crop-model\/|apps\/api\/|apps\/web\/|compose\.yaml|infra\/|\.github\/workflows\/ci\.yml)/ { planning = 1 }
+            /^contracts\/planning-v1\// { api = 1; web = 1; integration = 1 }
             END {
+              print "planning=" (planning ? "true" : "false")
               print "api=" (api ? "true" : "false")
               print "agent=" (agent ? "true" : "false")
               print "agent_reference=" (agent_reference ? "true" : "false")
@@ -217,8 +221,14 @@ jobs:
       - run: uv sync --locked --extra dev
       - run: docker compose config --quiet
         working-directory: .
+      - name: Create isolated profile migration database
+        env:
+          PG_ADMIN_URL: postgresql://field_shift:ci@localhost:${{ job.services.postgres.ports['5432'] }}/field_shift
+        run: uv run --no-sync python -c "import os, psycopg; c=psycopg.connect(os.environ['PG_ADMIN_URL'], autocommit=True); c.execute('CREATE DATABASE field_shift_profiles'); c.close()"
       - run: uv run --no-sync pytest -q -m integration
         env:
+          ISSUE3_DATABASE_URL: postgresql+psycopg://field_shift:ci@localhost:${{ job.services.postgres.ports['5432'] }}/field_shift_profiles
+          ISSUE5_POSTGRES_ADMIN_URL: postgresql://field_shift:ci@localhost:${{ job.services.postgres.ports['5432'] }}/field_shift
           FIELD_SHIFT_TEST_DATABASE_URL: postgresql+psycopg://field_shift:ci@localhost:${{ job.services.postgres.ports['5432'] }}/field_shift
           FIELD_SHIFT_TEST_REDIS_URL: redis://localhost:${{ job.services.redis.ports['6379'] }}/15
       - name: Restore a PostgreSQL archive
@@ -248,10 +258,52 @@ jobs:
             [ "$(psql -U field_shift -d field_shift_restore -Atc "SELECT count(*) FROM jobs")" = 1 ]
           '
 
+  planning:
+    needs: changes
+    if: needs.changes.outputs.planning == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+        with:
+          version: '0.11.0'
+          python-version: '3.12'
+          enable-cache: true
+          cache-dependency-glob: |
+            apps/api/uv.lock
+            packages/field-shift-models/uv.lock
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - run: uv sync --project apps/api --locked --extra dev
+      - run: uv sync --project packages/field-shift-models --locked --python 3.12
+      - run: packages/field-shift-models/.venv/bin/python -m pytest -q packages/field-shift-models/tests
+      - run: PYTHONPATH=apps/api/src packages/field-shift-models/.venv/bin/python -m field_shift_models.cli benchmark --check packages/field-shift-models/reports/cpu-v1.json
+      - run: npm ci --prefix apps/web && npm ci --prefix services/agent && npm ci --prefix services/agent/frontend
+      - run: PYTHONPATH=apps/api/src apps/api/.venv/bin/python -m field_shift.contracts.planning_v1.export --check
+      - run: node contracts/planning-v1/check.mjs && apps/web/node_modules/.bin/tsc -p contracts/planning-v1/tsconfig.json
+      - run: node services/agent/frontend/node_modules/@playwright/test/cli.js install --with-deps chromium
+      - run: npm run test:planning --prefix apps/web
+      - run: apps/api/.venv/bin/ruff check --config apps/api/pyproject.toml services/crop-model/crop_runtime
+      - run: python3 infra/verify-planning.py
+        env:
+          PLANNING_VERIFY_PROJECT: planning-ci
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: planning-verification
+          path: |
+            apps/web/test-results/planning-v1
+            /tmp/field-shift-planning-verification/report.json
+          if-no-files-found: ignore
+
   required:
     name: Required checks
     if: always()
-    needs: [changes, api, ml, agent, agent_reference, web, integration]
+    needs: [changes, api, ml, agent, agent_reference, web, integration, planning]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     env:
