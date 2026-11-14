@@ -23,6 +23,15 @@
 
 Keep temporary work notes outside the delivered source tree or remove them after verification.
 
+## GitHub issue execution
+
+- For issue implementation, read and follow [.agents/skills/issue-worktree/SKILL.md](.agents/skills/issue-worktree/SKILL.md).
+- Establish the person's name before creating branches; ask only when it is not already provided. Use `<name>-jobs` (for Nazar, `nazar-jobs`), with no leading slash.
+- Create each issue's branch and isolated worktree from that person's jobs branch. Reserve its checkout for integration. Never implement concurrent issues in the same working directory.
+- The user authorizes merging verified issue work into the personal jobs branch and pushing that branch to `origin`. This supersedes older issue instructions to use `main` or stop at a PR. Do not merge into `main` or deploy without a separate request.
+- Serialize integration, combined-tree checks and push using the skill's repository-wide lock. Preserve real commit metadata and never force-push shared history.
+- Planning prerequisites remain: #2 first, then #3–#6 in parallel, then #7. Each prerequisite must be present in the jobs branch before dependent work begins.
+
 ## Delivery harness and commit policy
 
 - Follow `docs/roadmap.md` and record completed checkpoints in `docs/status.md`.
