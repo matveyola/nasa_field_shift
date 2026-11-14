@@ -1,0 +1,68 @@
+.context-help-row { display: flex; align-items: center; gap: 4px; min-width: 0; }
+
+.context-help-trigger {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink-2);
+  vertical-align: middle;
+  pointer-events: auto;
+}
+
+.context-help-trigger:is(:hover, [aria-expanded="true"]) {
+  background: var(--sunken);
+  color: var(--ink);
+}
+
+.context-help-trigger svg { width: 17px; height: 17px; }
+
+@media (any-pointer: coarse) {
+  .context-help-trigger { width: 44px; height: 44px; }
+}
+
+.context-help-panel {
+  display: none;
+  position: fixed;
+  inset: auto;
+  width: 20rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  overflow: visible;
+  font: 400 .875rem/1.5 var(--font);
+  text-align: start;
+  pointer-events: auto;
+}
+
+.context-help-panel:popover-open { display: block; }
+
+@supports not selector(:popover-open) {
+  .context-help-trigger { display: none; }
+}
+
+/* The padding keeps the pointer inside the open region as it crosses the gap. */
+.context-help-panel[data-side="below"] { padding-top: 6px; }
+.context-help-panel[data-side="above"] { padding-bottom: 6px; }
+.context-help-content:focus { outline: none; }
+.context-help-content:focus-visible { box-shadow: var(--focus), var(--shadow-float); }
+
+.context-help-content {
+  padding: 10px 14px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  overflow-wrap: anywhere;
+  border-radius: var(--r-md);
+  background: var(--card);
+  box-shadow: inset 0 0 0 1px var(--line-strong), var(--shadow-float);
+}
+
+.context-help-description > * + * { margin-top: .5rem; }
+.context-help-content summary { cursor: pointer; font-weight: 600; }
