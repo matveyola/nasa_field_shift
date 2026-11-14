@@ -1,0 +1,4 @@
+# Project-scoped concurrency; models and permissions inherit from the session.
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 8

@@ -14,6 +14,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  agent_tooling:
+    name: Development agent checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: '0.11.0'
+          python-version: '3.12'
+      - run: uv run --no-project --python 3.12 python infra/verify.py --mode tooling
+      - run: uvx --from ruff==0.17.4 ruff check --config apps/api/pyproject.toml infra/check_agent_tree.py infra/test_agent_tree.py infra/verify.py infra/test_verify.py
+      - run: uvx --from ruff==0.17.4 ruff format --check --config apps/api/pyproject.toml infra/check_agent_tree.py infra/test_agent_tree.py infra/verify.py infra/test_verify.py
+
   changes:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -251,7 +267,7 @@ jobs:
   required:
     name: Required checks
     if: always()
-    needs: [changes, api, ml, agent, agent_reference, web, integration]
+    needs: [agent_tooling, changes, api, ml, agent, agent_reference, web, integration]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     env:
