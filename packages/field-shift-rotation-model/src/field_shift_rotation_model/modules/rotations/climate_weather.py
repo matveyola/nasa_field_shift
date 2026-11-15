@@ -41,7 +41,7 @@ _UNITS = {
 _CALENDARS = {"proleptic_gregorian", "gregorian", "standard"}
 _TIME_UNITS = re.compile(r"days since (\d{4})-(\d{1,2})-(\d{1,2})(?:[ T]00:00:00(?:\.\d+)?Z?)?")
 _MAX_RESPONSE_BYTES = 256 * 1024
-_DOWNLOADS = ThreadPoolExecutor(max_workers=2, thread_name_prefix="nex-gddp")
+_DOWNLOADS = ThreadPoolExecutor(max_workers=4, thread_name_prefix="nex-gddp")
 _BUNDLE_DIRECTORY = files("field_shift_rotation_model").joinpath("examples/climate")
 _BUNDLED_CELLS = {
     (42.125, -93.875): "climate-weather.json.gz",
