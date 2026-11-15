@@ -210,7 +210,9 @@ CASES = {
     "services/agent/package.json": {"agent_reference"},
     "services/agent/tsconfig.json": {"agent_reference"},
     "services/agent/examples/client.ts": {"agent_reference"},
-    "services/agent/frontend/src/widget/ui/Panel.tsx": {"agent_reference", "web"},
+    # The App embeds this widget; its planning job owns the workspace browser checks.
+    "services/agent/frontend/src/widget/ui/Panel.tsx": {"agent_reference", "web"}
+    | has("planning"),
     "services/agent/frontend/docs/notes.md": set(),
     "apps/web/src/app/App.tsx": {"web"} | has("planning"),
     "packages/field-shift-ml/src/x.py": {"ml"},

@@ -22,7 +22,7 @@ class CIPathChecks(unittest.TestCase):
             for c in commands
             if c[:4] == ["uv", "sync", "--project", "packages/field-shift-models"]
         ]
-        checks = [c for c in commands if "field_shift_models.cli" in c and "--check" in c]
+        checks = [c for c in commands if "infra/verify_cpu_benchmark.py" in c and "--check" in c]
         self.assertEqual(len(configured), 1)
         self.assertEqual(len(sync), 1)
         self.assertEqual(len(checks), 1)
@@ -33,6 +33,15 @@ class CIPathChecks(unittest.TestCase):
         report_path = root / checks[0][checks[0].index("--check") + 1]
         report = json.loads(report_path.read_text())
         self.assertEqual(report["python"], configured[0])
+        self.assertEqual(checks[0][0], "packages/field-shift-models/.venv/bin/python")
+        self.assertIn("--output-dir", checks[0])
+        self.assertEqual(
+            checks[0][checks[0].index("--output-dir") + 1],
+            "$RUNNER_TEMP/field-shift-cpu-benchmark",
+        )
+        uploads = job.split("- uses: actions/upload-artifact@", 1)[1]
+        self.assertIn("if: always()", uploads)
+        self.assertIn("${{ runner.temp }}/field-shift-cpu-benchmark/", uploads)
 
     def test_fast_runner_includes_the_actual_ci_tooling_lint_and_format_scope(self):
         root = Path(__file__).resolve().parents[1]
@@ -58,6 +67,40 @@ class CIPathChecks(unittest.TestCase):
                 )
                 if operation == "format":
                     self.assertIn("--check", check.argv)
+
+    def test_shared_widget_runs_its_app_consumer_checks_without_unrelated_jobs(self):
+        workflow = (Path(__file__).resolve().parents[1] / ".github/workflows/ci.yml").read_text()
+        program = workflow.split("          awk '", 1)[1].split('\' "$RUNNER_TEMP/changes"', 1)[0]
+        for path, expected in (
+            (
+                "services/agent/frontend/src/widget/styles/widget.css",
+                {"planning", "web", "agent_reference"},
+            ),
+            (
+                "services/agent/frontend/src/widget/ui/Panel.tsx",
+                {"planning", "web", "agent_reference"},
+            ),
+            (
+                "services/agent/frontend/src/widget/nested/new.ts",
+                {"planning", "web", "agent_reference"},
+            ),
+            ("services/agent/frontend/src/reference-only.tsx", {"agent_reference"}),
+            ("services/agent/frontend/docs/widget.md", set()),
+            ("services/agent/agent_service/tools.py", {"agent"}),
+            ("docs/product/value-and-global-scenarios.md", set()),
+        ):
+            with self.subTest(path=path):
+                result = subprocess.run(
+                    ["awk", program],
+                    input=path + "\n",
+                    text=True,
+                    capture_output=True,
+                    check=True,
+                )
+                flags = dict(line.split("=", 1) for line in result.stdout.splitlines())
+                self.assertEqual(
+                    {name for name, enabled in flags.items() if enabled == "true"}, expected
+                )
 
     def test_shared_science_runs_paired_rotation_verification(self):
         workflow = (Path(__file__).resolve().parents[1] / ".github/workflows/ci.yml").read_text()
