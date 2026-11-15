@@ -57,16 +57,18 @@ describe("launcher and panel", () => {
     expect(screen.getByRole("button", { name: "Open Field Assistant" })).toHaveFocus();
   });
 
-  it("opens from the host's own button and tells the host when the farmer closes it", async () => {
+  it.each([false, true])("opens from the host's own button and reports close (reduced motion: %s)", async (reducedMotion) => {
+    mockMedia(reducedMotion ? ["(prefers-reduced-motion: reduce)"] : []);
     const onOpenChange = vi.fn();
     const { user, rerender } = setup({ launcher: false, open: false, onOpenChange });
     expect(screen.queryByRole("button", { name: "Open Field Assistant" })).toBeNull(); // the host's button only
     rerender({ launcher: false, open: true, onOpenChange });
     await screen.findByRole("dialog", { name: "Field Assistant" });
-    expect(onOpenChange).toHaveBeenLastCalledWith(true);
+    await waitFor(() => expect(onOpenChange).toHaveBeenLastCalledWith(true));
     await user.keyboard("{Escape}");
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
-    expect(onOpenChange).toHaveBeenLastCalledWith(false);
+    // DOM removal and the host's passive-effect notification are separate observations.
+    await waitFor(() => expect(onOpenChange).toHaveBeenLastCalledWith(false));
   });
 
   it("shows two pulse rings, and none under prefers-reduced-motion", () => {
