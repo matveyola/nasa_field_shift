@@ -275,10 +275,11 @@ def test_rotation_edits_recompute_comparison_and_preserve_main_plan(client: Test
     assert (
         client.patch("/api/rotations/main", json={**scope, "plan_id": "plan-b"}).status_code == 200
     )
-    assert (
-        client.put("/api/rotations/plans/plan-b", json={**scope, "crops": ["Maize"]}).status_code
-        == 422
-    )
+    # A one-season manual plan is now a supported duration, not an invalid tuple.
+    one_season = client.put("/api/rotations/plans/plan-b", json={**scope, "crops": ["Maize"]})
+    assert one_season.status_code == 200
+    assert client.get(path).json()["plans"][1]["crops"] == [{"year": 2027, "crop": "Maize"}]
+    assert client.put("/api/rotations/plans/plan-b", json={**scope, "crops": []}).status_code == 422
     saved = client.put(
         "/api/rotations/plans/plan-b", json={**scope, "crops": ["Maize", "Wheat", "Soy"]}
     )

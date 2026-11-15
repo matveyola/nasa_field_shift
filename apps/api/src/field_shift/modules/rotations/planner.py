@@ -5,7 +5,7 @@ preferences are a transparent area-weighted objective. All agronomic intervals,
 family rules, quotas and locks are explicit hard constraints.
 """
 
-from itertools import product
+from time import monotonic
 
 from field_shift.modules.rotations.planning_catalog import CROP_FAMILIES
 from field_shift.modules.rotations.planning_schemas import (
@@ -17,12 +17,18 @@ from field_shift.modules.rotations.planning_schemas import (
     PlanningResult,
 )
 
+# Separate counters preserve the existing search-node contract. A call attempts at
+# most 60,000 generation edges plus 120,000 search steps, shares a five-second
+# deadline, and retains at most one sequence per generation leaf (<=60,000).
+# Generation quotas are divided over sorted fields before any field is visited.
+GENERATION_LIMIT = 60_000
+TIME_LIMIT_SECONDS = 5.0
 NODE_LIMIT = 120_000
 EPSILON = 1e-7
 
 
 def _allowed_sequence(
-    sequence: tuple[str, ...], history: dict[int, str], request: PlanningRequest
+    sequence: tuple[str, ...], history: dict[int, str], request: PlanningRequest, *, complete=True
 ) -> bool:
     rules = {rule.crop: rule for rule in request.crops}
     previous = dict(history)
@@ -36,22 +42,31 @@ def _allowed_sequence(
             if CROP_FAMILIES.get(last_crop) == CROP_FAMILIES[crop]:
                 return False
         previous[season] = crop
-    return not request.require_two_crops or len(set(sequence)) >= 2
+    return not complete or not request.require_two_crops or len(set(sequence)) >= 2
 
 
 def optimize(
-    request: PlanningRequest, fields: list[PlanningField], *, node_limit: int = NODE_LIMIT
+    request: PlanningRequest,
+    fields: list[PlanningField],
+    *,
+    node_limit: int = NODE_LIMIT,
+    generation_limit: int = GENERATION_LIMIT,
+    max_seconds: float = TIME_LIMIT_SECONDS,
+    clock=monotonic,
 ) -> PlanningResult:
     """Return best visited feasible plan; only exhaustive search can prove optimality."""
-    if node_limit < 1:
-        raise ValueError("The search budget must be positive.")
+    if node_limit < 1 or generation_limit < 1 or not 0 < max_seconds <= TIME_LIMIT_SECONDS:
+        raise ValueError("Positive node budgets and a deadline of at most five seconds required.")
+    deadline = clock() + max_seconds
+    generation_nodes = 0
+    generation_complete = True
     if len(fields) != len(request.field_ids) or {field.id for field in fields} != set(
         request.field_ids
     ):
         raise ValueError("The planner must receive every selected field exactly once.")
     if any(not 0 < field.area_ha <= 100_000 for field in fields):
         raise ValueError("Selected field areas must be positive and at most 100,000 hectares.")
-    years = range(request.start_season, request.start_season + 3)
+    years = range(request.start_season, request.start_season + request.season_count)
     crop_names = sorted(rule.crop for rule in request.crops)
     rules = {rule.crop: rule for rule in request.crops}
     total_area = sum(field.area_ha for field in fields)
@@ -92,7 +107,9 @@ def optimize(
     candidates: dict[str, list[tuple[float, tuple[str, ...]]]] = {}
     histories: dict[str, dict[int, str]] = {}
     locks = {(entry.field_id, entry.season): entry.crop for entry in request.locked}
-    for field in fields:
+    ordered_fields = sorted(fields, key=lambda item: item.id)
+    quota, remainder = divmod(generation_limit, len(ordered_fields))
+    for field_index, field in enumerate(ordered_fields):
         history = {entry.season: entry.crop for entry in field.history}
         history.update(
             {entry.season: entry.crop for entry in request.history if entry.field_id == field.id}
@@ -113,18 +130,51 @@ def optimize(
                     ),
                 )
             )
-        choices = [
-            [locks[field.id, year]] if (field.id, year) in locks else crop_names for year in years
-        ]
-        sequences = [
-            (field.area_ha * sum(rules[crop].preference for crop in sequence), sequence)
-            for sequence in product(*choices)
-            if _allowed_sequence(sequence, history, request)
-            and all(field.area_ha <= upper[crop] + EPSILON for crop in sequence)
-        ]
+        # Prune an invalid prefix immediately. Count even rejected crop edges,
+        # rather than enumerating 7**horizon products outside the search bound.
+        field_budget = quota + (field_index < remainder)
+        field_nodes = 0
+        field_complete = True
+        sequences = []
+        choices = sorted(crop_names, key=lambda crop: (-rules[crop].preference, crop))
+
+        def generate(prefix):
+            nonlocal generation_nodes, field_nodes, field_complete
+            if len(prefix) == request.season_count:
+                if _allowed_sequence(prefix, history, request):
+                    score = field.area_ha * sum(rules[crop].preference for crop in prefix)
+                    sequences.append((score, prefix))
+                return
+            year = request.start_season + len(prefix)
+            options = [locks[field.id, year]] if (field.id, year) in locks else choices
+            for crop in options:
+                if field_nodes >= field_budget or clock() >= deadline:
+                    field_complete = False
+                    return
+                field_nodes += 1
+                generation_nodes += 1
+                if field.area_ha > upper[crop] + EPSILON:
+                    continue
+                extended = (*prefix, crop)
+                if _allowed_sequence(extended, history, request, complete=False):
+                    generate(extended)
+                if not field_complete:
+                    return
+
+        generate(())
+        generation_complete &= field_complete
+        if not field_complete:
+            warnings.append(
+                PlannerDiagnostic(
+                    code="generation_budget_exhausted",
+                    field_id=field.id,
+                    message="Candidate generation reached its resource bound. "
+                    "Any returned allocation is feasible, not proven optimal.",
+                )
+            )
         sequences.sort(key=lambda item: (-item[0], item[1]))
         candidates[field.id] = sequences
-        if not sequences:
+        if not sequences and field_complete:
             diagnostics.append(
                 PlannerDiagnostic(
                     code="no_field_sequence",
@@ -145,11 +195,25 @@ def optimize(
             warnings=warnings,
             explored_nodes=nodes,
             node_limit=node_limit,
+            generation_nodes=generation_nodes,
+            generation_limit=generation_limit,
+            generation_complete=generation_complete,
+            time_limit_seconds=max_seconds,
             objective=objective,
         )
 
     if diagnostics:
         return result("infeasible")
+
+    if any(not rows for rows in candidates.values()):
+        diagnostics.append(
+            PlannerDiagnostic(
+                code="generation_budget_exhausted",
+                message="Generation ended without a complete candidate for every field. "
+                "No infeasibility or optimality was proved; reduce the planning scope.",
+            )
+        )
+        return result("search_limit")
 
     # Most constrained fields first; a stable identifier provides reproducible ties.
     ordered = sorted(
@@ -176,11 +240,11 @@ def optimize(
     best: dict[str, tuple[str, ...]] | None = None
     best_score = float("-inf")
     nodes = 0
-    exhausted = True
+    exhausted = generation_complete
 
     def search(index: int, score: float) -> None:
         nonlocal best, best_score, nodes, exhausted
-        if nodes >= node_limit:
+        if nodes >= node_limit or clock() >= deadline:
             exhausted = False
             return
         nodes += 1
@@ -201,7 +265,7 @@ def optimize(
             return
         field = ordered[index]
         for sequence_score, sequence in candidates[field.id]:
-            if nodes >= node_limit:
+            if nodes >= node_limit or clock() >= deadline:
                 exhausted = False
                 break
             nodes += 1
