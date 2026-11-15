@@ -14,11 +14,14 @@ export type ActionPhase =
   | { phase: "applied"; auto: boolean }
   | { phase: "rejected"; reason: RejectReason };
 
+// `constraint`: the exact constraint sent to the host, which may be the farmer's edit of the proposal; the host's
+// context is matched against it, not against the original proposal.
 export type ConstraintPhase =
   | { phase: "proposed" }
-  | { phase: "applying" }
-  | { phase: "confirmed" }
-  | { phase: "dismissed" }
+  | { phase: "applying"; constraint?: Constraint }
+  | { phase: "confirmed"; constraint?: Constraint }
+  | { phase: "declined"; constraint?: Constraint } // the farmer rejected it, and the host saved that decision
+  | { phase: "dismissed" } // hidden in this conversation only: nothing was saved
   | { phase: "rejected"; reason: RejectReason };
 
 export interface UserItem {

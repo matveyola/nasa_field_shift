@@ -9,9 +9,10 @@ claims ("the soil is dry"), and paraphrased claims outside the patterns below ar
 """
 
 import re
+import unicodedata
 from dataclasses import dataclass, field
 
-from contracts.models import Fact, Provenance, Quantity
+from contracts.models import CALC_FACT_PREFIX, Fact, Provenance, Quantity
 
 from . import plain, scenarios
 
@@ -23,16 +24,32 @@ from . import plain, scenarios
 # (otherwise one notice under the answer says the numbers are demo data; the owner's call, 2026-11-12).
 
 LABELS = {
-    "uk": {"demo": "демо", "cached": "збережено раніше", "unavailable": "немає даних",
-           "estimate": "оцінка", "estimate_unchecked": "неперевірена оцінка", "calc": "розрахунок",
-           "reference": "довідкове значення", "farmer": "з ваших слів",
-           "simulation": "розрахунок сівозміни, варіант «{scenario}»",
-           "unverified": "не підтверджено сервісом даних"},
-    "en": {"demo": "demo", "cached": "saved earlier", "unavailable": "no data",
-           "estimate": "estimate", "estimate_unchecked": "unchecked estimate", "calc": "calculated",
-           "reference": "reference value", "farmer": "from you",
-           "simulation": "rotation calculation, case “{scenario}”",
-           "unverified": "not confirmed by the data service"},
+    "uk": {
+        "demo": "демо",
+        "cached": "збережено раніше",
+        "unavailable": "немає даних",
+        "estimate": "оцінка",
+        "estimate_unchecked": "неперевірена оцінка",
+        "calc": "розрахунок",
+        "reference": "довідкове значення",
+        "farmer": "з ваших слів",
+        "simulation": "розрахунок сівозміни, варіант «{scenario}»",
+        "arithmetic": "розрахунок з ваших чисел",
+        "unverified": "не підтверджено сервісом даних",
+    },
+    "en": {
+        "demo": "demo",
+        "cached": "saved earlier",
+        "unavailable": "no data",
+        "estimate": "estimate",
+        "estimate_unchecked": "unchecked estimate",
+        "calc": "calculated",
+        "reference": "reference value",
+        "farmer": "from you",
+        "simulation": "rotation calculation, case “{scenario}”",
+        "arithmetic": "calculated from your figures",
+        "unverified": "not confirmed by the data service",
+    },
 }
 _SCENARIO_IN_METHOD = re.compile(r"scenario=([a-z0-9_]+)")
 
@@ -42,8 +59,24 @@ def format_number(value: float, lang: str) -> str:
     return text.replace(".", ",") if lang == "uk" else text
 
 
+MONEY_UNITS = frozenset({"UAH", "USD", "UAH/ha", "USD/ha"})
+
+
+def format_money(value: float, lang: str) -> str:
+    """Grouped thousands and kopecks/cents only when there are any: "7 500", "22 500,50" (uk); "7,500", "22,500.50"."""
+    text = f"{value:,.2f}".removesuffix(".00")
+    return (
+        text.replace(",", "\u00a0").replace(".", ",") if lang == "uk" else text
+    )  # no-break space, as Intl uk-UA
+
+
 def format_quantity(q: Quantity, lang: str) -> str:
-    text = format_number(q.value, lang) + plain.unit(q.unit, lang, q.value)
+    number = (
+        format_money(q.value, lang)
+        if q.unit in MONEY_UNITS
+        else format_number(q.value, lang)
+    )
+    text = number + plain.unit(q.unit, lang, q.value)
     u = q.uncertainty
     if u and u.kind in ("range", "ci95") and u.low is not None and u.high is not None:
         text += f" ({format_number(u.low, lang)}–{format_number(u.high, lang)})"
@@ -56,7 +89,9 @@ def product_name(p: Provenance) -> str:
     if not p.source:
         return ""
     version = p.source.version
-    return f"{p.source.product_id} " + (f"v{version}" if version != "unverified" else "(version unverified)")
+    return f"{p.source.product_id} " + (
+        f"v{version}" if version != "unverified" else "(version unverified)"
+    )
 
 
 def origin_note(p: Provenance, lang: str, mark_demo: bool = True) -> str:
@@ -65,7 +100,9 @@ def origin_note(p: Provenance, lang: str, mark_demo: bool = True) -> str:
     t = LABELS[lang]
     parts = []
     if p.kind == "ml_estimate":
-        parts.append(t["estimate"] if p.model and p.model.validation else t["estimate_unchecked"])
+        parts.append(
+            t["estimate"] if p.model and p.model.validation else t["estimate_unchecked"]
+        )
     elif p.kind == "deterministic_calc":
         parts.append(t["calc"])
     elif p.kind == "reference":
@@ -80,24 +117,51 @@ def origin_note(p: Provenance, lang: str, mark_demo: bool = True) -> str:
     return ", ".join(parts)
 
 
+def is_farmer_arithmetic(f: Fact) -> bool:
+    """An input or result of calculate_farm_budget: the farmer's own figures, never field data or live data."""
+    return f.domain == "farm" and f.id.startswith(
+        CALC_FACT_PREFIX
+    )  # a FieldContext cannot carry such ids
+
+
 def is_simulation_output(f: Fact) -> bool:
     """A score from a compare_rotations result (see integrations.normalize.check_comparison)."""
     return f.domain == "rotation" and f.id.startswith("sim.")
 
 
-def render_fact(f: Fact, lang: str, unverified: bool = False, mark_demo: bool = True) -> str:
+def render_fact(
+    f: Fact, lang: str, unverified: bool = False, mark_demo: bool = True
+) -> str:
     if f.provenance.data_status == "unavailable":
-        name = plain.source(f.provenance.source.product_id if f.provenance.source else None, lang)
+        name = plain.source(
+            f.provenance.source.product_id if f.provenance.source else None, lang
+        )
         return f"{LABELS[lang]['unavailable']}" + (f" ({name})" if name else "")
-    value = format_quantity(f.quantity, lang) if f.quantity is not None else (f.category or "")
+    value = (
+        format_quantity(f.quantity, lang)
+        if f.quantity is not None
+        else (f.category or "")
+    )
     note = origin_note(f.provenance, lang, mark_demo)
+    if is_farmer_arithmetic(f) and f.provenance.kind == "deterministic_calc":
+        note = LABELS[lang]["arithmetic"]
     if is_simulation_output(f):
         m = _SCENARIO_IN_METHOD.search(f.provenance.method or "")
         # display name only; the id stays in provenance.method and every contract (unknown id → shown as is)
-        if f.provenance.kind == "deterministic_calc":  # the simulation label already says it is a calculation
+        if (
+            f.provenance.kind == "deterministic_calc"
+        ):  # the simulation label already says it is a calculation
             note = note.removeprefix(LABELS[lang]["calc"]).removeprefix(", ")
-        note = ", ".join(x for x in (LABELS[lang]["simulation"].format(
-            scenario=scenarios.label(m.group(1), lang) if m else "?"), note) if x)
+        note = ", ".join(
+            x
+            for x in (
+                LABELS[lang]["simulation"].format(
+                    scenario=scenarios.label(m.group(1), lang) if m else "?"
+                ),
+                note,
+            )
+            if x
+        )
     if unverified and f.provenance.data_status in ("live", "cached"):
         note = ", ".join(x for x in (note, LABELS[lang]["unverified"]) if x)
     return f"**{value}**" + (f" ({note})" if note else "")
@@ -129,13 +193,17 @@ FACT_TOKEN = re.compile(r"\{\{\s*fact\s*:\s*([^{}\s]{1,128})\s*\}\}")
 # A number not glued to a preceding letter (L4, V008) or letter-hyphen (FAO-56, poltava-01).
 _NUMBER = re.compile(r"(?<![^\W\d_])(?<![^\W\d_]-)(?<![\d.,])[-+±]?\d+(?:[.,]\d+)*")
 # ISO dates, d.m.yyyy, and the periods the app itself shows (plain.period): "01.07–31.07.2025", "1 Jul – 31 Jul 2025".
-_DATE = re.compile(r"\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}\.\d{1,2}\.\d{4}\b|\b\d{1,2}\.\d{2}(?=\s?[–-]\s?\d{1,2}\.\d{2}\.\d{4})"
-                   r"|\b\d{1,2}\s(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b(?:\s\d{4})?")
+_DATE = re.compile(
+    r"\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}\.\d{1,2}\.\d{4}\b|\b\d{1,2}\.\d{2}(?=\s?[–-]\s?\d{1,2}\.\d{2}\.\d{4})"
+    r"|\b\d{1,2}\s(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b(?:\s\d{4})?"
+)
 _YEAR = re.compile(r"(?:19|20)\d{2}")
 # Units after a number turn it into a measurement claim, whatever its size.
 _UNIT_AFTER = re.compile(
     r"\s?(?:%|‰|°|℃|mm\b|мм\b|cm\b|см\b|km\b|км\b|m\b|м\b|m[²³23]|м[²³23]|ha\b|га\b|kg\b|кг\b|t\b|т\b|ц\b"
-    r"|g/kg|г/кг|mg|мг|cmol|MJ|W/m|t/ha|т/га|ц/га|kg/ha|кг/га|mm/d|K\b|percent|відсот|процент)",
+    r"|g/kg|г/кг|mg|мг|cmol|MJ|W/m|t/ha|т/га|ц/га|kg/ha|кг/га|mm/d|K\b|percent|відсот|процент"
+    # money and its scale words: a price or cost is a claim whatever its size
+    r"|грн|гривн|гривень|₴|UAH\b|USD\b|\$|долар|dollars?\b|тис\.|тисяч|млн|thousand|million)",
     re.IGNORECASE,
 )
 _PH_BEFORE = re.compile(r"\bpH\W{0,3}$", re.IGNORECASE)
@@ -159,6 +227,17 @@ _CLAIMS: dict[str, re.Pattern[str]] = {
     "unsupported_recommendation": re.compile(
         r"(?:оптимальн|найкращ|найвигідніш)\w*\s+(?:\w+\s+){0,2}сівозмін|сівозмін\w*\s+(?:\w+\s+){0,2}(?:оптимальн|найкращ)"
         r"|\b(?:optimal|best|ideal)\s+(?:\w+\s+){0,2}rotation",
+        re.IGNORECASE,
+    ),
+    # No connected simulation service applies the farmer's confirmed conditions (tools.compare_rotations): a result
+    # must never be said to reflect them. The negated forms ("не враховує ваших умов") are what the agent should say.
+    "constraints_applied_claim": re.compile(
+        r"(?<!не )(?<!не\s)\bвраховує\w*\s+(?:\w+\s+){0,2}(?:ваш\w*|фермер\w*)\s+(?:\w+\s+){0,2}(?:умов|обмежен|вимог)\w*"
+        r"|(?<!без )\bз\s+урахуванням\s+(?:\w+\s+){0,1}ваш\w*\s+(?:\w+\s+){0,2}(?:умов|обмежен|вимог)\w*"
+        r"|(?<!not )(?<!n't )\b(?:takes?|took|taking)\s+(?:\w+\s+){0,2}into\s+account\s+your\s+(?:\w+\s+){0,2}"
+        r"(?:conditions|constraints|restrictions|rules)"
+        r"|(?<!not )(?<!n't )\b(?:reflects?|follows?|respects?)\s+your\s+(?:\w+\s+){0,2}"
+        r"(?:conditions|constraints|restrictions|rules)",
         re.IGNORECASE,
     ),
     # estimate_as_observation is checked per sentence in check(): it needs the cited facts' provenance.
@@ -190,59 +269,93 @@ _DEMO_AS_REAL = re.compile(
 
 @dataclass(frozen=True)
 class Violation:
-    category: str   # unknown_fact | fact_not_retrieved | ungrounded_number | <claim category>
-    snippet: str    # short, for the repair instruction and logs (never the whole answer)
-    start: int      # position in the model's raw text
+    category: (
+        str  # unknown_fact | fact_not_retrieved | ungrounded_number | <claim category>
+    )
+    snippet: str  # short, for the repair instruction and logs (never the whole answer)
+    start: int  # position in the model's raw text
     end: int
 
 
 @dataclass
 class Grounded:
     markdown: str
-    fact_ids: list[str] = field(default_factory=list)   # facts referenced, in order of first use
+    fact_ids: list[str] = field(
+        default_factory=list
+    )  # facts referenced, in order of first use
     violations: list[Violation] = field(default_factory=list)
-    citations: list = field(default_factory=list)        # contracts.models.Citation, numbered as in markdown
+    citations: list = field(
+        default_factory=list
+    )  # contracts.models.Citation, numbered as in markdown
 
 
 def _number_is_claim(text: str, m: re.Match[str], farmer_numbers: set[str]) -> bool:
     raw = m.group(0).lstrip("+-±")
-    after = text[m.end():m.end() + 12]
+    after = text[m.end() : m.end() + 12]
     has_unit = bool(_UNIT_AFTER.match(after))
-    if _PH_BEFORE.search(text[max(0, m.start() - 6):m.start()]):
+    if _PH_BEFORE.search(text[max(0, m.start() - 6) : m.start()]):
         return True
     if raw in farmer_numbers and not ("." in raw or "," in raw):
-        return False                           # echoing the farmer's own number ("my 50 ha")
+        return False  # echoing the farmer's own number ("my 50 ha")
     if _YEAR.fullmatch(raw) and not has_unit:
-        return False                           # a year
+        return False  # a year
     if has_unit or "." in raw or "," in raw:
-        return True                            # a measurement or a precise value
-    return int(raw) > 10                       # small integers: counts, list items, "3 years"
+        return True  # a measurement or a precise value
+    return int(raw) > 10  # small integers: counts, list items, "3 years"
 
 
-def check(text: str, *, retrieved: dict[str, Fact], known_ids: set[str], farmer_text: str,
-          simulation_ran: bool, any_live_fact: bool, lang: str,
-          evidence: dict | None = None, index_has=None, unverified: frozenset[str] | set[str] = frozenset(),
-          demo_only: bool = False) -> Grounded:
+def visible_text(text: str) -> str:
+    """The model's text without invisible format characters (Unicode Cf: zero-width spaces and joiners, bidi
+    controls, soft hyphens). "2<ZWSP>5<ZWSP>0" reads as 250 on screen but slipped past the number checks as three
+    small digits. Letters, apostrophes (ʼ ’) and no-break spaces are not Cf and stay; source passages are never
+    touched (only the model-written draft goes through here)."""
+    return "".join(ch for ch in text if unicodedata.category(ch) != "Cf")
+
+
+def check(
+    text: str,
+    *,
+    retrieved: dict[str, Fact],
+    known_ids: set[str],
+    farmer_text: str,
+    simulation_ran: bool,
+    any_live_fact: bool,
+    lang: str,
+    evidence: dict | None = None,
+    index_has=None,
+    unverified: frozenset[str] | set[str] = frozenset(),
+    demo_only: bool = False,
+) -> Grounded:
     """Render fact and citation tokens and report every grounding violation in `text`.
 
     `evidence` is this turn's retrieved knowledge chunks (chunk_id -> ChunkRecord); `index_has`
     tells whether a chunk id exists in the index at all (fabricated vs. not retrieved).
     """
-    from . import citations  # local import: grounding stays importable without the knowledge package
+    from . import (
+        citations,  # local import: grounding stays importable without the knowledge package
+    )
 
     violations: list[Violation] = []
     used: list[str] = []
     evidence = evidence or {}
-    cite_issues, cited_sentences = citations.resolve(text, evidence, index_has or (lambda _cid: False))
-    violations += [Violation(i.category, i.snippet, i.start, i.end) for i in cite_issues]
+    cite_issues, cited_sentences = citations.resolve(
+        text, evidence, index_has or (lambda _cid: False)
+    )
+    violations += [
+        Violation(i.category, i.snippet, i.start, i.end) for i in cite_issues
+    ]
 
     # 1. Fact references.
     for m in FACT_TOKEN.finditer(text):
         fid = m.group(1)
         if fid not in known_ids:
-            violations.append(Violation("unknown_fact", m.group(0)[:60], m.start(), m.end()))
+            violations.append(
+                Violation("unknown_fact", m.group(0)[:60], m.start(), m.end())
+            )
         elif fid not in retrieved:
-            violations.append(Violation("fact_not_retrieved", m.group(0)[:60], m.start(), m.end()))
+            violations.append(
+                Violation("fact_not_retrieved", m.group(0)[:60], m.start(), m.end())
+            )
         elif fid not in used:
             used.append(fid)
 
@@ -251,7 +364,9 @@ def check(text: str, *, retrieved: dict[str, Fact], known_ids: set[str], farmer_
     masked = FACT_TOKEN.sub(lambda m: "§" * len(m.group(0)), text)
     masked = citations.CITE_TOKEN.sub(lambda m: "§" * len(m.group(0)), masked)
     masked = _DATE.sub(lambda m: "§" * len(m.group(0)), masked)
-    masked = scenarios.NAMES.sub(lambda m: "§" * len(m.group(0)), masked)  # "спека +2,5 °C" is a name, not a value
+    masked = scenarios.NAMES.sub(
+        lambda m: "§" * len(m.group(0)), masked
+    )  # "спека +2,5 °C" is a name, not a value
     masked = re.sub(r"`[^`\n]{0,80}`", lambda m: "§" * len(m.group(0)), masked)
     farmer_numbers = set(re.findall(r"\d+", farmer_text))
     sentence_has_claims: dict[int, bool] = {}
@@ -259,37 +374,81 @@ def check(text: str, *, retrieved: dict[str, Fact], known_ids: set[str], farmer_
         if not _number_is_claim(masked, m, farmer_numbers):
             continue
         cited = next((s for s in cited_sentences if s.start <= m.start() < s.end), None)
-        snippet = masked[max(0, m.start() - 15):m.end() + 10].strip()
+        snippet = masked[max(0, m.start() - 15) : m.end() + 10].strip()
         if cited is None:
-            violations.append(Violation("ungrounded_number", snippet, m.start(), m.end()))
+            violations.append(
+                Violation("ungrounded_number", snippet, m.start(), m.end())
+            )
             continue
         sentence_has_claims[cited.start] = True
-        if problem := citations.number_problem(cited.text, m.group(0).lstrip("+-±"), cited.chunks):
+        if problem := citations.number_problem(
+            cited.text, m.group(0).lstrip("+-±"), cited.chunks
+        ):
             violations.append(Violation(problem, snippet, cited.start, cited.end))
     for sentence in cited_sentences:
-        if problem := citations.sentence_problem(sentence, sentence_has_claims.get(sentence.start, False)):
-            violations.append(Violation(problem, sentence.text.strip()[:60], sentence.start, sentence.end))
+        if problem := citations.sentence_problem(
+            sentence, sentence_has_claims.get(sentence.start, False)
+        ):
+            violations.append(
+                Violation(
+                    problem, sentence.text.strip()[:60], sentence.start, sentence.end
+                )
+            )
 
     # 3. A computed value (model estimate, calculation, simulation output) described as observed.
     for sentence in _SENTENCE.finditer(text):
-        cited_facts = [retrieved[m.group(1)] for m in FACT_TOKEN.finditer(sentence.group(0)) if m.group(1) in retrieved]
-        computed = [f for f in cited_facts if f.provenance.kind in ("ml_estimate", "deterministic_calc") or is_simulation_output(f)]
+        cited_facts = [
+            retrieved[m.group(1)]
+            for m in FACT_TOKEN.finditer(sentence.group(0))
+            if m.group(1) in retrieved
+        ]
+        computed = [
+            f
+            for f in cited_facts
+            if f.provenance.kind in ("ml_estimate", "deterministic_calc")
+            or is_simulation_output(f)
+        ]
         if computed and (m := _OBSERVED.search(FACT_TOKEN.sub(" ", sentence.group(0)))):
-            violations.append(Violation("estimate_as_observation", m.group(0)[:60], sentence.start(), sentence.end()))
+            violations.append(
+                Violation(
+                    "estimate_as_observation",
+                    m.group(0)[:60],
+                    sentence.start(),
+                    sentence.end(),
+                )
+            )
 
     # 3b. A simulation value presented under another scenario's name (M6C): a paragraph citing results of
     #     scenario A may name A (and others, e.g. "drought is not available; below: typical"), never only B.
     for para in _PARAGRAPH.finditer(text):
-        cited = [retrieved[m.group(1)] for m in FACT_TOKEN.finditer(para.group(0)) if m.group(1) in retrieved]
-        own = {m.group(1) for f in cited if is_simulation_output(f) and (m := _SCENARIO_IN_METHOD.search(f.provenance.method or ""))}
+        cited = [
+            retrieved[m.group(1)]
+            for m in FACT_TOKEN.finditer(para.group(0))
+            if m.group(1) in retrieved
+        ]
+        own = {
+            m.group(1)
+            for f in cited
+            if is_simulation_output(f)
+            and (m := _SCENARIO_IN_METHOD.search(f.provenance.method or ""))
+        }
         named = scenarios.mentioned(FACT_TOKEN.sub(" ", para.group(0)))
         if own and named and not named & own:
-            violations.append(Violation("scenario_mismatch", para.group(0).strip()[:60], para.start(), para.end()))
+            violations.append(
+                Violation(
+                    "scenario_mismatch",
+                    para.group(0).strip()[:60],
+                    para.start(),
+                    para.end(),
+                )
+            )
 
     # 3c. Demo data called actual or real: when everything this turn can show is demo data, no wording may say otherwise.
     if demo_only:
         for m in _DEMO_AS_REAL.finditer(FACT_TOKEN.sub(" ", text)):
-            violations.append(Violation("demo_as_real", m.group(0)[:60], m.start(), m.end()))
+            violations.append(
+                Violation("demo_as_real", m.group(0)[:60], m.start(), m.end())
+            )
 
     # 4. Claims the system cannot back.
     for category, pattern in _CLAIMS.items():
@@ -302,9 +461,19 @@ def check(text: str, *, retrieved: dict[str, Fact], known_ids: set[str], farmer_
 
     # Demo values are marked one by one only when the text also gives real ones (see LABELS).
     shown = [retrieved[fid].provenance.data_status for fid in used]
-    mixed = "fixture" in shown and any(s not in ("fixture", "unavailable") for s in shown)
-    rendered = FACT_TOKEN.sub(lambda m: render_fact(retrieved[m.group(1)], lang, m.group(1) in unverified, mark_demo=mixed)
-                              if m.group(1) in retrieved else "", text)
+    mixed = "fixture" in shown and any(
+        s not in ("fixture", "unavailable") for s in shown
+    )
+    rendered = FACT_TOKEN.sub(
+        lambda m: (
+            render_fact(
+                retrieved[m.group(1)], lang, m.group(1) in unverified, mark_demo=mixed
+            )
+            if m.group(1) in retrieved
+            else ""
+        ),
+        text,
+    )
 
     # 5. Citation tokens -> [n]; one Citation per chunk, quote = exact span closest to the claim.
     numbers: dict[str, int] = {}
@@ -314,17 +483,27 @@ def check(text: str, *, retrieved: dict[str, Fact], known_ids: set[str], farmer_
     def cite(m: re.Match[str]) -> str:
         cid, quote = m.group(1), m.group(2)
         chunk = evidence.get(cid)
-        if chunk is None or (quote and citations._norm_ws(quote) not in citations._norm_ws(chunk.text)):
+        if chunk is None or (
+            quote and citations._norm_ws(quote) not in citations._norm_ws(chunk.text)
+        ):
             return ""  # invalid: reported as a violation above, never rendered
         if cid not in numbers:
             numbers[cid] = len(numbers) + 1
             exact = quote and _exact_span(chunk.text, quote)
-            cites.append(citations.to_citation(numbers[cid], chunk, exact or citations.best_quote(chunk, claim_of.get(id(chunk), ""))))
+            cites.append(
+                citations.to_citation(
+                    numbers[cid],
+                    chunk,
+                    exact or citations.best_quote(chunk, claim_of.get(id(chunk), "")),
+                )
+            )
         return f"[{numbers[cid]}]"
 
     rendered = citations.CITE_TOKEN.sub(cite, rendered)
     rendered = re.sub(r"[ \t]+(\[\d+\])", r" \1", rendered)
-    return Grounded(markdown=rendered, fact_ids=used, violations=violations, citations=cites)
+    return Grounded(
+        markdown=rendered, fact_ids=used, violations=violations, citations=cites
+    )
 
 
 def _exact_span(text: str, quote: str) -> str | None:
@@ -335,7 +514,9 @@ def _exact_span(text: str, quote: str) -> str | None:
 
 
 _PARAGRAPH = re.compile(r"(?:[^\n]|\n(?![ \t]*\n))+")
-_SENTENCE = re.compile(r"(?:[^.!?\n]|[.!?](?![\s]|$))*(?:[.!?]+(?=\s|$)|\n|$)")  # a '.' ends a sentence only before whitespace: '1.20' does not
+_SENTENCE = re.compile(
+    r"(?:[^.!?\n]|[.!?](?![\s]|$))*(?:[.!?]+(?=\s|$)|\n|$)"
+)  # a '.' ends a sentence only before whitespace: '1.20' does not
 
 
 def redact(text: str, violations: list[Violation]) -> str:

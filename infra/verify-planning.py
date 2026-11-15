@@ -38,14 +38,10 @@ def main():
         "--no-build", action="store_true", help="Use explicitly supplied image tags"
     )
     args = parser.parse_args()
-    project = os.getenv(
-        "PLANNING_VERIFY_PROJECT", "planning-verify-" + secrets.token_hex(4)
-    )
+    project = os.getenv("PLANNING_VERIFY_PROJECT", "planning-verify-" + secrets.token_hex(4))
     if not re.fullmatch(r"planning-(verify|ci)(-[a-z0-9]+)?", project):
         raise ValueError("Use an isolated planning-verify-* or planning-ci project")
-    report_dir = Path(
-        os.getenv("PLANNING_VERIFY_OUTPUT", "/tmp/field-shift-planning-verification")
-    )
+    report_dir = Path(os.getenv("PLANNING_VERIFY_OUTPUT", "/tmp/field-shift-planning-verification"))
     report_dir.mkdir(parents=True, exist_ok=True)
     report_dir.chmod(0o700)
     report = {
@@ -53,9 +49,7 @@ def main():
         "technical": "failed",
         "empirical": "not_validated",
         "checks": [],
-        "image_mode": "explicit_prebuilt_tags"
-        if args.no_build
-        else "built_in_this_run",
+        "image_mode": "explicit_prebuilt_tags" if args.no_build else "built_in_this_run",
     }
     docker = ["docker"]
     if subprocess.run(
@@ -80,9 +74,7 @@ def main():
                 stderr=log,
             )
         if result.returncode:
-            raise RuntimeError(
-                f"Verification command failed ({parts[0]}); inspect commands.log"
-            )
+            raise RuntimeError(f"Verification command failed ({parts[0]}); inspect commands.log")
         return result.stdout.decode() if capture else None
 
     # Require a fresh project; even a previous failed verifier is not silently overwritten.
@@ -97,13 +89,9 @@ def main():
         capture=True,
     )
     if present.strip():
-        raise RuntimeError(
-            "Project already exists; select another unique PLANNING_VERIFY_PROJECT"
-        )
+        raise RuntimeError("Project already exists; select another unique PLANNING_VERIFY_PROJECT")
     web_port, pg_port, redis_port = free_port(), free_port(), free_port()
-    password, token, bootstrap, login_password = [
-        secrets.token_hex(24) for _ in range(4)
-    ]
+    password, token, bootstrap, login_password = [secrets.token_hex(24) for _ in range(4)]
     base = f"http://127.0.0.1:{web_port}"
     with tempfile.TemporaryDirectory(prefix=project + "-") as private:
         private = Path(private)
@@ -119,12 +107,8 @@ def main():
             "FIELD_SHIFT_BOOTSTRAP_TOKEN": bootstrap,
             "WEB_PORT": str(web_port),
             "FIELD_SHIFT_BACKUP_DIR": str(private / "backups"),
-            "API_IMAGE": os.getenv(
-                "PLANNING_VERIFY_API_IMAGE", f"field-shift-api:{project}"
-            ),
-            "WEB_IMAGE": os.getenv(
-                "PLANNING_VERIFY_WEB_IMAGE", f"field-shift-web:{project}"
-            ),
+            "API_IMAGE": os.getenv("PLANNING_VERIFY_API_IMAGE", f"field-shift-api:{project}"),
+            "WEB_IMAGE": os.getenv("PLANNING_VERIFY_WEB_IMAGE", f"field-shift-web:{project}"),
             "CROP_MODEL_IMAGE": os.getenv(
                 "PLANNING_VERIFY_MODEL_IMAGE", f"field-shift-crop-model:{project}"
             ),
@@ -138,9 +122,7 @@ def main():
                 "PLANNING_VERIFY_MODEL_IMAGE",
             ]
         ):
-            raise ValueError(
-                "--no-build requires all three explicit verification image tags"
-            )
+            raise ValueError("--no-build requires all three explicit verification image tags")
         envfile.write_text("".join(f"{k}={v}\n" for k, v in settings.items()))
         envfile.chmod(0o600)
         override = private / "ports.json"
@@ -199,9 +181,7 @@ def main():
             print("PASS", name, flush=True)
 
         cookies = http.cookiejar.CookieJar()
-        opener = urllib.request.build_opener(
-            urllib.request.HTTPCookieProcessor(cookies)
-        )
+        opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cookies))
         csrf = ""
 
         def api(path, body=None, expected=200):
@@ -221,16 +201,12 @@ def main():
                 response = exc
             data = json.load(response)
             if response.code != expected:
-                raise AssertionError(
-                    f"{path}: expected {expected}, received {response.code}"
-                )
+                raise AssertionError(f"{path}: expected {expected}, received {response.code}")
             return data
 
         def wait_run(run):
             deadline = time.monotonic() + 180
-            while (
-                run["status"] in {"queued", "running"} and time.monotonic() < deadline
-            ):
+            while run["status"] in {"queued", "running"} and time.monotonic() < deadline:
                 time.sleep(1)
                 run = api("/planning-v1/farms/1/runs/" + run["run_id"])
             assert run["status"] == "succeeded", (run["status"], run.get("error"))
@@ -240,10 +216,7 @@ def main():
         started = False
         try:
             command(prefix + ["config", "--quiet"])
-            command(
-                prefix
-                + ["--profile", "agent", "--profile", "crop-model", "config", "--quiet"]
-            )
+            command(prefix + ["--profile", "agent", "--profile", "crop-model", "config", "--quiet"])
             if not args.no_build:
                 compose("build", "api", "web", "crop-model")
             check("default and optional profiles; isolated image configuration")
@@ -300,31 +273,19 @@ def main():
             report["initial_seconds"] = run["comparison"]["elapsed_seconds"]
             report["run_id"] = run["run_id"]
             report["input_sha256"] = run["input_sha256"]
-            evidence = api(
-                "/planning-workspace/farms/1/runs/" + run["run_id"] + "/evidence"
-            )
+            evidence = api("/planning-workspace/farms/1/runs/" + run["run_id"] + "/evidence")
             assert evidence["model_card"]["promotion"] == "baseline_only"
-            assert any(
-                e["applicability"] == "baseline" for e in evidence["evaluations"]
-            )
-            assert any(
-                e["applicability"] == "unsupported" for e in evidence["evaluations"]
-            )
-            assert all(
-                e["applicability"] != "validated" for e in evidence["evaluations"]
-            )
+            assert any(e["applicability"] == "baseline" for e in evidence["evaluations"])
+            assert any(e["applicability"] == "unsupported" for e in evidence["evaluations"])
+            assert all(e["applicability"] != "validated" for e in evidence["evaluations"])
             report["model"] = evidence["model_card"]["model"]
-            check(
-                "two fields, three seasons, real CPU evaluations, alternatives and abstentions"
-            )
+            check("two fields, three seasons, real CPU evaluations, alternatives and abstentions")
             apply = {
                 "schema_version": "1.0.0",
                 "request_id": str(uuid4()),
                 "farm_id": "1",
                 "run_id": run["run_id"],
-                "alternative_id": run["comparison"]["alternatives"][0][
-                    "alternative_id"
-                ],
+                "alternative_id": run["comparison"]["alternatives"][0]["alternative_id"],
                 "expected_input_sha256": run["input_sha256"],
                 "expected_snapshots": run["comparison"]["snapshots"],
                 "confirmed_by_human": True,
@@ -341,16 +302,12 @@ def main():
                         "schema_version": "1.0.0",
                         "previous_run_id": run["run_id"],
                         "request": fresh,
-                        "preserve_commitment_ids": [
-                            a["commitment_id"] for a in fresh["locks"]
-                        ],
+                        "preserve_commitment_ids": [a["commitment_id"] for a in fresh["locks"]],
                     },
                     202,
                 )
             )
-            assert (
-                replan["comparison"]["alternatives"][0]["assignments"] == fresh["locks"]
-            )
+            assert replan["comparison"]["alternatives"][0]["assignments"] == fresh["locks"]
             check("human-confirmed apply, idempotency and commitment-preserving replan")
             # Exercise the actual frontend against the authenticated stack, without mocked HTTP.
             browser_env = dict(
@@ -417,7 +374,7 @@ def main():
             )
             assert sql(counts_query, "planning_restore") == original_counts
             heads = compose("exec", "-T", "api", "alembic", "heads", capture=True)
-            assert heads.count("(head)") == 1 and "0015_merge_onboarding" in heads
+            assert heads.count("(head)") == 1 and "0016_merge_agent_planning" in heads
             script = """import os, subprocess
 from field_shift.config import get_settings
 from sqlalchemy.engine import make_url
@@ -442,7 +399,7 @@ subprocess.run(["alembic", "downgrade", "0010_precision_plans"], check=True)
             )
             assert (
                 sql("select version_num from alembic_version", "planning_restore")
-                == "0015_merge_onboarding"
+                == "0016_merge_agent_planning"
             )
             check(
                 "single migration head; archive restored to fresh DB; "
@@ -485,18 +442,13 @@ subprocess.run(["alembic", "downgrade", "0010_precision_plans"], check=True)
             check("handoff owner, snapshot and final-attempt fences on PostgreSQL")
             compose("stop", "crop-model")
             unavailable = api("/planning-workspace")
-            assert (
-                unavailable["status"] == "unavailable"
-                and unavailable["request"] is None
-            )
+            assert unavailable["status"] == "unavailable" and unavailable["request"] is None
             check("model outage returns unavailable without replacement data")
             report["technical"] = "passed"
         finally:
             report["contracts_sha256"] = (
                 hashlib.sha256(
-                    (
-                        ROOT / "contracts/planning-v1/planning-v1.schema.json"
-                    ).read_bytes()
+                    (ROOT / "contracts/planning-v1/planning-v1.schema.json").read_bytes()
                 ).hexdigest()
                 if (ROOT / "contracts/planning-v1/planning-v1.schema.json").exists()
                 else None

@@ -8,7 +8,7 @@ from field_shift.modules.access.models import (
     Membership,
     User,
 )
-from field_shift.modules.agent.models import Conversation, Message
+from field_shift.modules.agent.models import Conversation, Message, PlanningConstraint
 from field_shift.modules.farm.models import Farm, Observation
 from field_shift.modules.fields.models import Field
 from field_shift.modules.fields.planning_profile.models import ProfileSnapshot
@@ -50,6 +50,7 @@ __all__ = [
     "FieldSetup",
     "Message",
     "Observation",
+    "PlanningConstraint",
     "RotationPreference",
     "metadata",
 ]

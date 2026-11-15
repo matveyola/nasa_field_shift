@@ -4,6 +4,7 @@ import { AdjustmentsHorizontalIcon, ArrowPathIcon, CalendarDaysIcon, ChartBarIco
 import { api } from '../../api/client'
 import type { Field, FieldContext, JobOptions, Scenario, WaterResult } from '../../api/contracts'
 import { isWaterResult, matchingWaterResult } from '../../shared/analysis'
+import { explicitHistoricalRun } from '../assistant/assistantRun'
 import { useJob, useStartJob } from '../../shared/jobs'
 import { JobStatus } from '../../shared/JobStatus'
 import { Empty, ErrorBox, Loading, PageHeading, ScenarioSelect } from '../../shared/ui'
@@ -129,6 +130,8 @@ function WaterScenarios(props: Props) {
   const result = completed ?? (source === 'demo' && preview?.field_id === field_id
     && preview.season === season && preview.scenario === scenario ? preview : undefined)
   const active = Boolean(jobId && (!job ? !error : job.status !== 'succeeded' && job.status !== 'failed'))
+  // Only the run the farmer selected, never the latest one shown by default, goes to the assistant.
+  const askedRun = explicitHistoricalRun(jobId, job, completed)
   const day = result?.days.find(({ date }) => date === selectedDate) ?? result?.days.find(({ date }) => date === result.first_stress_date) ?? result?.days[0]
   const { reload: reloadRuns } = runs
 
@@ -274,7 +277,9 @@ function WaterScenarios(props: Props) {
       {result && comparison && <ScenarioComparison key={jobId ?? 'preview'} context={props.context} baseline={result}
         boundaryRevision={field.boundary_revision} />}
       <div className="toolbar">
-        <button className="button" type="button" onClick={() => props.openAgent(completed ? (jobId ?? latest?.id) : undefined)}><SparklesIcon aria-hidden="true" />{t('Ask agent')}</button>
+        <button className="button" type="button" onClick={() => props.openAgent(askedRun)}>
+          <SparklesIcon aria-hidden="true" />{askedRun ? t('Ask agent about this run') : t('Ask agent')}
+        </button>
       </div>
     </>
   )
