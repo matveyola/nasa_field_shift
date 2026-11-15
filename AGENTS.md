@@ -27,6 +27,7 @@
 6. **Never fit a test to the implementation just to make it pass. Never delete, weaken, skip or bypass a failing test for a green result.** Find and fix the cause. Change an expectation only when the intended behavior changes or the existing expectation is demonstrably incorrect, and record the reason.
 7. Diagnose the root cause of a CI failure before rerunning unrelated checks.
 8. Serialize Docker/Compose lifecycle operations, including network cleanup, with host Chromium E2E runs using localhost, unless they have real network isolation. Different worktrees and ports do not isolate host network-change events. Inspect `ERR_NETWORK_CHANGED` traces, retain the interrupted attempt and repeat only affected checks after correcting the execution environment.
+9. Add a new web browser harness to the existing serial desktop/mobile CI configuration list, with an isolated port and explicit fixture provenance. A manually passing gallery is not evidence that CI runs it.
 
 ## Production behavior and global test scenarios
 
@@ -38,6 +39,8 @@
 - Propagate model applicability limits through every reachable summary, legacy view and assistant evidence path. A coherent water balance does not establish liquid water availability, crop growth or sowing suitability. Preserve source depth and units; a shallow temperature cannot prove the state of the whole root zone.
 - QA drivers use ordinary authentication, rate limits and retry budgets. Back off after throttling, preserve failed attempts and provider retrieval times, and never disable gates for the test account. A later live-provider response may be a different forecast vintage; compare exact values only against the same captured input.
 - Review layouts at phone, tablet and desktop sizes using element containment and readable controls. Do not hide layout defects with page-wide overflow clipping or remove decision evidence to make a screen fit. Put deeper technical evidence behind accessible details.
+- Lead dense planning and analytics views with the supported conclusion, a clear action and a few dated metrics. Keep critical applicability, missing-input and abstention states visible; disclose complete arithmetic, assumptions, sources and scenario detail on demand. Preserve keyboard access and drafts when compacting navigation.
+- Preserve colored crop artwork and apply grayscale through the shared presentation style. Resolve actual catalog identifiers and supported display aliases; keep unknown crops generic. An icon identifies a crop, never model support, calibrated accuracy or suitability.
 
 Keep temporary work notes outside the delivered source tree or remove them after verification.
 

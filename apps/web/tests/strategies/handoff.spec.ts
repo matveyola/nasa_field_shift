@@ -110,7 +110,7 @@ for (const suitability of ['no_thermal_growth', 'not_assessed'] as const) test(`
 test('saved active job resumes with GET after reload; status outage is retryable without submission', async ({ page }) => {
   const state = await setup(page, { saved: [jobFixture('north', 'running')], pollFailure: true })
   await page.reload()
-  await page.getByText('Saved comparisons for this field boundary', { exact: true }).click()
+  await page.getByText('Saved comparisons', { exact: true }).click()
   await page.getByRole('button', { name: /^Open saved calculation/ }).click()
   await expect(page.getByText('Synthetic status outage')).toBeVisible()
   await page.locator('.handoff-job').getByRole('button', { name: 'Try again', exact: true }).click()
@@ -160,6 +160,7 @@ test('catalog unavailable remains honest and keyboard/UK controls retain context
 
 test('three plans and cycles carry sourced moisture, zero economics and explicit cached-only inputs', async ({ page }) => {
   const { posts } = await setup(page)
+  await page.locator('.handoff-setup > summary').click()
   await page.getByLabel('Crop cycles to compare').selectOption('3')
   await page.getByLabel('Plans to compare').selectOption('3')
   for (let cycle = 1; cycle <= 3; cycle++) {
@@ -252,7 +253,7 @@ test('reopened terminal failure has a calendar exit without restoring or resubmi
   const failed = jobFixture('north', 'failed'); failed.attempts = 3; failed.error = null
   const catalog = catalogFixture(); catalog.status = 'unavailable'; catalog.reasons = ['Synthetic model unavailable']
   const state = await setup(page, { saved: [failed], catalog })
-  await page.getByText('Saved comparisons for this field boundary', { exact: true }).click()
+  await page.getByText('Saved comparisons', { exact: true }).click()
   await page.getByRole('button', { name: /^Open saved calculation/ }).click()
   await expect(page.getByText('No comparison was produced. A calculation failure does not establish that these crops are unsuitable.', { exact: true })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Run again', exact: true })).toHaveCount(0)
