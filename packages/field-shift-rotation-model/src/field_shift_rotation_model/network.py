@@ -7,6 +7,7 @@ no mutable process state is shared between requests or installed package resourc
 import base64
 import hashlib
 import json
+from concurrent.futures import Future
 from contextlib import contextmanager
 from datetime import UTC, datetime
 from io import BytesIO
@@ -74,6 +75,7 @@ class EvidenceSession:
         self.acquire = acquire
         self.records = dict(records or {})
         self.lock = RLock()
+        self.pending: dict[str, Future[bytes]] = {}
         self.total = 0
         if len(self.records) > MAX_REQUESTS:
             raise ValueError("Too many captured provider responses")
@@ -94,25 +96,41 @@ class EvidenceSession:
                 raise AcquisitionUnavailable(
                     "Required public input is not captured; enable explicit acquisition"
                 )
-            if len(self.records) >= MAX_REQUESTS:
-                raise AcquisitionUnavailable("Public acquisition request bound exceeded")
+            pending = self.pending.get(key)
+            owns_request = pending is None
+            if pending is None:
+                if len(self.records.keys() | self.pending.keys()) >= MAX_REQUESTS:
+                    raise AcquisitionUnavailable("Public acquisition request bound exceeded")
+                pending = self.pending[key] = Future()
+        if not owns_request:
+            return BytesIO(pending.result())
+
+        try:
             parts = [*handlers, NoRedirect()]
             if context is not None:
                 parts.append(HTTPSHandler(context=context))
             with real_build_opener(*parts).open(request, timeout=min(timeout, 20)) as response:
                 raw = response.read(MAX_RESPONSE + 1)
-            if len(raw) > MAX_RESPONSE or self.total + len(raw) > MAX_TOTAL:
-                raise AcquisitionUnavailable("Public response byte bound exceeded")
-            self.total += len(raw)
-            self.records[key] = {
-                "source_url": request.full_url,
-                "sha256": hashlib.sha256(raw).hexdigest(),
-                "bytes": len(raw),
-                "available_at": datetime.now(UTC).isoformat(),
-                "kind": "acquired_public_input",
-                "body_base64": base64.b64encode(raw).decode(),
-            }
-            return BytesIO(raw)
+            with self.lock:
+                if len(raw) > MAX_RESPONSE or self.total + len(raw) > MAX_TOTAL:
+                    raise AcquisitionUnavailable("Public response byte bound exceeded")
+                self.records[key] = {
+                    "source_url": request.full_url,
+                    "sha256": hashlib.sha256(raw).hexdigest(),
+                    "bytes": len(raw),
+                    "available_at": datetime.now(UTC).isoformat(),
+                    "kind": "acquired_public_input",
+                    "body_base64": base64.b64encode(raw).decode(),
+                }
+                self.total += len(raw)
+            pending.set_result(raw)
+        except BaseException as error:
+            pending.set_exception(error)
+            raise
+        finally:
+            with self.lock:
+                del self.pending[key]
+        return BytesIO(raw)
 
 
 @contextmanager
@@ -148,6 +166,8 @@ def build_opener(*handlers):
 
 def acquisition_time():
     """Preserve actual captured availability when offline provider decoding is repeated."""
-    if _ACTIVE is not None and _ACTIVE.records:
-        return max(row["available_at"] for row in _ACTIVE.records.values())
+    if _ACTIVE is not None:
+        with _ACTIVE.lock:
+            if _ACTIVE.records:
+                return max(row["available_at"] for row in _ACTIVE.records.values())
     return datetime.now(UTC).isoformat(timespec="seconds")
