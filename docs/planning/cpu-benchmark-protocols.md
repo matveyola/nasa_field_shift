@@ -110,3 +110,22 @@ restore equality, retain the outputs and treat the hypothesis as unconfirmed;
 do not choose another reference, relax precision or rerun until green. This
 protocol is scoped to the pinned x86 wheel/runtime, not universal cross-platform
 bitwise reproducibility, a scientific accuracy improvement or model promotion.
+## Hosted результати 2026-11-15
+
+Фактичні запуски
+[`nazar-jobs` / 43696297009](https://github.com/matveyola/nasa_field_shift/actions/runs/43696297009)
+та [`main` / 43698717277](https://github.com/matveyola/nasa_field_shift/actions/runs/43698717277)
+завершили всі 13 jobs успішно. В обох `planning-verification` архівах native
+і restricted звіти точно збігаються з незмінним CPU-v7 за всіма сталими
+полями, числами та ідентичностями. Перевірено checksum архівів, п'ять
+конкретних CPU-файлів, checksum звітів у контексті/порівнянні та ефективні
+NumPy прапорці.
+
+Обидва native runners мали `X86_V4=false`. Ці запуски підтверджують виконання
+заданого release-протоколу, але не відтворюють попередній AVX-512 випадок.
+Причина початкової розбіжності залишається непідтвердженою. Для заяви про
+її відтворення потрібна рівність усього native stable report початковому
+checksum-підтвердженому captured report, зокрема двох значень запасу води
+та чотирьох похідних ідентичностей; однакових назв шести JSON-шляхів
+недостатньо. Ці перевірки не є метриками агрономічної точності.
+
