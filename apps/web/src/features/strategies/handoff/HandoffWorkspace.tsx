@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useRef } from 'react'
 import type { Field } from '../../../api/contracts'
 import { rotationHandoffApi, type HandoffCatalog } from '../../../api/rotationHandoff'
 import { useLocale } from '../../../shared/locale'
@@ -12,6 +12,8 @@ import { HandoffResults } from './HandoffResults'
 import './handoff.css'
 
 export function HandoffWorkspace({ field, openCalendar, openAgent }: { field: Field; openCalendar: () => void; openAgent: () => void }) {
+  const formRef = useRef<HTMLFormElement>(null)
+  const reviewInputs = () => { formRef.current?.focus(); formRef.current?.scrollIntoView({ block: 'start' }) }
   const { language } = useLocale()
   const uk = language === 'uk'
   const load = useCallback((signal: AbortSignal) => rotationHandoffApi.catalog(signal), [])
@@ -44,9 +46,9 @@ export function HandoffWorkspace({ field, openCalendar, openAgent }: { field: Fi
       {state.pollError && <ErrorBox message={label(errors, state.pollError, uk)} retry={state.retryStatus} />}
       <details><summary>{text('Saved job identity', 'Ідентифікатор збереженого завдання')}</summary><p>{state.job.job_id} · {text('Boundary revision', 'Версія меж')} {state.job.geometry_revision}</p><p>{text('Changing fields stops status requests here, not the durable calculation. Return to this field to resume watching it.', 'Зміна поля зупиняє запити статусу тут, але не збережений розрахунок. Поверніться до поля, щоб продовжити перегляд.')}</p></details>
     </section>}
-    {state.job?.status === 'succeeded' && state.job.result && <HandoffResults result={state.job.result} catalog={catalog} />}
+    {state.job?.status === 'succeeded' && state.job.result && <HandoffResults result={state.job.result} catalog={catalog} reviewInputs={ready && canEdit && !state.busy ? reviewInputs : undefined} openAgent={openAgent} />}
     {state.error && <ErrorBox message={label(errors, state.error, uk)} />}
-    {ready && <form noValidate onSubmit={event => { event.preventDefault(); void state.calculate(state.job?.status === 'succeeded' || state.job?.status === 'failed') }}>
+    {ready && <form ref={formRef} tabIndex={-1} aria-label={text('Current comparison inputs', 'Поточні дані порівняння')} noValidate onSubmit={event => { event.preventDefault(); void state.calculate(state.job?.status === 'succeeded' || state.job?.status === 'failed') }}>
       <fieldset disabled={state.busy || !canEdit} className="handoff-form">
         <div className="handoff-period">
           <label>{text('Crop cycles to compare', 'Циклів культур для порівняння')}<select value={draft.cycles.length} onChange={event => { const count = Number(event.target.value); edit(current => ({ ...current, cycles: Array.from({ length: count }, (_, i) => current.cycles[i] ?? newCycle()), plans: current.plans.map(plan => ({ ...plan, crops: Array.from({ length: count }, (_, i) => plan.crops[i] ?? newCrop()) })) })) }}>{[1, 2, 3].map(count => <option key={count}>{count}</option>)}</select></label>

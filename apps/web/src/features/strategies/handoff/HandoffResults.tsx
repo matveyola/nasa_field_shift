@@ -3,14 +3,16 @@ import type { HandoffCatalog, HandoffResult } from '../../../api/rotationHandoff
 import { useLocale } from '../../../shared/locale'
 import { array, numeric, object, rankedRecommendations, string, strings } from './model'
 import { cropNames, label, priorityLabels } from './copy'
+import { canUseRanking, weatherBasis, weatherLabels } from './brief'
+import { DecisionBrief } from './DecisionBrief'
 
-export function HandoffResults({ result, catalog }: { result: HandoffResult; catalog?: HandoffCatalog }) {
+export function HandoffResults({ result, catalog, reviewInputs, openAgent }: { result: HandoffResult; catalog?: HandoffCatalog; reviewInputs?: () => void; openAgent?: () => void }) {
   const { language } = useLocale(); const uk = language === 'uk'
   const text = (en: string, ua: string) => uk ? ua : en
   const payload = result.payload
   const plans = array(payload.plans).map(object)
   const decision = object(payload.decision)
-  const rankingUsable = object(result).ranking_usable === true
+  const rankingUsable = canUseRanking(result)
   const diagnostics = array(object(result).diagnostics).map(object)
   const recommendations = result.status === 'available' && result.operation === 'forecast' ? rankedRecommendations(payload, rankingUsable) : []
   const priorities = strings(decision.priorities_used)
@@ -18,11 +20,12 @@ export function HandoffResults({ result, catalog }: { result: HandoffResult; cat
   return <section className="handoff-results" aria-labelledby="handoff-results-title">
     <p className="handoff-badge">{text('Experimental · field accuracy not validated', 'Експериментально · польова точність не перевірена')}</p>
     <h3 id="handoff-results-title">{result.status === 'available' ? text('Your calculated comparison', 'Ваше розраховане порівняння') : text('The model could not assess these plans', 'Модель не змогла оцінити ці плани')}</h3>
-    <p>{text('Data basis', 'Основа даних')}: {({ historical_replay: text('Historical replay', 'Історичне відтворення'), hybrid_scenario: text('Short forecast with conditional historical scenarios', 'Короткий прогноз та умовні історичні сценарії'), conditional_climate: text('Conditional climate scenario, not an issued weather forecast', 'Умовний кліматичний сценарій, не оперативний прогноз погоди'), supplied_balance: text('Supplied water balance', 'Наданий водний баланс') })[result.data_kind]}</p>
+    <p>{text('Data basis', 'Основа даних')}: {({ historical_replay: text('Historical replay', 'Історичне відтворення'), hybrid_scenario: weatherLabels[weatherBasis(result)][uk ? 1 : 0], conditional_climate: text('Conditional climate scenario, not an issued weather forecast', 'Умовний кліматичний сценарій, не оперативний прогноз погоди'), supplied_balance: text('Supplied water balance', 'Наданий водний баланс') })[result.data_kind]}</p>
     {string(payload.as_of) && <p>{text('Calculation cutoff', 'Дата відсікання розрахунку')}: {string(payload.as_of)}</p>}
     <p>{text('Suitability evidence', 'Докази придатності')}: {({ not_assessed: text('Not assessed', 'Не оцінено'), arable_land_only: text('Arable land evidence only; crop suitability is not validated', 'Лише підтвердження орної землі; придатність культури не перевірена'), review_required: text('Review required', 'Потрібна перевірка'), no_thermal_growth: text('No thermal growth in the assessed period', 'Немає теплових умов росту в оціненому періоді') } as Record<string, string>)[string(object(result).suitability_status) ?? 'not_assessed'] ?? text('Not assessed', 'Не оцінено')}</p>
     {diagnostics.length > 0 && <ul className="handoff-diagnostics">{diagnostics.map((item, index) => <li key={index}><strong>{string(item.severity)}</strong>: {string(item.message) ?? string(item.code)}{string(item.crop_id) ? ` · ${item.crop_id}` : ''}{string(item.start_date) ? ` · ${item.start_date} → ${item.end_date ?? '—'}` : ''}</li>)}</ul>}
     {result.reasons.length > 0 && <ul>{result.reasons.map((reason, i) => <li key={i}>{reason}</li>)}</ul>}
+    <DecisionBrief result={result} reviewInputs={reviewInputs} openAgent={openAgent} />
     {result.status === 'available' && result.operation === 'forecast' && <>
       {recommendations.length > 0 ? <div className="handoff-ranking"><strong>{text('First by the selected criterion', 'Перші за обраним критерієм')}: {recommendations.map(row => planName(row.id, uk)).join(', ')}</strong><p>{priorities.map(priority => label(priorityLabels, priority, uk)).join(', ')}. {text('This rank comes from the engine among plans passing its resource checks. It does not validate local crop suitability or guarantee an outcome.', 'Це ранг моделі серед планів, що пройшли її перевірки ресурсів. Він не підтверджує місцеву придатність культури й не гарантує результат.')}</p></div>
         : <p className="strategies-notice">{text('No recommended plan is established by this result. Review missing inputs, resource checks and comparable metrics.', 'Цей результат не визначає рекомендованого плану. Перевірте відсутні дані, ресурси й порівнюваність показників.')}</p>}

@@ -42,3 +42,11 @@
 .handoff-workspace :is(input, select, legend) { max-width: 100%; }
 .handoff-workspace legend { overflow-wrap: anywhere; }
 .handoff-workspace .handoff-check { min-height: 44px; align-items: center; }
+
+.handoff-brief { display: grid; gap: 10px; padding: 16px; border: 1px solid var(--line, #ddd); border-radius: 14px; min-width: 0; }
+.handoff-brief > div { min-width: 0; overflow-wrap: anywhere; }
+.handoff-brief h4 { margin: 0 0 6px; }
+.handoff-brief p, .handoff-brief ul { margin: 6px 0; }
+.handoff-brief-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+.handoff-brief-actions .button { max-width: 100%; white-space: normal; }
+.handoff-workspace form[tabindex]:focus-visible { outline: 2px solid var(--primary, #316847); outline-offset: 4px; }
