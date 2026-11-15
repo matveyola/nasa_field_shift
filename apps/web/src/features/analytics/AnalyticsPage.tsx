@@ -15,7 +15,7 @@ import { RotationsPage } from '../rotations/RotationsPage'
 import { useAnalyticsCopy } from './copy'
 import { overviewInsights, profileForField, vegetationEvidence } from './model'
 import { ProfileSources, RotationHistory, SoilProfile } from './ProfileEvidence'
-import { FieldWeatherPanel } from './FieldWeatherPanel'
+import { FieldWeatherPanel, RainArchivePanel } from './FieldWeatherPanel'
 import { FieldWaterPanel } from './FieldWaterPanel'
 import './weather.css'
 import './analytics.css'
@@ -90,8 +90,11 @@ function AnalyticsWorkspace(props: AnalyticsPageProps & { rainPeriod: 7 | 30; ch
     <div className="analytics-content" key={section}>
       {['overview', 'soil', 'rotation'].includes(section) && profile?.sources.some(source => source.kind === 'synthetic') && <p className="analytics-caution" role="status">{text('Synthetic profile — demonstration inputs, not field measurements.')}</p>}
       {section === 'overview' && <>
-        <FieldWeatherPanel field={field} periodDays={props.rainPeriod} setPeriodDays={props.chooseRainPeriod} />
+        <div className="analytics-current-state">
+        <FieldWeatherPanel field={field} />
         <FieldWaterPanel field={field} forecast={forecast.data} season={context.season} pending={forecast.pending} error={forecast.error} reload={forecast.reload} />
+        </div>
+        <RainArchivePanel field={field} periodDays={props.rainPeriod} setPeriodDays={props.chooseRainPeriod} />
         <details className="analytics-disclosure"><summary>{text('Water controls, history and scenarios')}</summary><div className="analytics-details-body"><WaterPage {...props} embedded /></div></details>
         <details className="analytics-disclosure"><summary>{text('More field evidence')}</summary><div className="analytics-details-body">
         <section className="analytics-intro"><span className="analytics-eyebrow">{text('Overview')} · {context.season}</span><h2>{text('What needs attention')}</h2>
@@ -113,8 +116,11 @@ function AnalyticsWorkspace(props: AnalyticsPageProps & { rainPeriod: 7 | 30; ch
         </div></details>
       </>}
       {section === 'water' && <>
-        <FieldWeatherPanel field={field} periodDays={props.rainPeriod} setPeriodDays={props.chooseRainPeriod} />
+        <div className="analytics-current-state">
+        <FieldWeatherPanel field={field} />
         <FieldWaterPanel field={field} forecast={forecast.data} season={context.season} pending={forecast.pending} error={forecast.error} reload={forecast.reload} />
+        </div>
+        <RainArchivePanel field={field} periodDays={props.rainPeriod} setPeriodDays={props.chooseRainPeriod} />
         <details className="analytics-disclosure" open={Boolean(props.jobId || props.forecastDay)}><summary>{text('Water controls, history and scenarios')}</summary><div className="analytics-details-body">
         <p className="analytics-meta">{text('The live forecast concerns the coming days. Historical scenarios below use the selected season and assumptions.')}</p>
         <WaterPage {...props} embedded />
