@@ -438,7 +438,7 @@ jobs:
       - name: Check decision workspaces on desktop and mobile
         working-directory: apps/web
         run: |
-          for config in tests/analytics/playwright.config.ts tests/strategies/playwright.config.ts playwright.workspace.config.ts; do
+          for config in tests/analytics/playwright.config.ts tests/strategies/playwright.config.ts playwright.workspace.config.ts tests/crop-icons/playwright.config.ts; do
             ./node_modules/.bin/playwright test --config "$config"
           done
       - run: apps/api/.venv/bin/ruff check --config apps/api/pyproject.toml services/crop-model/crop_runtime
