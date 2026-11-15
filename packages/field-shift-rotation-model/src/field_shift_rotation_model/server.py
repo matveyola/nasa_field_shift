@@ -61,8 +61,9 @@ def execute(operation, payload, *, timeout=TIMEOUT_SECONDS):
             process.join()
 
 
-def handler(token):
+def handler(token, *, catalog=None):
     slot = BoundedSemaphore(1)
+    catalog_slot = BoundedSemaphore(1)
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *args):
@@ -94,7 +95,8 @@ def handler(token):
                     raise ValueError
             except ValueError:
                 return self.send_json(413, {"detail": "Bounded Content-Length required"})
-            if not slot.acquire(blocking=False):
+            request_slot = catalog_slot if self.path == "/catalog" and catalog is not None else slot
+            if not request_slot.acquire(blocking=False):
                 return self.send_json(503, {"detail": "Model execution slot is busy"})
             try:
                 self.connection.settimeout(10)
@@ -104,12 +106,15 @@ def handler(token):
                 payload = json.loads(raw)
                 if not isinstance(payload, dict):
                     raise ValueError
-                status, result = execute(self.path[1:], payload)
+                if self.path == "/catalog" and catalog is not None:
+                    status, result = 200, catalog
+                else:
+                    status, result = execute(self.path[1:], payload)
                 self.send_json(status, result)
             except (ValueError, TimeoutError):
                 self.send_json(400, {"detail": "Invalid JSON request"})
             finally:
-                slot.release()
+                request_slot.release()
 
     return Handler
 
@@ -118,7 +123,15 @@ def main():
     token = os.getenv("FIELD_SHIFT_ROTATION_MODEL_TOKEN", "")
     if len(token) < 32:
         raise SystemExit("A private rotation model token of at least 32 characters is required")
-    server = ThreadingHTTPServer(("0.0.0.0", int(os.getenv("PORT", "8080"))), handler(token))
+    # Catalog metadata are immutable for this installed engine. Acquire them once
+    # within the normal process bound before readiness, without public data access.
+    # Reading capabilities must not contend with a long-running field calculation.
+    status, catalog = execute("catalog", {})
+    if status != 200:
+        raise SystemExit("Installed rotation catalog could not initialize")
+    server = ThreadingHTTPServer(
+        ("0.0.0.0", int(os.getenv("PORT", "8080"))), handler(token, catalog=catalog)
+    )
     server.serve_forever()
 
 

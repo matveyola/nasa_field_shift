@@ -2,7 +2,7 @@ import json
 from datetime import UTC, datetime
 from http.client import HTTPConnection
 from http.server import ThreadingHTTPServer
-from threading import Thread
+from threading import Event, Thread
 
 from field_shift_rotation_model import server
 
@@ -66,3 +66,56 @@ def test_process_timeout_reaps_child():
     status, result = server.execute("catalog", {}, timeout=0)
     assert status == 503 and "time bound" in result["detail"]
     assert {p.pid for p in multiprocessing.active_children()} <= before
+
+
+def test_warm_catalog_remains_authenticated_and_available_during_calculation(monkeypatch):
+    from field_shift_rotation_model import runtime
+
+    catalog = runtime.catalog()
+    started, finish = Event(), Event()
+    calls = []
+
+    def calculation(operation, payload):
+        calls.append(operation)
+        started.set()
+        assert finish.wait(5), "Test did not release the calculation"
+        return 200, {"completed": True}
+
+    monkeypatch.setattr(server, "execute", calculation)
+    token = "unit-test-private-token-" * 2
+    http = ThreadingHTTPServer(("127.0.0.1", 0), server.handler(token, catalog=catalog))
+    thread = Thread(target=http.serve_forever, daemon=True)
+    thread.start()
+
+    def request(path, body="{}", authorized=True):
+        connection = HTTPConnection(*http.server_address, timeout=2)
+        headers = {"Authorization": "Bearer " + token} if authorized else {}
+        try:
+            connection.request("POST", path, body=body, headers=headers)
+            response = connection.getresponse()
+            return response.status, json.loads(response.read())
+        finally:
+            connection.close()
+
+    completed = []
+    worker = Thread(target=lambda: completed.append(request("/acquire")))
+    try:
+        worker.start()
+        assert started.wait(2)
+        assert request("/evaluate")[0] == 503
+        assert request("/catalog", authorized=False)[0] == 401
+        assert request("/catalog", body="[]")[0] == 400
+        for _ in range(2):
+            status, actual = request("/catalog")
+            assert status == 200 and actual == catalog
+            assert len(actual["crops"]) == 13
+        assert calls == ["acquire"]
+        finish.set()
+        worker.join(5)
+        assert completed == [(200, {"completed": True})]
+    finally:
+        finish.set()
+        worker.join(5)
+        http.shutdown()
+        http.server_close()
+        thread.join(5)
