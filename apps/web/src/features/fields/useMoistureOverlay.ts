@@ -2,8 +2,8 @@ import { useCallback, useState, type FormEvent } from 'react'
 import { api } from '../../api/client'
 import type { MoistureSource } from '../../api/contracts'
 import { useJob, useStartJob } from '../../shared/jobs'
-import { useResource } from '../../shared/useResource'
 import { isStaleMoisture, latestMoistureArchiveDate, visibleMoisture } from './moisture'
+import { useMapResource } from './useMapResource'
 
 export function useMoistureOverlay(source: MoistureSource, fieldId: string | undefined, season: number, boundaryRevision: number) {
   const canRefresh = source !== 'demo'
@@ -14,7 +14,7 @@ export function useMoistureOverlay(source: MoistureSource, fieldId: string | und
   const load = useCallback(async (signal: AbortSignal) => fieldId
     ? { revision: boundaryRevision, layer: await api.moisture(fieldId, source, querySeason, sampleDate, signal) }
     : undefined, [fieldId, source, querySeason, sampleDate, boundaryRevision])
-  const resource = useResource(load, canRefresh && fieldId && !sampleDate ? 5 * 60 * 1000 : undefined)
+  const resource = useMapResource(load, canRefresh && fieldId && !sampleDate ? 5 * 60 * 1000 : undefined)
   const jobId = key ? jobIds[key] : undefined
   const { job, error: jobError } = useJob(jobId)
   const launch = useStartJob()

@@ -2,9 +2,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { analyticsApi, type VegetationObservation, type VegetationResult } from '../../api/analytics'
 import type { Field } from '../../api/contracts'
 import type { MapFocus } from '../../shared/productContext'
-import { errorText, useResource } from '../../shared/useResource'
+import { errorText } from '../../shared/useResource'
 import { useJob } from '../../shared/jobs'
 import { usableObservations } from './vegetationInsights'
+import { useMapResource } from './useMapResource'
 
 function useVegetationScene(result: VegetationResult | undefined, observation: VegetationObservation | undefined) {
   const fieldId = result?.field_id
@@ -24,7 +25,7 @@ function useVegetationScene(result: VegetationResult | undefined, observation: V
       && data.observation.date === date && data.observation.scene_id === sceneId && data.heterogeneity.date === date
       ? data : null }
   }, [requestKey, fieldId, season, date, sceneId, revision, fingerprint])
-  const resource = useResource(load)
+  const resource = useMapResource(load)
   const current = resource.data?.requestKey === requestKey ? resource.data?.data : undefined
   return { ...resource, data: current,
     pending: Boolean(requestKey && current === undefined && !resource.error) }
@@ -39,7 +40,7 @@ export function useFieldAnalytics(field: Field | undefined, season: number, incl
     : Promise.resolve(undefined), [fieldId, season, revision, footprint])
   const loadTerrain = useCallback((signal: AbortSignal) => fieldId && includeMap
     ? analyticsApi.terrain(fieldId, signal) : Promise.resolve(undefined), [fieldId, revision, includeMap])
-  const vegetation = useResource(loadVegetation, 30_000)
+  const vegetation = useMapResource(loadVegetation, 30_000)
   const current = vegetation.data && vegetation.data.field_id === fieldId && vegetation.data.boundary_revision === revision
     && vegetation.data.season === season && vegetation.data.requestFootprint === footprint ? vegetation.data : undefined
   const observations = useMemo(() => usableObservations(current), [current])
@@ -80,7 +81,7 @@ export function useFieldAnalytics(field: Field | undefined, season: number, incl
   function showIndex(index: import('../../api/analytics').SpectralIndex) {
     setSelection({ ...scoped, scope, showComparison: false, index })
   }
-  const terrain = useResource(loadTerrain)
+  const terrain = useMapResource(loadTerrain)
   const [submitting, setSubmitting] = useState<'vegetation' | 'terrain'>()
   const [error, setError] = useState<string>()
   const [terrainJobId, setTerrainJobId] = useState<string>()

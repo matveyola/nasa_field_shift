@@ -67,9 +67,9 @@
 .heterogeneity-legend span { display: flex; align-items: center; gap: 6px; }
 .heterogeneity-legend i { width: 10px; height: 10px; border-radius: 3px; }
 /* zone colours are data (the heterogeneity map's scale, analyticsMapLayers.ts), not chrome */
-.zone-low, .map-swatch-heterogeneity { background: #c19548; }
-.zone-typical { background: #a0b58d; }
-.zone-high { background: #2b5940; }
+.zone-low, .map-swatch-heterogeneity { background: #e89836; }
+.zone-typical { background: #dbd65b; }
+.zone-high { background: #278b50; }
 /* the terrain arrows: a white line with a black casing (analyticsMapLayers.ts) */
 .map-swatch-terrain { background: #fff; box-shadow: inset 0 0 0 2px var(--black); }
 .terrain-readout { display: flex; gap: 24px; margin-top: 13px; }

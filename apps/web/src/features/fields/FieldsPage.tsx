@@ -12,23 +12,24 @@ import { FieldPanelResizer } from './FieldPanelResizer'
 import type { BasemapId } from './basemaps'
 import { FieldGeometryEditor } from './FieldGeometryEditor'
 import { fieldGeometryDraft, recordShape, undoShape, type FieldEditMode, type FieldGeometryDraft } from './fieldGeometryDraft'
-import { estimateHectares, parseVertices, polygonFrom } from './geometry'
+import { estimateHectares, moistureColor, parseVertices, polygonFrom } from './geometry'
 import { readGeoJsonBoundary } from './geoJsonBoundary'
-import { MapLayerPicker, type MapLayer } from './MapLayerPicker'
+import { MapLayerPicker } from './MapLayerPicker'
+import { initialVisualization, visibleVisualization, type FieldMapVisualization, type VisualizationId } from './fieldMapVisualization'
 import { MoistureForecastPanel, useMoistureForecast } from './MoistureForecastPanel'
 import { useSatelliteLayer } from './satellite'
 import { useBoundarySuggestion } from './useBoundarySuggestion'
 import { useMoistureOverlay, type MoistureOverlay } from './useMoistureOverlay'
 import { useFieldAnalytics } from './useFieldAnalytics'
 import { MapObservationControls } from './MapObservationControls'
-import { ndviBands } from './vegetationInsights'
-import { spectralCell, spectralColor, spectralDefinitions } from './spectralIndices'
+import { spectralCell, spectralColorStops } from './spectralIndices'
 import { BoundaryHistoryPanel } from './BoundaryHistoryPanel'
 import { PreparedContoursPanel, type MapWindow } from './PreparedContoursPanel'
 import type { PreparedContour } from '../../api/boundaries'
 import { useAccess } from '../access/AccessProvider'
 import './map.css'
 import './fieldWorkspace.css'
+import './fieldMapLegend.css'
 
 const FieldMap = lazy(() => import('./FieldMap'))
 
@@ -58,24 +59,16 @@ type Props = {
 }
 
 export function FieldsPage({ fields, selected, season, initialDrawing = false, initialAnalysis, showNdviLayer, showTerrainLayer, mapFocus, openStrategies, openAnalytics, openAgent, chooseField, onCreate, onUpdate, reloadFields, openForecast, onSetup, setupLabel }: Props) {
-
-  const { t, number, date, shortDate } = useLocale()
+  const { t, number, date, shortDate, language } = useLocale()
   const { canEdit } = useAccess()
   const [preparedContours, setPreparedContours] = useState<PreparedContour[]>([])
   const [contourFocus, setContourFocus] = useState<Position>()
   const [viewport, setViewport] = useState<MapWindow>()
-  const [activeLayers, setActiveLayers] = useState<ReadonlySet<MapLayer>>(() => {
-    const layers = new Set<MapLayer>(['forecast', 'historical', 'boundaries', 'planting'])
-    if (showNdviLayer) layers.add('heterogeneity')
-    if (showTerrainLayer) layers.add('terrain')
-    return layers
-  })
-  useEffect(() => {
-    if (showNdviLayer) setActiveLayers((layers) => layers.has('heterogeneity') ? layers : new Set([...layers, 'heterogeneity']))
-  }, [showNdviLayer])
-  useEffect(() => {
-    if (showTerrainLayer) setActiveLayers(layers => layers.has('terrain') ? layers : new Set([...layers, 'terrain']))
-  }, [showTerrainLayer])
+  const linkedVisualization = showTerrainLayer ? 'terrain' : initialVisualization(showNdviLayer)
+  const [selection, setSelection] = useState<{ link: VisualizationId; active: VisualizationId }>(() => ({ link: linkedVisualization, active: linkedVisualization }))
+  const [showBoundaries, setShowBoundaries] = useState(true)
+  const requestedVisualization = selection.link === linkedVisualization ? selection.active : linkedVisualization
+  if (selection.link !== linkedVisualization) setSelection({ link: linkedVisualization, active: requestedVisualization })
   const [drawing, setDrawing] = useState(initialDrawing && canEdit)
   const [points, setPoints] = useState<Position[]>([])
   const [draft, setDraft] = useState<FieldGeometryDraft>()
@@ -94,7 +87,6 @@ export function FieldsPage({ fields, selected, season, initialDrawing = false, i
   const [tileFailure, setTileFailure] = useState(false)
   const [localAerial, setLocalAerial] = useState(false)
   const [retryTiles, setRetryTiles] = useState(0)
-  const [showSatellite, setShowSatellite] = useState(false)
   const [satelliteDate, setSatelliteDate] = useState('')
   const [showSurfaceForecast, setShowSurfaceForecast] = useState(false)
   const surfaceForecastPanel = useRef<HTMLDivElement>(null)
@@ -119,35 +111,60 @@ export function FieldsPage({ fields, selected, season, initialDrawing = false, i
   const drawingMap = drawing || Boolean(edit)
   const inspecting = !drawingMap && !search
   const assistantField = inspecting ? selected : undefined
+  const activeVisualization = visibleVisualization(requestedVisualization, Boolean(assistantField), Boolean(assistantField?.planting))
   const analysisSeason = season
   const analytics = useFieldAnalytics(assistantField, analysisSeason, true, mapFocus)
   const sceneLayer = analytics.activeScene.data?.heterogeneity
   const comparingNdvi = Boolean(analytics.comparison && !analytics.spectralIndex)
   const vegetationIndex = analytics.spectralIndex ?? (comparingNdvi ? 'ndvi' : 'relative')
-  const sceneHasLayer = sceneLayer && (vegetationIndex === 'relative' || sceneLayer.cells.some((cell) => spectralCell(cell, vegetationIndex) != null))
-  const historicalGeometry = inspecting && activeLayers.has('heterogeneity') && analysisSeason !== season
-    ? analytics.vegetation.data?.boundary_geometry : undefined
-  const mapFields = useMemo(() => historicalGeometry
-    ? fields.map((field) => field.id === selectedId ? { ...field, geometry: historicalGeometry, planting: null } : field)
-    : fields, [fields, selectedId, historicalGeometry])
+  const [fieldContrast, setFieldContrast] = useState(false)
+  const vegetationColors = useMemo(() => {
+    if (vegetationIndex === 'relative') return undefined
+    const values = fieldContrast && !comparingNdvi
+      ? sceneLayer?.cells.flatMap((cell) => {
+        const value = spectralCell(cell, vegetationIndex)
+        return value == null ? [] : [value]
+      }) : undefined
+    return spectralColorStops(vegetationIndex, values)
+  }, [vegetationIndex, sceneLayer, fieldContrast, comparingNdvi])
+  const sceneHasLayer = sceneLayer && (vegetationIndex === 'relative' ? sceneLayer.cells.length > 0
+    : sceneLayer.cells.some((cell) => Number.isFinite(spectralCell(cell, vegetationIndex))))
+  const sceneBoundary = activeVisualization === 'heterogeneity' ? analytics.vegetation.data?.boundary_geometry : undefined
+  const mapFields = useMemo(() => sceneBoundary
+    ? fields.map((field) => field.id === selectedId
+      ? { ...field, geometry: sceneBoundary, planting: analysisSeason === season ? field.planting : null }
+      : field)
+    : fields, [fields, selectedId, sceneBoundary, analysisSeason, season])
   const mapSelected = mapFields.find((field) => field.id === selectedId)
   const forecastState = useMoistureForecast(inspecting ? selectedId : undefined, boundaryRevision)
-  const showForecast = inspecting && Boolean(selectedId) && activeLayers.has('forecast')
+  const showForecast = activeVisualization === 'forecast'
   const currentSurface = forecastState.days.find((day) => day.date === forecastState.today)
-  const satelliteActive = showSatellite && !drawingMap && selectedId !== undefined
+  const satelliteActive = activeVisualization === 'satellite'
   const satellite = useSatelliteLayer(selectedId, satelliteActive, satelliteDate, boundaryRevision)
   const scene = satellite.data?.scene
-  const overlayField = (source: MoistureSource) => inspecting && activeLayers.has(source) ? selectedId : undefined
+  const overlayField = (source: MoistureSource) => activeVisualization === source ? selectedId : undefined
   const historical = useMoistureOverlay('historical', overlayField('historical'), season, boundaryRevision)
   const model = useMoistureOverlay('ml', overlayField('ml'), season, boundaryRevision)
   const demo = useMoistureOverlay('demo', overlayField('demo'), season, boundaryRevision)
-  const overlays = [historical, model, demo].filter(({ source }) => overlayField(source) !== undefined)
-  const configurableOverlays = overlays.filter(({ canRefresh }) => canRefresh)
-  const moistureLayers = useMemo(() => [historical.layer, model.layer, demo.layer]
-    .filter((layer): layer is MoistureLayer => layer !== undefined), [historical.layer, model.layer, demo.layer])
-  const hasSettings = inspecting && (satelliteActive || configurableOverlays.length > 0)
+  const moistureOverlay = [historical, model, demo].find(({ source }) => activeVisualization === source)
+  const moistureLayer = moistureOverlay?.layer
+  const terrainResult = analytics.terrain.data
+  const satelliteRaster = satellite.data?.raster
+  const vegetationGeometry = sceneBoundary ?? selected?.geometry
+  const visualization = useMemo<FieldMapVisualization | undefined>(() => {
+    if (activeVisualization === 'heterogeneity' && sceneLayer && sceneHasLayer && vegetationGeometry) {
+      return { kind: 'vegetation', layer: sceneLayer, index: vegetationIndex, geometry: vegetationGeometry, colorStops: vegetationColors }
+    }
+    if (activeVisualization === 'terrain' && terrainResult?.status === 'ready' && terrainResult.vectors.length) {
+      return { kind: 'terrain', result: terrainResult }
+    }
+    if (activeVisualization === 'satellite' && satelliteRaster) return { kind: 'satellite', raster: satelliteRaster }
+    if (activeVisualization === 'planting') return { kind: 'planting' }
+    if (moistureLayer?.cells.length) return { kind: 'moisture', layer: moistureLayer }
+  }, [activeVisualization, sceneHasLayer, sceneLayer, vegetationIndex, vegetationColors, vegetationGeometry, terrainResult, satelliteRaster, moistureLayer])
+  const hasSettings = satelliteActive || moistureOverlay?.canRefresh
   const basemap = preferredBasemap ?? 'aerial'
-  const mapLayers: Array<{ id: MapLayer; label: string }> = [historical, model, demo]
+  const mapLayers: Array<{ id: VisualizationId; label: string }> = [historical, model, demo]
     .map(({ source: id, layer }) => {
       const layerDepth = layer ? [...new Set(layer.depth_cm)].join('–') + ' ' + t('cm') : undefined
       const label = layer?.source?.kind === 'ml'
@@ -155,10 +172,11 @@ export function FieldsPage({ fields, selected, season, initialDrawing = false, i
       return { id, label: t(label) + (layerDepth ? ' · ' + layerDepth : '') }
     })
   mapLayers.unshift({ id: 'forecast', label: t('Today’s soil moisture · IFS') })
-  mapLayers.push({ id: 'boundaries', label: t('Field boundaries') })
-  mapLayers.push({ id: 'heterogeneity', label: t('Within-field variation · NDVI') })
+  const vegetationLabel = analytics.spectralIndex?.toUpperCase() ?? (comparingNdvi ? t('NDVI comparison') : t('Within-field variation'))
+  mapLayers.push({ id: 'heterogeneity', label: vegetationLabel })
   mapLayers.push({ id: 'terrain', label: t('Terrain directions · 30 m') })
   if (selected?.planting) mapLayers.push({ id: 'planting', label: t('Planted area') })
+  mapLayers.push({ id: 'satellite', label: t('Satellite image by date') })
 
   function startEdit(mode: FieldEditMode) {
     if (!selected || !canEdit) return
@@ -203,7 +221,7 @@ export function FieldsPage({ fields, selected, season, initialDrawing = false, i
           geometry: edit.fullField ? null : polygonFrom(edit.points), boundary_revision: edit.revision,
         })
       onUpdate(updated)
-      if (edit.mode === 'planting') setActiveLayers((current) => new Set([...current, 'planting']))
+      if (edit.mode === 'planting') selectVisualization('planting')
       setSavedEdit({ fieldId: updated.id, mode: edit.mode })
       setDraft(undefined)
     } catch (failure) {
@@ -255,17 +273,12 @@ export function FieldsPage({ fields, selected, season, initialDrawing = false, i
     setTileFailure(!savedAerialAvailable)
   }
 
-  function toggleLayer(id: MapLayer) {
-    setActiveLayers((current) => {
-      const next = new Set(current)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
-      return next
-    })
+  function selectVisualization(active: VisualizationId) {
+    setSelection({ link: linkedVisualization, active })
   }
 
   function revealNdviLayer() {
-    setActiveLayers((current) => current.has('heterogeneity') ? current : new Set([...current, 'heterogeneity']))
+    selectVisualization('heterogeneity')
   }
 
   return (
@@ -326,27 +339,16 @@ export function FieldsPage({ fields, selected, season, initialDrawing = false, i
               <summary><AdjustmentsHorizontalIcon aria-hidden="true" /><span>{t('Layer data and settings')}</span><ChevronRightIcon aria-hidden="true" /></summary>
               <div className="map-inspector">
               <div className="map-details">
-                {showForecast && <CurrentMoisture state={forecastState} />}
-                {satelliteActive && <div className="map-legend regional-legend satellite-scene" role="status">
-                  {scene ? <>
-                    <p><strong>Sentinel-2 · <time dateTime={scene.acquired_at}>{date(scene.acquired_at)}</time></strong></p>
-                    <small>{t('10 m true color ·')} {number(scene.tile_cloud_percent, 1)}{t('% tile cloud cover')}</small>
-                    <small className="moisture-detail">{t('Contains modified Copernicus Sentinel data')} {scene.acquired_at.slice(0, 4)} ·{' '}
-                      <a href={scene.catalog_url} target="_blank" rel="noreferrer">{t('Earth Search scene')}</a></small>
-                  </> : satellite.error ? <>
-                    <p>{t(satellite.error)}</p>
-                    <button className="button subtle" type="button" onClick={satellite.reload}>{t('Retry satellite')}</button>
-                  </> : satellite.pending || !satellite.data ? <p>{t('Loading Sentinel-2 image…')}</p>
-                    : <p>{t('No suitable Sentinel-2 scene in the preceding 35 days.')}</p>}
+                {scene && <div className="map-legend regional-legend satellite-scene">
+                  <small>{number(scene.tile_cloud_percent, 1)}{t('% tile cloud cover')}</small>
+                  <small className="moisture-detail">{t('Contains modified Copernicus Sentinel data')} {scene.acquired_at.slice(0, 4)} ·{' '}
+                    <a href={scene.catalog_url} target="_blank" rel="noreferrer">{t('Earth Search scene')}</a></small>
                 </div>}
-                {overlays.map((overlay) => <MoistureOverlayLegend key={overlay.source} overlay={overlay} />)}
+                {moistureLayer?.cells.length && !moistureLayer.demo ? <MoistureLegend layer={moistureLayer} stale={Boolean(moistureOverlay?.stale)} /> : null}
                 {tileFailure && <p className="map-fallback" role="status">{t('Basemap tiles unavailable. Field boundaries remain visible.')}
                   <button type="button" className="button subtle" onClick={() => { setTileFailure(false); setRetryTiles((value) => value + 1) }}>{t('Retry')}</button>
                 </p>}
                 {localAerial && <p className="map-fallback" role="status">{t('Live tiles unavailable. Showing a saved USGS aerial image of this area.')}</p>}
-                {!overlays.length && !satelliteActive && !showForecast && !drawing && (
-                  <span className="map-layer-label">{activeLayers.has('boundaries') ? t('Field boundaries') : t('No overlays enabled')}</span>
-                )}
               </div>
               {hasSettings && <div id="field-map-settings" className="map-settings-panel">
                 {satelliteActive && <label className="control satellite-date">
@@ -354,7 +356,7 @@ export function FieldsPage({ fields, selected, season, initialDrawing = false, i
                   <input type="date" value={satelliteDate} min="2015-06-23" max={new Date().toISOString().slice(0, 10)}
                     onChange={(event) => setSatelliteDate(event.target.value)} />
                 </label>}
-                {configurableOverlays.map((overlay) => <MoistureControls key={overlay.source} overlay={overlay} />)}
+                {moistureOverlay?.canRefresh && <MoistureControls overlay={moistureOverlay} />}
               </div>}
               </div>
             </details>
@@ -405,13 +407,9 @@ export function FieldsPage({ fields, selected, season, initialDrawing = false, i
             </div>}
             <div className="map-frame" ref={mapFrame}>
               <Suspense fallback={<div className="map-loading" role="status">{t('Loading geographic map…')}</div>}>
-                <FieldMap fields={mapFields} selected={mapSelected} layers={moistureLayers} showBoundaries={activeLayers.has('boundaries')}
-                  vegetation={inspecting && activeLayers.has('heterogeneity') && sceneHasLayer ? sceneLayer : undefined}
-                  vegetationIndex={vegetationIndex}
-                  terrain={inspecting && activeLayers.has('terrain') ? analytics.terrain.data : undefined}
+                <FieldMap fields={mapFields} selected={mapSelected} visualization={visualization} showBoundaries={showBoundaries}
                   bottomOcclusion={sheetOcclusion.fieldId === selectedId ? sheetOcclusion.height : 0}
-                  showPlanting={!search && activeLayers.has('planting')}
-                  satellite={edit?.suggestion?.preview ?? search?.preview ?? (satelliteActive ? satellite.data?.raster : undefined)}
+                  satellite={edit?.suggestion?.preview ?? search?.preview}
                   newBoundary={newBoundary} suggestionSeed={search?.seed}
                   suggestBoundary={search && !search.pending ? suggestBoundary : undefined}
                   reportSuggestionCenter={setSuggestionCenter}
@@ -431,13 +429,22 @@ export function FieldsPage({ fields, selected, season, initialDrawing = false, i
               </Suspense>
               <div className="map-tools">
                 <MapLayerPicker basemap={basemap}
-                  layers={mapLayers} activeLayers={activeLayers} satelliteActive={satelliteActive}
-                  satelliteAvailable={Boolean(selectedId) && !drawingMap} onBasemap={selectBasemap}
-                  onLayer={toggleLayer} onSatellite={() => setShowSatellite((shown) => !shown)} />
+                  layers={mapLayers} activeVisualization={activeVisualization} fieldAvailable={Boolean(assistantField)}
+                  showBoundaries={showBoundaries} onBoundaries={setShowBoundaries}
+                  onBasemap={selectBasemap} onVisualization={selectVisualization} />
               </div>
-              {inspecting && (activeLayers.has('heterogeneity') || activeLayers.has('terrain')) && <div className="map-analytics-legend">
-                {activeLayers.has('heterogeneity') && <>
-                  <strong>{analytics.spectralIndex ? analytics.spectralIndex.toUpperCase() : comparingNdvi ? t('NDVI comparison') : t('Within-field variation')}</strong>
+              {activeVisualization !== 'none' && <div className="map-analytics-legend field-map-legend">
+                <strong>{mapLayers.find(({ id }) => id === activeVisualization)?.label}</strong>
+                {showForecast && <CurrentMoisture state={forecastState} />}
+                {moistureOverlay && <MoistureOverlayLegend overlay={moistureOverlay} />}
+                {satelliteActive && <div role="status">
+                  <small>{scene ? <><time dateTime={scene.acquired_at}>{date(scene.acquired_at)}</time> · Sentinel-2 · 10 {t('m')}</>
+                    : t(satellite.error ?? (satellite.pending ? 'Loading Sentinel-2 image…' : 'No suitable Sentinel-2 scene in the preceding 35 days.'))}</small>
+                  {satellite.error && <button className="ndvi-retry" type="button" onClick={satellite.reload}>{t('Retry')}</button>}
+                </div>}
+                {activeVisualization === 'planting' && assistantField?.planting &&
+                  <small>{assistantField.planting.season} · {number(assistantField.planting.area_ha, 2)} {t('ha')}</small>}
+                {activeVisualization === 'heterogeneity' && <>
                   {comparingNdvi && analytics.comparison && analytics.primary && <div className="ndvi-map-switch" role="group" aria-label={t('Select comparison map')}>
                     <button type="button" aria-pressed={!analytics.showingComparison} onClick={() => analytics.showComparison(false)}>
                       A · {shortDate(analytics.primary.date)}
@@ -449,23 +456,42 @@ export function FieldsPage({ fields, selected, season, initialDrawing = false, i
                   <div role="status">
                     {sceneHasLayer ? <>
                       {vegetationIndex !== 'relative'
-                        ? <div className="heterogeneity-legend ndvi-scale">{ndviBands.map(({ min, color }, index) => {
-                          const range = spectralDefinitions[vegetationIndex].range
-                          const low = vegetationIndex === 'ndvi' ? min : range[0] + (range[1] - range[0]) * index / 5
-                          const high = vegetationIndex === 'ndvi' ? ndviBands[index + 1]?.min ?? 1 : range[0] + (range[1] - range[0]) * (index + 1) / 5
-                          return <span key={index}><i style={{ backgroundColor: vegetationIndex === 'ndvi' ? color : spectralColor((low + high) / 2, vegetationIndex) }} />{index === 0 ? '≤ ' : ''}{number(low, 2)}–{number(high, 2)}{index === 4 ? ' ≥' : ''}</span>
-                        })}</div>
+                        ? <>{!comparingNdvi && <div className="field-map-contrast" role="group"
+                            aria-label={language === 'uk' ? 'Шкала індексу' : 'Index scale'}>
+                            <button type="button" aria-pressed={!fieldContrast} onClick={() => setFieldContrast(false)}>
+                              {language === 'uk' ? 'Стандартна' : 'Standard'}
+                            </button>
+                            <button type="button" aria-pressed={fieldContrast} onClick={() => setFieldContrast(true)}>
+                              {language === 'uk' ? 'Контраст поля' : 'Field contrast'}
+                            </button>
+                          </div>}
+                          <MapColorScale stops={vegetationColors!} />
+                          <small>{language === 'uk'
+                            ? (fieldContrast && !comparingNdvi ? 'Мін.–макс. цього поля · безрозмірний індекс' : 'Безрозмірний індекс')
+                            : (fieldContrast && !comparingNdvi ? 'Field min–max · unitless index' : 'Unitless index')}</small>
+                          <DisplaySmoothingNote /></>
                         : <div className="heterogeneity-legend"><span><i className="zone-low" />{t('Lower')}</span><span><i className="zone-typical" />{t('Typical')}</span><span><i className="zone-high" />{t('Higher')}</span></div>}
-                      <small>{date(sceneLayer.date)} · Sentinel-2 · {sceneLayer.resolution_m} {t('m')}</small>
-                    </> : <small>{t(analytics.activeScene.error ? 'Could not load this scene.' : analytics.activeScene.pending ? 'Loading selected scene…'
-                      : analytics.showingMsavi ? 'MSAVI is unavailable for this observation.'
-                        : analytics.primary ? 'No saved map for this observation.' : 'Update satellite analysis to load this layer.')}</small>}
+                      <small><time dateTime={sceneLayer.date}>{date(sceneLayer.date)}</time> · Sentinel-2 · {sceneLayer.resolution_m} {t('m')}</small>
+                    </> : <small>
+                      {analytics.activeScene.error || analytics.vegetation.error
+                        ? (language === 'uk' ? 'Не вдалося завантажити супутникові дані.' : 'Could not load satellite data.')
+                        : analytics.activeScene.pending || analytics.vegetation.pending
+                          ? (language === 'uk' ? 'Завантаження супутникових даних…' : 'Loading satellite data…')
+                          : (language === 'uk' ? 'Для цього спостереження немає карти.' : 'No map for this observation.')}
+                    </small>}
                   </div>
-                  {analytics.activeScene.error && <button className="ndvi-retry" type="button" onClick={analytics.activeScene.reload}>{t('Retry')}</button>}
+                  {(analytics.activeScene.error || analytics.vegetation.error) && <button className="ndvi-retry" type="button"
+                    onClick={analytics.vegetation.error ? analytics.vegetation.reload : analytics.activeScene.reload}>{t('Retry')}</button>}
                 </>}
-                {activeLayers.has('terrain') && <><strong>{t('Terrain directions')}</strong><small>{t(analytics.terrain.data?.status === 'ready'
-                  ? analytics.terrain.data.vectors.length ? 'Potential downhill directions · 30 m' : 'No reliable downhill direction at this resolution.'
-                  : 'Calculate terrain directions to load this layer.')}</small></>}
+                {activeVisualization === 'terrain' && <div role="status">
+                  <small>{terrainResult?.status === 'ready' && terrainResult.vectors.length
+                    ? <><time dateTime={terrainResult.generated_at}>{date(terrainResult.generated_at)}</time> · {terrainResult.source} · {terrainResult.source_resolution_m} {t('m')}</>
+                    : analytics.terrain.error ? (language === 'uk' ? 'Не вдалося завантажити дані рельєфу.' : 'Could not load terrain data.')
+                      : analytics.terrain.pending || analytics.terrainPending ? (language === 'uk' ? 'Завантаження даних рельєфу…' : 'Loading terrain data…')
+                        : terrainResult?.status === 'ready' ? (language === 'uk' ? 'За цієї роздільності напрям схилу не визначено.' : 'No reliable downhill direction at this resolution.')
+                          : (language === 'uk' ? 'Для цього поля немає збережених даних рельєфу.' : 'No saved terrain data for this field.')}</small>
+                  {analytics.terrain.error && <button className="ndvi-retry" type="button" onClick={analytics.terrain.reload}>{t('Retry')}</button>}
+                </div>}
               </div>}
             </div>
             {edit && (
@@ -481,13 +507,12 @@ export function FieldsPage({ fields, selected, season, initialDrawing = false, i
             )}
           </section>
         </div>
-        {overlays.map(({ source, resource, submitError, jobId, job, jobError }) => (resource.error || submitError || jobId) && (
-          <div className="map-job-status" key={source} aria-label={t(moistureSources[source])}>
-            {resource.error && <ErrorBox message={resource.error} retry={resource.reload} />}
-            {submitError && <ErrorBox message={submitError} />}
-            {jobId && <JobStatus job={job} error={jobError} />}
+        {moistureOverlay && (moistureOverlay.submitError || moistureOverlay.jobId) && (
+          <div className="map-job-status" aria-label={t(moistureSources[moistureOverlay.source])}>
+            {moistureOverlay.submitError && <ErrorBox message={moistureOverlay.submitError} />}
+            {moistureOverlay.jobId && <JobStatus job={moistureOverlay.job} error={moistureOverlay.jobError} />}
           </div>
-        ))}
+        )}
         {selected && inspecting && showSurfaceForecast && <div id="field-surface-forecast" className="field-surface-forecast" ref={surfaceForecastPanel} tabIndex={-1}>
           <MoistureForecastPanel key={selected.id} state={forecastState} />
         </div>}
@@ -505,35 +530,67 @@ function CurrentMoisture({ state }: { state: ReturnType<typeof useMoistureForeca
   const { forecast, days, today, saved } = state
   const current = days.find((day) => day.date === today)
   return (
-    <div className="moisture-layer-detail current-moisture">
-      <h3>{t('Today’s soil moisture · IFS')}</h3>
+    <div role="status">
       {forecast && current ? (
-        <div className="map-legend regional-legend">
-          <p><strong>{number(current.ifs_value, 3)} {forecast.unit}</strong>{' · '}
-            <time dateTime={current.date}>{date(current.date)}</time></p>
-          <small>{t('Daily UTC estimate · 0–7 cm')} ·{' '}
-            <a href={forecast.source_url} target="_blank" rel="noreferrer">{forecast.provider}</a> · {number(forecast.resolution_km)} {t('km')}</small>
-        </div>
-      ) : <p className="map-layer-label" role="status">{saved.pending ? t('Loading forecast…') : t('No forecast available for today.')}</p>}
+        <>
+          <small>{number(current.ifs_value, 3)} {forecast.unit} · <time dateTime={current.date}>{date(current.date)}</time></small>
+          <small>{t('Daily UTC estimate · 0–7 cm')} · {forecast.provider} · {number(forecast.resolution_km)} {t('km')}</small>
+        </>
+      ) : <small>{t(saved.error ?? (saved.pending ? 'Loading forecast…' : 'No forecast available for today.'))}</small>}
+      {saved.error && <button className="ndvi-retry" type="button" onClick={saved.reload}>{t('Retry')}</button>}
     </div>
   )
 }
 
 function MoistureOverlayLegend({ overlay }: { overlay: MoistureOverlay }) {
-  const { t } = useLocale()
-  const { source, layer, resource, stale, pending, sampleDate } = overlay
+  const { t, number, date } = useLocale()
+  const { layer, resource, pending, sampleDate } = overlay
   return (
-    <div className="moisture-layer-detail">
-      <h3><span className={'map-layer-swatch map-swatch-' + source} aria-hidden="true" />{t(moistureSources[source])}</h3>
-      {layer ? <MoistureLegend layer={layer} stale={stale} /> : (
-        <p className="map-layer-label" role="status">
-          {resource.pending || pending ? t('Loading moisture…')
-            : resource.error ? t('Unavailable')
+    <div role="status">
+      {layer?.cells.length ? <>
+        {layer.demo ? <>
+          <MapColorScale stops={Array.from({ length: 4 }, (_, index) => {
+            const value = layer.minimum + (layer.maximum - layer.minimum) * index / 3
+            return { value, color: moistureColor(value, layer.minimum, layer.maximum) }
+          })} unit={layer.unit} />
+          <DisplaySmoothingNote />
+        </> : <small>{number(layer.cells[0].value, 3)} {layer.unit}</small>}
+        <small><time dateTime={layer.date}>{date(layer.date)}</time> · {layer.demo ? t('Simulated preview') : layer.source?.name}</small>
+        {layer.source && <small>{t('Grid spacing')} {number(layer.source.resolution_degrees, 3)}°</small>}
+      </> : (
+        <small>
+          {resource.error ? t(resource.error)
+            : resource.pending || pending ? t('Loading moisture…')
               : sampleDate ? t('No saved estimate for this date.') : t('No saved moisture estimate yet.')}
-        </p>
+        </small>
       )}
+      {resource.error && <button className="ndvi-retry" type="button" onClick={resource.reload}>{t('Retry')}</button>}
     </div>
   )
+}
+
+function MapColorScale({ stops, unit }: { stops: { value: number; color: string }[]; unit?: string }) {
+  const { number } = useLocale()
+  const min = stops[0].value
+  const max = stops[stops.length - 1].value
+  const gradient = min === max ? stops[0].color
+    : 'linear-gradient(90deg, ' + stops.map(({ value, color }) => color + ' ' + 100 * (value - min) / (max - min) + '%').join(', ') + ')'
+  return (
+    <div className="field-map-scale">
+      <i style={{ background: gradient }} aria-hidden="true" />
+      <div>
+        <span>{number(min, 4)}{min === max && unit ? ' ' + unit : ''}</span>
+        {min !== max && <span>{number(max, 4)}{unit ? ' ' + unit : ''}</span>}
+      </div>
+    </div>
+  )
+}
+
+function DisplaySmoothingNote() {
+  const { language } = useLocale()
+  return <small>{language === 'uk'
+    ? 'Плавні кольори не змінюють просторову роздільність даних.'
+    : 'Colors are smoothed for display. The source resolution is unchanged.'}</small>
 }
 
 function MoistureControls({ overlay }: { overlay: MoistureOverlay }) {
@@ -559,13 +616,7 @@ function MoistureControls({ overlay }: { overlay: MoistureOverlay }) {
 }
 
 function MoistureLegend({ layer, stale }: { layer: MoistureLayer; stale: boolean }) {
-  const { number, shortDate, t, date } = useLocale()
-  if (layer.demo) return (
-    <div className="map-legend">
-      <div><span>{number(layer.minimum, 2)}</span><i /><span>{number(layer.maximum, 2)} {layer.unit}</span></div>
-      <small>{shortDate(layer.date)} · {t('Simulated preview')}</small>
-    </div>
-  )
+  const { number, t, date } = useLocale()
   const source = layer.source
   const value = layer.cells[0]?.value
   const model = source?.kind === 'ml' ? source : undefined

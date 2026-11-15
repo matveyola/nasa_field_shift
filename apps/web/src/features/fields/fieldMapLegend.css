@@ -1,0 +1,94 @@
+.fields-content .field-map-legend {
+  position: absolute;
+  z-index: 4;
+  top: 18px;
+  right: 18px;
+  width: max-content;
+  max-width: min(238px, calc(100% - 120px));
+  border-radius: var(--r-md);
+  padding: 10px 12px;
+  background: var(--card);
+  box-shadow: var(--shadow-float);
+  pointer-events: none;
+  overflow-wrap: anywhere;
+}
+
+.field-map-legend > strong {
+  display: block;
+  font-size: .76rem;
+  margin-bottom: 5px;
+}
+
+.field-map-legend small {
+  display: block;
+  font-size: .65rem;
+  color: var(--ink-2);
+  margin-top: 4px;
+}
+
+.field-map-scale {
+  display: grid;
+  gap: 3px;
+  min-width: 100px;
+}
+
+.field-map-scale i {
+  height: 10px;
+  border-radius: var(--r-pill);
+}
+
+.field-map-scale div {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: .62rem;
+  color: var(--ink-2);
+}
+
+.field-map-legend .ndvi-retry, .field-map-legend .ndvi-map-switch button {
+  pointer-events: auto;
+}
+
+@media (max-width: 1000px) {
+  .fields-content .field-map-legend {
+    top: 14px;
+    right: 12px;
+    max-width: min(205px, calc(100% - 145px));
+    padding: 7px 9px;
+  }
+  .fields-layout .map-frame:has(.map-layer-picker[open]) {
+    isolation: auto;
+  }
+  .fields-content .fields-layout .map-tools:has(.map-layer-picker[open]) {
+    z-index: 7;
+  }
+}
+
+.field-map-contrast {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  margin: 8px 0;
+  border-radius: 8px;
+  background: var(--surface, #f0f0ed);
+  pointer-events: auto;
+}
+.field-map-contrast button {
+  flex: 1;
+  padding: 7px 6px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: .65rem;
+  cursor: pointer;
+}
+.field-map-contrast button[aria-pressed="true"] {
+  background: var(--ink, #161917);
+  color: white;
+}
+.field-map-contrast button:focus-visible {
+  outline: 2px solid #298858;
+  outline-offset: 2px;
+}

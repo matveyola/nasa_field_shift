@@ -1,20 +1,5 @@
 import type { VegetationObservation, VegetationResult } from '../../api/analytics'
 
-export const ndviBands = [
-  { min: -1, color: '#936448' },
-  { min: 0, color: '#c19548' },
-  { min: .25, color: '#c4bc72' },
-  { min: .5, color: '#86a06b' },
-  { min: .75, color: '#2b5940' },
-] as const
-
-export function ndviColor(value: number) {
-  for (let index = ndviBands.length - 1; index > 0; index--) {
-    if (value >= ndviBands[index].min) return ndviBands[index].color
-  }
-  return ndviBands[0].color
-}
-
 export function vegetationCsv(observations: VegetationObservation[]) {
   const heading = 'date,scene_id,mean_ndvi,p10_ndvi,p90_ndvi,mean_msavi,valid_percent,pixel_count,source_url'
   const escapeText = (text: string) => '"' + (/^[\s]*[=+@-]|^[\t\r\n]/.test(text) ? "'" : '') + text.replaceAll('"', '""') + '"'

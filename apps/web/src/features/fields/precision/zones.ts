@@ -7,7 +7,7 @@ export type ZoneCell = SceneLayer['cells'][number]
 export type Zone = ZoneCell['zone']
 export const zones: readonly Zone[] = ['low', 'typical', 'high']
 export const zoneLabels: Record<Zone, string> = { low: 'Lower', typical: 'Typical', high: 'Higher' }
-export const zoneColors: Record<Zone, string> = { low: '#c19548', typical: '#a0b58d', high: '#2b5940' }
+export const zoneColors: Record<Zone, string> = { low: '#e89836', typical: '#dbd65b', high: '#278b50' }
 
 export function cellArea(cell: ZoneCell) {
   return estimateHectares(cell.geometry.coordinates[0])

@@ -186,7 +186,7 @@
 /* the swatches mirror the map overlays: dashed white (records), dashed black (model), solid white (planted area) */
 .map-swatch-historical { background: #fff; border: 1.5px dashed var(--ink); }
 .map-swatch-ml { background: var(--black); border: 1.5px dashed var(--black); }
-.map-swatch-demo { background: linear-gradient(90deg, #fbee8a, #5db395, #1e6ca2, #1f427b); }
+.map-swatch-demo { background: linear-gradient(90deg, #f9da5b, #4ac5b9, #1c88bf, #1d3e91); }
 .map-swatch-planting { background: #fff; border-color: var(--ink-3); }
 .map-satellite-option { margin-top: 7px; background: var(--screen); }
 .fields-content .map-fallback {

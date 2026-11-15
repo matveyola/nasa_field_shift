@@ -18,8 +18,28 @@ export function spectralCell(cell: NonNullable<VegetationResult['heterogeneity']
   return index === 'ndvi' ? cell.value : index === 'msavi' ? cell.msavi : cell.indices?.[index]
 }
 
-export function spectralColor(value: number, index: SpectralIndex) {
-  const [min, max] = spectralDefinitions[index].range
-  const colors = ['#936448', '#c19548', '#c4bc72', '#86a06b', '#2b5940']
-  return colors[Math.min(4, Math.max(0, Math.floor((value - min) / (max - min) * 5)))]
+// Fixed scales keep dates comparable. Field contrast stretches only the display range.
+export function spectralColorStops(index: SpectralIndex, fieldValues?: readonly number[]) {
+  const moisture = index === 'ndmi' || index === 'ndwi'
+  const colors = moisture
+    ? ['#ac572c', '#e9b75f', '#f2edbb', '#76ced1', '#2788b8', '#224b91']
+    : ['#d63e32', '#f08b32', '#f3ce45', '#c4df52', '#76c34e', '#299c50', '#087446']
+  const [minimum, maximum] = spectralDefinitions[index].range
+  const unbounded = index === 'reci' || index === 'mcari'
+  const valid = fieldValues?.filter((value) => Number.isFinite(value)
+    && (unbounded || (value >= minimum && value <= maximum)))
+  if (valid?.length) {
+    const min = valid.reduce((a, b) => Math.min(a, b))
+    const max = valid.reduce((a, b) => Math.max(a, b))
+    if (max - min < 1e-6) return [{ value: min, color: colors[Math.floor(colors.length / 2)] }]
+    return colors.map((color, stop) => ({ color, value: min + (max - min) * stop / (colors.length - 1) }))
+  }
+  if (index === 'ndvi') {
+    return [{ value: -1, color: '#a6aab0' }, ...colors.map((color, stop) => ({
+      color, value: stop / (colors.length - 1),
+    }))]
+  }
+  return colors.map((color, stop) => ({
+    color, value: minimum + (maximum - minimum) * stop / (colors.length - 1),
+  }))
 }

@@ -1,26 +1,22 @@
 import { useLocale } from '../../shared/locale'
-import { useEffect, useEffectEvent, useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from 'react'
 import { MinusIcon, PlusIcon, ViewfinderCircleIcon } from '@heroicons/react/24/outline'
 import * as L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import type { Field, MoistureLayer, Position } from '../../api/contracts'
+import type { Field, Position } from '../../api/contracts'
 import { basemaps, coordinateFromMap, demoAerialBounds, usgsAttribution, type BasemapId } from './basemaps'
-import { moistureColor } from './geometry'
 import { useMapGeometryEditor, type EditMode } from './mapGeometryEditor'
 import type { SatelliteRaster } from './satelliteRaster'
-import type { SpectralIndex, TerrainResult, VegetationResult } from '../../api/analytics'
 import { useAnalyticsMapLayers } from './analyticsMapLayers'
 import { useDetailedImagery, usePlaceLabels } from './mapImagery'
+import type { FieldMapVisualization } from './fieldMapVisualization'
 import type { PreparedContour } from '../../api/boundaries'
 import type { MapWindow } from './PreparedContoursPanel'
 
 type Props = {
   fields: Field[]
   selected?: Field
-  layers: readonly MoistureLayer[]
-  vegetation?: VegetationResult['heterogeneity']
-  vegetationIndex?: 'relative' | SpectralIndex
-  terrain?: TerrainResult
+  visualization?: FieldMapVisualization
   showBoundaries: boolean
   bottomOcclusion?: number
   satellite?: SatelliteRaster
@@ -33,7 +29,6 @@ type Props = {
   selectVertex?: (index: number) => void
   moveVertex?: (index: number, point: Position) => void
   insertVertex?: (index: number, point: Position) => void
-  showPlanting?: boolean
   newBoundary?: boolean
   suggestionSeed?: Position
   locationMarker?: Position
@@ -67,10 +62,10 @@ function fitFields(map: L.Map, fields: Field[], editPoints?: Position[]) {
 }
 
 export default function FieldMap({
-  fields, selected, layers, showBoundaries, satellite, points, drawing, basemap, retryTiles, chooseField, addPoint,
+  fields, selected, visualization, showBoundaries, satellite, points, drawing, basemap, retryTiles, chooseField, addPoint,
   onBasemapFailure, onBasemapReady, editMode, editLocked, appendVertices, activeVertex, selectVertex, moveVertex, insertVertex,
-  showPlanting, newBoundary, suggestionSeed, locationMarker, suggestBoundary, reportSuggestionCenter,
-  bottomOcclusion = 0, vegetation, terrain, vegetationIndex,
+  newBoundary, suggestionSeed, locationMarker, suggestBoundary, reportSuggestionCenter,
+  bottomOcclusion = 0,
   preparedContours, adoptContour, contourFocus, onViewport,
   viewportRequest, autoFitFields = true,
 }: Props) {
@@ -83,6 +78,10 @@ export default function FieldMap({
   const planting = selected?.planting
   const editing = drawing || Boolean(editMode)
   const suggesting = Boolean(suggestBoundary)
+  const activeVisualization = editing || suggesting || satellite ? undefined : visualization
+  const satelliteView = satellite ?? (activeVisualization?.kind === 'satellite' ? activeVisualization.raster : undefined)
+  const showPlanting = activeVisualization?.kind === 'planting'
+  const showOutlineFill = !activeVisualization
   const adding = editMode ? !editLocked && Boolean(appendVertices) : drawing
   const handleMapClick = useEffectEvent(({ latlng }: L.LeafletMouseEvent) => {
     const position = coordinateFromMap(latlng.wrap())
@@ -134,8 +133,9 @@ export default function FieldMap({
       .setView([49, 31], 5)
     instance.attributionControl?.setPrefix(false)
     instance.createPane('satellitePane').style.zIndex = '300'
-    instance.createPane('moisturePane').style.zIndex = '390'
-    instance.createPane('vegetationPane').style.zIndex = '395'
+    const analyticsPane = instance.createPane('analyticsPane')
+    analyticsPane.style.zIndex = '395'
+    analyticsPane.style.pointerEvents = 'none'
     instance.createPane('terrainPane').style.zIndex = '415'
     instance.createPane('plantingPane').style.zIndex = '410'
     instance.createPane('geometryDraftPane').style.zIndex = '420'
@@ -267,21 +267,21 @@ export default function FieldMap({
     }
   }, [map, basemap, retryTiles])
 
-  useDetailedImagery(map, basemap === 'aerial' && !satellite, retryTiles, detailedImageryVisible, onBasemapReady)
+  useDetailedImagery(map, basemap === 'aerial' && !satelliteView, retryTiles, detailedImageryVisible, onBasemapReady)
   usePlaceLabels(map, basemap === 'aerial')
 
-  useEffect(() => {
-    if (!map || !satellite) return
-    const aerial = satellite.source === 'aerial'
-    const overlay = L.imageOverlay(satellite.url, satellite.bounds, {
+  useLayoutEffect(() => {
+    if (!map || !satelliteView) return
+    const aerial = satelliteView.source === 'aerial'
+    const overlay = L.imageOverlay(satelliteView.url, satelliteView.bounds, {
       pane: 'satellitePane', interactive: false,
       alt: aerial ? 'USGS aerial imagery used for the field outline' : 'Sentinel-2 true-color field imagery',
       attribution: aerial ? usgsAttribution
         : '<a href="https://registry.opendata.aws/sentinel-2-l2a-cogs/">Copernicus Sentinel-2</a>',
     }).addTo(map)
-    if (suggesting && map.getZoom() < 14) map.fitBounds(satellite.bounds, { maxZoom: 15, animate: false })
+    if (suggesting && map.getZoom() < 14) map.fitBounds(satelliteView.bounds, { maxZoom: 15, animate: false })
     return () => { overlay.remove() }
-  }, [map, satellite, suggesting])
+  }, [map, satelliteView, suggesting])
 
   useEffect(() => {
     if (!map || (!showBoundaries && !editing && !suggesting)) return
@@ -291,13 +291,14 @@ export default function FieldMap({
       const priorBoundary = active && editMode === 'boundary'
       // white outlines read on dark imagery; the chosen field gets a thicker line over a black halo
       if (active && !priorBoundary) {
-        L.geoJSON(field.geometry, { style: { color: '#0d0d0d', weight: 7, opacity: .55, fill: false, interactive: false } }).addTo(group)
+        L.geoJSON(field.geometry, { style: { color: '#0d0d0d', weight: 5, opacity: .65, fill: false, interactive: false } }).addTo(group)
       }
       const outline = L.geoJSON(field.geometry, {
         style: {
-          color: '#ffffff', weight: active && !priorBoundary ? 3 : 2,
+          color: '#ffffff', weight: active && !priorBoundary ? 2.5 : 1.5,
           dashArray: priorBoundary ? '6 5' : undefined,
-          fillColor: active ? '#ffffff' : '#0d0d0d', fillOpacity: editMode || suggesting ? 0 : active ? .18 : .13,
+          fillColor: active ? '#ffffff' : '#0d0d0d',
+          fillOpacity: editMode || suggesting || !showOutlineFill ? 0 : active ? .18 : .13,
           interactive: !editing, bubblingMouseEvents: false,
         },
       }).addTo(group)
@@ -320,7 +321,7 @@ export default function FieldMap({
       }
     }
     return () => { group.remove() }
-  }, [map, fields, selectedId, editing, editMode, showBoundaries, suggesting, bottomOcclusion])
+  }, [map, fields, selectedId, editing, editMode, showBoundaries, suggesting, bottomOcclusion, showOutlineFill])
 
   useEffect(() => {
     const point = suggestionSeed ?? locationMarker
@@ -335,7 +336,7 @@ export default function FieldMap({
     return () => { marker.remove() }
   }, [map, suggestionSeed, locationMarker, viewportRequest])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!map || !planting || (!showPlanting && editMode !== 'boundary') || editMode === 'planting') return
     const overlay = L.geoJSON(planting.geometry, {
       pane: 'plantingPane',
@@ -345,27 +346,6 @@ export default function FieldMap({
     }).addTo(map)
     return () => { overlay.remove() }
   }, [map, planting, showPlanting, editMode])
-
-  useEffect(() => {
-    if (!map || !layers.length) return
-    const group = L.layerGroup().addTo(map)
-    for (const layer of [...layers].sort((a, b) => Number(b.demo) - Number(a.demo))) {
-      const model = layer.source?.kind === 'ml'
-      for (const cell of layer.cells) {
-        L.geoJSON(cell.geometry, {
-          pane: 'moisturePane',
-          style: layer.demo ? {
-            fillColor: moistureColor(cell.value, layer.minimum, layer.maximum),
-            fillOpacity: .58, weight: 0, interactive: false,
-          } : {
-            color: model ? '#0d0d0d' : '#ffffff', fill: false, dashArray: '8 8',
-            dashOffset: model ? '8' : '0', weight: 3, interactive: false,
-          },
-        }).addTo(group)
-      }
-    }
-    return () => { group.remove() }
-  }, [map, layers])
 
   useEffect(() => {
     if (!map || !drawing || editMode || !points.length) return
@@ -381,7 +361,7 @@ export default function FieldMap({
   }, [map, drawing, editMode, points])
 
   useMapGeometryEditor(map, points, { editMode, editLocked, activeVertex, selectVertex, moveVertex, insertVertex })
-  useAnalyticsMapLayers(map, editing || suggesting ? undefined : vegetation, editing || suggesting ? undefined : terrain, vegetationIndex)
+  useAnalyticsMapLayers(map, selected?.geometry, activeVisualization)
 
   return (
     <>

@@ -1,6 +1,6 @@
 import { useCallback, useRef } from 'react'
 import { api } from '../../api/client'
-import { useResource } from '../../shared/useResource'
+import { useMapResource } from './useMapResource'
 import type { SatelliteRaster } from './satelliteRaster'
 
 export function useSatelliteLayer(fieldId: string | undefined, enabled: boolean, cutoff: string, boundaryRevision: number) {
@@ -21,7 +21,7 @@ export function useSatelliteLayer(fieldId: string | undefined, enabled: boolean,
       throw new Error('The Sentinel-2 image could not be loaded. Try again or choose another date.')
     }
   }, [fieldId, enabled, cutoff, boundaryRevision])
-  const resource = useResource(load, enabled && !cutoff ? 15 * 60 * 1000 : undefined)
+  const resource = useMapResource(load, enabled && !cutoff ? 15 * 60 * 1000 : undefined)
   const data = enabled && resource.data?.fieldId === fieldId && resource.data?.cutoff === cutoff
     && resource.data?.boundaryRevision === boundaryRevision
     ? resource.data : undefined

@@ -48,7 +48,7 @@ export function parseVertices(text: string): Position[] {
 
 export function moistureColor(value: number, minimum: number, maximum: number): string {
   const ratio = maximum === minimum ? .5 : Math.min(1, Math.max(0, (value - minimum) / (maximum - minimum)))
-  const stops = [[251, 238, 138], [93, 179, 149], [30, 108, 162], [31, 66, 123]]
+  const stops = [[249, 218, 91], [74, 197, 185], [28, 136, 191], [29, 62, 145]]
   const position = ratio * (stops.length - 1)
   const index = Math.min(stops.length - 2, Math.floor(position))
   const rgb = stops[index].map((channel, i) => Math.round(channel + (stops[index + 1][i] - channel) * (position - index)))

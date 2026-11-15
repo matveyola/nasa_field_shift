@@ -1,31 +1,31 @@
 import { useLocale } from '../../shared/locale'
-import { useEffect, useRef } from 'react'
+import { useEffect, useId, useRef } from 'react'
 import { CheckIcon, ChevronDownIcon, PhotoIcon, Square3Stack3DIcon } from '@heroicons/react/24/outline'
 import { basemaps, type BasemapId } from './basemaps'
-import type { MoistureSource } from '../../api/contracts'
-
-export type MapLayer = MoistureSource | 'boundaries' | 'forecast' | 'planting' | 'heterogeneity' | 'terrain'
+import type { VisualizationId } from './fieldMapVisualization'
 
 type Props = {
   basemap: BasemapId
-  layers: ReadonlyArray<{ id: MapLayer; label: string }>
-  activeLayers: ReadonlySet<MapLayer>
-  satelliteActive: boolean
-  satelliteAvailable: boolean
+  layers: ReadonlyArray<{ id: VisualizationId; label: string }>
+  activeVisualization: VisualizationId
+  showBoundaries: boolean
+  fieldAvailable: boolean
   onBasemap: (id: BasemapId) => void
-  onLayer: (id: MapLayer) => void
-  onSatellite: () => void
+  onVisualization: (id: VisualizationId) => void
+  onBoundaries: (shown: boolean) => void
 }
 
 const basemapIds: BasemapId[] = ['aerial', 'street']
 
 export function MapLayerPicker({
-  basemap, layers, activeLayers, satelliteActive, satelliteAvailable,
-  onBasemap, onLayer, onSatellite,
+  basemap, layers, activeVisualization, showBoundaries, fieldAvailable,
+  onBasemap, onVisualization, onBoundaries,
 }: Props) {
-  const { t } = useLocale()
+  const { language, t } = useLocale()
+  const radioGroup = useId()
   const picker = useRef<HTMLDetailsElement>(null)
   const trigger = useRef<HTMLElement>(null)
+  const noVisualization = language === 'uk' ? 'Без візуалізації' : 'No visualization'
 
   useEffect(() => {
     function closeOnOutsidePointer(event: PointerEvent) {
@@ -69,20 +69,22 @@ export function MapLayerPicker({
             ))}
           </div>
         </div>
-        <div className="map-overlay-options" role="group" aria-label={t('Map overlay')}>
+        <div className="map-overlay-options" role="radiogroup" aria-label={t('Map overlay')}>
           <p className="map-layer-heading" aria-hidden="true">{t('Field data')}</p>
-          {layers.map(({ id, label }) => (
-            <label key={id} className="map-layer-option">
-              <input type="checkbox" checked={activeLayers.has(id)} onChange={() => onLayer(id)} />
+          {[{ id: 'none' as const, label: noVisualization }, ...layers].map(({ id, label }) => (
+            <label key={id} className={'map-layer-option' + (id === 'satellite' ? ' map-satellite-option' : '')}>
+              <input type="radio" name={radioGroup} value={id} checked={activeVisualization === id}
+                disabled={id !== 'none' && !fieldAvailable} onChange={() => onVisualization(id)} />
               <span>{label}</span>
-              {id !== 'forecast' && <span className={'map-layer-swatch map-swatch-' + id} aria-hidden="true" />}
+              {id === 'satellite' ? <PhotoIcon aria-hidden="true" /> : id !== 'none' && id !== 'forecast' &&
+                <span className={'map-layer-swatch map-swatch-' + id} aria-hidden="true" />}
             </label>
           ))}
         </div>
-        <label className="map-layer-option map-satellite-option">
-          <input type="checkbox" checked={satelliteActive} disabled={!satelliteAvailable} onChange={onSatellite} />
-          <span>{t('Satellite image by date')}</span>
-          <PhotoIcon aria-hidden="true" />
+        <label className="map-layer-option">
+          <input type="checkbox" checked={showBoundaries} onChange={(event) => onBoundaries(event.target.checked)} />
+          <span>{t('Field boundaries')}</span>
+          <span className="map-layer-swatch map-swatch-boundaries" aria-hidden="true" />
         </label>
       </div>
     </details>

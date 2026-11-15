@@ -19,7 +19,6 @@ import './fieldSetupMap.css'
 
 const FieldMap = lazy(() => import('../fields/FieldMap'))
 const noFields: Field[] = []
-const noLayers = [] as const
 
 export type FieldSetupMapProps = {
   location: SetupLocation
@@ -271,7 +270,7 @@ export function FieldSetupMap({ location, onLocationChange, geometry, onGeometry
       </div>
       <div className="fields-content setup-map-canvas" ref={mapCanvas}>
         <Suspense fallback={<p className="setup-map-loading">{text('Завантажую карту…', 'Loading map…')}</p>}>
-          <FieldMap fields={fields} layers={noLayers} showBoundaries points={draft.points} drawing={mode === 'manual' && draft.append}
+          <FieldMap fields={fields} showBoundaries points={draft.points} drawing={mode === 'manual' && draft.append}
             editMode={mode !== 'automatic' ? 'boundary' : undefined} editLocked={locked || !showEditor} appendVertices={draft.append}
             activeVertex={draft.active} selectVertex={(active) => setDraft((current) => ({ ...current, active }))}
             moveVertex={(index, point) => modify(draft.points.map((value, i) => i === index ? point : value))}

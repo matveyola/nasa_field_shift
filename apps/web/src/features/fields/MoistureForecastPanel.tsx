@@ -7,13 +7,13 @@ import { useLocale } from '../../shared/locale'
 import { useJob, useStartJob } from '../../shared/jobs'
 import { JobStatus } from '../../shared/JobStatus'
 import { ErrorBox } from '../../shared/ui'
-import { useResource } from '../../shared/useResource'
 import { waterHelp, waterHelpMetadata } from '../water/waterHelp'
+import { useMapResource } from './useMapResource'
 
 export function useMoistureForecast(fieldId: string | undefined, boundaryRevision: number) {
   const load = useCallback(async (signal: AbortSignal) => fieldId
     ? { revision: boundaryRevision, forecast: await api.moistureForecast(fieldId, signal) } : undefined, [fieldId, boundaryRevision])
-  const saved = useResource(load, fieldId ? 5 * 60 * 1000 : undefined)
+  const saved = useMapResource(load, fieldId ? 5 * 60 * 1000 : undefined)
   const launch = useStartJob()
   const [request, setRequest] = useState<{ fieldId: string; revision: number; jobId: string }>()
   const jobId = request?.fieldId === fieldId && request?.revision === boundaryRevision ? request.jobId : undefined
