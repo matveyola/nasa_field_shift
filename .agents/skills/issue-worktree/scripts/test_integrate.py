@@ -1,6 +1,6 @@
 """Exercise integration against temporary local repositories, never live remotes."""
 
-import fcntl
+import importlib.util
 import shlex
 import subprocess
 import sys
@@ -9,6 +9,59 @@ import unittest
 from pathlib import Path
 
 HELPER = Path(__file__).with_name("integrate.py")
+_spec = importlib.util.spec_from_file_location("integrate", HELPER)
+integrate = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(integrate)
+
+HOLD_LOCK = """
+import importlib.util, sys
+spec = importlib.util.spec_from_file_location("integrate", sys.argv[1])
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+with open(sys.argv[2], "a") as lock:
+    module.lock_exclusive(lock)
+    print("locked", flush=True)
+    sys.stdin.readline()
+"""
+
+
+class LockTests(unittest.TestCase):
+    """Git-free checks of the platform lock; they run on Windows and Linux alike."""
+
+    def test_lock_excludes_another_process_until_released(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "issue-integration.lock"
+            holder = subprocess.Popen(
+                [sys.executable, "-c", HOLD_LOCK, str(HELPER), str(path)],
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                text=True,
+            )
+            try:
+                self.assertEqual(holder.stdout.readline().strip(), "locked")
+                with path.open("a") as lock, self.assertRaises(BlockingIOError):
+                    integrate.lock_exclusive(lock)
+            finally:
+                holder.communicate("release\n", timeout=30)
+            with path.open("a") as lock:
+                integrate.lock_exclusive(lock)
+
+    def test_host_shared_filesystems_are_detected(self):
+        mountinfo = "\n".join(
+            [
+                "22 1 0:21 / / rw - overlay overlay rw",
+                "40 22 0:35 / /src rw - fakeowner C:\\134 rw",
+                "41 22 0:36 / /mnt/c rw - 9p drvfs rw",
+                "42 22 0:37 / /my\\040repo rw - ext4 /dev/sdb rw",
+            ]
+        )
+        kind = integrate.mount_filesystem
+        self.assertEqual(kind("/src/.git", mountinfo), "fakeowner")
+        self.assertEqual(kind("/mnt/c/x/.git", mountinfo), "9p")
+        self.assertEqual(kind("/srcx/.git", mountinfo), "overlay")
+        self.assertEqual(kind("/my repo/.git", mountinfo), "ext4")
+        self.assertIn("fakeowner", integrate.HOST_SHARED_FILESYSTEMS)
+        self.assertNotIn("ext4", integrate.HOST_SHARED_FILESYSTEMS)
 
 
 class IntegrationTests(unittest.TestCase):
@@ -97,7 +150,7 @@ class IntegrationTests(unittest.TestCase):
 
     def test_shared_lock_blocks_other_agent(self):
         with (self.repo / ".git" / "issue-integration.lock").open("a") as lock:
-            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            integrate.lock_exclusive(lock)
             self.assert_blocked(self.integrate())
         self.assertEqual(self.integrate().returncode, 0)
 

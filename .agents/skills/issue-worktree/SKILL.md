@@ -46,6 +46,14 @@ python3 /path/to/issue-worktree/scripts/integrate.py \
   --check 'actual required fast suite command'
 ```
 
+Run the helper on the host that owns the integration checkout, so every integrator of that checkout uses the same lock API: `flock` on Linux/macOS, `msvcrt` byte-range locking on Windows. Never run it in a container or VM against a bind-mounted host checkout. Those locks are invisible to the host, so the helper refuses host-shared filesystems such as Docker Desktop and WSL drive mounts. On Windows, checks run in Git Bash (located from `git --exec-path`), not the WSL `bash.exe` in System32. Pushes use the host's normal Git credentials. For Linux-only checks on such a host, pass `--check 'python .agents/skills/issue-worktree/scripts/linux_check.py'`. It streams the staged merge tree (`git write-tree`, then `git archive`) into a disposable `python:3.12-slim` container and runs Ruff, the API fast suite and the lock tests there. Beforehand it downloads hashed Linux wheels and a signature-checked `libexpat1` into a cache outside the checkout. The container has no network, no checkout mount and no credentials. Some tests hash source files byte for byte, so native Windows checks should also run on an LF export of the staged tree rather than the working copy, and set `PYTHONUTF8=1`:
+
+```bash
+--check 'T=$(mktemp -d) && git -c core.autocrlf=false -c core.eol=lf archive "$(git write-tree)" | tar -C "$T" -xf - && cd "$T/apps/api" && export UV_PROJECT_ENVIRONMENT=<venv outside the checkout> PYTHONUTF8=1 && uv sync --locked --extra dev && uv run --no-sync ruff check . && uv run --no-sync ruff format --check . && uv run --no-sync pytest -q -m "not integration" -p no:cacheprovider --ignore=tests/test_global_tester.py; rc=$?; cd / && rm -rf "$T"; exit $rc'
+```
+
+The Windows run leaves out `tests/test_global_tester.py` only because it imports POSIX `fcntl`. The Linux check runs it, so always pass both checks.
+
 Select checks for the union of changes being integrated, including changes since the issue's base. Do not pass `true` or a token check to satisfy the tool. Keep progress updates during long checks. The helper supplies serialization, not a substitute for review or a sandbox for check commands.
 
 On a merge conflict or failed check, the helper leaves the merge for diagnosis and does not push. Preserve the evidence. Under the same lock, inspect and abort only that pending merge (`git merge --abort`) before fixing the cause in the issue worktree; then rerun integration. Do not weaken tests or overwrite another lane. For manual recovery use `flock -n "$(git rev-parse --path-format=absolute --git-common-dir)/issue-integration.lock" bash /path/to/recovery.sh` from a checkout of this repository; hold the lock for the entire recovery operation.

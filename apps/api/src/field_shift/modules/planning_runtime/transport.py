@@ -10,6 +10,10 @@ from field_shift_contracts.planning_v1 import ModelCard, SequenceEvaluation
 from field_shift.modules.rotations.scenario_planning.common import canonical
 
 MAX_BYTES = 16 * 1024 * 1024
+# Each card request starts a fresh model process in the crop service (crop_runtime/server.py),
+# so a healthy reply includes a cold numerical import: about 7.4-7.9 s on a 1-CPU container.
+# The bound stays far below the service's 60 s child limit, so a hung model still fails.
+CARD_TIMEOUT_SECONDS = 20
 
 
 class ModelUnavailable(RuntimeError):
@@ -30,8 +34,9 @@ class ModelClient:
             data=data,
             headers={"Authorization": "Bearer " + token, "Content-Type": "application/json"},
         )
+        timeout = CARD_TIMEOUT_SECONDS if operation == "card" else 65
         try:
-            with urlopen(request, timeout=5 if operation == "card" else 65) as response:
+            with urlopen(request, timeout=timeout) as response:
                 raw = response.read(MAX_BYTES + 1)
             if len(raw) > MAX_BYTES:
                 raise ModelUnavailable("Private model output limit exceeded")
