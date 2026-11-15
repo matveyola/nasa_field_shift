@@ -2,7 +2,7 @@ import { cropIconKind, type CropKind } from './cropIconKind'
 
 const drawings: Record<CropKind, () => React.JSX.Element> = {
   wheat: Wheat, maize: Maize, soy: Soy, barley: Barley, sunflower: Sunflower,
-  rapeseed: Rapeseed, peas: Peas, sugar_beet: SugarBeet, potato: Potato, oats: Oats, millet: Millet,
+  rapeseed: Rapeseed, peas: Peas, sugar_beet: SugarBeet, potato: Potato, oats: Oats, millet: Millet, rice: Rice,
 }
 
 export function CropIcon({ crop }: { crop?: string }) {
@@ -173,6 +173,24 @@ function Millet() {
       <path d="M20 3c5 2 5 8 2 13-3 6-9 8-11 5-2-2 2-5 3-9 1-5 2-8 6-9Z" fill="#c7a45c" />
       <g fill="#e7c982">
         {[[19,6],[22,8],[17,9],[20,11],[15,12],[18,14],[21,14],[14,16],[17,18],[12,19]].map(([cx,cy]) => <ellipse key={`${cx}-${cy}`} cx={cx} cy={cy} rx="1.5" ry="1.8" />)}
+      </g>
+    </g>
+  )
+}
+
+function Rice() {
+  return (
+    <g strokeWidth="1" strokeLinejoin="round">
+      <path d="M10 30c1-7 2-15 5-22 2-4 6-5 9-2" fill="none" stroke="#64793d" strokeWidth="1.4" />
+      <path d="M11 26C5 23 3 18 3 13c5 3 7 7 8 13Zm1-5c4-3 7-4 11-3-4 4-7 5-12 7Z" fill="#8b9d50" stroke="#526b36" />
+      <path d="M15 8c-2 0-3 2-3 5m5-8c2 1 3 3 3 6m0-7c4 1 6 4 6 8m-11-1c1 1 2 3 2 6m3-8c2 1 3 4 3 7m3-7c2 1 3 3 3 6" fill="none" stroke="#a48b49" />
+      <g fill="#e4c679" stroke="#a17e37" strokeWidth=".8">
+        <ellipse cx="12" cy="14" rx="1.4" ry="2.8" />
+        <ellipse cx="17" cy="19" rx="1.4" ry="2.8" />
+        <ellipse cx="20" cy="12" rx="1.4" ry="2.8" />
+        <ellipse cx="23" cy="18" rx="1.4" ry="2.8" />
+        <ellipse cx="26" cy="13" rx="1.4" ry="2.8" />
+        <ellipse cx="29" cy="17" rx="1.4" ry="2.8" />
       </g>
     </g>
   )

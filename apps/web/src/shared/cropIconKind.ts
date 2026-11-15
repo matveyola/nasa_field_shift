@@ -1,5 +1,5 @@
 /** Visual species aliases only; this lookup does not declare model support or suitability. */
-export type CropKind = 'maize' | 'soy' | 'wheat' | 'barley' | 'sunflower' | 'rapeseed' | 'peas' | 'sugar_beet' | 'potato' | 'oats' | 'millet'
+export type CropKind = 'maize' | 'soy' | 'wheat' | 'barley' | 'sunflower' | 'rapeseed' | 'peas' | 'sugar_beet' | 'potato' | 'oats' | 'millet' | 'rice'
 
 const aliases: ReadonlyMap<string, CropKind> = new Map([
   ['maize', 'maize'], ['corn', 'maize'], ['maize_grain', 'maize'], ['кукурудза', 'maize'], ['кукурудза на зерно', 'maize'],
@@ -15,6 +15,7 @@ const aliases: ReadonlyMap<string, CropKind> = new Map([
   ['sugar beet', 'sugar_beet'], ['sugar_beet', 'sugar_beet'], ['цукровий буряк', 'sugar_beet'], ['буряк цукровий', 'sugar_beet'],
   ['potato', 'potato'], ['potatoes', 'potato'], ['картопля', 'potato'],
   ['oats', 'oats'], ['oat', 'oats'], ['овес', 'oats'],
+  ['rice', 'rice'], ['paddy', 'rice'], ['paddy rice', 'rice'], ['рис', 'rice'],
   ['millet', 'millet'], ['просо', 'millet'], ['просо, узагальнений рядок millet', 'millet'],
 ])
 

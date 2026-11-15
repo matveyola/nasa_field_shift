@@ -25,10 +25,16 @@ test('allocation crop literals all resolve and retain their distinct species', (
 
 test('aliases normalize case and surrounding spaces but do not guess unknown species', () => {
   for (const [name, expected] of [[' CORN ', 'maize'], ['Soybean', 'soy'], ['Canola', 'rapeseed'], ['Dry peas', 'peas'], ['Potatoes', 'potato'], ['ЯРА ПШЕНИЦЯ', 'wheat']]) assert.equal(cropIconKind(name), expected)
-  for (const name of [undefined, '', ' ', 'Rice', 'rye', 'constructor', '__proto__', 'QA-Maize', '<svg>', 'maize_grain_future']) assert.equal(cropIconKind(name), undefined)
+  for (const name of [undefined, '', ' ', 'rye', 'constructor', '__proto__', 'QA-Maize', '<svg>', 'maize_grain_future']) assert.equal(cropIconKind(name), undefined)
 })
 
 test('all wheat management profiles share the existing wheat drawing without implying support', () => {
   for (const id of ['wheat_spring', 'wheat_winter_frozen', 'wheat_winter_nonfrozen']) assert.equal(cropIconKind(id), 'wheat')
 })
 
+
+test('recorded rice and strict bilingual aliases identify rice independently of model support', () => {
+  for (const name of ['Rice', ' RICE ', 'paddy', 'Paddy rice', 'Рис', ' РИС ']) assert.equal(cropIconKind(name), 'rice')
+  for (const name of ['Unknown', 'Unknown fixture crop', 'wild rice', 'rice_future', 'rice-like', 'paddy field']) assert.equal(cropIconKind(name), undefined)
+  for (const name of ['oats', 'wheat', 'millet']) assert.notEqual(cropIconKind(name), cropIconKind('Rice'))
+})
