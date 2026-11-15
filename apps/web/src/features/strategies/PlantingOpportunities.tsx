@@ -58,7 +58,7 @@ function OpportunityGroup({ title, collapsed, items, busy, choose }: { title: st
     : <section className="opportunity-group"><h3>{title} <span>({items.length})</span></h3>{content}</section>
 }
 function OpportunityCard({ item, busy, choose }: { item: PlantingOpportunity; busy: boolean; choose: (item: PlantingOpportunity) => void }) {
-  const { language, t } = useLocale()
+  const { language, crop } = useLocale()
   const uk = language === 'uk'
   const planting = calendarPeriodLabel(item.planting_period, item.date_precision, uk ? 'uk-UA' : 'en-GB')
   const maturity = calendarPeriodLabel(item.maturity_period, item.date_precision, uk ? 'uk-UA' : 'en-GB')
@@ -75,7 +75,7 @@ function OpportunityCard({ item, busy, choose }: { item: PlantingOpportunity; bu
         : item.harvest_year === null ? (uk ? 'Рік урожаю невідомий; його не підставлено за припущенням.' : 'The harvest year is unknown; no assumed year is supplied.')
           : (uk ? 'Немає доступного переходу до нового розподілу: перевірте календар та підтримуваний рік урожаю (2001–2100).' : 'A new allocation is unavailable: review the calendar and supported harvest year (2001–2100).')
   return <article className="opportunity-card" data-opportunity-id={item.id}>
-    <p className="opportunity-kind">{kind}</p><h4>{t(item.crop_id)}</h4>
+    <p className="opportunity-kind">{kind}</p><h4>{crop(item.crop_id)}</h4>
     <p className="opportunity-cycle">{uk ? 'Цикл' : 'Cycle'}: {item.cycle_id ?? (uk ? 'невідомий' : 'unknown')} · {item.system}</p>
     <dl><dt>{item.date_precision === 'month' ? (uk ? 'Довідковий місяць сівби' : 'Reference planting month') : (uk ? 'Календарне вікно сівби' : 'Calendar planting window')}</dt><dd>{planting ?? (uk ? 'Не визначено' : 'Not determined')}</dd>
       <dt>{uk ? 'Дозрівання / кінець росту' : 'Maturity / growth end'}</dt><dd>{maturity ?? (uk ? 'Не визначено' : 'Not determined')}</dd>

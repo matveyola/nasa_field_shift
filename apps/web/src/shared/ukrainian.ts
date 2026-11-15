@@ -8,6 +8,8 @@ import { accessUkrainian } from './accessUkrainian'
 
 export const ukrainian: Readonly<Record<string, string>> = {
   'Strategies': 'Стратегії',
+  'peas': 'Горох',
+  'Crop unknown': 'Культура не вказана',
   'Analytics': 'Аналітика',
   'Next decision': 'Наступне рішення',
   'What should grow here next?': 'Що вирощувати тут далі?',
