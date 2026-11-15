@@ -15,8 +15,8 @@ import { RotationsPage } from '../rotations/RotationsPage'
 import { useAnalyticsCopy } from './copy'
 import { overviewInsights, profileForField, vegetationEvidence } from './model'
 import { ProfileSources, RotationHistory, SoilProfile } from './ProfileEvidence'
-import { FieldWeatherPanel, RainArchivePanel } from './FieldWeatherPanel'
-import { FieldWaterPanel } from './FieldWaterPanel'
+import { RainArchivePanel } from './FieldWeatherPanel'
+import { CurrentFieldOverview } from './CurrentFieldOverview'
 import './weather.css'
 import './analytics.css'
 
@@ -76,8 +76,8 @@ function AnalyticsWorkspace(props: AnalyticsPageProps & { rainPeriod: 7 | 30; ch
     : 'No saved profile for this field. Add its soil and crop history in Strategies.')}</p>
 
   return <div className="page-body analytics-page">
-    <header className="analytics-heading"><div><span className="analytics-eyebrow">{text('Territory evidence')}</span><h1>{text('Analytics')}</h1>
-      <p>{field.name} · {number(field.planting?.season === context.season ? field.planting.area_ha : field.area_ha)} {text('ha')} · {text('Recorded crop')}: {crop(field.crop)}</p></div>
+    <header className="analytics-heading"><div><h1>{text('Analytics')}</h1>
+      <p>{number(field.planting?.season === context.season ? field.planting.area_ha : field.area_ha)} {text('ha')} · {text('Recorded crop')}: {crop(field.crop)}</p></div>
       <button className="button" type="button" onClick={() => props.openAgent()}><SparklesIcon aria-hidden="true" />{text('Ask the assistant')}</button>
     </header>
     <div className="analytics-context" aria-label={text('Field context')}>
@@ -90,10 +90,7 @@ function AnalyticsWorkspace(props: AnalyticsPageProps & { rainPeriod: 7 | 30; ch
     <div className="analytics-content" key={section}>
       {['overview', 'soil', 'rotation'].includes(section) && profile?.sources.some(source => source.kind === 'synthetic') && <p className="analytics-caution" role="status">{text('Synthetic profile — demonstration inputs, not field measurements.')}</p>}
       {section === 'overview' && <>
-        <div className="analytics-current-state">
-        <FieldWeatherPanel field={field} />
-        <FieldWaterPanel field={field} forecast={forecast.data} season={context.season} pending={forecast.pending} error={forecast.error} reload={forecast.reload} />
-        </div>
+        <CurrentFieldOverview field={field} forecast={forecast.data} season={context.season} pending={forecast.pending} error={forecast.error} reload={forecast.reload} />
         <RainArchivePanel field={field} periodDays={props.rainPeriod} setPeriodDays={props.chooseRainPeriod} />
         <details className="analytics-disclosure"><summary>{text('Water controls, history and scenarios')}</summary><div className="analytics-details-body"><WaterPage {...props} embedded /></div></details>
         <details className="analytics-disclosure"><summary>{text('More field evidence')}</summary><div className="analytics-details-body">
@@ -116,10 +113,7 @@ function AnalyticsWorkspace(props: AnalyticsPageProps & { rainPeriod: 7 | 30; ch
         </div></details>
       </>}
       {section === 'water' && <>
-        <div className="analytics-current-state">
-        <FieldWeatherPanel field={field} />
-        <FieldWaterPanel field={field} forecast={forecast.data} season={context.season} pending={forecast.pending} error={forecast.error} reload={forecast.reload} />
-        </div>
+        <CurrentFieldOverview field={field} forecast={forecast.data} season={context.season} pending={forecast.pending} error={forecast.error} reload={forecast.reload} />
         <RainArchivePanel field={field} periodDays={props.rainPeriod} setPeriodDays={props.chooseRainPeriod} />
         <details className="analytics-disclosure" open={Boolean(props.jobId || props.forecastDay)}><summary>{text('Water controls, history and scenarios')}</summary><div className="analytics-details-body">
         <p className="analytics-meta">{text('The live forecast concerns the coming days. Historical scenarios below use the selected season and assumptions.')}</p>
