@@ -120,3 +120,7 @@ the fingerprinted package. All other report fields equal the immutable
 `paired-v2.json` exactly: 126 cases, inputs, numerical comparisons, omissions,
 golden replay, empirical-data limitations and promotion status. This is an
 identity update with replay evidence, not a new accuracy claim or protocol.
+
+`reports/paired-v4.json` records the Linux replay after adding the opt-in field
+strategy and irrigation path. All 126 paired cases, inputs and numerical results
+match `paired-v3.json`. The installed source identity reflects the new package.

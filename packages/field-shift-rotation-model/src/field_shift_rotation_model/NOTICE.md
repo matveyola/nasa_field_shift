@@ -15,3 +15,9 @@ assumptions and formulas remain separate from deployment and empirical gates.
 No model is promoted to validated yield, profit or global sowing recommendation.
 The original synthetic weather helpers remain for research traceability but are
 not used by the service's allowlisted operations.
+
+The optional Strategies mode extends the installed adaptation with sourced
+dry pea, oat and millet thermal profiles and an adaptive net irrigation policy.
+The original receipt identifies the upstream research files. The runtime's
+installed engine hash and each climate result's balance-source hash identify
+the executed adaptation. The new profiles remain uncalibrated scenario inputs.

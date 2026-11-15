@@ -15,8 +15,10 @@ from field_shift.models import metadata
 from field_shift.modules.access.service import Principal
 from field_shift.modules.farm.models import Farm
 from field_shift.modules.fields.models import Field
+from field_shift.modules.rotations.handoff import strategy
 from field_shift.modules.rotations.handoff.schemas import HandoffSubmission
 from field_shift.modules.rotations.handoff.service import catalog, read, submit
+from field_shift.modules.rotations.handoff.strategy_schemas import SaveStrategy, StrategyRun
 from field_shift.modules.rotations.handoff.transport import HandoffUnavailable
 from field_shift.modules.rotations.handoff.worker import checkpoint, current_field, succeed
 
@@ -90,6 +92,137 @@ def body(**changes):
 def queued(factory):
     with factory.begin() as session:
         return submit(session, OWNER, "F-01", body())
+
+
+def strategy_request(**changes):
+    return StrategyRun.model_validate(
+        {
+            "request_id": "first",
+            "geometry_revision": 2,
+            "mode": "sequence",
+            "planting_date": "2040-04-15",
+            "step_count": 2,
+            "priority": "revenue_after_seed",
+            "history_sowing_date": "2026-04-22",
+            "irrigation": {"status": "available", "daily_m3": 30, "method": "drip"},
+        }
+        | changes
+    )
+
+
+def finish_strategy_step(session, job_id, crop):
+    """Supply a synthetic private result; these tests cover application policy only."""
+    job = session.get(Job, job_id)
+    job.status = JobStatus.SUCCEEDED
+    job.result = {
+        "envelope": {
+            "status": "available",
+            "limitations": ["Conditional climate scenario"],
+            "payload": {
+                "ranking": {"selection_ids": [crop]},
+                "candidates": [
+                    {
+                        "choice_id": crop,
+                        "choice": {"crop_id": crop, "calendar_id": "C01"},
+                        "water": {"water_deficit_pct": 12},
+                        "economics": {"revenue_after_seed_per_ha": None},
+                    }
+                ],
+            },
+        }
+    }
+
+
+def test_strategy_replays_owned_choices_and_saves_only_explicit_completion(factory):
+    with factory.begin() as session:
+        first = strategy.submit(session, OWNER, "F-01", strategy_request())
+        assert strategy.submit(session, OWNER, "F-01", strategy_request()).job_id == first.job_id
+        inputs = session.get(Job, first.job_id).inputs["parameters"]
+        assert inputs["selected"] == []
+        assert inputs["irrigation"] == {"status": "available", "daily_mm": 3, "method": "drip"}
+        assert inputs["farmer"] == {"priorities": ["revenue_after_seed"]}
+        assert inputs["observed_crop_history"] == [
+            {
+                "season_year": 2026,
+                "land_use": "crop",
+                "crop_id": "maize_grain",
+                "planting_date": "2026-04-22",
+                "harvest_date": None,
+            }
+        ]
+        finish_strategy_step(session, first.job_id, "barley")
+    first_choice = {"job_id": first.job_id, "crop_id": "barley"}
+    with factory.begin() as session:
+        assert not strategy.list_saved(session, OWNER, "F-01")
+        with pytest.raises(HTTPException, match="Complete all steps"):
+            strategy.save(
+                session, OWNER, "F-01", SaveStrategy(geometry_revision=2, choices=[first_choice])
+            )
+        with pytest.raises(HTTPException, match="recalculation"):
+            strategy.submit(
+                session,
+                OWNER,
+                "F-01",
+                strategy_request(
+                    request_id="second",
+                    planting_date="2041-04-15",
+                    previous=[first_choice],
+                    priority="water_stress",
+                ),
+            )
+        second = strategy.submit(
+            session,
+            OWNER,
+            "F-01",
+            strategy_request(
+                request_id="second", planting_date="2041-04-15", previous=[first_choice]
+            ),
+        )
+        assert session.get(Job, second.job_id).inputs["parameters"]["selected"] == [
+            {"crop_id": "barley", "calendar_id": "C01", "planting_date": "2040-04-15"}
+        ]
+        finish_strategy_step(session, second.job_id, "soybeans")
+    confirmed = SaveStrategy(
+        geometry_revision=2,
+        choices=[first_choice, {"job_id": second.job_id, "crop_id": "soybeans"}],
+    )
+    with factory() as session:
+        saved = strategy.save(session, OWNER, "F-01", confirmed)
+        assert strategy.save(session, OWNER, "F-01", confirmed).id == saved.id
+        assert strategy.list_saved(session, OWNER, "F-01") == [saved]
+        assert strategy.list_saved(session, OWNER, "F-01", offset=1) == []
+        assert [choice.crop_id for choice in saved.choices] == ["barley", "soybeans"]
+        assert saved.choices[1].metrics["economics"]["revenue_after_seed_per_ha"] is None
+        assert session.get(Field, "F-01").crop == "Maize"
+        with pytest.raises(HTTPException) as denied:
+            strategy.save(session, OWNER, "OTHER", confirmed)
+        assert denied.value.status_code == 404
+    with factory.begin() as session:
+        session.get(Field, "F-01").boundary_revision = 3
+    with factory() as session:
+        assert not strategy.list_saved(session, OWNER, "F-01")
+        with pytest.raises(HTTPException, match="boundary changed"):
+            strategy.save(session, OWNER, "F-01", confirmed)
+
+
+@pytest.mark.parametrize("status", ["unknown", "none"])
+def test_two_crop_comparison_shares_one_field_weather_and_keeps_irrigation_status(factory, status):
+    with factory.begin() as session:
+        result = strategy.submit(
+            session,
+            OWNER,
+            "F-01",
+            strategy_request(
+                mode="compare",
+                step_count=1,
+                comparison_crops=["barley", "soybeans"],
+                irrigation={"status": status},
+            ),
+        )
+        parameters = session.get(Job, result.job_id).inputs["parameters"]
+        assert parameters["candidates"] == [{"crop_id": "barley"}, {"crop_id": "soybeans"}]
+        assert parameters["field"]["latitude"] == pytest.approx(50.005)
+        assert parameters["irrigation"] == {"status": status, "daily_mm": None, "method": None}
 
 
 def test_submit_is_durable_idempotent_and_binds_owned_geometry(factory):

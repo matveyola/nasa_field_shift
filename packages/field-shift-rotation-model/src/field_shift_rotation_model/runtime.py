@@ -134,6 +134,7 @@ def catalog():
                 "id": c.id,
                 "name": c.name,
                 "climate_supported": c.id in climate_balance.SUPPORTED_CROPS,
+                "strategy_supported": c.id in climate_balance.STRATEGY_CROPS,
                 "allocation_crop_id": MAPPING.get(c.id),
                 "profile": c.model_dump(mode="json"),
             }
@@ -158,9 +159,9 @@ def calculate(operation, parameters, decision_date):
             raise ValueError("Unknown reference field")
         result = hybrid_forecast.forecast(request, field, as_of=decision_date)
     elif operation == "climate_step":
-        result = climate_planner.step(request)
+        result = climate_planner.ClimateStepResult.model_validate(climate_planner.step(request))
     elif operation == "climate_compare":
-        result = climate_planner.compare(request)
+        result = climate_planner.ClimatePlansResult.model_validate(climate_planner.compare(request))
     elif operation == "assessment":
         field = load_fields().get(request.field_id)
         if field is None:

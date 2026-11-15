@@ -1,7 +1,7 @@
 /** Synthetic interaction harness. Never imported by production. */
 import { useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { StrategiesPage } from '../../src/features/strategies/StrategiesPage'
+import { LegacyStrategiesHarness } from './LegacyStrategiesHarness'
 import { LanguageSelect, LocaleProvider } from '../../src/shared/locale'
 import type { Field } from '../../src/api/contracts'
 import '../../src/shared/styles.css'
@@ -13,7 +13,7 @@ function Harness() {
   const [fieldId, setFieldId] = useState(fields[0].id)
   const [season, setSeason] = useState(2027)
   const [action, setAction] = useState('')
-  return <LocaleProvider><LanguageSelect /><button onClick={() => setSeason(2028)}>Inspect 2028 externally</button><output>{action}</output><StrategiesPage
+  return <LocaleProvider><LanguageSelect /><button onClick={() => setSeason(2028)}>Inspect 2028 externally</button><output>{action}</output><LegacyStrategiesHarness
     field={fields.find(f => f.id === fieldId)!} fields={fields} season={season} onContext={(id, year) => { setFieldId(id); setSeason(year) }}
     openAnalytics={section => setAction(`analytics:${section}`)} openAgent={() => setAction(`agent:${fieldId}:${season}`)} /></LocaleProvider>
 }

@@ -12,6 +12,7 @@ export interface HandoffCrop {
   id: string
   name: string
   climate_supported: boolean
+  strategy_supported?: boolean
   allocation_crop_id: string | null
   profile: {
     calendars?: Array<{ id: string; stage_lengths: number[]; reference_planting_months: string; reference_region: string | null }>
@@ -61,6 +62,44 @@ export interface HandoffJob {
   result: HandoffResult | null
   error: string | null
 }
+export type StrategyMode = 'sequence' | 'compare'
+export type StrategyPriority = 'water_stress' | 'water_deficit' | 'water_saving' | 'yield' | 'revenue' | 'revenue_after_seed' | 'soil_cover'
+export type StrategyIrrigation = { status: 'unknown' | 'none' | 'available'; daily_m3?: number; method?: string }
+export type StrategyChoice = { job_id: string; crop_id: string }
+export type StrategyContext = {
+  field_id: string; geometry_revision: number; area_ha: number
+  min_year: number; max_year: number; min_month: number; max_month: number; max_steps: number; max_calendar_years: number
+  history: { crop_id: string | null; sowing_date: string | null; season_year: number }[]
+}
+export type StrategySubmission = {
+  request_id: string; geometry_revision: number; mode: StrategyMode; planting_date: string
+  step_count: number; priority: StrategyPriority; previous: StrategyChoice[]
+  comparison_crops?: [string, string]; history_crop_id?: string; history_sowing_date?: string
+  irrigation: StrategyIrrigation
+}
+export type StrategyCandidate = {
+  crop_id: string; choice_id?: string; rank: number | null; status: 'ok' | 'unsupported' | 'unavailable'; reason?: string | null
+  warnings?: string[]; blockers?: string[]
+  water?: Record<string, number | null>; economics?: Record<string, unknown>
+  agronomy?: Record<string, unknown>; scenarios?: Record<string, unknown>; erosion?: Record<string, unknown>
+}
+export type StrategyScenario = {
+  id: string; field_id: string; geometry_revision: number; created_at: string
+  priority: StrategyPriority; irrigation: StrategyIrrigation; assumptions: string[]
+  choices: (StrategyChoice & { planting_date: string; metrics: StrategyCandidate })[]
+}
+
+const strategyPath = (fieldId: string) => `/rotations/handoff/fields/${encodeURIComponent(fieldId)}`
+export const rotationStrategyApi = {
+  context: (fieldId: string, signal?: AbortSignal) => apiFetch<StrategyContext>(`${strategyPath(fieldId)}/strategy-context`, { signal }),
+  submit: (fieldId: string, body: StrategySubmission, signal?: AbortSignal) => apiFetch<HandoffJob>(`${strategyPath(fieldId)}/strategy-jobs`, { method: 'POST', body: JSON.stringify(body), signal }),
+  scenarios: (fieldId: string, offset: number, limit: number, signal?: AbortSignal) =>
+    apiFetch<StrategyScenario[]>(`${strategyPath(fieldId)}/strategy-scenarios?offset=${offset}&limit=${limit}`, { signal }),
+  save: (fieldId: string, geometryRevision: number, choices: StrategyChoice[], signal?: AbortSignal) => apiFetch<StrategyScenario>(`${strategyPath(fieldId)}/strategy-scenarios`, {
+    method: 'POST', body: JSON.stringify({ geometry_revision: geometryRevision, choices }), signal,
+  }),
+}
+
 export const rotationHandoffApi = {
   jobs: (fieldId: string, signal?: AbortSignal) => apiFetch<HandoffJob[]>(`/rotations/handoff/fields/${encodeURIComponent(fieldId)}/jobs`, { signal }),
   catalog: (signal?: AbortSignal) => apiFetch<HandoffCatalog>('/rotations/handoff/catalog', { signal }),

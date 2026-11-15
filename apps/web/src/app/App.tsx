@@ -41,7 +41,8 @@ export function App() {
   const [setupInProgress, setSetupInProgress] = useState(pendingSetup)
   const requestedField = fields.find(({ id }) => id === route.fieldId)
   const missingField = !route.home && route.page !== 'farm' && Boolean(route.fieldId) && !requestedField
-  const field = missingField ? undefined : requestedField ?? fields.find(({ id }) => id === lastField) ?? fields[0]
+  const selectedField = missingField ? undefined : requestedField ?? fields.find(({ id }) => id === lastField)
+  const field = route.page === 'strategies' || missingField ? selectedField : selectedField ?? fields[0]
   const scenario = scenarioOrDefault(route.scenario)
   const season = route.season ?? (farm ? farm.season + (route.page === 'strategies' ? 1 : 0) : new Date().getUTCFullYear())
   const context = field ? { field_id: field.id, season, scenario } : undefined
@@ -100,7 +101,7 @@ export function App() {
       && (!options.fieldId || options.fieldId === field?.id)
       && (!options.scenario || options.scenario === scenario)
     const nextSeason = options.season ?? route.season ?? (farm ? farm.season + (target.page === 'strategies' ? 1 : 0) : season)
-    setAddress({ page: target.page, fieldId: options.fieldId ?? field?.id, season: nextSeason,
+    setAddress({ page: target.page, fieldId: options.fieldId ?? (target.page === 'strategies' ? selectedField?.id : field?.id), season: nextSeason,
       scenario: options.scenario ?? scenario, trajectory: route.trajectory,
       section: target.page === 'analytics' ? options.section ?? target.section ?? 'overview' : undefined,
       jobId: options.jobId === null ? undefined : options.jobId ?? (sameWater ? route.jobId : undefined),
@@ -113,6 +114,10 @@ export function App() {
     go('analytics', { fieldId, section: 'water', forecastDay, jobId: null })
   }
   function chooseField(fieldId: string) { setAddress({ ...route, fieldId, scenario }) }
+  function chooseStrategyField(fieldId: string) {
+    if (!fieldId) { setLastField(undefined); rememberSelectedField('') }
+    chooseField(fieldId)
+  }
   function chooseScenario(value: Scenario) { setAddress({ ...route, fieldId: field?.id, scenario: value }) }
   function showWaterJob(jobId: string, value?: Scenario) {
     if (routeAddress(route) !== routeAddress(parseRoute(location.href))) return
@@ -153,7 +158,7 @@ export function App() {
   }
   function goHome() {
     setAssistantOpen(false)
-    setAddress({ page: fields.length ? 'strategies' : 'fields', home: true, fieldId: field?.id, season, scenario })
+    setAddress({ page: fields.length ? 'strategies' : 'fields', home: true, fieldId: selectedField?.id, season, scenario })
   }
   function updateField(updated: Field) {
     workspace.update(({ fields, farm }) => {
@@ -185,8 +190,8 @@ export function App() {
       onObservationSaved={observation => workspace.update(current => ({ ...current,
         farm: { ...current.farm, observations: [observation, ...current.farm.observations.filter(({ id }) => id !== observation.id)] } }))}
       onAddField={startSetup} openField={fieldId => go('fields', { fieldId })} openWater={openFieldForecast} />
-    else if (!context || !field) content = <Empty><p>{t('Add a field to use this workspace.')}</p><button className="button" type="button" onClick={() => go('fields', { addField: true })}>{t('Add field')}</button></Empty>
-    else if (route.page === 'analytics') content = <Suspense fallback={<Loading text={t('Loading workspace…')} />}>
+    else if (route.page !== 'strategies' && (!context || !field)) content = <Empty><p>{t('Add a field to use this workspace.')}</p><button className="button" type="button" onClick={() => go('fields', { addField: true })}>{t('Add field')}</button></Empty>
+    else if (route.page === 'analytics' && context && field) content = <Suspense fallback={<Loading text={t('Loading workspace…')} />}>
       <AnalyticsPage fields={fields} field={field} context={context} section={route.section ?? 'overview'} jobId={route.jobId} forecastDay={route.forecastDay}
         irrigationAvailable={field.irrigation_available ?? farm.defaults.irrigation_available} chooseField={chooseField} chooseSeason={year => setAddress({ ...route, season: year })}
         chooseScenario={chooseScenario} onSection={section => go('analytics', { section })} showJob={showWaterJob}
@@ -194,19 +199,17 @@ export function App() {
         openAgent={jobId => go('agent', { jobId })} openMapLayer={openMapLayer} />
     </Suspense>
   }
-  const keepStrategies = !route.setupId && farm && field && !missingField && (strategiesVisited || route.page === 'strategies')
+  const keepStrategies = !route.setupId && farm && !missingField && (strategiesVisited || route.page === 'strategies')
   return <NotificationProvider fields={fields} season={farm?.season ?? new Date().getUTCFullYear()} farmKey={farm?.name ?? 'workspace'}
     openAgent={item => { go('agent', { fieldId: item.fieldId, season: farm?.season, scenario: 'baseline', signal: item.kind === 'water' ? 'water' : 'vegetation' }) }}
     openAnalysis={item => item.kind === 'water'
       ? go('analytics', { fieldId: item.fieldId, season: farm?.season, section: 'water', forecastDay: item.date, jobId: null })
       : go('analytics', { fieldId: item.fieldId, season: farm?.season, section: 'vegetation' })}>
-    <Shell route={route} homeAddress={routeAddress({ page: 'strategies', home: true, fieldId: field?.id, season, scenario })} navigateHome={goHome} farmName={farm?.name} navigate={go} assistantOpen={assistantOpen} openAssistant={() => setAssistantOpen(true)}>
+    <Shell route={route} homeAddress={routeAddress({ page: 'strategies', home: true, fieldId: selectedField?.id, season, scenario })} navigateHome={goHome} farmName={farm?.name} navigate={go} assistantOpen={assistantOpen} openAssistant={() => setAssistantOpen(true)}>
       {content}
       {keepStrategies && <div hidden={route.page !== 'strategies'} inert={route.page !== 'strategies'} className="strategies-outlet">
-        <Suspense fallback={<Loading text={t('Loading workspace…')} />}><StrategiesPage field={field} fields={fields} season={season}
-          trajectory={route.trajectory} focus={route.strategyFocus}
-          onContext={(fieldId, year, trajectory) => setAddress({ ...route, page: 'strategies', fieldId, season: year, trajectory })}
-          openAnalytics={(section = 'overview') => go('analytics', { section })} openAgent={() => setAssistantOpen(true)} /></Suspense>
+        <Suspense fallback={<Loading text={t('Loading workspace…')} />}><StrategiesPage field={selectedField} fields={fields}
+          chooseField={chooseStrategyField} openAgent={() => setAssistantOpen(true)} /></Suspense>
       </div>}
     </Shell>
     {farm && !route.setupId && <Assistant field={missingField ? undefined : field} season={season} scenario={scenario} runId={assistantRunId} open={assistantOpen} onOpenChange={setAssistantOpen}

@@ -71,13 +71,16 @@ def read(session, principal, field_id, job_id):
     return view(job)
 
 
-def submit(session, principal, field_id, body):
+def submit(session, principal, field_id, body, *, strategy=None):
     if principal.role not in {"admin", "editor"}:
         raise HTTPException(403, "Editing permission is required to submit a comparison")
     field = scoped_field(session, principal, field_id, lock=True)
     if field.boundary_revision != body.geometry_revision:
         raise HTTPException(409, "Field boundary changed; reload the field")
-    request_hash = digest(body.model_dump(mode="json"))
+    request = body.model_dump(mode="json")
+    if strategy is not None:
+        request["strategy"] = strategy
+    request_hash = digest(request)
     key = "internal:rotation-handoff:" + digest([principal.farm_id, field_id, body.request_id])
     existing = session.scalar(select(Job).where(Job.idempotency_key == key))
     if existing is not None:
@@ -128,6 +131,8 @@ def submit(session, principal, field_id, body):
         "parameters": parameters,
         "allow_public_data": body.allow_public_data,
     }
+    if strategy is not None:
+        inputs["strategy"] = strategy
     try:
         job = repository.submit(
             session,

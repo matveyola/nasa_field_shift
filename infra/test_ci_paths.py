@@ -208,19 +208,19 @@ class CIPathChecks(unittest.TestCase):
         self.assertRegex(required, r"needs: \[[^\]]*python_packages")
         self.assertIn("python3 infra/verify_python_wheels.py", workflow)
 
-    def test_private_telemetry_reference_changes_identity_only_and_stays_strict(self):
+    def test_rotation_replay_references_change_identity_only_and_stay_strict(self):
         root = Path(__file__).resolve().parents[1]
         workflow = (root / ".github/workflows/ci.yml").read_text()
         job = workflow.split("\n  rotation_model:\n", 1)[1].split("\n  agent_reference:\n", 1)[0]
-        self.assertIn("reports/paired-v3.json", job)
+        self.assertIn("reports/paired-v4.json", job)
         self.assertIn("assert actual == expected", job)
         reports = root / "packages/field-shift-rotation-model/reports"
-        previous = json.loads((reports / "paired-v2.json").read_text())
-        current = json.loads((reports / "paired-v3.json").read_text())
-        self.assertNotEqual(previous["engine_version"], current["engine_version"])
-        # These immutable historical replays retain all numerical results and
-        # input identities; adding private server logs changes its package hash.
-        self.assertEqual(
-            {key: value for key, value in previous.items() if key != "engine_version"},
-            {key: value for key, value in current.items() if key != "engine_version"},
-        )
+        for earlier, later in (("v2", "v3"), ("v3", "v4")):
+            previous = json.loads((reports / f"paired-{earlier}.json").read_text())
+            current = json.loads((reports / f"paired-{later}.json").read_text())
+            self.assertNotEqual(previous["engine_version"], current["engine_version"])
+            # These immutable historical replays retain their inputs and numerical results.
+            self.assertEqual(
+                {key: value for key, value in previous.items() if key != "engine_version"},
+                {key: value for key, value in current.items() if key != "engine_version"},
+            )

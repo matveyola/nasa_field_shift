@@ -143,5 +143,10 @@ def climate_diagnostics(payload):
             for nested in value:
                 visit(nested)
 
-    visit(payload)
+    if payload.get("strategy_mode"):
+        # An excluded alternative must not invalidate a different viable crop.
+        visit(payload.get("selected_water_by_scenario", {}))
+        visit([row for row in payload["candidates"] if row["status"] == "ok"])
+    else:
+        visit(payload)
     return rows

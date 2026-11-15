@@ -20,6 +20,7 @@ from field_shift.modules.planning_runtime.models import (
     PlanningHead,
 )
 from field_shift.modules.precision.models import PrecisionPlan
+from field_shift.modules.rotations.handoff.strategy_models import StrategyScenario
 from field_shift.modules.rotations.models import RotationPreference
 from field_shift.modules.rotations.scenario_planning.models import (
     PlanningApplyRow,
@@ -52,5 +53,6 @@ __all__ = [
     "Observation",
     "PlanningConstraint",
     "RotationPreference",
+    "StrategyScenario",
     "metadata",
 ]

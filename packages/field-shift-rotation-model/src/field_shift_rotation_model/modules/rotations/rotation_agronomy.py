@@ -28,6 +28,7 @@ WebSource = Annotated[str, Field(pattern=r"^https?://\S+$")]
 
 _CROP_GROUPS = {
     "wheat_spring": "wheat",
+    "wheat_winter": "wheat",
     "wheat_winter_frozen": "wheat",
     "wheat_winter_nonfrozen": "wheat",
 }

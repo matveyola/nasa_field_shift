@@ -110,6 +110,7 @@ class CropCapability(Input):
     id: str
     name: str
     climate_supported: bool
+    strategy_supported: bool = False
     allocation_crop_id: str | None
     profile: dict[str, Any]
 

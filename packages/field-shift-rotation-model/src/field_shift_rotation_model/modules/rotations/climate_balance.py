@@ -36,6 +36,21 @@ THERMAL_PARAMETERS = {
     "sugar_beet": (5.0, 30.0, "I.7 Sugar Beet", "row", "C15"),
 }
 SUPPORTED_CROPS = tuple(THERMAL_PARAMETERS)
+STRATEGY_PROFILES = {
+    # Use each crop's documented thermal optimum as the cap for this simple GDD model.
+    "peas_dry": (0.0, 25.0, "https://library.dpird.wa.gov.au/books/41/", "row", "C13"),
+    "oats": (0.0, 26.0, "https://doi.org/10.3389/fagro.2025.1701976", "small_grain", "C02"),
+    "millet": (
+        10.0,
+        30.0,
+        "https://www.ars.usda.gov/ARSUserFiles/30100000/2009Documents/2009/491.pdf",
+        "small_grain",
+        "C22",
+    ),
+}
+STRATEGY_CROPS = SUPPORTED_CROPS + tuple(STRATEGY_PROFILES)
+MAX_STRATEGY_STEPS = 6
+MAX_STRATEGY_CANDIDATES = 10
 _ENGINE_LOCK = Lock()
 
 
@@ -72,16 +87,20 @@ def _date_range(first, last):
     return (first + timedelta(days=offset) for offset in range((last - first).days + 1))
 
 
-def required_weather_dates(planting_date, selected=()):
+def required_weather_dates(planting_date, selected=(), *, strategy=False):
     """Return inclusive weather dates for the common simulation and spin-up."""
-    if len(selected) > 2:
+    if strategy and len(selected) >= MAX_STRATEGY_STEPS:
+        raise ClimateBalanceError("At most five previous strategy crops can be replayed.")
+    if not strategy and len(selected) > 2:
         raise ClimateBalanceError("At most two previous crops can be replayed.")
     dates = [_as_date(row.get("planting_date")) for row in selected] + [_as_date(planting_date)]
     if any(not (3 <= day.month <= 7) for day in dates):
         raise ClimateBalanceError("This mode supports March through July sowing.")
     if any(later.year <= earlier.year for earlier, later in pairwise(dates)):
         raise ClimateBalanceError("Use one sowing per year, in ascending order.")
-    if dates[-1].year - dates[0].year > 4:
+    if strategy and dates[-1].year - dates[0].year > 9:
+        raise ClimateBalanceError("Strategy decisions may span up to ten calendar years.")
+    if not strategy and dates[-1].year - dates[0].year > 4:
         raise ClimateBalanceError("The three farm decisions can span up to five calendar years.")
     if dates[0].year <= 1 or dates[-1].year >= 9999:
         raise ClimateBalanceError("The planting year needs room for spin-up and next-year dates.")
@@ -229,11 +248,17 @@ def _local_phenology(engine, historical_temperatures):
         engine.crops.reset_calibration()
 
 
-def _crop_record(engine, catalogue, choice, day, depth, tag):
+def _crop_record(engine, catalogue, choice, day, depth, tag, *, strategy=False):
     crop_id = choice.get("crop_id")
-    if crop_id not in THERMAL_PARAMETERS:
+    parameters = THERMAL_PARAMETERS.get(crop_id)
+    thermal_source = None
+    if parameters is None and strategy:
+        parameters = STRATEGY_PROFILES.get(crop_id)
+        if parameters:
+            thermal_source = parameters[2]
+    if parameters is None:
         raise ClimateBalanceError(f"No supported spring/summer thermal profile for {crop_id!r}.")
-    base, cap, thermal_reference, cover_class, proxy = THERMAL_PARAMETERS[crop_id]
+    base, cap, thermal_reference, cover_class, proxy = parameters
     profile = catalogue[crop_id]
     stage_lengths = choice.get("stage_lengths")
     calendar_id = choice.get("calendar_id")
@@ -248,7 +273,7 @@ def _crop_record(engine, catalogue, choice, day, depth, tag):
         if calendar
         else choice.get("stage_lengths_source") or "User-supplied durations (source not provided)"
     )
-    thermal_source = f"{AQUACROP} (Annex {thermal_reference})"
+    thermal_source = thermal_source or f"{AQUACROP} (Annex {thermal_reference})"
     val = engine.crops.Val
     omitted = val(None, "Outside the water balance outputs.")
     user_date = val((day.month, day.day), "Supplied sowing date")
@@ -278,7 +303,7 @@ def _crop_record(engine, catalogue, choice, day, depth, tag):
         flowering=omitted,
         sensitive_phase=omitted,
         heat_threshold_c=omitted,
-        legume=val(crop_id == "soybeans", "Botany"),
+        legume=val(crop_id in {"soybeans", "peas_dry"}, "Botany"),
         cover_class=val(cover_class, engine.crops.TR55, "adapted"),
         winter=val(False, "Supported set"),
         gdd_base_c=val(base, thermal_source),
@@ -352,7 +377,7 @@ def _plantings(specs, temps, engine):
     return plantings
 
 
-def _season_result(planting, earlier_planting, next_planting, simulated, capacity):
+def _season_result(planting, earlier_planting, next_planting, simulated, capacity, *, strategy):
     sowing, end = planting.start, planting.end
     opening, closing = simulated[sowing - timedelta(days=1)], simulated[end]
     days = [simulated[day] for day in _date_range(sowing, end)]
@@ -372,6 +397,8 @@ def _season_result(planting, earlier_planting, next_planting, simulated, capacit
         ]
     )
     summary = metrics.model_dump()
+    if strategy:
+        summary["scheduled_irrigation_mm"] = round(fsum(day.irrigation_mm for day in days), 3)
     summary["drought_stress_crop_day_pct"] = round(
         100 * metrics.drought_stress_days / metrics.crop_days, 1
     )
@@ -430,7 +457,7 @@ def _season_result(planting, earlier_planting, next_planting, simulated, capacit
     }
 
 
-def _scenario_rows(plantings, wx, layers, soil_source, engine):
+def _scenario_rows(plantings, wx, layers, soil_source, engine, *, strategy, irrigation_capacity_mm):
     surface, depth, awc, gravity = layers
     hydraulics = engine.soil.SoilHydraulics(surface[2], surface[3], soil_source)
     profile = engine.balance.Profile(
@@ -448,7 +475,7 @@ def _scenario_rows(plantings, wx, layers, soil_source, engine):
             profile,
             wx,
             plantings,
-            irrigation={},
+            irrigation_capacity_mm=irrigation_capacity_mm,
         )
     }
     capacity = profile.capacity(depth)
@@ -459,6 +486,7 @@ def _scenario_rows(plantings, wx, layers, soil_source, engine):
             plantings[index + 1] if index + 1 < len(plantings) else None,
             simulated,
             capacity,
+            strategy=strategy,
         )
         for index, crop in enumerate(plantings)
     ]
@@ -476,6 +504,8 @@ def compare_candidates(
     planting_date,
     selected=(),
     ruslan_dir,
+    strategy=False,
+    irrigation_capacity_mm=None,
 ):
     """Return modeled one-season outcomes under every shared projected weather member.
 
@@ -486,20 +516,22 @@ def compare_candidates(
     longitude = _number(longitude, "field longitude", -180, 180)
     if not soil_source:
         raise ClimateBalanceError("A soil source is required alongside the hydraulic parameters.")
-    start, end = required_weather_dates(planting_date, selected)
+    start, end = required_weather_dates(planting_date, selected, strategy=strategy)
     planting_date = _as_date(planting_date)
     candidate_choices = [
         {"crop_id": item} if isinstance(item, str) else item for item in candidates
     ]
     candidate_ids = [choice.get("crop_id") for choice in candidate_choices]
     choice_ids = [choice.get("choice_id", choice.get("crop_id")) for choice in candidate_choices]
+    limit = MAX_STRATEGY_CANDIDATES if strategy else 8
     if (
-        not 1 <= len(candidate_ids) <= 8
+        not 1 <= len(candidate_ids) <= limit
         or not all(isinstance(key, str) and key for key in candidate_ids)
         or not all(isinstance(key, str) and key for key in choice_ids)
         or len(set(choice_ids)) != len(choice_ids)
+        or (strategy and len(set(candidate_ids)) != len(candidate_ids))
     ):
-        raise ClimateBalanceError("Supply one to eight unique candidate choice IDs.")
+        raise ClimateBalanceError(f"Supply one to {limit} unique candidate choices.")
     temperatures, historical = _historical_reference(historical_weather, latitude, longitude)
     if _as_date(historical["end"]) >= start:
         raise ClimateBalanceError(
@@ -529,7 +561,13 @@ def compare_candidates(
                 day = _as_date(choice["planting_date"])
                 try:
                     record, reference = _crop_record(
-                        engine, catalogue, choice, day, soil_depth, f"previous_{index}"
+                        engine,
+                        catalogue,
+                        choice,
+                        day,
+                        soil_depth,
+                        f"previous_{index}",
+                        strategy=strategy,
                     )
                 except ValueError as error:
                     raise ClimateBalanceError(f"Invalid selected crop at {day}: {error}") from error
@@ -545,7 +583,13 @@ def compare_candidates(
                 choice_id = choice_ids[index]
                 try:
                     record, reference = _crop_record(
-                        engine, catalogue, choice, planting_date, soil_depth, f"candidate_{index}"
+                        engine,
+                        catalogue,
+                        choice,
+                        planting_date,
+                        soil_depth,
+                        f"candidate_{index}",
+                        strategy=strategy,
                     )
                     scenarios = {}
                     replayed_selected = {}
@@ -554,7 +598,15 @@ def compare_candidates(
                             [(record, planting_date)], member_temperatures[key], engine
                         )[0]
                         plantings = [*prior_plantings[key], candidate]
-                        results = _scenario_rows(plantings, wx, layers, soil_source, engine)
+                        results = _scenario_rows(
+                            plantings,
+                            wx,
+                            layers,
+                            soil_source,
+                            engine,
+                            strategy=strategy,
+                            irrigation_capacity_mm=irrigation_capacity_mm,
+                        )
                         replayed_selected[key], scenarios[key] = results[:-1], results[-1]
                     selected_scenarios = replayed_selected
                     minimum_next = date(planting_date.year + 1, 3, 1)
@@ -582,7 +634,15 @@ def compare_candidates(
                     )
             if not selected_scenarios:
                 selected_scenarios = {
-                    key: _scenario_rows(prior_plantings[key], wx, layers, soil_source, engine)
+                    key: _scenario_rows(
+                        prior_plantings[key],
+                        wx,
+                        layers,
+                        soil_source,
+                        engine,
+                        strategy=strategy,
+                        irrigation_capacity_mm=irrigation_capacity_mm,
+                    )
                     if prior
                     else []
                     for key, wx in weather.items()
@@ -612,7 +672,7 @@ def compare_candidates(
             "drainage": "10% of water above field capacity per day"
             if layers[3] is not None
             else "Immediate tipping to field capacity; complete saturation missing.",
-            "irrigation_mm": 0,
+            "irrigation_mm": 0 if irrigation_capacity_mm is None else None,
             "reference_evapotranspiration": (
                 f"FAO-56 Penman–Monteith with daily mean relative humidity. {FAO56}"
             ),

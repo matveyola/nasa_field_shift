@@ -74,6 +74,7 @@ ClimatePriority = Literal[
     "revenue_after_seed",
     "soil_cover",
 ]
+StrategyMode = Literal["sequence", "compare"]
 
 
 class UnknownClimateField(LookupError):
@@ -175,11 +176,6 @@ class ClimateChoice(Input):
 class ClimateSelection(ClimateChoice):
     planting_date: date
 
-    @model_validator(mode="after")
-    def check_date(self):
-        validate_planting(self.planting_date)
-        return self
-
 
 class ClimateContext(Input):
     field_id: Identifier | None = None
@@ -221,9 +217,11 @@ class ClimateContext(Input):
         return self
 
 
-def validate_planting(planting_date: date):
-    if not 2040 <= planting_date.year <= 2049:
-        raise ValueError("Choose a planting date from 2040 to 2049.")
+def validate_planting(planting_date: date, *, strategy=False):
+    # One-year weather spin-up follows the 1991–2020 thermal reference.
+    first_year = 2022 if strategy else 2040
+    if not first_year <= planting_date.year <= 2049:
+        raise ValueError(f"Choose a planting date from {first_year} to 2049.")
 
 
 def validate_history_dates(history, dates):
@@ -238,9 +236,25 @@ def validate_history_dates(history, dates):
         )
 
 
+class StrategyIrrigation(Input):
+    status: Literal["unknown", "none", "available"] = "unknown"
+    daily_mm: Annotated[float, Field(gt=0, allow_inf_nan=False)] | None = None
+    method: Annotated[str, Field(min_length=1, max_length=40)] | None = None
+
+    @model_validator(mode="after")
+    def check_capacity(self):
+        if self.status != "available" and (self.daily_mm is not None or self.method is not None):
+            raise ValueError("Irrigation details require available irrigation.")
+        return self
+
+
 class ClimateStepRequest(ClimateContext):
     planting_date: date
-    selected: list[ClimateSelection] = Field(default_factory=list, max_length=2)
+    strategy_mode: StrategyMode | None = None
+    irrigation: StrategyIrrigation | None = None
+    selected: list[ClimateSelection] = Field(
+        default_factory=list, max_length=climate_balance.MAX_STRATEGY_STEPS - 1
+    )
     candidates: list[ClimateChoice] = Field(
         default_factory=lambda: [
             ClimateChoice(crop_id=crop)
@@ -253,12 +267,19 @@ class ClimateStepRequest(ClimateContext):
             )
         ],
         min_length=1,
-        max_length=8,
+        max_length=climate_balance.MAX_STRATEGY_CANDIDATES,
     )
 
     @model_validator(mode="after")
     def check_step(self):
-        validate_planting(self.planting_date)
+        strategy = self.strategy_mode is not None
+        for day in [*(choice.planting_date for choice in self.selected), self.planting_date]:
+            validate_planting(day, strategy=strategy)
+        climate_balance.required_weather_dates(
+            self.planting_date,
+            [choice.engine_input() for choice in self.selected],
+            strategy=strategy,
+        )
         validate_history_dates(
             self.observed_crop_history,
             [*(p.planting_date for p in self.selected), self.planting_date],
@@ -269,7 +290,32 @@ class ClimateStepRequest(ClimateContext):
             raise ValueError(
                 "Use distinct choice_id values when comparing options of the same crop."
             )
+        if self.strategy_mode is None:
+            if len(self.candidates) > 8 or self.irrigation is not None:
+                raise ValueError(
+                    "The legacy step supports up to eight candidates and no irrigation."
+                )
+            return self
+        if self.strategy_mode == "sequence":
+            if "candidates" in self.model_fields_set:
+                raise ValueError("A sequence uses the model's supported crop catalogue.")
+        elif (
+            self.selected
+            or len(self.candidates) != 2
+            or len({c.crop_id for c in self.candidates}) != 2
+        ):
+            raise ValueError("Compare two distinct crops without any previous scenario selections.")
+        for choice in (*self.selected, *self.candidates):
+            if choice.crop_id not in climate_balance.STRATEGY_CROPS:
+                raise ValueError(f"Unsupported strategy crop: {choice.crop_id}.")
+            if choice.stage_lengths is not None or choice.hybrid is not None:
+                raise ValueError("Strategy crops use standard sourced calendars.")
         return self
+
+    def candidate_choices(self):
+        if self.strategy_mode == "sequence":
+            return [ClimateChoice(crop_id=crop) for crop in climate_balance.STRATEGY_CROPS]
+        return self.candidates
 
 
 class ClimatePlan(Input):
@@ -283,6 +329,8 @@ class ClimatePlansRequest(ClimateContext):
     @model_validator(mode="after")
     def comparable_timelines(self):
         dates = [season.planting_date for season in self.plans[0].seasons]
+        for day in dates:
+            validate_planting(day)
         validate_history_dates(self.observed_crop_history, dates)
         if len({plan.id for plan in self.plans}) != len(self.plans) or any(
             [season.planting_date for season in plan.seasons] != dates for plan in self.plans
@@ -372,8 +420,11 @@ class FieldInputs:
 
 
 def resolve_inputs(request: ClimateContext, planting_date: date, selected) -> FieldInputs:
+    is_strategy = isinstance(request, ClimateStepRequest) and request.strategy_mode is not None
     start, end = climate_balance.required_weather_dates(
-        planting_date, [s.engine_input() for s in selected]
+        planting_date,
+        [s.engine_input() for s in selected],
+        strategy=is_strategy,
     )
     ruslan_dir = require_engine_directory()
     config = load_fields().get(request.field_id) if request.field_id else None
@@ -425,13 +476,19 @@ def resolve_inputs(request: ClimateContext, planting_date: date, selected) -> Fi
         },
     }
     calendar = load_thermal_reference(latitude, longitude)
+    # One stated projection by default keeps acquisitions for a long sequence bounded.
+    scenarios = (
+        ["ssp245"]
+        if is_strategy and "scenarios" not in request.model_fields_set
+        else request.scenarios
+    )
     weather = climate_weather.load_climate_weather(
-        latitude, longitude, start, end, request.models, request.scenarios
+        latitude, longitude, start, end, request.models, scenarios
     )
     return FieldInputs(details, layers, soil_source, calendar, weather, ruslan_dir)
 
 
-def run_balance(inputs, planting_date, selected, candidates):
+def run_balance(inputs, planting_date, selected, candidates, *, strategy=False, irrigation=None):
     return climate_balance.compare_candidates(
         latitude=inputs.details["latitude"],
         longitude=inputs.details["longitude"],
@@ -443,6 +500,8 @@ def run_balance(inputs, planting_date, selected, candidates):
         planting_date=planting_date,
         selected=[choice.engine_input() for choice in selected],
         ruslan_dir=inputs.ruslan_dir,
+        strategy=strategy,
+        irrigation_capacity_mm=irrigation.daily_mm if irrigation else None,
     )
 
 
@@ -489,8 +548,8 @@ def finance(inputs, choice):
     )
 
 
-def water_stats(scenarios):
-    return {
+def water_stats(scenarios, irrigation=None):
+    stats = {
         key: whole_median(value["metrics"].get(metric) for value in scenarios.values())
         for key, metric in (
             ("water_deficit_pct", "water_shortfall_pct"),
@@ -499,10 +558,20 @@ def water_stats(scenarios):
             ("water_stress_days_pct", "water_stress_days_pct"),
             ("living_cover_days", "crop_days"),
         )
-    } | {"scheduled_irrigation_mm": 0 if scenarios else None}
+    }
+    if irrigation is None:
+        return stats | {"scheduled_irrigation_mm": 0 if scenarios else None}
+    return stats | {
+        "water_demand_mm": whole_median(s["metrics"].get("demand_mm") for s in scenarios.values()),
+        "scheduled_irrigation_mm": whole_median(
+            s["metrics"].get("scheduled_irrigation_mm") for s in scenarios.values()
+        )
+        if irrigation.status == "none" or irrigation.daily_mm is not None
+        else None,
+    }
 
 
-def candidate_result(inputs, choice, planting_date, raw, history):
+def candidate_result(inputs, choice, planting_date, raw, history, irrigation=None):
     scenarios = raw["scenarios"]
     end = common_model_end(scenarios)
     agronomy = assess_rotation_agronomy(
@@ -528,7 +597,7 @@ def candidate_result(inputs, choice, planting_date, raw, history):
     return {key: value for key, value in raw.items() if key != "selected_scenarios"} | {
         "choice_id": choice.choice_id or choice.crop_id,
         "choice": choice.model_dump(mode="json", exclude_none=True),
-        "water": water_stats(scenarios),
+        "water": water_stats(scenarios, irrigation),
         "economics": finance(inputs, choice),
         "agronomy": agronomy.model_dump(mode="json"),
         "same_crop_return_reference_year": earliest_year,
@@ -542,7 +611,7 @@ def candidate_result(inputs, choice, planting_date, raw, history):
     }
 
 
-def rank(request, entries, key):
+def rank(request, entries, key, irrigation=None):
     priority = request.farmer.priorities[0] if request.farmer.priorities else "water_deficit"
     settings = FarmerSettings(**request.farmer.model_dump(exclude={"priorities"}))
     equipment = rank_plans(
@@ -591,12 +660,16 @@ def rank(request, entries, key):
         def value(row):
             return row["water"][field]
 
-    comparable = bool(valid) and all(value(row) is not None for row in valid)
+    is_strategy = isinstance(request, ClimateStepRequest) and request.strategy_mode is not None
+    comparison = is_strategy and request.strategy_mode == "compare"
+    comparable = len(valid) >= (2 if comparison else 1) and all(
+        value(row) is not None for row in valid
+    )
     if priority in ("revenue", "revenue_after_seed"):
         currencies = {row["economics"]["currency"] for row in valid}
         comparable = comparable and len(currencies) == 1 and None not in currencies
-    if priority == "water_saving":
-        comparable = False  # This release applies a common zero-irrigation schedule.
+    if priority == "water_saving" and (irrigation is None or irrigation.daily_mm is None):
+        comparable = False
     if comparable:
         valid.sort(key=value, reverse=not lower_is_better)
         last = None
@@ -606,12 +679,13 @@ def rank(request, entries, key):
                 rank_number = index
             row["rank"] = rank_number
             last = current
+    limit = climate_balance.MAX_STRATEGY_CANDIDATES if is_strategy else 3
     return {
         "priority": priority,
         "status": "ranked" if comparable else "priority_unavailable",
         "rank_metric": field,
         "ranked_ids": [row[key] for row in valid] if comparable else [],
-        "selection_ids": [row[key] for row in valid[:3]],
+        "selection_ids": [row[key] for row in valid[:limit]],
         "selection_basis": "chosen_priority" if comparable else "eligible_input_order",
     }
 
@@ -666,29 +740,93 @@ def model_history(request, selected, selected_scenarios):
 
 
 def step(request: ClimateStepRequest) -> dict:
+    is_strategy = request.strategy_mode is not None
+    irrigation = (request.irrigation or StrategyIrrigation()) if is_strategy else None
+    choices = request.candidate_choices()
     inputs = resolve_inputs(request, request.planting_date, request.selected)
-    result = run_balance(inputs, request.planting_date, request.selected, request.candidates)
+    result = run_balance(
+        inputs,
+        request.planting_date,
+        request.selected,
+        choices,
+        strategy=is_strategy,
+        irrigation=irrigation,
+    )
     selected_cases = result["selected_scenarios"]
     history = model_history(request, request.selected, selected_cases)
     candidates = [
-        candidate_result(inputs, choice, request.planting_date, value, history)
-        for choice, value in zip(request.candidates, result["candidates"], strict=True)
+        candidate_result(inputs, choice, request.planting_date, value, history, irrigation)
+        for choice, value in zip(choices, result["candidates"], strict=True)
     ]
-    ranking = rank(request, candidates, "choice_id")
-    return output_context(inputs, result) | {
+    maximum_steps = (
+        1
+        if request.strategy_mode == "compare"
+        else (climate_balance.MAX_STRATEGY_STEPS if is_strategy else 3)
+    )
+    if is_strategy:
+        for candidate in candidates:
+            if any(
+                member["end_reason"] not in {"maturity", "harvest"}
+                or (member["metrics"].get("demand_mm") or 0) <= 1e-9
+                for member in candidate["scenarios"].values()
+            ):
+                candidate["status"] = "unsupported"
+                candidate["reason"] = (
+                    "The crop did not complete a viable thermal cycle in all members."
+                )
+            if calendar := candidate.get("phenology", {}).get("calendar_id"):
+                candidate["choice"]["calendar_id"] = calendar
+    ranking = rank(request, candidates, "choice_id", irrigation)
+    output = output_context(inputs, result) | {
         "step": len(request.selected) + 1,
-        "max_steps": 3,
+        "max_steps": maximum_steps,
         "planting_date": request.planting_date,
         "selected": request.selected,
         "selected_water_by_scenario": selected_cases,
-        "has_next_step_after_selection": len(request.selected) < 2
+        "has_next_step_after_selection": len(request.selected) + 1 < maximum_steps
         and request.planting_date.year < 2049,
         "candidates": candidates,
         "ranking": ranking,
         "top_candidates": [
             next(row for row in candidates if row["choice_id"] == key)
-            for key in ranking["selection_ids"]
+            for key in (ranking["ranked_ids"] if is_strategy else ranking["selection_ids"])
         ],
+    }
+    if is_strategy:
+        output.update(
+            strategy_mode=request.strategy_mode,
+            irrigation=irrigation.model_dump(mode="json"),
+            eligible_count=len(ranking["selection_ids"]),
+            observed_previous_crop=previous_observed_crop(request),
+        )
+        output["assumptions"]["irrigation"] = {
+            "unknown": "Rainfed scenario only; irrigation availability is unknown.",
+            "none": "No irrigation is available.",
+            "available": (
+                "Adaptive net water delivery within the daily capacity during growth."
+                if irrigation.daily_mm is not None
+                else "Rainfed scenario only; available irrigation volume is unknown."
+            ),
+        }[irrigation.status]
+        if irrigation.status != "none" and irrigation.daily_mm is None:
+            output["assumptions"]["irrigation_mm"] = None
+    return output
+
+
+def previous_observed_crop(request: ClimateStepRequest):
+    previous = max(request.observed_crop_history, key=lambda row: row.season_year, default=None)
+    if previous is None or previous.land_use != "crop":
+        return None
+    sowing_date = request.selected[0].planting_date if request.selected else request.planting_date
+    return {
+        "crop_id": previous.crop_id,
+        "planting_date": previous.planting_date,
+        "harvest_date": previous.harvest_date,
+        "fallow_days_before_first_planting": (
+            (sowing_date - previous.harvest_date).days - 1
+            if previous.harvest_date and previous.harvest_date < sowing_date
+            else None
+        ),
     }
 
 

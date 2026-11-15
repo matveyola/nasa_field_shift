@@ -231,6 +231,7 @@ def simulate(
     *,
     rain_multiplier: float = 1.0,
     irrigation: dict[date, float] | None = None,
+    irrigation_capacity_mm: float | None = None,
     runoff: bool = True,
     bare_reference_m: float = 1.0,
     record_layers: list | None = None,
@@ -240,6 +241,8 @@ def simulate(
     days = list(weather)
     wx = {w.date: w for w in days}
     kc_adj = {id(p): _climate_kc(p, wx) for p in plantings}
+    if irrigation and irrigation_capacity_mm is not None:
+        raise ValueError("Use an irrigation schedule or adaptive irrigation capacity.")
     irrigation = irrigation or {}
     out: list[DayResult] = []
     for w in days:
@@ -277,8 +280,16 @@ def simulate(
             etc = kc * w.et0_mm
             pfrac = min(max(p.crop.p.value + 0.04 * (5 - etc), 0.1), 0.8)
             thr = (1 - pfrac) * taw
-            ks = 1.0 if opening >= thr else max(opening / thr, 0.0)
-            dp = profile.infiltrate(water_in - q + irr)
+            effective_rain = water_in - q
+            if irrigation_capacity_mm is not None and not frozen and not snow_cover:
+                # Refill toward readily available water plus today's crop demand.
+                target_storage = min(taw, thr + etc)
+                irr = min(
+                    irrigation_capacity_mm, max(0.0, target_storage - opening - effective_rain)
+                )
+            dp = profile.infiltrate(effective_rain + irr)
+            available = profile.storage(zr) if irrigation_capacity_mm is not None else opening
+            ks = 1.0 if available >= thr else max(available / thr, 0.0)
             eta = profile.extract(ks * etc, zr)
             storage = profile.storage(zr)
             stage, cover = p.stage(w.date), p.crop.key
