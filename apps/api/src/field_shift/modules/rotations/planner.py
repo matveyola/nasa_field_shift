@@ -136,7 +136,12 @@ def optimize(
         field_nodes = 0
         field_complete = True
         sequences = []
-        choices = sorted(crop_names, key=lambda crop: (-rules[crop].preference, crop))
+        eligible = [
+            crop
+            for crop in crop_names
+            if field.allowed_crops is None or crop in field.allowed_crops
+        ]
+        choices = sorted(eligible, key=lambda crop: (-rules[crop].preference, crop))
 
         def generate(prefix):
             nonlocal generation_nodes, field_nodes, field_complete
@@ -146,7 +151,11 @@ def optimize(
                     sequences.append((score, prefix))
                 return
             year = request.start_season + len(prefix)
-            options = [locks[field.id, year]] if (field.id, year) in locks else choices
+            options = (
+                [crop for crop in choices if crop == locks[field.id, year]]
+                if (field.id, year) in locks
+                else choices
+            )
             for crop in options:
                 if field_nodes >= field_budget or clock() >= deadline:
                     field_complete = False
@@ -303,6 +312,8 @@ def optimize(
     for field in sorted(fields, key=lambda item: item.id):
         for year, crop in zip(years, best[field.id], strict=True):
             reasons = ["Respects configured return interval", "Within farm area limits"]
+            if field.allowed_crops is not None:
+                reasons.append("Allowed by the field setup")
             if (field.id, year) in locks:
                 reasons.append("Locked by farmer")
             if request.avoid_consecutive_family:

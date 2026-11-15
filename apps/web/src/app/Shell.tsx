@@ -16,32 +16,36 @@ const destinations = {
 }
 
 export function Shell({
-  route, farmName, navigate, assistantOpen, openAssistant, children,
-}: { route: Route; farmName?: string; navigate: (page: Page) => void; assistantOpen: boolean; openAssistant: () => void; children: ReactNode }) {
+  route, homeAddress, farmName, navigate, navigateHome, assistantOpen, openAssistant, children,
+}: {
+  route: Route; homeAddress: string; farmName?: string; navigate: (page: Page) => void; navigateHome: () => void
+  assistantOpen: boolean; openAssistant: () => void; children: ReactNode
+}) {
   const { t } = useLocale()
-  function follow(event: MouseEvent<HTMLAnchorElement>, page: Page) {
+  function follow(event: MouseEvent<HTMLAnchorElement>, visit: () => void) {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return
     event.preventDefault()
-    navigate(page)
+    visit()
   }
+  const tabAddress = (page: Page) => routeAddress({ ...route, page, home: undefined, setupId: undefined })
 
   return (
     <div className={'app-shell page-' + route.page}>
       <a className="skip-link" href="#content">{t('Skip to content')}</a>
       <header className="mobile-header">
-        <a className="mobile-brand" href={routeAddress({ ...route, page: 'fields' })} onClick={(event) => follow(event, 'fields')}>
+        <a className="mobile-brand" href={homeAddress} onClick={(event) => follow(event, navigateHome)}>
           <BrandLogo />
           <span>Field Shift<small>AGRITECH</small></span>
         </a>
         <div className="mobile-header-actions">
           <LanguageSelect />
           <HeaderActions />
-          <a className="mobile-farm" aria-label={t('Your farm')} href={routeAddress({ ...route, page: 'farm' })}
-            onClick={(event) => follow(event, 'farm')}><UserIcon aria-hidden="true" /></a>
+          <a className="mobile-farm" aria-label={t('Your farm')} href={tabAddress('farm')}
+            onClick={(event) => follow(event, () => navigate('farm'))}><UserIcon aria-hidden="true" /></a>
         </div>
       </header>
       <aside className="sidebar">
-        <a className="brand" href={routeAddress({ ...route, page: 'fields' })} onClick={(event) => follow(event, 'fields')}>
+        <a className="brand" href={homeAddress} onClick={(event) => follow(event, navigateHome)}>
           <BrandLogo />
           <span>Field Shift</span>
           <small>AGRITECH</small>
@@ -51,6 +55,7 @@ export function Shell({
             // «Польовий помічник»: its round mark in Agent's place (the middle of the phone's bar) opens it.
             if (page === 'agent') return (
               <button key={page} type="button" className="nav-link nav-assistant" aria-haspopup="dialog" aria-expanded={assistantOpen}
+                disabled={Boolean(route.setupId)}
                 onClick={openAssistant}>
                 <span className="nav-assistant-mark" aria-hidden="true"><FieldMark /></span>
                 <span>{t('Assistant')}</span>
@@ -59,15 +64,15 @@ export function Shell({
             const { label, icon: Icon } = destinations[page]
             return (
               <a key={page} className={'nav-link nav-' + page} aria-current={route.page === page ? 'page' : undefined}
-                href={routeAddress({ ...route, page })}
-                onClick={(event) => follow(event, page)}>
+                href={tabAddress(page)}
+                onClick={(event) => follow(event, () => navigate(page))}>
                 <Icon aria-hidden="true" />
                 {page === 'farm' ? <><span className="nav-label-desktop">{t('Farm management')}</span><span className="nav-label-mobile">{t(label)}</span></> : <span>{t(label)}</span>}
               </a>
             )
           })}
         </nav>
-        <a className="farm-link" href={routeAddress({ ...route, page: 'farm' })} onClick={(event) => follow(event, 'farm')}>
+        <a className="farm-link" href={tabAddress('farm')} onClick={(event) => follow(event, () => navigate('farm'))}>
           <BuildingOffice2Icon aria-hidden="true" />
           <span>{farmName ?? t('Your farm')}</span>
         </a>

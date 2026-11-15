@@ -13,6 +13,7 @@ from field_shift.modules.farm.models import Farm, Observation
 from field_shift.modules.fields.models import Field
 from field_shift.modules.fields.planning_profile.models import ProfileSnapshot
 from field_shift.modules.fields.planning_profile.weather_archive import WeatherIssue
+from field_shift.modules.onboarding.models import FieldSetup
 from field_shift.modules.planning_runtime.models import (
     PlanningBundle,
     PlanningDelivery,
@@ -46,6 +47,7 @@ __all__ = [
     "Conversation",
     "Farm",
     "Field",
+    "FieldSetup",
     "Message",
     "Observation",
     "RotationPreference",

@@ -59,10 +59,13 @@ export function useMapGeometryEditor(map: L.Map | undefined, points: Position[],
       pane: 'geometryDraftPane',
       color: '#ffffff',
       fillColor: '#ffffff',
-      fillOpacity: .22,
+      fillOpacity: .15,
       weight: 3,
       interactive: false,
     }
+    const haloStyle = { ...outlineStyle, color: '#101710', weight: 7, opacity: .7, fill: false }
+    const halo = positions.length >= 3 ? L.polygon(positions, haloStyle) : L.polyline(positions, haloStyle)
+    halo.addTo(group)
     const outline = positions.length >= 3 ? L.polygon(positions, outlineStyle) : L.polyline(positions, outlineStyle)
     outline.addTo(group)
     if (editLocked) {
@@ -114,6 +117,7 @@ export function useMapGeometryEditor(map: L.Map | undefined, points: Position[],
       marker.on('click dragstart', () => select(index))
       marker.on('drag', () => {
         positions[index] = marker.getLatLng()
+        halo.setLatLngs(positions)
         outline.setLatLngs(positions)
         updateMidpoint(index)
         updateMidpoint((index + positions.length - 1) % positions.length)

@@ -75,3 +75,5 @@ class FieldRead(BaseModel):
     geometry: Polygon
     boundary_revision: BoundaryRevision
     planting: FieldPlantingRead | None = None
+    # Null means the field uses the farm default.
+    irrigation_available: bool | None = None

@@ -1,10 +1,12 @@
-export const pages = ['fields', 'water', 'agent', 'rotations', 'farm'] as const
+export const pages = ['rotations', 'fields', 'agent', 'water', 'farm'] as const
 export type Page = (typeof pages)[number]
 export type Route = {
   page: Page
   planning?: boolean
   season?: number
   trajectory?: string
+  home?: boolean
+  setupId?: string
   fieldId?: string
   scenario?: string
   jobId?: string
@@ -24,7 +26,10 @@ function isForecastDay(value: string | null | undefined): value is string {
 export function parseRoute(address: string): Route {
   const url = new URL(address, 'https://field-shift.local')
   const path = url.pathname.replace(/^\/+|\/+$/g, '')
-  const page = pages.find((item) => item === path) ?? 'fields'
+  const explicitPage = path === 'onboarding' ? 'fields' : pages.find((item) => item === path)
+  const page = explicitPage ?? pages[0]
+  const setup = path === 'onboarding' ? url.searchParams.get('setup') : null
+  const setupId = setup && /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(setup) ? setup : undefined
   const fieldId = url.searchParams.get('field') || undefined
   const scenario = url.searchParams.get('scenario') || undefined
   const jobId = page === 'water' || page === 'agent' ? url.searchParams.get('job') || undefined : undefined
@@ -36,6 +41,8 @@ export function parseRoute(address: string): Route {
     ...(page === 'rotations' && url.searchParams.get('planning') === '1' ? { planning: true } : {}),
     ...(/^\d{4}$/.test(url.searchParams.get('season') ?? '') && Number(url.searchParams.get('season')) >= 1900 && Number(url.searchParams.get('season')) <= 2200 ? { season: Number(url.searchParams.get('season')) } : {}),
     ...(/^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$/.test(url.searchParams.get('trajectory') ?? '') ? { trajectory: url.searchParams.get('trajectory')! } : {}),
+    ...(!explicitPage ? { home: true } : {}),
+    ...(setupId ? { setupId } : {}),
     ...(page === 'fields' && url.searchParams.get('add') === '1' ? { addField: true } : {}),
     ...(analysis ? { analysis: true } : {}),
     ...(analysis && url.searchParams.get('layer') === 'ndvi_variability' ? { layer: 'ndvi_variability' } : {}),
@@ -44,11 +51,16 @@ export function parseRoute(address: string): Route {
   }
 }
 
+export function resolveHomeRoute(route: Route, hasFields: boolean): Route {
+  return route.home && !hasFields ? { ...route, page: 'fields' } : route
+}
+
 export function routeAddress(route: Route): string {
   const params = new URLSearchParams()
   if (route.planning && route.page === 'rotations') params.set('planning', '1')
   if (route.season !== undefined && Number.isInteger(route.season) && route.season >= 1900 && route.season <= 2200) params.set('season', String(route.season))
   if (route.trajectory && /^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$/.test(route.trajectory)) params.set('trajectory', route.trajectory)
+  if (route.setupId) params.set('setup', route.setupId)
   if (route.fieldId) params.set('field', route.fieldId)
   if (route.scenario) params.set('scenario', route.scenario)
   if (route.jobId && (route.page === 'water' || route.page === 'agent')) params.set('job', route.jobId)
@@ -60,5 +72,5 @@ export function routeAddress(route: Route): string {
     if (route.layer === 'ndvi_variability') params.set('layer', route.layer)
   }
   const search = params.toString()
-  return '/' + route.page + (search ? '?' + search : '')
+  return '/' + (route.setupId ? 'onboarding' : route.home ? '' : route.page) + (search ? '?' + search : '')
 }

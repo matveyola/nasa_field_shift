@@ -1,6 +1,20 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { parseRoute, routeAddress } from '../src/app/routing.ts'
+import { pages, parseRoute, resolveHomeRoute, routeAddress } from '../src/app/routing.ts'
+
+test('onboarding links keep the setup and its return field after a refresh', () => {
+  const setupId = 'fe1d4840-3928-4d02-8a09-67f883e0245b'
+  const address = '/onboarding?setup=' + setupId + '&field=F-03'
+  const route = parseRoute(address)
+  assert.equal(route.page, 'fields')
+  assert.equal(route.setupId, setupId)
+  assert.equal(route.fieldId, 'F-03')
+  assert.equal(routeAddress(route), address)
+  assert.equal(parseRoute('/fields?setup=' + setupId).setupId, undefined)
+  const invalid = parseRoute('/onboarding?setup=invalid')
+  assert.equal(invalid.page, 'fields')
+  assert.equal(invalid.setupId, undefined)
+})
 
 test('notification links preserve exact field and signal intent only on the assistant route', () => {
   const route = { page: 'agent' as const, fieldId: 'F-02', scenario: 'baseline', signal: 'water' as const }
@@ -26,10 +40,34 @@ test('the agent can open the same run, and unrelated pages drop the run', () => 
   assert.equal(routeAddress({ ...water, page: 'rotations' }), '/rotations?field=F-03&scenario=dry+year')
 })
 
-test('unknown paths and empty values fall back to Fields safely', () => {
-  assert.deepEqual(parseRoute('/unknown?field=&scenario=&job=42'), {
-    page: 'fields', fieldId: undefined, scenario: undefined, jobId: undefined,
-  })
+test('Rotations is the first tab and the home destination when the farm has fields', () => {
+  assert.deepEqual(pages, ['rotations', 'fields', 'agent', 'water', 'farm'])
+  const home = parseRoute('/')
+  assert.equal(home.home, true)
+  assert.equal(home.page, 'rotations')
+  assert.equal(routeAddress(home), '/')
+  assert.equal(resolveHomeRoute(home, true).page, 'rotations')
+  assert.equal(resolveHomeRoute(home, false).page, 'fields')
+  const homeWithSelection = resolveHomeRoute(parseRoute('/?field=F-03&scenario=less_rain'), true)
+  assert.equal(routeAddress(homeWithSelection), '/?field=F-03&scenario=less_rain')
+})
+
+test('unknown paths use the same home fallback and discard empty values and unrelated jobs', () => {
+  assert.deepEqual(parseRoute('/unknown?field=&scenario=&job=42'), parseRoute('/'))
+})
+
+test('home resolution leaves every explicit tab and its field and scenario intact', () => {
+  for (const page of pages) {
+    const address = '/' + page + '?field=FIELD-42&scenario=dry_year'
+    const route = parseRoute(address)
+    assert.equal(route.page, page)
+    assert.notEqual(route.home, true)
+    assert.equal(route.fieldId, 'FIELD-42')
+    assert.equal(route.scenario, 'dry_year')
+    assert.equal(routeAddress(route), address)
+    assert.deepEqual(resolveHomeRoute(route, false), route)
+    assert.deepEqual(resolveHomeRoute(route, true), route)
+  }
 })
 
 test('a map alert can link to one field and one forecast day', () => {

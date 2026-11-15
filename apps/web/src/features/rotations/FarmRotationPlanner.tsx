@@ -16,14 +16,19 @@ const colors: Record<PlanningCrop, string> = {
   Sunflower: '#a6a6a6', Rapeseed: '#c4c4c4', Peas: '#dcdcdc',
 }
 const defaultRule = (crop: PlanningCrop): CropRule => ({ crop, min_break_years: 1, preference: 0, max_share_percent: 100, min_area_ha: 0, max_area_ha: null })
-const defaults: CropRule[] = ['Wheat', 'Maize', 'Soy'].map((crop) => defaultRule(crop as PlanningCrop))
+const defaults: PlanningCrop[] = ['Wheat', 'Maize', 'Soy']
+const priorityNotes = {
+  water: 'Water is a priority. Compare water stress before applying a plan.',
+  soil: 'Soil health is a priority. Review crop return breaks and botanical families.',
+  low_change: 'Fewer changes is a priority. Use crop preferences to favor familiar crops.',
+} as const
 
 function usePlanningLocale() {
   const locale = useLocale()
   return { ...locale, t: (key: string) => locale.language === 'uk' && planningUkrainian[key] ? planningUkrainian[key] : locale.t(key) }
 }
 
-export function FarmRotationPlanner({ season, onApplied, embedded = false, focusedField, seasonCount, onSeasonCountChange }: { season: number; onApplied: () => void; embedded?: boolean; focusedField?: string; seasonCount?: number; onSeasonCountChange?: (count: number) => void }) {
+export function FarmRotationPlanner({ season, onApplied, embedded = false, fieldId, focusedField = fieldId, seasonCount, onSeasonCountChange }: { season: number; fieldId?: string; onApplied: () => void; embedded?: boolean; focusedField?: string; seasonCount?: number; onSeasonCountChange?: (count: number) => void }) {
   const { t, language } = usePlanningLocale()
   const [internalCount, setInternalCount] = useState(3)
   const count = seasonCount ?? internalCount
@@ -63,7 +68,7 @@ function PlannerEditor({ context, onApplied, refresh, embedded, focusedField, se
   const { canEdit } = useAccess()
   const [name, setName] = useState(t('Farm rotation plan'))
   const [selected, setSelected] = useState(context.fields.slice(0, 30).map(({ id }) => id))
-  const [rules, setRules] = useState<CropRule[]>(() => embedded ? context.crops.map(({ crop }) => defaultRule(crop)) : defaults)
+  const [rules, setRules] = useState<CropRule[]>(() => embedded ? context.crops.map(({ crop }) => defaultRule(crop)) : defaults.map(defaultRule))
   const [familyBreak, setFamilyBreak] = useState(false)
   const [twoCrops, setTwoCrops] = useState(seasonCount > 1)
   const [history, setHistory] = useState<CropDecision[]>(context.fields.flatMap(({ history }) => history))
@@ -182,6 +187,10 @@ function PlannerEditor({ context, onApplied, refresh, embedded, focusedField, se
               onChange={(event) => { changed(); setSelected(event.target.checked ? [...selected, field.id] : selected.filter((id) => id !== field.id)) }} />
             <span><strong>{field.name}</strong><small>{number(field.area_ha)} {t('ha')}</small></span>
           </label>)}</div><p className="planner-help">{t('Select up to 30 fields. Whole fields are allocated; a field is never split to meet an area target.')}</p>
+          {selectedFields.map((field) => field.allowed_crops?.length ? <p className="planner-help" key={field.id}>
+            <strong>{field.name}</strong> · {t('Allowed crops from field setup')}: {field.allowed_crops.map(t).join(', ')}.
+            {field.priority && <> {t(priorityNotes[field.priority])}</>}
+          </p> : null)}
         </fieldset>
         </details>
         {embedded && <fieldset className="strategy-crop-preview planner-fields"><legend>{language === 'uk' ? 'Культури для розподілу' : 'Crops to allocate'}</legend>
@@ -222,7 +231,8 @@ function PlannerEditor({ context, onApplied, refresh, embedded, focusedField, se
             </fieldset>
             <fieldset><legend>{t('Locked future crops')}</legend><div className="planner-year-choices">{years.map((year) =>
               <label key={year}>{year}<select value={locked.find((entry) => entry.field_id === field.id && entry.season === year)?.crop ?? ''} onChange={(event) => decide(field.id, year, event.target.value, false)}>
-                <option value="">{t('Let planner choose')}</option>{rules.map(({ crop }) => <option key={crop} value={crop}>{t(crop)}</option>)}</select></label>)}</div></fieldset>
+                <option value="">{t('Let planner choose')}</option>{rules.filter(({ crop }) => !field.allowed_crops || field.allowed_crops.includes(crop))
+                  .map(({ crop }) => <option key={crop} value={crop}>{t(crop)}</option>)}</select></label>)}</div></fieldset>
           </div>)}
         </details>
         </details>

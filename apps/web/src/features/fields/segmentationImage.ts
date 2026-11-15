@@ -1,6 +1,6 @@
 import { api } from '../../api/client'
 import type { Position } from '../../api/contracts'
-import { defaultBasemap, demoAerialBounds, usgsImageryService } from './basemaps'
+import { hasUsgsAerial, demoAerialBounds, usgsImageryService } from './basemaps'
 import type { SatelliteRaster } from './satelliteRaster'
 
 type Point = [number, number]
@@ -164,7 +164,7 @@ export async function readSegmentationImage(
     try { return await extractWindow('/bondurant-usgs-aerial.webp', local, window, point, 'aerial', bounded) }
     catch { signal.throwIfAborted() }
   }
-  if (defaultBasemap(position) === 'aerial' && window.left >= -mercatorLimit && window.right <= mercatorLimit) {
+  if (hasUsgsAerial(position) && window.left >= -mercatorLimit && window.right <= mercatorLimit) {
     try { return await extractWindow(usgsUrl(window), window, window, point, 'aerial', bounded) }
     catch { signal.throwIfAborted() }
   }
