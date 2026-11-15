@@ -18,8 +18,8 @@ function agentKind(backend: BackendStatus | null): "rules" | "scripted" | "llm" 
   return "llm";
 }
 
-function Header({ onClose, titleId }: { onClose(): void; titleId: string }) {
-  const { d, name, assistant } = useEnv();
+function Header({ onClose, titleId, onOpenHistory }: { onClose(): void; titleId: string; onOpenHistory?: () => void }) {
+  const { d, name, assistant, locale } = useEnv();
   const { backend, checking, busy } = assistant;
   const state = busy ? "working" : checking && !backend ? "checking" : (backend?.state ?? "checking");
   const text = state === "not_ready" ? d.status.notReady : d.status[state as keyof typeof d.status];
@@ -36,6 +36,12 @@ function Header({ onClose, titleId }: { onClose(): void; titleId: string }) {
           {text}
         </span>
       </div>
+      {onOpenHistory && <button type="button" className="fsa-iconbtn" style={{ width: 44, height: 44 }}
+        disabled={busy} onClick={onOpenHistory}
+        aria-label={locale === "uk" ? "Збережені розмови" : "Saved conversations"}
+        title={locale === "uk" ? "Збережені розмови" : "Saved conversations"}>
+        <I.Book />
+      </button>}
       <button type="button" className="fsa-iconbtn" onClick={onClose} aria-label={d.close}>
         <I.Close />
       </button>
@@ -369,13 +375,14 @@ export interface PanelProps {
   citation: { key: string; citation: Citation } | null;
   onCloseCitation(): void;
   onClose(): void;
+  onOpenHistory?: () => void;
   /** The host's button the panel unfolds from and folds back into (else the launcher's corner, in CSS). */
   anchor?: Element | null;
 }
 
 const UNFOLD_MS = 460; // = --fsa-t-unfold in widget.css
 
-export function Panel({ id, modal, closing, fieldName, showRevision, citation, onCloseCitation, onClose, anchor }: PanelProps) {
+export function Panel({ id, modal, closing, fieldName, showRevision, citation, onCloseCitation, onClose, onOpenHistory, anchor }: PanelProps) {
   const { d, assistant } = useEnv();
   const root = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLTextAreaElement>(null);
@@ -452,7 +459,7 @@ export function Panel({ id, modal, closing, fieldName, showRevision, citation, o
       aria-labelledby={titleId}
       onKeyDown={onKeyDown}
     >
-      <Header onClose={onClose} titleId={titleId} />
+      <Header onClose={onClose} titleId={titleId} onOpenHistory={onOpenHistory} />
       <ContextBar fieldName={fieldName} showRevision={showRevision} />
       <div className="fsa-main">
         <Conversation thread={assistant.thread} inert={!!citation} fieldName={fieldName} />
