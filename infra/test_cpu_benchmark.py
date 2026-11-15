@@ -12,7 +12,32 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
-from verify_cpu_benchmark import differing_paths, pcse_database_context, runtime_context, verify
+from verify_cpu_benchmark import (
+    CPU_DISPATCH,
+    CPU_TARGET,
+    cpu_target_errors,
+    differing_paths,
+    main,
+    pcse_database_context,
+    record_context,
+    runtime_context,
+    verify,
+)
+
+
+def valid_cpu_context():
+    return {
+        "system": "Linux",
+        "machine": "x86_64",
+        "numpy_simd": {
+            "X86_V3": True,
+            "X86_V4": False,
+            "AVX512_ICL": False,
+            "AVX512_SPR": False,
+        },
+        "numpy_baseline": ["X86_V2"],
+        "numpy_dispatch": sorted(CPU_DISPATCH),
+    }
 
 
 class BenchmarkArtifacts(unittest.TestCase):
@@ -128,7 +153,9 @@ class BenchmarkArtifacts(unittest.TestCase):
                         "SSE2": False,
                         "private-url": canary,
                         "BADTYPE": canary,
-                    }
+                    },
+                    __cpu_baseline__=["X86_V2", "private-url", 123],
+                    __cpu_dispatch__=["X86_V3", "https://private.invalid", canary * 10],
                 )
             )
         )
@@ -148,9 +175,13 @@ class BenchmarkArtifacts(unittest.TestCase):
                 "libc",
                 "distributions",
                 "numpy_simd",
+                "numpy_baseline",
+                "numpy_dispatch",
             },
         )
         self.assertEqual(result["numpy_simd"], {"AVX2": True, "SSE2": False})
+        self.assertEqual(result["numpy_baseline"], ["X86_V2"])
+        self.assertEqual(result["numpy_dispatch"], ["X86_V3"])
         self.assertNotIn(canary, json.dumps(result))
         self.assertEqual(set(result["distributions"]), {"numpy", "scipy", "aquacrop", "pcse"})
 
@@ -229,6 +260,166 @@ class BenchmarkArtifacts(unittest.TestCase):
         self.assertEqual(
             json.loads((self.root / "fresh/comparison.json").read_text())["outcome"], "FAIL"
         )
+
+    def test_target_accepts_only_known_effective_platform_and_dispatch(self):
+        valid = valid_cpu_context()
+        self.assertEqual(cpu_target_errors(valid, CPU_TARGET), [])
+        self.assertEqual(cpu_target_errors({}, None), [])
+        self.assertTrue(cpu_target_errors(valid, "unknown-target"))
+        for name, value in valid["numpy_simd"].items():
+            for wrong in (not value, None, int(value), str(value)):
+                with self.subTest(feature=name, wrong=wrong):
+                    changed = valid | {"numpy_simd": valid["numpy_simd"] | {name: wrong}}
+                    self.assertIn("invalid_" + name, cpu_target_errors(changed, CPU_TARGET))
+        for key, wrongs in {
+            "system": ["Darwin", None],
+            "machine": ["aarch64", None],
+            "numpy_simd": [None, {}, []],
+            "numpy_baseline": [None, [], ["X86_V4"]],
+            "numpy_dispatch": [None, [], ["X86_V3"], [None], list(CPU_DISPATCH) + ["NEW_TARGET"]],
+        }.items():
+            for wrong in wrongs:
+                with self.subTest(key=key, wrong=wrong):
+                    self.assertTrue(cpu_target_errors(valid | {key: wrong}, CPU_TARGET))
+        for key in valid:
+            self.assertTrue(
+                cpu_target_errors({k: v for k, v in valid.items() if k != key}, CPU_TARGET)
+            )
+
+    def test_report_equality_does_not_bypass_wrong_or_missing_cpu_context(self):
+        contexts = [valid_cpu_context(), {}, None, {"numpy_simd": {"X86_V3": True}}]
+        contexts += [valid_cpu_context() | {"numpy_simd": {"X86_V3": True, "X86_V4": True}}]
+        for index, metadata in enumerate(contexts):
+            destination = self.root / f"target-{index}"
+            self.compute.reset_mock()
+            with self.subTest(metadata=metadata), redirect_stdout(io.StringIO()):
+                code = verify(
+                    self.baseline,
+                    destination,
+                    compute=self.compute,
+                    stabilize=lambda value: value,
+                    context=lambda: metadata,
+                    cpu_target=CPU_TARGET,
+                )
+                self.assertEqual(code, 0 if index == 0 else 1)
+                self.compute.assert_called_once_with()
+                comparison = json.loads((destination / "comparison.json").read_text())
+                self.assertEqual(comparison["differing_paths"], [])
+                self.assertEqual(bool(comparison["cpu_target_errors"]), index != 0)
+                self.assertEqual(
+                    json.loads((destination / "actual.json").read_text()), self.expected
+                )
+
+    def test_required_context_failure_retains_matching_actual_but_fails(self):
+        with redirect_stdout(io.StringIO()):
+            code = verify(
+                self.baseline,
+                self.root / "target-failure",
+                compute=self.compute,
+                stabilize=lambda value: value,
+                context=Mock(side_effect=OSError("PRIVATE_CANARY")),
+                cpu_target=CPU_TARGET,
+            )
+        self.assertEqual(code, 1)
+        self.compute.assert_called_once_with()
+        comparison = json.loads((self.root / "target-failure/comparison.json").read_text())
+        self.assertEqual(comparison["outcome"], "FAIL")
+        self.assertTrue(comparison["cpu_target_errors"])
+        self.assertNotIn("PRIVATE_CANARY", (self.root / "target-failure/context.json").read_text())
+
+    def test_valid_target_does_not_bypass_strict_numeric_or_identity_difference(self):
+        for index, actual in enumerate(
+            [
+                self.expected | {"synthetic_fixture": [1, 2.0000000000000004]},
+                self.expected | {"python": "wrong-interpreter"},
+                self.expected | {"input_sha256": "different-input"},
+            ]
+        ):
+            with self.subTest(actual=actual), redirect_stdout(io.StringIO()):
+                code = verify(
+                    self.baseline,
+                    self.root / f"strict-{index}",
+                    compute=lambda: actual,
+                    stabilize=lambda value: value,
+                    context=valid_cpu_context,
+                    cpu_target=CPU_TARGET,
+                )
+                self.assertEqual(code, 1)
+
+    def test_native_context_binds_report_without_model_or_release_verdict(self):
+        destination = self.root / "native-context.json"
+        with patch("verify_cpu_benchmark.runtime_context", return_value=valid_cpu_context()):
+            self.assertEqual(record_context(destination, self.baseline), 0)
+        result = json.loads(destination.read_text())
+        self.assertEqual(result["actual_sha256"], hashlib.sha256(self.original).hexdigest())
+        self.assertEqual(result["purpose"], "native_control_observation_not_release_check")
+        self.assertNotIn("outcome", result)
+        self.assertEqual(self.baseline.read_bytes(), self.original)
+        self.compute.assert_not_called()
+
+    def test_native_context_rejects_existing_and_alias_destinations(self):
+        link = self.root / "link"
+        link.symlink_to(self.baseline)
+        hardlink = self.root / "hardlink"
+        os.link(self.baseline, hardlink)
+        dangling = self.root / "dangling"
+        dangling.symlink_to(self.root / "absent")
+        with patch("verify_cpu_benchmark.runtime_context", return_value=valid_cpu_context()):
+            for path in [self.baseline, link, hardlink, dangling, self.root / "./baseline.json"]:
+                with self.subTest(path=path), self.assertRaises(FileExistsError):
+                    record_context(path, self.baseline)
+                self.assertEqual(self.baseline.read_bytes(), self.original)
+        self.assertFalse((self.root / "absent").exists())
+
+    def test_native_context_failure_never_creates_or_fabricates_metadata(self):
+        destination = self.root / "native-context.json"
+        with patch("verify_cpu_benchmark.runtime_context", side_effect=OSError("unavailable")):
+            with self.assertRaises(OSError):
+                record_context(destination, self.baseline)
+        self.assertFalse(destination.exists())
+        self.assertEqual(self.baseline.read_bytes(), self.original)
+
+    def test_cli_rejects_conflicting_or_incomplete_modes_before_work(self):
+        for args in [
+            [],
+            ["--check", str(self.baseline)],
+            ["--record-context", "destination"],
+            [
+                "--record-context",
+                "destination",
+                "--actual-report",
+                str(self.baseline),
+                "--cpu-target",
+                CPU_TARGET,
+            ],
+            [
+                "--record-context",
+                "destination",
+                "--actual-report",
+                str(self.baseline),
+                "--check",
+                str(self.baseline),
+            ],
+            [
+                "--check",
+                str(self.baseline),
+                "--output-dir",
+                "destination",
+                "--actual-report",
+                str(self.baseline),
+            ],
+        ]:
+            with (
+                self.subTest(args=args),
+                patch("verify_cpu_benchmark.verify") as checker,
+                patch("verify_cpu_benchmark.record_context") as recorder,
+                patch("sys.stderr", io.StringIO()),
+                self.assertRaises(SystemExit) as error,
+            ):
+                main(args)
+            self.assertEqual(error.exception.code, 2)
+            checker.assert_not_called()
+            recorder.assert_not_called()
 
     def test_diagnostic_paths_are_bounded_and_never_include_values(self):
         canary = "TEST_SECRET_MUST_NOT_APPEAR_IN_PATHS"
