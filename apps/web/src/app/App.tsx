@@ -132,11 +132,11 @@ export function App() {
     window.scrollTo(0, 0)
   }
   function closeSetup(next: Route) { setAddress(next, true); window.scrollTo(0, 0) }
-  function finishSetup(created: Field) {
+  function finishSetup(created: Field, startSeason: number) {
     if (parseRoute(location.href).setupId !== route.setupId) return
     addCreatedField(created); setSetupInProgress(pendingSetup())
     setLastField(created.id); rememberSelectedField(created.id)
-    closeSetup({ page: 'strategies', fieldId: created.id, scenario, season: (farm?.season ?? season) + 1 })
+    closeSetup({ page: 'strategies', fieldId: created.id, scenario, season: startSeason })
     setStrategiesVisited(true)
   }
   function goHome() {

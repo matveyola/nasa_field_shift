@@ -17,7 +17,7 @@ type Props = {
   fields: Field[]
   season: number
   onCancel: () => void
-  onComplete: (field: Field) => void
+  onComplete: (field: Field, startSeason: number) => void
 }
 
 export function FieldOnboarding({ id, fields, season, onCancel, onComplete }: Props) {
@@ -48,7 +48,7 @@ export function FieldOnboarding({ id, fields, season, onCancel, onComplete }: Pr
       if (controller.signal.aborted) return
       if (setup?.status === 'completed' && setup.field) {
         finishSetupDraft(id, draftFromInputs(setup.inputs).location)
-        completion.current(setup.field)
+        completion.current(setup.field, setup.inputs.start_season)
         return
       }
       if (setup?.inputs.start_season) setStartSeason(setup.inputs.start_season)
@@ -85,7 +85,7 @@ export function FieldOnboarding({ id, fields, season, onCancel, onComplete }: Pr
       if (!mounted.current) return
       if (result.status === 'completed' && result.field) {
         finishSetupDraft(id, draft.location)
-        completion.current(result.field)
+        completion.current(result.field, result.inputs.start_season)
       } else {
         update({ ...draft, step: 'chat' })
         window.scrollTo(0, 0)

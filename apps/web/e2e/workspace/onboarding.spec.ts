@@ -32,3 +32,23 @@ for (const inspectionYear of [2024, 2028]) {
     expect(submitted?.history).toEqual([{ season: 2026, crop: 'Maize' }])
   })
 }
+
+for (const { farmYear, savedStart } of [{ farmYear: 2100, savedStart: 2100 }, { farmYear: 2026, savedStart: 2030 }]) {
+  test(`completed setup preserves saved planning year ${savedStart} for farm ${farmYear}`, async ({ page }) => {
+    const field = { id: 'new-field', name: 'Completed synthetic field', crop: 'Maize', area_ha: 1, geometry, boundary_revision: 0, planting: null }
+    await page.addInitScript(() => sessionStorage.setItem('field-shift-desktop', '1'))
+    await page.route('http://127.0.0.1:18112/api/**', async route => {
+      const path = new URL(route.request().url()).pathname
+      let json: unknown = null
+      if (path.endsWith('/auth/session')) json = { mode: 'local', authenticated: true, needs_setup: false, setup_available: false, user: null, role: 'admin', csrf_token: null }
+      else if (path === '/api/fields') json = []
+      else if (path === '/api/farm') json = { name: 'Synthetic regression farm', season: farmYear, total_area_ha: 0, defaults: { irrigation_available: false, priority: '', equipment: null, budget: null }, observations: [] }
+      else if (path === '/api/onboarding/' + id) json = { id, status: 'completed', inputs: { start_season: savedStart, country_code: 'UA', region_code: 'all', geometry }, field, demo_plan: null }
+      await route.fulfill({ json })
+    })
+    await page.goto(`/onboarding?setup=${id}&desktop=1`)
+    await expect.poll(() => new URL(page.url()).pathname).toBe('/strategies')
+    expect(new URL(page.url()).searchParams.get('season')).toBe(String(savedStart))
+    expect(new URL(page.url()).searchParams.get('field')).toBe('new-field')
+  })
+}
