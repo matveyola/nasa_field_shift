@@ -1,15 +1,21 @@
 import { test, expect, type Page } from '@playwright/test'
 import { catalogFixture, jobFixture, resultFixture } from './handoffFixtures'
+import { opportunities } from './opportunityFixtures'
 import type { HandoffCatalog, HandoffJob, HandoffResult, HandoffSubmission } from '../../src/api/rotationHandoff'
 
 type Options = { catalog?: HandoffCatalog; result?: HandoffResult; saved?: HandoffJob[]; failFirst?: boolean; failedJob?: boolean; queued?: boolean; wrongScope?: boolean; pollFailure?: boolean }
 async function setup(page: Page, options: Options = {}) {
-  const posts: HandoffSubmission[] = [], gets: string[] = []
+  const posts: HandoffSubmission[] = [], gets: string[] = [], calendarFields: string[] = []
   let polls = 0
   await page.clock.setFixedTime(new Date('2026-11-15T12:00:00Z'))
   await page.route('**/api/**', async route => {
     const path = new URL(route.request().url()).pathname
     if (!path.startsWith('/api/')) return route.continue()
+    if (path.endsWith('/planting-opportunities')) {
+      const url = new URL(route.request().url()), field = path.split('/')[3]
+      calendarFields.push(field)
+      return route.fulfill({ json: opportunities(field, url.searchParams.get('planning_date')!, Number(url.searchParams.get('year_count'))) })
+    }
     if (path.endsWith('/handoff/catalog')) return route.fulfill({ json: options.catalog ?? catalogFixture() })
     if (path.includes('/handoff/fields/')) {
       const field = path.split('/')[5]
@@ -29,7 +35,7 @@ async function setup(page: Page, options: Options = {}) {
   })
   await page.goto('/tests/strategies/index.html')
   await expect(page.getByRole('heading', { name: 'Compare what to grow on this field' })).toBeVisible()
-  return { posts, gets }
+  return { posts, gets, calendarFields }
 }
 async function fill(page: Page) {
   await page.getByLabel('Planting date · 1').fill('2027-05-01')
@@ -207,4 +213,51 @@ test('late submission reply cannot attach to another field and interrupted origi
   await page.getByLabel('Field in focus').selectOption('north')
   await expect(page.getByRole('button', { name: 'Retry the same request', exact: true })).toBeVisible()
   await expect(page.getByText('The submission response was interrupted.', { exact: false })).toBeVisible()
+})
+
+for (const uk of [false, true]) test(`failed comparison keeps a keyboard calendar exit and draft (${uk ? 'UK' : 'EN'}, 320px)`, async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 740 })
+  const state = await setup(page, { failedJob: true })
+  const guidance = uk ? 'Порівняння не отримано. Помилка розрахунку не означає, що ці культури непридатні.' : 'No comparison was produced. A calculation failure does not establish that these crops are unsuitable.'
+  await expect(page.getByText(guidance, { exact: true })).toHaveCount(0)
+  await fill(page)
+  await page.getByRole('button', { name: 'Calculate comparison', exact: true }).click()
+  await expect(page.getByText('Synthetic provider failure')).toBeVisible()
+  if (uk) await page.getByRole('combobox', { name: /Language|Мова/ }).selectOption('uk')
+  await expect(page.getByText(guidance, { exact: true })).toBeVisible()
+  await expect(page.locator('.handoff-outcome')).toHaveCount(0)
+  const name = uk ? 'Знайти найближчу календарну можливість' : 'Find the next calendar opportunity'
+  const calendar = page.getByRole('button', { name, exact: true })
+  await expect(calendar).toHaveCount(1)
+  await expect(page.locator('.handoff-job').getByRole('button', { name, exact: true })).toBeVisible()
+  const bounds = await calendar.boundingBox()
+  expect(bounds).not.toBeNull()
+  expect(bounds!.height).toBeGreaterThanOrEqual(44)
+  expect(bounds!.x).toBeGreaterThanOrEqual(0)
+  expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(320)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  await calendar.focus()
+  await page.keyboard.press('Enter')
+  await expect(page.getByRole('button', { name: uk ? /^Найближча сівба/ : /^Next sowing opportunities/ })).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.getByLabel(uk ? 'Поле у фокусі' : 'Field in focus')).toHaveValue('north')
+  expect(state.calendarFields).toContain('north')
+  await page.getByRole('button', { name: uk ? /^Порівняти плани культур/ : /^Compare crop plans/ }).click()
+  await expect(page.getByLabel(uk ? 'Дата сівби · 1' : 'Planting date · 1')).toHaveValue('2027-05-01')
+  await expect(page.getByLabel(uk ? 'Профіль культури · A1' : 'Crop profile · A1')).toHaveValue('maize_grain')
+  await expect(page.getByText(guidance, { exact: true })).toBeVisible()
+  expect(state.posts).toHaveLength(1)
+})
+
+test('reopened terminal failure has a calendar exit without restoring or resubmitting saved inputs', async ({ page }) => {
+  const failed = jobFixture('north', 'failed'); failed.attempts = 3; failed.error = null
+  const catalog = catalogFixture(); catalog.status = 'unavailable'; catalog.reasons = ['Synthetic model unavailable']
+  const state = await setup(page, { saved: [failed], catalog })
+  await page.getByText('Saved comparisons for this field boundary', { exact: true }).click()
+  await page.getByRole('button', { name: /^Open saved calculation/ }).click()
+  await expect(page.getByText('No comparison was produced. A calculation failure does not establish that these crops are unsuitable.', { exact: true })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Run again', exact: true })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Calculate comparison', exact: true })).toHaveCount(0)
+  await page.locator('.handoff-job').getByRole('button', { name: 'Find the next calendar opportunity' }).click()
+  await expect(page.getByRole('button', { name: /^Next sowing opportunities/ })).toHaveAttribute('aria-pressed', 'true')
+  expect(state.posts).toHaveLength(0)
 })
