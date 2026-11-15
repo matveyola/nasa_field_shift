@@ -34,8 +34,7 @@ def field_read(
     # Only the exact untouched seed identity is an example. New user registrations
     # and edited boundaries never inherit the label merely from their name.
     example = field.boundary_revision == 0 and any(
-        field.id == seed_id
-        and field.geometry == {"type": "Polygon", "coordinates": [ring]}
+        field.id == seed_id and field.geometry == {"type": "Polygon", "coordinates": [ring]}
         for seed_id, _name, _crop, _area, ring in DEMO_FIELDS_NAIP_2026
     )
     return FieldRead.model_validate(field).model_copy(
