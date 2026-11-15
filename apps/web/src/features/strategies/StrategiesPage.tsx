@@ -47,7 +47,7 @@ export function StrategiesPage({ field, fields, season, trajectory, focus, onCon
   return <section className="strategies-page" aria-labelledby="strategies-title">
     <header className="strategies-heading"><div><p className="strategies-eyebrow">{uk ? 'РІШЕННЯ ДО ЗАКУПІВЕЛЬ' : 'DECISIONS BEFORE PROCUREMENT'}</p>
       <h1 id="strategies-title">{uk ? 'Що сіяти наступним?' : 'What to sow next?'}</h1>
-      <p>{uk ? 'Оберіть культури та період планування до закупівлі насіння й ресурсів.' : 'Choose crops and a planning period before buying seed and resources.'}</p></div>
+      </div>
       <button className="button" onClick={openAgent}>{uk ? 'Обговорити з асистентом' : 'Discuss with assistant'}</button>
     </header>
     <div className="strategies-context">
@@ -61,17 +61,17 @@ export function StrategiesPage({ field, fields, season, trajectory, focus, onCon
     </div>
     {(view === 'allocation' || view === 'scenarios') && <p className="strategies-calendar-note">{uk ? 'Рік плану — рік урожаю. Озимі можуть висіватися попереднього року. Розподіл передбачає одну культуру на полі за рік.' : 'A planning year is the harvest year. Winter crops may be sown in the previous year. Allocation uses one crop per field per year.'}</p>}
     <div className="strategies-workflows" role="group" aria-label={uk ? 'Спосіб планування' : 'Planning workflow'}>
-      <button className="strategies-workflow" aria-pressed={view === 'handoff'} onClick={() => setView('handoff')}>
-        <strong>{uk ? 'Порівняти плани культур' : 'Compare crop plans'}</strong><span>{uk ? 'Експериментальна модель · датовані цикли та ваші ресурси' : 'Experimental model · dated cycles and your resources'}</span></button>
-      <button className="strategies-workflow" aria-pressed={view === 'opportunities'} onClick={() => setView('opportunities')}>
-        <strong>{uk ? 'Найближча сівба' : 'Next sowing opportunities'}</strong><span>{uk ? 'Календар поля · від обраної дати' : 'Field calendar · from your planning date'}</span></button>
-      <button className="strategies-workflow" aria-pressed={view === 'allocation'} onClick={() => setView('allocation')}>
-        <strong>{uk ? 'Розподіл культур' : 'Crop allocation'}</strong><span>{uk ? 'Від 1 до 6 років · площі та ваші обмеження' : '1–6 years · areas and your constraints'}</span></button>
-      <button className="strategies-workflow" aria-pressed={view === 'scenarios'} onClick={() => setView('scenarios')}>
-        <strong>{uk ? 'Порівняння сценаріїв' : 'Scenario comparison'}</strong><span>{uk ? '1–3 роки · за наявності перевірених вхідних даних' : '1–3 years · with reviewed model inputs'}</span></button>
+      <button type="button" className="strategies-workflow" aria-controls="strategy-handoff" aria-pressed={view === 'handoff'} onClick={() => setView('handoff')}>
+        <strong>{uk ? 'Порівняти плани культур' : 'Compare crop plans'}</strong></button>
+      <button type="button" className="strategies-workflow" aria-controls="strategy-opportunities" aria-pressed={view === 'opportunities'} onClick={() => setView('opportunities')}>
+        <strong>{uk ? 'Найближча сівба' : 'Next sowing opportunities'}</strong></button>
+      <button type="button" className="strategies-workflow" aria-controls="strategy-allocation" aria-pressed={view === 'allocation'} onClick={() => setView('allocation')}>
+        <strong>{uk ? 'Розподіл культур' : 'Crop allocation'}</strong></button>
+      <button type="button" className="strategies-workflow" aria-controls="strategy-scenarios" aria-pressed={view === 'scenarios'} onClick={() => setView('scenarios')}>
+        <strong>{uk ? 'Порівняння сценаріїв' : 'Scenario comparison'}</strong></button>
     </div>
-    <div hidden={view !== 'handoff'}><HandoffWorkspace field={field} openCalendar={() => setView('opportunities')} openAgent={openAgent} /></div>
-    <div hidden={view !== 'opportunities'}>
+    <div id="strategy-handoff" hidden={view !== 'handoff'}><HandoffWorkspace field={field} openCalendar={() => setView('opportunities')} openAgent={openAgent} /></div>
+    <div id="strategy-opportunities" hidden={view !== 'opportunities'}>
       <PlantingOpportunities field={field} busy={draftState.busy} choose={item => { if (item.harvest_year !== null) requestPeriod(item.harvest_year, item) }} openAnalytics={() => openAnalytics('water')} openProfiles={() => { setInputFocus('profiles'); setView('scenarios') }} />
     </div>
     <dialog ref={confirmation} className="opportunity-confirm" aria-labelledby="replace-allocation-title" onCancel={() => setPendingPeriod(null)}>
@@ -81,7 +81,7 @@ export function StrategiesPage({ field, fields, season, trajectory, focus, onCon
       <div className="opportunity-actions"><button className="button" onClick={() => setPendingPeriod(null)} autoFocus>{uk ? 'Зберегти поточну чернетку' : 'Keep current draft'}</button>
         <button className="button primary" disabled={draftState.busy} onClick={() => { if (pendingPeriod) openPeriod(pendingPeriod.year, pendingPeriod.item) }}>{uk ? 'Перейти до нового періоду' : 'Start the new period'}</button></div>
     </dialog>
-    <div hidden={view !== 'allocation'}>
+    <div id="strategy-allocation" hidden={view !== 'allocation'}>
       {calendarChoice && <p role="status" className="strategies-notice">{uk ? `Календарна ідея: ${calendarChoice.crop_id}, цикл ${calendarChoice.cycle_id ?? '—'}, урожай ${calendarChoice.harvest_year}. Змінено лише рік плану. Культуру не зафіксовано; перевірте обмеження нижче.` : `Calendar idea: ${calendarChoice.crop_id}, cycle ${calendarChoice.cycle_id ?? '—'}, harvest ${calendarChoice.harvest_year}. Only the planning year is prefilled. No crop is locked; review constraints below.`}</p>}
       <div className="strategies-purpose"><div><h2>{uk ? 'Сплануйте культури, потім закупівлі' : 'Plan crops, then procurement'}</h2>
         <p>{uk ? 'Ціль: розподілити цілі поля за вашими пріоритетами культур, площами та перервами сівозміни. Це план розміщення, а не прогноз урожайності, прибутку чи погодних ризиків.' : 'Goal: allocate whole fields using your crop preferences, area limits and rotation breaks. This is an allocation plan, not a yield, profit or weather-risk forecast.'}</p></div>
@@ -90,10 +90,10 @@ export function StrategiesPage({ field, fields, season, trajectory, focus, onCon
       {allocationSeasonSupported(firstSeason) ? <FarmRotationPlanner season={firstSeason} seasonCount={seasonCount} onSeasonCountChange={setSeasonCount} embedded focusedField={field.id} onApplied={() => setApplied(true)} onDraftState={setDraftState} />
         : <p role="status">{uk ? 'Розподіл доступний для першого року урожаю 2001–2100. Оберіть інший рік.' : 'Allocation supports first harvest years 2001–2100. Choose another year.'}</p>}
     </div>
-    <div hidden={view !== 'scenarios'}>
+    <div id="strategy-scenarios" hidden={view !== 'scenarios'}>
       <PlanningPage fieldId={field.id} season={season} trajectory={trajectory} onContext={onContext} embedded fieldNames={names} focus={inputFocus} />
     </div>
-    {view !== 'opportunities' && <aside className="strategies-next"><p>{uk ? 'Перед підтвердженням перевірте придатність культур, техніку й актуальність історії. Для строків сівби перевірте календар і водні умови. Зони та норми внесення залишаються у робочому просторі поля.' : 'Before confirming, review crop suitability, equipment and history freshness. For sowing timing, review the calendar and water conditions. Zones and application rates remain in the field workspace.'}</p>
-      <button className="button" onClick={() => openAnalytics('water')}>{uk ? 'Переглянути водні умови' : 'Review water conditions'}</button></aside>}
+    {view !== 'opportunities' && <details className="strategies-next"><summary>{uk ? 'Перед рішенням про сівбу' : 'Before a sowing decision'}</summary><p>{uk ? 'Перед підтвердженням перевірте придатність культур, техніку й актуальність історії. Для строків сівби перевірте календар і водні умови. Зони та норми внесення залишаються у робочому просторі поля.' : 'Before confirming, review crop suitability, equipment and history freshness. For sowing timing, review the calendar and water conditions. Zones and application rates remain in the field workspace.'}</p>
+      <button className="button" onClick={() => openAnalytics('water')}>{uk ? 'Переглянути водні умови' : 'Review water conditions'}</button></details>}
   </section>
 }
