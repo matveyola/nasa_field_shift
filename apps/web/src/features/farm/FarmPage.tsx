@@ -54,6 +54,7 @@ export function FarmPage({ farm, fields, refresh, onAddField, openField, openWat
             <div><dt>{t('Fields')}</dt><dd>{number(fields.length, 0)}</dd></div>
             <div><dt>{t('Crops this season')}</dt><dd>{number(cropCount, 0)}</dd></div>
           </dl>
+          {fields.some(field => field.boundary_origin === 'example') && <p className="analytics-meta">{t('Includes example fields. Register your own boundaries and crop history before planning farm operations.')}</p>}
           {view === 'overview' && <FarmPriorityList fields={fields} season={farm.season} openField={openField} openWater={openWater}
             openVegetation={openVegetation} recordObservation={recordObservation} />}
           <FarmOverview fields={fields} openField={openField} onAddField={onAddField} />

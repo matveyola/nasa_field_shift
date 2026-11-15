@@ -33,6 +33,7 @@ export type Field = {
   boundary_revision: number
   planting: FieldPlanting | null
   irrigation_available?: boolean | null
+  boundary_origin?: 'example' | 'registered'
 }
 export type NewField = Pick<Field, 'name' | 'crop' | 'area_ha' | 'geometry'> & { season?: number }
 export type MoistureSource = 'ml' | 'historical' | 'demo'

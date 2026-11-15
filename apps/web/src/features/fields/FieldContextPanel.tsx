@@ -46,6 +46,7 @@ export function FieldContextPanel({ field, season, openStrategies, openAnalytics
           </button>
         </div>
         <p className="field-context-crop"><CropIcon crop={field.crop} /><span>{field.crop.trim() ? crop(field.crop) : t('Crop unknown')} · {number(field.area_ha)} {t('ha')}</span></p>
+        {field.boundary_origin === 'example' && <small className="chip">{t('Example field')}</small>}
       </header>
     <FieldContextSheet key={`${field.id}:${field.boundary_revision}`} field={field} surface={surface}
       season={season} openStrategies={openStrategies} openAnalytics={openAnalytics} openAgent={openAgent}

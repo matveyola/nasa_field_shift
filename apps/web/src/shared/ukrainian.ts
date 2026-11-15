@@ -10,6 +10,8 @@ export const ukrainian: Readonly<Record<string, string>> = {
   'Strategies': 'Стратегії',
   'peas': 'Горох',
   'Crop unknown': 'Культура не вказана',
+  'Example field': 'Приклад поля',
+  'Includes example fields. Register your own boundaries and crop history before planning farm operations.': 'Є поля-приклади. Перед плануванням робіт додайте власні межі та історію культур.',
   'Analytics': 'Аналітика',
   'Next decision': 'Наступне рішення',
   'What should grow here next?': 'Що вирощувати тут далі?',
