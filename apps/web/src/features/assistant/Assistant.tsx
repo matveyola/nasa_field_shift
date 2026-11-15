@@ -7,7 +7,7 @@ import { apiBase, applicationHeaders, request } from '../../api/client'
 import type { Field } from '../../api/contracts'
 import { useLocale } from '../../shared/locale'
 
-export type AssistantScreen = 'fields' | 'water' | 'rotations' | 'farm'
+export type AssistantScreen = 'fields' | 'strategies' | 'analytics' | 'water' | 'rotations' | 'farm'
 
 type Props = {
   field: Field | undefined
@@ -26,7 +26,9 @@ const applied: ActionResult = { status: 'applied' }
 export function Assistant({ field, season, scenario, open, onOpenChange, openScreen, openVegetation, openForecast }: Props) {
   const { language, t } = useLocale()
   const path = field ? `/agent/assistant/${encodeURIComponent(field.id)}/${season}/${scenario}` : undefined
-  const [context, setContext] = useState<FieldContext | null>(null)
+  const scope = JSON.stringify([path, language, field?.boundary_revision])
+  const [loadedContext, setContext] = useState<{ scope: string; value: FieldContext } | null>(null)
+  const context = loadedContext?.scope === scope ? loadedContext.value : null
   // The navigation's assistant button (the disc in the middle of the phone's tab bar): the panel unfolds from it.
   const [anchor, setAnchor] = useState<Element | null>(null)
   useEffect(() => setAnchor(document.querySelector('.nav-assistant-mark')), [])
@@ -36,18 +38,20 @@ export function Assistant({ field, season, scenario, open, onOpenChange, openScr
     if (!path || !open) return
     const controller = new AbortController()
     request<FieldContext>(`${path}/field-context?locale=${language}`, { signal: controller.signal })
-      .then(setContext)
+      .then(value => { if (!controller.signal.aborted) setContext({ scope, value }) })
       .catch(() => { if (!controller.signal.aborted) setContext(null) })
     return () => controller.abort()
-  }, [path, open, language, field?.boundary_revision])
+  }, [path, open, language, field?.boundary_revision, scope])
 
   const capabilities: HostCapabilities = useMemo(() => ({
     actions: ['map.set_layers', 'map.focus_field', 'chart.focus', 'app.open_screen'],
     simulation: false,
     screens: [
       { screen_id: 'fields', label: t('Fields') },
-      { screen_id: 'water', label: t('Water') },
-      { screen_id: 'rotations', label: t('Rotations') },
+      { screen_id: 'strategies', label: t('Strategies') },
+      { screen_id: 'analytics', label: t('Analytics') },
+      { screen_id: 'water', label: t('Analytics') + ' · ' + t('Water') },
+      { screen_id: 'rotations', label: t('Analytics') + ' · ' + t('Rotations') },
       { screen_id: 'farm', label: t('Farm management') },
     ],
   }), [t])
@@ -77,7 +81,7 @@ export function Assistant({ field, season, scenario, open, onOpenChange, openScr
         return done()
       }
       case 'app.open_screen':
-        if (!['fields', 'water', 'rotations', 'farm'].includes(action.screen_id as string)) break
+        if (!['fields', 'strategies', 'analytics', 'water', 'rotations', 'farm'].includes(action.screen_id as string)) break
         openScreen(action.screen_id as AssistantScreen)
         return done()
     }

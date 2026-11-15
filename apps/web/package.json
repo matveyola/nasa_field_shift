@@ -10,7 +10,7 @@
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
-    "test": "node --disable-warning=ExperimentalWarning --test tests/*.test.ts tests/planning/*.test.ts",
+    "test": "node --disable-warning=ExperimentalWarning --test tests/*.test.ts tests/planning/*.test.ts tests/strategies/*.test.ts tests/analytics/*.test.ts",
     "preview": "vite preview",
     "test:planning": "node ../../services/agent/frontend/node_modules/@playwright/test/cli.js test --config playwright.planning.config.ts"
   },

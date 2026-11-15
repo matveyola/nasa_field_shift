@@ -7,6 +7,22 @@ import { precisionPlansUkrainian } from './precisionPlansUkrainian'
 import { accessUkrainian } from './accessUkrainian'
 
 export const ukrainian: Readonly<Record<string, string>> = {
+  'Strategies': 'Стратегії',
+  'Analytics': 'Аналітика',
+  'Next decision': 'Наступне рішення',
+  'What should grow here next?': 'Що вирощувати тут далі?',
+  'Plan your next sowing': 'Сплануйте наступний посів',
+  'Plan upcoming sowing': 'Планувати майбутні посіви',
+  'Discuss this field': 'Обговорити це поле',
+  'Explore field evidence': 'Переглянути аналітику поля',
+  'Measurements and assumptions': 'Показники та припущення',
+  'Compare upcoming planting opportunities, check the reasons and prepare your field plan.': 'Порівняйте найближчі варіанти посіву, перевірте обґрунтування та підготуйте план поля.',
+  'Map observations': 'Спостереження на карті',
+  'Observation date': 'Дата спостереження',
+  'Comparison date': 'Дата для порівняння',
+  'No comparison': 'Без порівняння',
+  'Open full analytics': 'Відкрити повну аналітику',
+  'Selected observation is unavailable. Choose an available date.': 'Обране спостереження недоступне. Виберіть доступну дату.',
   'Rotation overview': 'Огляд сівозмін',
   'Scenario planning': 'Сценарне планування',
   ...analyticsUkrainian,
