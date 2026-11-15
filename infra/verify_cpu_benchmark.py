@@ -54,12 +54,58 @@ def differing_paths(expected, actual, *, limit=50):
     return {"differing_paths": paths, "paths_truncated": truncated}
 
 
+CPU_TARGET = "x86-64-v3"
+CPU_DISPATCH = {"X86_V3", "X86_V4", "AVX512_ICL", "AVX512_SPR"}
+
+
+def feature_name(value):
+    return (
+        isinstance(value, str)
+        and 1 <= len(value) <= 32
+        and all(c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_" for c in value)
+    )
+
+
+def cpu_target_errors(metadata, target):
+    """Fail closed for the declared pinned x86 wheel's effective dispatch."""
+    if target is None:
+        return []
+    if target != CPU_TARGET:
+        return ["unknown_cpu_target"]
+    errors = []
+    if metadata.get("system") != "Linux" or metadata.get("machine") != "x86_64":
+        errors.append("unsupported_platform")
+    features = metadata.get("numpy_simd")
+    if not isinstance(features, dict):
+        features = {}
+    for name, required in {
+        "X86_V3": True,
+        "X86_V4": False,
+        "AVX512_ICL": False,
+        "AVX512_SPR": False,
+    }.items():
+        if features.get(name) is not required:
+            errors.append("invalid_" + name)
+    if metadata.get("numpy_baseline") != ["X86_V2"]:
+        errors.append("unexpected_numpy_baseline")
+    dispatch = metadata.get("numpy_dispatch")
+    if (
+        not isinstance(dispatch, list)
+        or any(not isinstance(name, str) for name in dispatch)
+        or len(dispatch) != len(CPU_DISPATCH)
+        or set(dispatch) != CPU_DISPATCH
+    ):
+        errors.append("unexpected_numpy_dispatch")
+    return errors
+
+
 def runtime_context():
     """Fixed safe metadata, excluding environment, hostname, paths and build settings."""
     import numpy
 
     libc, version = platform.libc_ver()
-    features = getattr(numpy._core._multiarray_umath, "__cpu_features__", {})
+    runtime = numpy._core._multiarray_umath
+    features = getattr(runtime, "__cpu_features__", {})
     return {
         "python": platform.python_version(),
         "implementation": platform.python_implementation(),
@@ -73,11 +119,14 @@ def runtime_context():
         "numpy_simd": {
             key: value
             for key, value in sorted(features.items())
-            if isinstance(key, str)
-            and 1 <= len(key) <= 32
-            and all(c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_" for c in key)
-            and isinstance(value, bool)
+            if feature_name(key) and isinstance(value, bool)
         },
+        "numpy_baseline": [
+            name for name in getattr(runtime, "__cpu_baseline__", []) if feature_name(name)
+        ],
+        "numpy_dispatch": [
+            name for name in getattr(runtime, "__cpu_dispatch__", []) if feature_name(name)
+        ],
     }
 
 
@@ -120,7 +169,7 @@ def pcse_database_context():
         return {"status": "unavailable"}
 
 
-def verify(baseline, output_dir, *, compute, stabilize, context):
+def verify(baseline, output_dir, *, compute, stabilize, context, cpu_target=None):
     """Reserve a fresh artifact destination before computing exactly once.
 
     Callables keep tooling tests independent of model dependencies; main always
@@ -146,6 +195,8 @@ def verify(baseline, output_dir, *, compute, stabilize, context):
         artifacts["actual.json"].flush()
         try:
             metadata = context()
+            if not isinstance(metadata, dict):
+                raise TypeError("Runtime context must be an object")
         except Exception:
             metadata = {"runtime_context_status": "unavailable"}
         metadata = metadata | {
@@ -156,21 +207,48 @@ def verify(baseline, output_dir, *, compute, stabilize, context):
         artifacts["context.json"].flush()
         old, new = stabilize(expected), stabilize(actual)
         equal = old == new
+        target_errors = cpu_target_errors(metadata, cpu_target)
+        accepted = equal and not target_errors
         comparison = {
-            "outcome": "PASS" if equal else "FAIL",
+            "outcome": "PASS" if accepted else "FAIL",
             "actual_sha256": hashlib.sha256(encoded.encode()).hexdigest(),
             **differing_paths(old, new),
         }
+        if cpu_target is not None:
+            comparison["cpu_target"] = cpu_target
+            comparison["cpu_target_errors"] = target_errors
         artifacts["comparison.json"].write(json.dumps(comparison, indent=2) + "\n")
     print(json.dumps(comparison))
-    return 0 if equal else 1
+    return 0 if accepted else 1
+
+
+def record_context(destination, actual_report):
+    """Bind safe native-control metadata to an existing actual report, without computing."""
+    actual_bytes = Path(actual_report).read_bytes()
+    json.loads(actual_bytes)  # Refuse to bind a missing or malformed report.
+    metadata = runtime_context() | {
+        "actual_sha256": hashlib.sha256(actual_bytes).hexdigest(),
+        "purpose": "native_control_observation_not_release_check",
+    }
+    with Path(destination).open("x", encoding="utf-8") as output:
+        output.write(json.dumps(metadata, indent=2, allow_nan=False) + "\n")
+    return 0
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--check", required=True, type=Path)
-    parser.add_argument("--output-dir", required=True, type=Path)
+    parser.add_argument("--check", type=Path)
+    parser.add_argument("--output-dir", type=Path)
+    parser.add_argument("--cpu-target", choices=[CPU_TARGET])
+    parser.add_argument("--record-context", type=Path)
+    parser.add_argument("--actual-report", type=Path)
     args = parser.parse_args(argv)
+    if args.record_context is not None:
+        if args.actual_report is None or any((args.check, args.output_dir, args.cpu_target)):
+            parser.error("--record-context requires only --actual-report")
+        return record_context(args.record_context, args.actual_report)
+    if args.check is None or args.output_dir is None or args.actual_report is not None:
+        parser.error("strict verification requires --check and --output-dir")
     # Ordinary installed imports; no checkout path injection or package edits.
     from field_shift_models.cli import benchmark, stable_report
 
@@ -180,6 +258,7 @@ def main(argv=None):
         compute=benchmark,
         stabilize=stable_report,
         context=runtime_context,
+        cpu_target=args.cpu_target,
     )
 
 

@@ -43,6 +43,65 @@ class CIPathChecks(unittest.TestCase):
         self.assertIn("if: always()", uploads)
         self.assertIn("${{ runner.temp }}/field-shift-cpu-benchmark/", uploads)
 
+    def test_planning_cpu_target_and_native_control_are_explicit_and_same_job(self):
+        root = Path(__file__).resolve().parents[1]
+        workflow = (root / ".github/workflows/ci.yml").read_text()
+        job = workflow.split("  planning:\n", 1)[1].split("\n  required:", 1)[0]
+        steps = re.split(r"(?=^      - )", job, flags=re.M)
+        strict = [step for step in steps if "infra/verify_cpu_benchmark.py --check" in step]
+        control = [step for step in steps if "--record-context" in step]
+        self.assertEqual(len(strict), 1)
+        self.assertEqual(len(control), 1)
+        self.assertIn("--cpu-target x86-64-v3", strict[0])
+        self.assertIn("NPY_DISABLE_CPU_FEATURES: X86_V4,AVX512_ICL,AVX512_SPR", strict[0])
+        self.assertNotIn("NPY_ENABLE_CPU_FEATURES:", strict[0])
+        for step in (strict[0], control[0]):
+            self.assertIn("PYTHONHASHSEED: '0'", step)
+            self.assertNotIn("continue-on-error", step)
+        self.assertLess(job.index(control[0]), job.index(strict[0]))
+        self.assertIn('mkdir "$RUNNER_TEMP/field-shift-cpu-native-control"', control[0])
+        self.assertNotIn("mkdir -p", control[0])
+        commands = [
+            shlex.split(line.strip())
+            for line in control[0].splitlines()
+            if line.strip().startswith("env ")
+        ]
+        self.assertEqual(len(commands), 2)
+        prefix = [
+            "env",
+            "-u",
+            "NPY_DISABLE_CPU_FEATURES",
+            "-u",
+            "NPY_ENABLE_CPU_FEATURES",
+            "packages/field-shift-models/.venv/bin/python",
+        ]
+        self.assertEqual(commands[0][: len(prefix)], prefix)
+        self.assertEqual(
+            commands[0][len(prefix) :],
+            [
+                "-m",
+                "field_shift_models.cli",
+                "benchmark",
+                "--output",
+                "$RUNNER_TEMP/field-shift-cpu-native-control/actual.json",
+            ],
+        )
+        self.assertEqual(commands[1][: len(prefix)], prefix)
+        self.assertEqual(
+            commands[1][len(prefix) :],
+            [
+                "infra/verify_cpu_benchmark.py",
+                "--record-context",
+                "$RUNNER_TEMP/field-shift-cpu-native-control/context.json",
+                "--actual-report",
+                "$RUNNER_TEMP/field-shift-cpu-native-control/actual.json",
+            ],
+        )
+        upload = job.split("- uses: actions/upload-artifact@", 1)[1]
+        self.assertIn("if: always()", upload)
+        self.assertIn("${{ runner.temp }}/field-shift-cpu-native-control/", upload)
+        self.assertIn("${{ runner.temp }}/field-shift-cpu-benchmark/", upload)
+
     def test_fast_runner_includes_the_actual_ci_tooling_lint_and_format_scope(self):
         root = Path(__file__).resolve().parents[1]
         workflow = (root / ".github/workflows/ci.yml").read_text()

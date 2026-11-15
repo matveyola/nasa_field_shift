@@ -47,3 +47,66 @@ interpreter-only mismatch is still a real protocol mismatch. Future interpreter
 updates require actual execution, exact comparison, a new retained report when
 needed, and independent review before changing the CI target. No report establishes
 observed yield accuracy or promotes a scientific model.
+
+
+## Pinned x86 dispatch protocol and native control
+
+A later hosted run on the same Python 3.12.13 and NumPy 2.5.4 differed from v7
+at six stable paths: Barley dry/temperate root-zone reserves by one ULP each,
+plus their closing-state and evaluation identities. The hosted runtime enabled
+AVX-512 dispatch groups absent on the local machine. This suggests an execution
+path difference; it does not prove a particular numerical kernel caused it.
+Closing-state identities include internal moisture arrays, so the difference
+must not be described as only the final reserve summation.
+
+Planning CI declares a benchmark-only Linux x86-64-v3-compatible protocol:
+`NPY_DISABLE_CPU_FEATURES=X86_V4,AVX512_ICL,AVX512_SPR` is set before fresh Python
+processes import NumPy. The infra wrapper's optional `--cpu-target x86-64-v3`
+requires Linux/x86_64, effective X86_V3=true and all three excluded groups=false,
+plus the pinned wheel's X86_V2 baseline and expected four dispatch groups.
+Missing or unexpected runtime diagnostics fail this required protocol even when
+the report matches. No restriction is added to production model serving.
+
+The [official NumPy runtime documentation](https://numpy.org/doc/stable/reference/simd/build-options.html#runtime-dispatch)
+describes import-time feature restriction. [Upstream issue33016](https://github.com/numpy/numpy/issues/33016)
+records legacy feature names being ignored under NumPy2.5.4 with normally hidden
+warnings. The protocol uses current dispatch group names and checks effective
+flags, rather than assuming an environment string took effect.
+
+After the same locked setup shown above, reproduce the required check in a fresh
+artifact directory:
+
+```sh
+env -u NPY_ENABLE_CPU_FEATURES \
+  NPY_DISABLE_CPU_FEATURES=X86_V4,AVX512_ICL,AVX512_SPR PYTHONHASHSEED=0 \
+  packages/field-shift-models/.venv/bin/python infra/verify_cpu_benchmark.py \
+  --cpu-target x86-64-v3 \
+  --check packages/field-shift-models/reports/cpu-v7.json \
+  --output-dir /tmp/field-shift-cpu-restricted-new
+```
+
+The wrapper computes once and persists that actual report before strict
+comparison. It does not alter `stable_report`, numerical values or hashes. All
+previous reports and package/parameter identities remain immutable. A wrong
+interpreter, numerical difference or changed identity still fails; CPU metadata
+is an additional requirement, never a substitute for exact equality.
+
+In the same CI job, a separate native control first runs the original raw
+`benchmark --output` with both NPY_ENABLE_CPU_FEATURES and
+NPY_DISABLE_CPU_FEATURES unset. It is an observation, not a passing release
+comparison. An exclusive control directory retains its actual report and safe
+runtime metadata bound to the report checksum; no environment dump, host name,
+credentials or paths are recorded in that metadata. Both arms fix the same
+hash seed. Native and restricted artifacts are uploaded even if the required
+check fails. Neither step uses continue-on-error or replaces the reference.
+
+Two predeclared local compatibility runs produced exact v7 equality in both
+arms. That machine lacks AVX-512, so these results cannot establish causality.
+A hosted causal claim requires the SAME runner to reproduce the native mismatch,
+show the effective dispatch change, and restore exact equality in the restricted
+arm at every stable field, including all four derived identities. Native errors
+and mismatches remain evidence. If native also matches or restriction does not
+restore equality, retain the outputs and treat the hypothesis as unconfirmed;
+do not choose another reference, relax precision or rerun until green. This
+protocol is scoped to the pinned x86 wheel/runtime, not universal cross-platform
+bitwise reproducibility, a scientific accuracy improvement or model promotion.
