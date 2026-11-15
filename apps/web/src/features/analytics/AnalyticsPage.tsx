@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { ArrowRightIcon, ArrowPathIcon, MapIcon, SparklesIcon } from '@heroicons/react/24/outline'
 import { api } from '../../api/client'
 import { planningBootstrap } from '../../api/planningWorkspace'
@@ -30,6 +30,22 @@ export function AnalyticsPage(props: AnalyticsPageProps) {
 
 function AnalyticsWorkspace(props: AnalyticsPageProps & { rainPeriod: 7 | 30; chooseRainPeriod: (days: 7 | 30) => void }) {
   const { field, fields, context, section } = props
+  const sectionsRef = useRef<HTMLElement>(null)
+  // Reveal deep-linked/back-forward sections without scrolling the page away from its context.
+  useEffect(() => {
+    const bar = sectionsRef.current
+    const selected = bar?.querySelector<HTMLElement>('[aria-current="page"]')
+    if (!bar || !selected) return
+    const reveal = () => {
+      const item = selected.getBoundingClientRect(), bounds = bar.getBoundingClientRect()
+      if (item.left < bounds.left + 6) bar.scrollLeft -= bounds.left + 6 - item.left
+      else if (item.right > bounds.right - 6) bar.scrollLeft += item.right - bounds.right + 6
+    }
+    reveal()
+    const observer = new ResizeObserver(reveal)
+    observer.observe(bar)
+    return () => observer.disconnect()
+  }, [section])
   const { text, number, crop, date } = useAnalyticsCopy()
   const today = new Date().toISOString().slice(0, 10)
   const currentYear = Number(today.slice(0, 4))
@@ -69,7 +85,7 @@ function AnalyticsWorkspace(props: AnalyticsPageProps & { rainPeriod: 7 | 30; ch
       <label className="control"><span>{text('Analysis year')}</span><select value={context.season} onChange={e => props.chooseSeason(Number(e.target.value))}>{seasons.map(year => <option key={year} value={year}>{year}</option>)}</select></label>
       <ScenarioSelect value={context.scenario} onChange={props.chooseScenario} />
     </div>
-    <nav className="analytics-sections" aria-label={text('Analytics')}>{analyticsSections.map(id => <button key={id} type="button" aria-current={section === id ? 'page' : undefined}
+    <nav ref={sectionsRef} className="analytics-sections" aria-label={text('Analytics')}>{analyticsSections.map(id => <button key={id} type="button" aria-current={section === id ? 'page' : undefined}
       onClick={() => props.onSection(id)}>{text(labels[id])}</button>)}</nav>
     <div className="analytics-content" key={section}>
       {['overview', 'soil', 'rotation'].includes(section) && profile?.sources.some(source => source.kind === 'synthetic') && <p className="analytics-caution" role="status">{text('Synthetic profile — demonstration inputs, not field measurements.')}</p>}

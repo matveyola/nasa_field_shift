@@ -26,7 +26,7 @@
 .handoff-outcome dl { display: grid; gap: 8px; font-size: .8rem; }
 .handoff-outcome dt { color: var(--ink-2, #555); }
 .handoff-outcome dd { margin: 5px 0 12px; font-weight: 600; }
-.handoff-metrics { grid-template-columns: 1fr 1fr; }
+.handoff-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .handoff-season { border-top: 1px solid var(--line, #ddd); padding-top: 12px; margin-top: 14px; }
 .handoff-season h5 { font-size: 1rem; margin: 0; }
 .handoff-workspace pre { font-size: .7rem; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 420px; overflow: auto; }
@@ -35,3 +35,10 @@
 .handoff-receipts { padding-left: 18px; }
 @media (max-width: 900px) { .strategies-page .strategies-workflows { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 600px) { .strategies-page .strategies-workflows { grid-template-columns: 1fr; } .handoff-calculate { flex-direction: column; align-items: stretch; } }
+
+.handoff-workspace, .handoff-form { grid-template-columns: minmax(0, 1fr); }
+.handoff-workspace form, .handoff-workspace details, .handoff-workspace dl > *,
+.handoff-workspace .handoff-crop-choice { min-width: 0; }
+.handoff-workspace :is(input, select, legend) { max-width: 100%; }
+.handoff-workspace legend { overflow-wrap: anywhere; }
+.handoff-workspace .handoff-check { min-height: 44px; align-items: center; }
