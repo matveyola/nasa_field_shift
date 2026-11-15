@@ -20,7 +20,6 @@ from field_shift.modules.field_weather.calculations import (
     power_days,
     rainfall_period,
 )
-from field_shift.modules.field_weather.routes import router
 from field_shift.modules.fields.models import Field
 from field_shift.seed import seed_demo
 
@@ -254,7 +253,6 @@ def test_owned_route_unknown_crop_missing_field_and_auth(monkeypatch):
         service, "datetime", type("Clock", (), {"now": staticmethod(lambda _: NOW)})
     )
     app = create_app(Settings(), session_factory=factory)
-    app.include_router(router, prefix="/api")
     with TestClient(app) as client:
         response = client.get("/api/fields/F-01/weather-summary")
         assert response.status_code == 200, response.text
@@ -269,7 +267,6 @@ def test_owned_route_unknown_crop_missing_field_and_auth(monkeypatch):
         )
         assert client.get("/api/fields/F-01/weather-summary").status_code == 503
     app = create_app(Settings(access_mode="team"), session_factory=factory)
-    app.include_router(router, prefix="/api")
     with TestClient(app) as client:
         assert client.get("/api/fields/F-01/weather-summary").status_code == 401
     factory.kw["bind"].dispose()
@@ -336,7 +333,6 @@ def test_foreign_field_cannot_trigger_provider_calls(monkeypatch):
     monkeypatch.setattr(providers, "forecast", lambda *_: pytest.fail("Foreign provider call"))
     monkeypatch.setattr(providers, "archive", lambda *_: pytest.fail("Foreign provider call"))
     app = create_app(Settings(), session_factory=factory)
-    app.include_router(router, prefix="/api")
     with TestClient(app) as client:
         assert client.get("/api/fields/private/weather-summary").status_code == 404
         assert client.get("/api/fields/private/rainfall-history?typical=true").status_code == 404

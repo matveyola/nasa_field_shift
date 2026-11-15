@@ -14,6 +14,7 @@ from field_shift.modules.agent.provider import AgentProvider, DemoAgentProvider
 from field_shift.modules.agent.remote import RemoteAgentError, RemoteAgentProvider
 from field_shift.modules.agent.routes import router as agent_router
 from field_shift.modules.farm.routes import router as farm_router
+from field_shift.modules.field_weather.routes import router as field_weather_router
 from field_shift.modules.fields.boundary_suggestion_routes import (
     router as boundary_suggestion_router,
 )
@@ -91,6 +92,7 @@ def create_app(
         rotation_planning_router,
         precision_router,
         fields_router,
+        field_weather_router,
         opportunities_router,
         imagery_router,
         terrain_router,
