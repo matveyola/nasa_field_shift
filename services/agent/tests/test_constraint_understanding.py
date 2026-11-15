@@ -648,6 +648,40 @@ def test_the_rules_agent_reads_ne_mayu_polyvu_as_no_irrigation():
     )  # contradiction: nothing kept
 
 
+@pytest.mark.parametrize(
+    ("message", "evidence"),
+    [
+        # Found in the 2026-11-15 acceptance run: these ordinary phrasings
+        # proposed nothing in scripted mode.
+        ("I can't irrigate this field.", "can't irrigate"),
+        ("We cannot irrigate here.", "cannot irrigate"),
+        ("This is a rainfed field.", "rainfed"),
+        ("It is a rain-fed field.", "rain-fed"),
+        ("We farm it as dryland.", "dryland"),
+        ("Не можу поливати це поле.", "Не можу поливати"),
+        ("Це богарне поле.", "богарне"),
+    ],
+)
+def test_the_rules_agent_reads_ordinary_no_irrigation_phrasings(message, evidence):
+    [constraint] = _extract_constraints(message)
+    assert (constraint.type, constraint.value, constraint.evidence) == (
+        "irrigation_available",
+        False,
+        evidence,
+    )
+
+
+@pytest.mark.parametrize(
+    "message",
+    [
+        "I can irrigate this field.",  # no irrigation rule matches an affirmative "can"
+        "Я не можу сказати, чи є полив.",  # not a statement about irrigation being absent
+    ],
+)
+def test_the_new_phrasings_do_not_invent_a_no_irrigation_condition(message):
+    assert [c for c in _extract_constraints(message) if c.value is False] == []
+
+
 def test_the_prompt_and_tool_say_how_to_quote_and_when_to_ask():
     assert "including any negation or condition" in SYSTEM_PROMPT
     assert (

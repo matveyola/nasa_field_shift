@@ -81,7 +81,7 @@ NAMES: dict[str, dict[str, str]] = {
         "fact.legume_n_credit": "nitrogen left by peas, beans or other legumes",
         "fact.ndvi_clear_coverage": "share of the field covered by usable satellite data",
         "fact.ndvi_latest": "latest vegetation index (NDVI)",
-        "fact.ndvi_low_area_share": "share of the observed area with lower NDVI",
+        "fact.ndvi_low_area_share": "share of the usable satellite area with lower NDVI",
         "fact.ndvi_peak": "best crop growth this season",
         "fact.precipitation_total": "total rainfall",
         "fact.reference_et0": "water lost to evaporation",
