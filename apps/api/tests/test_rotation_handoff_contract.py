@@ -29,3 +29,45 @@ def test_parameters_are_finite_and_bounded(parameters):
         HandoffSubmission(
             request_id="a", geometry_revision=0, operation="forecast", parameters=parameters
         )
+
+
+def test_unsourced_custom_forecast_calendar_is_not_presented_as_reviewed():
+    with pytest.raises(ValidationError, match="sourced catalog"):
+        HandoffSubmission(
+            request_id="a",
+            geometry_revision=0,
+            operation="forecast",
+            parameters={
+                "plans": [
+                    {"crops": [{"crop_id": "rapeseed_canola", "stage_lengths": [20, 30, 40, 10]}]}
+                ]
+            },
+        )
+
+
+def test_malformed_nested_request_reaches_worker_validation_without_type_error():
+    # The public contract bounds the opaque native payload; the worker applies its native schema.
+    request = HandoffSubmission(
+        request_id="a",
+        geometry_revision=0,
+        operation="forecast",
+        parameters={"plans": [{"crops": 42}]},
+    )
+    assert request.operation == "forecast"
+
+
+def test_result_defaults_never_authorize_a_rank_without_explicit_interpretation():
+    from field_shift.modules.rotations.handoff.schemas import HandoffResult
+
+    result = HandoffResult(
+        operation="forecast",
+        status="available",
+        data_kind="hybrid_scenario",
+        engine_version="test",
+        source_commit="test",
+        input_sha256="a" * 64,
+        evidence_sha256="b" * 64,
+        acquired_at="2026-01-01T00:00:00Z",
+        limitations=[],
+    )
+    assert not result.ranking_usable and result.suitability_status == "not_assessed"
