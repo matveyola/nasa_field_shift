@@ -38,7 +38,7 @@ export function StrategiesPage({ field, fields, chooseField }: {
     </select></label></div>
     <div className="strategies-workflows strategy-modes" role="tablist" aria-label={text('Strategies', 'Стратегії')}>
       {tabs.map(item => <button type="button" className="strategies-workflow" key={item} role="tab"
-        id={`strategy-tab-${item}`} aria-controls={`strategy-panel-${item}`} aria-selected={tab === item}
+        id={`strategy-tab-${item}`} aria-label={labels[item]} aria-controls={`strategy-panel-${item}`} aria-selected={tab === item}
         tabIndex={tab === item ? 0 : -1} ref={element => { if (element) buttons.current[item] = element }}
         onClick={() => setTab(item)} onKeyDown={event => navigate(event, item)}>
         <strong>{labels[item]}</strong>
@@ -46,7 +46,7 @@ export function StrategiesPage({ field, fields, chooseField }: {
     </div>
     {field ? <StrategyWorkspace key={JSON.stringify([field.id, field.boundary_revision])} field={field} tab={tab} />
       : tabs.map(item => <div key={item} id={`strategy-panel-${item}`} role="tabpanel" aria-labelledby={`strategy-tab-${item}`} hidden={item !== tab}>
-        <Empty><p>{text('Choose a field to continue.', 'Оберіть поле, щоб продовжити.')}</p></Empty>
+        {item === tab && <Empty><p>{text('Choose a field to continue.', 'Оберіть поле, щоб продовжити.')}</p></Empty>}
       </div>)}
   </section>
 }
