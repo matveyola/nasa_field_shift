@@ -111,7 +111,7 @@ test('historical water controls reset with season and keep scenario and saved-jo
   await page.getByRole('button', { name: 'Run simulation', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Root-zone water reserve', exact: true })).toBeVisible()
   expect(submitted).toMatchObject({ field_id: 'two', inputs: { season: 2025, scenario: 'dry_year', source: 'historical', start_date: '2025-08-01' } })
-  await page.getByRole('button', { name: 'Ask agent', exact: true }).click()
+  await page.getByRole('button', { name: 'Ask agent about this run', exact: true }).click()
   await expect(page.getByTestId('action')).toHaveText('agent:two:2025:dry_year:saved-run')
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
 })
