@@ -1,5 +1,6 @@
 """Prevent silently skipped checks when change detection grows new outputs."""
 
+import json
 import re
 import shlex
 import subprocess
@@ -10,6 +11,29 @@ from verify import build_plan
 
 
 class CIPathChecks(unittest.TestCase):
+    def test_planning_benchmark_pins_the_recorded_interpreter_patch(self):
+        root = Path(__file__).resolve().parents[1]
+        workflow = (root / ".github/workflows/ci.yml").read_text()
+        job = workflow.split("  planning:\n", 1)[1].split("\n  required:", 1)[0]
+        configured = re.findall(r"python-version: ['\"]([^'\"]+)['\"]", job)
+        commands = [shlex.split(line) for line in re.findall(r"^      - run: (.+)$", job, re.M)]
+        sync = [
+            c
+            for c in commands
+            if c[:4] == ["uv", "sync", "--project", "packages/field-shift-models"]
+        ]
+        checks = [c for c in commands if "field_shift_models.cli" in c and "--check" in c]
+        self.assertEqual(len(configured), 1)
+        self.assertEqual(len(sync), 1)
+        self.assertEqual(len(checks), 1)
+        self.assertRegex(configured[0], r"^3\.12\.\d+$", "Benchmark protocol requires a patch pin")
+        self.assertIn("--locked", sync[0])
+        self.assertIn("--python", sync[0])
+        self.assertEqual(sync[0][sync[0].index("--python") + 1], configured[0])
+        report_path = root / checks[0][checks[0].index("--check") + 1]
+        report = json.loads(report_path.read_text())
+        self.assertEqual(report["python"], configured[0])
+
     def test_fast_runner_includes_the_actual_ci_tooling_lint_and_format_scope(self):
         root = Path(__file__).resolve().parents[1]
         workflow = (root / ".github/workflows/ci.yml").read_text()
