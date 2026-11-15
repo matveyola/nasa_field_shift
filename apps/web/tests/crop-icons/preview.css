@@ -6,3 +6,5 @@
 .gallery-pair .crop-icon{width:32px;height:32px}.crop-icon-gallery .original .crop-icon{filter:none}
 .catalog-icons{display:flex;flex-wrap:wrap;gap:16px}.catalog-icons>div{display:flex;align-items:center;gap:8px;font-size:12px;max-width:100%;overflow-wrap:anywhere}.catalog-icons span{min-width:0}
 [data-testid=unknown-inputs]{display:flex;gap:16px;margin-top:24px}
+
+.rice-sizes{display:flex;flex-wrap:wrap;gap:24px}.rice-sizes [data-rice-alias]{display:flex;align-items:center;gap:12px;min-height:40px;font-size:12px}.rice-sizes .crop-icon{width:var(--icon-size);height:var(--icon-size)}

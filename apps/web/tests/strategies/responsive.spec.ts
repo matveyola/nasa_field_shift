@@ -36,6 +36,7 @@ async function contained(page: Page) {
 for (const width of [320, 360, 390, 430, 768, 1024, 1440, 1920]) test(`controls stay inside their cards at ${width}px`, async ({ page }) => {
   await page.setViewportSize({ width, height: 1000 })
   await prepare(page)
+  await page.locator('.handoff-setup > summary').click()
   await page.getByRole('combobox', { name: 'Plans to compare', exact: true }).selectOption('3')
   await page.getByRole('combobox', { name: 'Crop cycles to compare', exact: true }).selectOption('3')
   for (const letter of ['A', 'B', 'C']) for (const cycle of [1, 2, 3]) await page.getByRole('combobox', { name: `Crop profile · ${letter}${cycle}`, exact: true }).selectOption('maize_grain')
@@ -83,6 +84,7 @@ test('every catalog crop and a three-plan result fit narrow cards', async ({ pag
     await expect(crop).toHaveValue(profile.id)
     await contained(page)
   }
+  await page.locator('.handoff-setup > summary').click()
   await page.getByRole('combobox', { name: 'Plans to compare', exact: true }).selectOption('3')
   await page.getByLabel('Planting date · 1').fill('2027-05-01')
   for (const letter of ['A', 'B', 'C']) {
@@ -134,4 +136,32 @@ for (const language of ['en', 'uk']) test(`compact workflow choice preserves evi
   await expect(page.getByRole('form', { name: uk ? 'Поточні дані порівняння' : 'Current comparison inputs' })).toBeFocused()
   await expect(page.getByLabel(uk ? 'Дата сівби · 1' : 'Planting date · 1')).toHaveValue('2027-05-01')
   await contained(page)
+})
+
+for (const language of ['en', 'uk']) test(`sowing inputs precede optional setup in ${language}`, async ({ page }, info) => {
+  await page.setViewportSize({ width: 320, height: 844 })
+  await prepare(page)
+  await page.getByLabel(/Language|Мова/).selectOption(language)
+  const uk = language === 'uk'
+  const planting = page.getByLabel(uk ? 'Дата сівби · 1' : 'Planting date · 1')
+  const setup = page.locator('.handoff-setup')
+  await expect(setup).not.toHaveAttribute('open')
+  await expect(page.getByLabel(uk ? 'Циклів культур для порівняння' : 'Crop cycles to compare')).not.toBeVisible()
+  expect((await planting.boundingBox())!.y).toBeLessThan((await setup.boundingBox())!.y)
+  // The task starts within a phone viewport, before optional counts or a second calendar action.
+  await expect(planting).toBeInViewport()
+  await expect(page.getByRole('button', { name: uk ? 'Знайти найближчу календарну можливість' : 'Find the next calendar opportunity', exact: true })).toHaveCount(0)
+  await expect(page.getByText(uk ? 'Експериментальна модель · польова точність не перевірена.' : 'Experimental model · field accuracy not validated.', { exact: true })).toBeVisible()
+  await planting.fill('2027-05-01')
+  await setup.locator(':scope > summary').focus()
+  await page.keyboard.press('Enter')
+  const count = page.getByLabel(uk ? 'Циклів культур для порівняння' : 'Crop cycles to compare')
+  await expect(count).toHaveAttribute('aria-describedby', 'handoff-count-warning')
+  await expect(page.getByText(uk ? 'Зменшення кількості видаляє пізніші дані.' : 'Reducing a count removes its later inputs.', { exact: true })).toBeVisible()
+  await count.selectOption('3')
+  await expect(page.getByLabel(uk ? 'Дата сівби · 1' : 'Planting date · 1')).toHaveValue('2027-05-01')
+  await expect(page.locator('.handoff-cycles > fieldset')).toHaveCount(3)
+  await setup.locator(':scope > summary').click()
+  await contained(page)
+  await page.screenshot({ path: info.outputPath(`inputs-${language}-320.png`), fullPage: true })
 })

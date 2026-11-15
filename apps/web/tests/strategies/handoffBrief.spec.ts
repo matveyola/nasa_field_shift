@@ -21,7 +21,7 @@ async function setup(page: Page, result: HandoffResult, uk = false, ready = true
   return posts
 }
 async function saved(page: Page, uk = false) {
-  await page.getByText(uk ? 'Збережені порівняння для цих меж поля' : 'Saved comparisons for this field boundary', { exact: true }).click()
+  await page.getByText(uk ? 'Збережені порівняння' : 'Saved comparisons', { exact: true }).click()
   await page.getByRole('button', { name: uk ? /^Відкрити збережений розрахунок/ : /^Open saved calculation/ }).click()
   await expect(page.getByRole('heading', { name: uk ? 'Ваше розраховане порівняння' : 'Your calculated comparison' })).toBeVisible()
 }

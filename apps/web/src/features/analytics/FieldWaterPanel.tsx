@@ -5,8 +5,8 @@ import { useResource } from '../../shared/useResource'
 import { useLocale } from '../../shared/locale'
 import { ErrorBox } from '../../shared/ui'
 import { waterReferenceDisplay } from '../water/waterReferenceDisplay'
-import { getCurrentWaterOutlook } from '../water/waterOutlook'
-import { waterMetrics, seasonalGroups, range } from './waterMetrics'
+import { currentWater } from './currentWater'
+import { seasonalGroups, range } from './waterMetrics'
 
 export function FieldWaterPanel({ field, forecast, season, pending, error, reload }: {
   field: Field; forecast: WaterForecast | null | undefined; season: number; pending: boolean; error?: string; reload: () => void;
@@ -16,13 +16,7 @@ export function FieldWaterPanel({ field, forecast, season, pending, error, reloa
   const num = (n: number | null | undefined, unit = '') => n == null ? label('No estimate', 'Немає оцінки') : `${number(n, 1)}${unit ? ' ' + unit : ''}`
   const mm = label('mm', 'мм')
   const today = new Date().toISOString().slice(0, 10)
-  const supported = ['maize', 'corn', 'soy', 'soybean', 'soybeans', 'wheat', 'spring wheat', 'barley', 'sunflower', 'rapeseed', 'canola', 'peas', 'dry peas'].includes(field.crop.trim().toLowerCase())
-  const scopedForecast = supported && forecast?.crop.trim().toLowerCase() === field.crop.trim().toLowerCase() ? forecast : undefined
-  const outlook = getCurrentWaterOutlook(scopedForecast, field.id, today)
-  const current = outlook.kind !== 'unavailable' ? forecast : undefined
-  const days = outlook.kind !== 'unavailable' ? outlook.days : []
-  const metrics = current ? waterMetrics(days, current.threshold_mm) : null
-  const first = days[0]
+  const { outlook, current, days, metrics, first } = currentWater(field, forecast, today)
   const applicability = current?.applicability
   const display = waterReferenceDisplay(applicability, outlook.kind === 'shortage', language)
   const seasonalLoad = useCallback((signal: AbortSignal) => fieldWeatherApi.seasonal(field.id, signal), [field.id, field.boundary_revision])
@@ -32,8 +26,9 @@ export function FieldWaterPanel({ field, forecast, season, pending, error, reloa
   const groups = seasonalGroups(rows)
   const ranged = (r: ReturnType<typeof range>, unit = mm) => r ? `${num(r.median, unit)}${r.count > 1 ? ` (${num(r.min)}–${num(r.max)} ${unit}; n=${r.count})` : ''}` : label('No estimate', 'Немає оцінки')
   return <section className="field-water-block" aria-labelledby="field-water-heading">
-    <header className="weather-block-heading"><div><h2 id="field-water-heading">{label('Water balance', 'Водний баланс')}</h2><p>{label('Modeled root-zone reserve using reference crop and soil assumptions.', 'Розрахунковий запас у кореневій зоні за довідковими припущеннями про культуру та ґрунт.')}</p></div>
-      <button className="button" type="button" onClick={() => {reload(); seasonal.reload()}}>{label('Refresh saved results', 'Оновити збережені результати')}</button></header>
+    <details className="analytics-disclosure water-detail"><summary><h2 id="field-water-heading">{label('Water balance', 'Водний баланс')}</h2><span>{label('Daily calculation and assumptions', 'Щоденний розрахунок і припущення')}</span></summary><div className="analytics-details-body">
+    <p>{label('Modeled root-zone reserve using reference crop and soil assumptions.', 'Розрахунковий запас у кореневій зоні за довідковими припущеннями про культуру та ґрунт.')}</p>
+    <button className="button" type="button" onClick={() => {reload(); seasonal.reload()}}>{label('Refresh saved results', 'Оновити збережені результати')}</button>
     {pending && <p role="status">{label('Loading water reserve…', 'Завантаження запасу води…')}</p>}
     {error && <ErrorBox message={error} retry={reload} />}
     {!pending && !current && <p className="analytics-empty">{label('No current water estimate. Select a supported crop and calculate a forecast in the controls below. Weather remains available independently.', 'Немає актуальної оцінки води. Оберіть підтримувану культуру й розрахуйте прогноз у керуванні нижче. Погода доступна незалежно.')}</p>}
@@ -49,7 +44,6 @@ export function FieldWaterPanel({ field, forecast, season, pending, error, reloa
         <div><dt>{label('Minimum reserve', 'Мінімальний запас')}</dt><dd>{num(metrics.minimum?.reserve_mm, mm)} · {metrics.minimum && shortDate(metrics.minimum.date)}</dd></div>
         <div><dt>{label('Days below threshold', 'Днів нижче порога')}</dt><dd>{metrics.stressDays}</dd></div>
       </dl>
-      <details className="analytics-disclosure"><summary>{label('Daily calculation and assumptions', 'Щоденний розрахунок і припущення')}</summary><div className="analytics-details-body">
         <p>{display.limitation}</p>
       <div className="water-reading-line"><p>{label('Threshold', 'Поріг')}: <strong>{num(current.threshold_mm, mm)}</strong></p><p>{label('Margin above threshold', 'Запас над порогом')}: <strong>{num(first.reserve_mm - current.threshold_mm, mm)}</strong></p><p>{label('Daily change', 'Зміна за добу')}: <strong>{num(first.reserve_mm - first.opening_mm, mm)}</strong></p></div>
       <h3>{label('Water movement during the day', 'Рух води за день')}</h3>
@@ -82,8 +76,8 @@ export function FieldWaterPanel({ field, forecast, season, pending, error, reloa
         <div className="analytics-table-scroll"><table><thead><tr>{[label('Date','Дата'),label('Opening','На початок'),label('Closing','На кінець'),label('Rain','Опади'),label('Irrigation','Полив'),label('Use','Витрата'),label('Drainage','Дренаж'),label('Source rain','Опади джерела'),'ET₀'].map(x=><th key={x}>{x} {x!==label('Date','Дата') && `(${mm})`}</th>)}</tr></thead>
           <tbody>{days.map(d=><tr key={d.date}><td>{shortDate(d.date)}</td>{[d.opening_mm,d.reserve_mm,d.rain_mm,d.irrigation_mm,d.water_use_mm,d.drainage_mm,d.source_rain_mm,d.reference_et0_mm].map((v,i)=><td key={i}>{num(v)}</td>)}</tr>)}</tbody></table></div>
         {current.limitations.map(s=><p key={s}>{s}</p>)}
-      </div></details>
     </>}
+    </div></details>
     <details className="analytics-disclosure"><summary>{label('Water for the season', 'Вода за сезон')} · {season}</summary><div className="analytics-details-body">
       <p>{label('Saved model executions, not validated field accuracy or drought probability. Separate executions, plans and periods remain separate; median and range summarize scenarios within one execution.', 'Збережені виконання моделі, не перевірена точність для поля чи ймовірність посухи. Виконання, плани та періоди не змішуються; медіана й діапазон описують сценарії одного виконання.')}</p>
       {seasonal.pending && <p role="status">{label('Loading saved scenarios…','Завантаження збережених сценаріїв…')}</p>}

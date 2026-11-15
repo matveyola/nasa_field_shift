@@ -38,3 +38,30 @@
 @media(max-width:640px){.analytics-current-state .weather-block-heading{display:flex}.analytics-current-state .weather-block-heading>.button{margin:0}.analytics-weather-summary{gap:12px}.analytics-headline-metric h3{margin:0}.analytics-current-state .water-result-lines>div{grid-template-columns:minmax(0,1fr) minmax(0,.85fr)}.analytics-current-state .water-result-lines dd{font-size:.9rem}.field-rain-history .rainfall-periods article{gap:8px 12px}.field-rain-history .rainfall-periods article>p:first-of-type{grid-column:1/-1}}
 
 .analytics-current-state summary{min-height:48px;box-sizing:border-box;padding:12px 0;cursor:pointer}
+
+/* One current-field summary precedes optional evidence, even on a narrow phone. */
+.current-field-overview{min-width:0;border-top:1px solid var(--line,#ddd);padding-top:8px}
+.current-field-values{margin:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.current-field-values>div{display:flex;flex-direction:column;justify-content:space-between;gap:8px;min-width:0;padding:12px 0}
+.current-field-values dt{font-size:.9rem;font-weight:600;line-height:1.4}
+.current-field-values dt span{display:block;font-size:.75rem;color:var(--ink-2,#555);font-weight:400;margin-top:3px;line-height:1.4}
+.current-field-values dd{margin:0;font-size:1.6rem;font-weight:650;line-height:1.2;letter-spacing:-.025em}
+.current-field-overview>p{margin:8px 0;font-size:.85rem;line-height:1.5}
+.current-check{border-left:3px solid var(--line-strong,#999);padding-left:10px}
+.current-next-check{font-weight:550}
+.analytics-current-evidence{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start;min-width:0}
+.analytics-current-evidence .field-weather-block,.analytics-current-evidence .field-water-block{border:0;margin:0;padding:0;min-width:0}
+.analytics-current-evidence .field-water-block{display:flex;flex-direction:column;gap:12px}
+.analytics-current-evidence summary{min-height:48px;box-sizing:border-box;cursor:pointer}
+.analytics-current-evidence>section>details>summary{padding:14px 16px}
+.analytics-current-evidence summary h2{display:inline;font-size:1rem;line-height:1.4;margin:0}
+.analytics-current-evidence summary>span{display:block;margin:4px 0 0 16px;font-size:.8rem;font-weight:400;color:var(--ink-2,#555)}
+.analytics-current-evidence .analytics-details-body{gap:12px;padding:0 16px 16px}
+.analytics-current-evidence .analytics-details-body>.button{align-self:flex-start}
+.analytics-current-evidence :is(.weather-rain-total,.water-today-reading) strong{font-size:1.8rem}
+@media(max-width:700px){
+  .current-field-values{grid-template-columns:minmax(0,1fr);gap:0}
+  .current-field-values>div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.85fr);align-items:center;gap:12px;border-bottom:1px solid var(--line,#ddd);padding:10px 0}
+  .current-field-values dd{text-align:right;font-size:1.35rem;overflow-wrap:normal}
+  .analytics-current-evidence{grid-template-columns:minmax(0,1fr)}
+}
