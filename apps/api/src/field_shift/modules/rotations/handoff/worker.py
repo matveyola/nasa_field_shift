@@ -78,7 +78,7 @@ def execute(factory, lease, client=None):
         raise InvalidModelInput(
             "Rotation execution requires a worker task bound of at least 115 seconds"
         )
-    client = client or HandoffClient()
+    client = client or HandoffClient(correlation_id=lease.job_id)
     with factory() as session:
         current_field(session, lease)
         job = session.get(Job, lease.job_id)

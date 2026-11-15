@@ -27,7 +27,11 @@ def test_installed_spawn_catalog_and_offline_reference_round_trip():
 
 def test_private_http_auth_route_and_body_bounds(monkeypatch):
     calls = []
-    monkeypatch.setattr(server, "execute", lambda *args: calls.append(args) or (200, {"ok": True}))
+    monkeypatch.setattr(
+        server,
+        "execute",
+        lambda *args, **kwargs: calls.append((args, kwargs)) or (200, {"ok": True}),
+    )
     token = "unit-test-private-token-" * 2
     http = ThreadingHTTPServer(("127.0.0.1", 0), server.handler(token))
     thread = Thread(target=http.serve_forever, daemon=True)
@@ -52,7 +56,8 @@ def test_private_http_auth_route_and_body_bounds(monkeypatch):
         assert request("/catalog", "[]", headers)[0] == 400
         assert calls == []
         assert request("/catalog", "{}", headers)[0] == 200
-        assert calls == [("catalog", {})]
+        assert len(calls) == 1 and calls[0][0] == ("catalog", {})
+        assert server.valid_request_id(calls[0][1]["request_id"])
     finally:
         http.shutdown()
         http.server_close()
@@ -75,7 +80,8 @@ def test_warm_catalog_remains_authenticated_and_available_during_calculation(mon
     started, finish = Event(), Event()
     calls = []
 
-    def calculation(operation, payload):
+    def calculation(operation, payload, *, request_id=None):
+        assert server.valid_request_id(request_id)
         calls.append(operation)
         started.set()
         assert finish.wait(5), "Test did not release the calculation"

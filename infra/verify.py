@@ -67,6 +67,8 @@ def build_plan(root: Path, mode: str = "fast", build: bool = False) -> list[Chec
             "../../infra/check_agent_tree.py",
             "../../infra/test_agent_tree.py",
             "../../infra/test_ci_paths.py",
+            "../../infra/verify_cpu_benchmark.py",
+            "../../infra/test_cpu_benchmark.py",
             "../../infra/verify.py",
             "../../infra/test_verify.py",
         )
