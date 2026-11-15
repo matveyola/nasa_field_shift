@@ -71,3 +71,25 @@ def test_result_defaults_never_authorize_a_rank_without_explicit_interpretation(
         limitations=[],
     )
     assert not result.ranking_usable and result.suitability_status == "not_assessed"
+
+
+def test_seasonal_source_percentage_is_optional_and_never_derived():
+    from field_shift.modules.rotations.handoff.schemas import SeasonalWaterRow
+
+    values = dict(
+        job_id="j",
+        scenario_id="s",
+        plan_id="p",
+        crop_id="maize_grain",
+        start_date="2027-05-01",
+        end_date="2027-09-01",
+        data_kind="hybrid_scenario",
+        evidence_sha256="e",
+        demand_mm=100,
+        deficit_mm=20,
+    )
+    assert SeasonalWaterRow(**values).water_shortfall_pct is None
+    row = SeasonalWaterRow(
+        **values, water_shortfall_pct=19.98, input_sha256="i", engine_version="v"
+    )
+    assert row.water_shortfall_pct == 19.98 and row.input_sha256 == "i"

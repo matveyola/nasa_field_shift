@@ -143,6 +143,9 @@ class SeasonalWaterRow(Input):
     end_date: str
     data_kind: str
     evidence_sha256: str
+    input_sha256: str | None = None
+    engine_version: str | None = None
+    water_shortfall_pct: float | None = None
     demand_mm: float | None = None
     use_mm: float | None = None
     deficit_mm: float | None = None

@@ -77,6 +77,9 @@ export interface HandoffSeasonalWaterRow {
   end_date: string
   data_kind: string
   evidence_sha256: string
+  input_sha256?: string | null
+  engine_version?: string | null
+  water_shortfall_pct: number | null
   demand_mm: number | null
   use_mm: number | null
   deficit_mm: number | null
