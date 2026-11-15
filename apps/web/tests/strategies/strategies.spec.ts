@@ -1,11 +1,12 @@
 import { createRequire } from 'node:module'
 import type { Page } from '../../../../services/agent/frontend/node_modules/@playwright/test'
 const { test, expect } = createRequire(import.meta.url)('../../../../services/agent/frontend/node_modules/@playwright/test') as typeof import('../../../../services/agent/frontend/node_modules/@playwright/test')
+import { opportunities } from './opportunityFixtures'
 import { fixture } from '../planning/fixtures'
 import type { FarmPlanningRequest } from '../../src/api/planningV1.generated'
 import type { PlanningDraft, PlanningRequest, PlanningField } from '../../src/api/rotationPlanning'
 
-async function setup(page: Page, failFirst = false) {
+async function setup(page: Page, failFirst = false, openAllocation = true) {
   const fields: PlanningField[] = [{ id: 'north', name: 'North field', area_ha: 20 }, { id: 'south', name: 'South field', area_ha: 35.6 }]
     .map(field => ({ ...field, boundary_revision: 1, crop: 'Wheat', crop_season: 2026, history: [{ field_id: field.id, season: 2026, crop: 'Wheat' }] }))
   const requests: PlanningRequest[] = []
@@ -15,6 +16,7 @@ async function setup(page: Page, failFirst = false) {
   await page.route('**/api/**', async route => {
     const url = new URL(route.request().url())
     if (!url.pathname.startsWith('/api/')) return route.continue()
+    if (url.pathname.endsWith('/planting-opportunities')) return route.fulfill({ json: opportunities(url.pathname.split('/')[3], url.searchParams.get('planning_date')!, Number(url.searchParams.get('year_count'))) })
     if (url.pathname === '/api/planning-workspace') return route.fulfill({ json: {
       farm_id: 'synthetic-test-farm', profiles: [], missing_profiles: [{ field_id: 'north', name: 'North field', code: 'not_found' }],
       request: null, crop_options: [], model_card: null, configuration: null, status: 'unavailable', reason: 'Trusted weather and regional rules are not configured',
@@ -41,6 +43,7 @@ async function setup(page: Page, failFirst = false) {
     return route.fulfill({ status: 404, json: { detail: 'Unexpected test route' } })
   })
   await page.goto('/tests/strategies/index.html')
+  if (openAllocation) await page.getByRole('button', { name: 'Crop allocation', exact: false }).click()
   return { requests, contextYears, applied: () => applyCount }
 }
 
@@ -123,6 +126,7 @@ test('empty field catalog cannot produce a draft or invented decisions', async (
   await setup(page)
   await page.route('**/api/rotations/planning/context?*', route => route.fulfill({ json: { start_season: 2027, season_count: 1, min_season_count: 1, max_season_count: 6, fields: [], crops: [] } }))
   await page.reload()
+  await page.getByRole('button', { name: 'Crop allocation', exact: false }).click()
   await expect(page.getByText('No registered fields are available for allocation.', { exact: false })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Generate and save draft' })).toBeDisabled()
   await expect(page.locator('.strategy-decision')).toHaveCount(0)
@@ -196,6 +200,8 @@ test('saved durations restore without losing the plan, and year bounds are expli
   await expect(page.locator('.planner-field-results article').first().locator('section')).toHaveCount(3)
   await page.getByLabel('Allocation planning years').selectOption('1')
   await page.getByRole('combobox', { name: 'First harvest year', exact: true }).selectOption('2100')
+  await expect(page.getByRole('dialog')).toBeVisible()
+  await page.getByRole('button', { name: 'Start the new period', exact: true }).click()
   await expect.poll(() => state.contextYears.at(-1)).toBe(2100)
   await expect(page.getByLabel('Allocation planning years').locator('option[value="6"]')).toBeDisabled()
   await page.getByRole('button', { name: 'Generate and save draft' }).click()
@@ -223,4 +229,179 @@ test('sowing dates come from saved assignments and remain distinct from weather 
   await expect(card.getByText('Calendar constraint, not a weather-optimal date forecast', { exact: true })).toBeVisible()
   await expect(card.getByText('Weather-based sowing timing: Not assessed', { exact: true })).toBeVisible()
   await expect(card.getByText('Saved assignment', { exact: false })).toContainText(data.run.request.rulebook_version)
+})
+
+test('calendar is the first entry, with separate reviewed, typical, passed and unsupported evidence', async ({ page }, testInfo) => {
+  await setup(page, false, false)
+  await page.getByLabel('Planning date', { exact: true }).fill('2027-06-15')
+  await expect(page.getByRole('heading', { name: 'What could you consider sowing next?' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Reviewed windows open on the planning date', exact: false })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Current reference month', exact: false })).toBeVisible()
+  const winter = page.locator('[data-opportunity-id="winter-wheat"]')
+  await expect(winter).toContainText('September 2027')
+  await expect(winter).not.toContainText('1 September')
+  await expect(winter).toContainText('July 2028')
+  await expect(winter).toContainText('regional reference, not a range of admissible dates')
+  await winter.getByText('Why this entry, and where is it from?', { exact: true }).click()
+  await expect(winter).toContainText('synthetic-calendar-v1')
+  await expect(winter).toContainText('Sowing weather: not assessed. Profit: not assessed.')
+  await expect(winter.getByRole('link', { name: 'Calendar source' })).toHaveAttribute('href', 'https://example.org/test-calendar')
+  await expect(page.locator('[data-opportunity-id="reviewed"]')).toContainText('10 June 2027 – 20 June 2027')
+  await expect(page.locator('[data-opportunity-id="rice"]').getByRole('button')).toHaveCount(0)
+  await page.getByText('Passed windows and reference months (1)', { exact: true }).click()
+  await expect(page.locator('[data-opportunity-id="passed"]').getByRole('button')).toHaveCount(0)
+  await page.getByText('Missing calendar data (1)', { exact: true }).click()
+  await expect(page.locator('[data-opportunity-id="peas"]')).toContainText('Calendar unknown')
+  await expect(page.locator('[data-opportunity-id="peas"]').getByRole('button')).toHaveCount(0)
+  await page.screenshot({ path: testInfo.outputPath('planting-opportunities.png'), fullPage: true })
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+})
+
+test('maturity year prefills allocation, while an edited draft requires explicit replacement', async ({ page }) => {
+  const state = await setup(page)
+  await page.getByText('Fields and plan name', { exact: true }).click()
+  await page.getByLabel('Plan name', { exact: true }).fill('Keep my procurement draft')
+  await page.getByRole('button', { name: 'Next sowing opportunities', exact: false }).click()
+  await page.locator('[data-opportunity-id="winter-wheat"]').getByRole('button').click()
+  await expect(page.getByRole('dialog')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Keep current draft', exact: true })).toBeFocused()
+  await page.keyboard.press('Escape')
+  await page.getByRole('button', { name: 'Crop allocation', exact: false }).click()
+  await expect(page.getByLabel('Plan name', { exact: true })).toHaveValue('Keep my procurement draft')
+  expect(state.contextYears).toEqual([2027])
+  await page.getByRole('button', { name: 'Next sowing opportunities', exact: false }).click()
+  await page.locator('[data-opportunity-id="winter-wheat"]').getByRole('button').click()
+  await page.getByRole('button', { name: 'Start the new period', exact: true }).click()
+  await expect(page.getByRole('combobox', { name: 'First harvest year', exact: true })).toHaveValue('2028')
+  await expect.poll(() => state.contextYears.at(-1)).toBe(2028)
+  await expect(page.getByText('Calendar idea:', { exact: false })).toContainText('No crop is locked')
+  await page.getByRole('button', { name: 'Generate and save draft' }).click()
+  await expect.poll(() => state.requests.length).toBe(1)
+  expect(state.requests[0].start_season).toBe(2028)
+  expect(state.requests[0].locked).toEqual([])
+  expect(state.requests[0].crops).toHaveLength(7)
+})
+
+test('same-year calendar review preserves the draft and field changes preserve allocation edits', async ({ page }) => {
+  await setup(page)
+  await page.getByText('Fields and plan name', { exact: true }).click()
+  await page.getByLabel('Plan name', { exact: true }).fill('Same year draft')
+  await page.getByRole('button', { name: 'Next sowing opportunities', exact: false }).click()
+  await page.locator('[data-opportunity-id="reviewed"]').getByRole('button').click()
+  await expect(page.getByRole('dialog')).not.toBeVisible()
+  await expect(page.getByLabel('Plan name', { exact: true })).toHaveValue('Same year draft')
+  await page.getByLabel('Field in focus').selectOption('south')
+  await expect(page.getByText('Calendar idea:', { exact: false })).toHaveCount(0)
+  await expect(page.getByLabel('Plan name', { exact: true })).toHaveValue('Same year draft')
+})
+
+test('calendar date and rolling horizon use typed query parameters and reject cross-field responses', async ({ page }) => {
+  await setup(page, false, false)
+  const queries: URL[] = []
+  await page.route('**/planting-opportunities?*', route => {
+    const url = new URL(route.request().url()); queries.push(url)
+    return route.fulfill({ json: opportunities('wrong-field', url.searchParams.get('planning_date')!, Number(url.searchParams.get('year_count'))) })
+  })
+  await page.getByLabel('Planning date', { exact: true }).fill('2028-02-29')
+  await page.getByLabel('Calendar lookahead, years').selectOption('6')
+  await expect(page.getByText('Calendar does not match', { exact: false })).toBeVisible()
+  expect(queries.at(-1)?.searchParams.get('planning_date')).toBe('2028-02-29')
+  expect(queries.at(-1)?.searchParams.get('year_count')).toBe('6')
+  await expect(page.locator('.opportunity-card')).toHaveCount(0)
+  await page.getByLabel('Planning date', { exact: true }).fill('')
+  await expect(page.getByText('Enter a valid planning date from 1900 with a lookahead ending by 2100.', { exact: true })).toBeVisible()
+  await expect(page.locator('.opportunity-card')).toHaveCount(0)
+})
+
+test('calendar failures retry and empty results do not imply impossibility or block allocation', async ({ page }) => {
+  await setup(page, false, false)
+  let failure = true
+  await page.route('**/planting-opportunities?*', route => {
+    const url = new URL(route.request().url())
+    return failure ? route.fulfill({ status: 503, json: { detail: 'Calendar provider unavailable' } }) : route.fulfill({ json: { ...opportunities('north', url.searchParams.get('planning_date')!, Number(url.searchParams.get('year_count'))), items: [] } })
+  })
+  await page.getByLabel('Calendar lookahead, years').selectOption('2')
+  await expect(page.getByText('Calendar provider unavailable', { exact: true })).toBeVisible()
+  failure = false
+  await page.getByRole('button', { name: 'Try again', exact: true }).click()
+  await expect(page.getByText('This does not establish that sowing is impossible.', { exact: false })).toBeVisible()
+  await page.getByRole('button', { name: 'Crop allocation', exact: false }).click()
+  await expect(page.getByRole('button', { name: 'Generate and save draft' })).toBeVisible()
+})
+
+test('Ukrainian calendar guidance and input readiness remain available without a model', async ({ page }) => {
+  await setup(page, false, false)
+  await page.getByLabel('Language').selectOption('uk')
+  await expect(page.getByRole('heading', { name: 'Що можна розглянути для наступної сівби?' })).toBeVisible()
+  await expect(page.getByLabel('Дата планування', { exact: true })).toBeVisible()
+  await expect(page.locator('[data-opportunity-id="winter-wheat"]')).toContainText('не інтервал дозволених дат')
+  await page.getByRole('button', { name: 'Переглянути дані для оцінки', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Прогноз ще не готовий до порівняння' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Створити паспорт поля' })).toBeVisible()
+})
+
+test('late calendar responses cannot replace the newly selected field calendar', async ({ page }) => {
+  await setup(page, false, false)
+  let release!: () => void
+  const wait = new Promise<void>(resolve => { release = resolve })
+  let held = false
+  await page.route('**/planting-opportunities?*', async route => {
+    const url = new URL(route.request().url())
+    const field = url.pathname.split('/')[3]
+    if (field === 'north') { held = true; await wait }
+    const data = opportunities(field, url.searchParams.get('planning_date')!, Number(url.searchParams.get('year_count')))
+    data.items = [{ ...data.items[0], id: field + '-only', cycle_id: field + '-cycle' }]
+    await route.fulfill({ json: data })
+  })
+  await page.getByLabel('Calendar lookahead, years').selectOption('2')
+  await expect.poll(() => held).toBe(true)
+  await page.getByLabel('Field in focus').selectOption('south')
+  await expect(page.locator('[data-opportunity-id="south-only"]')).toBeVisible()
+  release()
+  await expect(page.locator('[data-opportunity-id="north-only"]')).toHaveCount(0)
+  await expect(page.locator('[data-opportunity-id="south-only"]')).toBeVisible()
+})
+
+test('an allocation mutation in flight prevents calendar replacement and remains recoverable', async ({ page }) => {
+  await setup(page)
+  let release!: () => void
+  const wait = new Promise<void>(resolve => { release = resolve })
+  let held = false
+  await page.route('**/api/rotations/planning/drafts', async route => {
+    if (route.request().method() !== 'POST') return route.fallback()
+    held = true; await wait
+    return route.fulfill({ status: 503, json: { detail: 'Synthetic delayed failure' } })
+  })
+  await page.getByRole('button', { name: 'Generate and save draft' }).click()
+  await expect.poll(() => held).toBe(true)
+  await page.getByRole('button', { name: 'Next sowing opportunities', exact: false }).click()
+  await expect(page.locator('[data-opportunity-id="winter-wheat"]').getByRole('button')).toBeDisabled()
+  release()
+  await expect(page.locator('[data-opportunity-id="winter-wheat"]').getByRole('button')).toBeEnabled()
+  await page.getByRole('button', { name: 'Crop allocation', exact: false }).click()
+  await expect(page.getByText('Synthetic delayed failure', { exact: true })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Generate and save draft' })).toBeEnabled()
+})
+
+test('a calendar handoff never silently shortens an allocation at the year limit', async ({ page }) => {
+  await setup(page)
+  await page.getByLabel('Allocation planning years').selectOption('6')
+  await page.route('**/planting-opportunities?*', route => {
+    const url = new URL(route.request().url())
+    const data = opportunities('north', url.searchParams.get('planning_date')!, Number(url.searchParams.get('year_count')))
+    data.items = [{ ...data.items[0], harvest_year: 2100 }]
+    return route.fulfill({ json: data })
+  })
+  await page.getByRole('button', { name: 'Next sowing opportunities', exact: false }).click()
+  await page.getByLabel('Planning date', { exact: true }).fill('2099-06-15')
+  await page.locator('[data-opportunity-id="winter-wheat"]').getByRole('button').click()
+  await expect(page.getByRole('dialog')).toContainText('Confirming changes the allocation to one harvest year: 2100')
+  await page.getByRole('button', { name: 'Keep current draft', exact: true }).click()
+  await page.getByRole('button', { name: 'Crop allocation', exact: false }).click()
+  await expect(page.getByLabel('Allocation planning years')).toHaveValue('6')
+  await page.getByRole('button', { name: 'Next sowing opportunities', exact: false }).click()
+  await page.locator('[data-opportunity-id="winter-wheat"]').getByRole('button').click()
+  await page.getByRole('button', { name: 'Start the new period', exact: true }).click()
+  await expect(page.getByLabel('Allocation planning years')).toHaveValue('1')
+  await expect(page.getByRole('combobox', { name: 'First harvest year', exact: true })).toHaveValue('2100')
 })

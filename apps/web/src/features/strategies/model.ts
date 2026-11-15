@@ -14,5 +14,5 @@ export function allocationSeasonSupported(season: number) {
 }
 
 export function initialStrategyView(focus?: 'profiles' | 'economics') {
-  return focus ? 'scenarios' : 'allocation'
+  return focus ? 'scenarios' : 'opportunities'
 }

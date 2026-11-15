@@ -5,7 +5,7 @@ import { StrategiesPage } from '../../src/features/strategies/StrategiesPage'
 import { LanguageSelect, LocaleProvider } from '../../src/shared/locale'
 import type { Field } from '../../src/api/contracts'
 import '../../src/shared/styles.css'
-const fields = [{ id: 'north', name: 'North field', area_ha: 20 }, { id: 'south', name: 'South field', area_ha: 35.6 }] as Field[]
+const fields = [{ id: 'north', name: 'North field', area_ha: 20, boundary_revision: 1 }, { id: 'south', name: 'South field', area_ha: 35.6, boundary_revision: 1 }] as Field[]
 if (new URLSearchParams(location.search).has('configured')) fields[0].id = 'G23'
 function Harness() {
   const [fieldId, setFieldId] = useState(fields[0].id)

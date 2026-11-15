@@ -28,7 +28,9 @@ function usePlanningLocale() {
   return { ...locale, t: (key: string) => locale.language === 'uk' && planningUkrainian[key] ? planningUkrainian[key] : locale.t(key) }
 }
 
-export function FarmRotationPlanner({ season, onApplied, embedded = false, fieldId, focusedField = fieldId, seasonCount, onSeasonCountChange }: { season: number; fieldId?: string; onApplied: () => void; embedded?: boolean; focusedField?: string; seasonCount?: number; onSeasonCountChange?: (count: number) => void }) {
+export type AllocationDraftState = { dirty: boolean; busy: boolean }
+
+export function FarmRotationPlanner({ season, onApplied, embedded = false, fieldId, focusedField = fieldId, seasonCount, onSeasonCountChange, onDraftState }: { season: number; fieldId?: string; onApplied: () => void; embedded?: boolean; focusedField?: string; seasonCount?: number; onSeasonCountChange?: (count: number) => void; onDraftState?: (state: AllocationDraftState) => void }) {
   const { t, language } = usePlanningLocale()
   const [internalCount, setInternalCount] = useState(3)
   const count = seasonCount ?? internalCount
@@ -42,11 +44,11 @@ export function FarmRotationPlanner({ season, onApplied, embedded = false, field
       </button>
     </div>}
     {embedded && <h2 id="farm-planner-title" className="sr-only">{t('Plan across your farm')}</h2>}
-    {(embedded || open) && <PlannerLoader key={season} startSeason={embedded ? season : Math.min(2101 - count, season + 1)} onApplied={onApplied} embedded={embedded} focusedField={focusedField} seasonCount={count} onSeasonCountChange={changeCount} />}
+    {(embedded || open) && <PlannerLoader key={season} startSeason={embedded ? season : Math.min(2101 - count, season + 1)} onApplied={onApplied} embedded={embedded} focusedField={focusedField} seasonCount={count} onSeasonCountChange={changeCount} onDraftState={onDraftState} />}
   </section>
 }
 
-function PlannerLoader({ startSeason, onApplied, embedded, focusedField, seasonCount, onSeasonCountChange }: { startSeason: number; onApplied: () => void; embedded?: boolean; focusedField?: string; seasonCount: number; onSeasonCountChange: (count: number) => void }) {
+function PlannerLoader({ startSeason, onApplied, embedded, focusedField, seasonCount, onSeasonCountChange, onDraftState }: { startSeason: number; onApplied: () => void; embedded?: boolean; focusedField?: string; seasonCount: number; onSeasonCountChange: (count: number) => void; onDraftState?: (state: AllocationDraftState) => void }) {
   const { t } = usePlanningLocale()
   const [firstSeason, setFirstSeason] = useState(startSeason)
   // Context provides field history/catalog. A horizon edit does not discard those inputs or the draft editor.
@@ -59,11 +61,11 @@ function PlannerLoader({ startSeason, onApplied, embedded, focusedField, seasonC
     </select></label>
     {context.pending && <Loading text={t('Loading farm planning data…')} />}
     {context.error && <ErrorBox message={context.error} retry={context.reload} />}
-    {context.data && !context.pending && <PlannerEditor key={JSON.stringify([context.data.start_season, context.data.fields])} context={context.data} onApplied={onApplied} refresh={context.reload} embedded={embedded} focusedField={focusedField} seasonCount={seasonCount} onSeasonCountChange={onSeasonCountChange} />}
+    {context.data && !context.pending && <PlannerEditor key={JSON.stringify([context.data.start_season, context.data.fields])} context={context.data} onApplied={onApplied} refresh={context.reload} embedded={embedded} focusedField={focusedField} seasonCount={seasonCount} onSeasonCountChange={onSeasonCountChange} onDraftState={onDraftState} />}
   </div>
 }
 
-function PlannerEditor({ context, onApplied, refresh, embedded, focusedField, seasonCount, onSeasonCountChange }: { context: PlanningContext; onApplied: () => void; refresh: () => void; embedded?: boolean; focusedField?: string; seasonCount: number; onSeasonCountChange: (count: number) => void }) {
+function PlannerEditor({ context, onApplied, refresh, embedded, focusedField, seasonCount, onSeasonCountChange, onDraftState }: { context: PlanningContext; onApplied: () => void; refresh: () => void; embedded?: boolean; focusedField?: string; seasonCount: number; onSeasonCountChange: (count: number) => void; onDraftState?: (state: AllocationDraftState) => void }) {
   const { t, number, language } = usePlanningLocale()
   const { canEdit } = useAccess()
   const [name, setName] = useState(t('Farm rotation plan'))
@@ -74,9 +76,12 @@ function PlannerEditor({ context, onApplied, refresh, embedded, focusedField, se
   const [history, setHistory] = useState<CropDecision[]>(context.fields.flatMap(({ history }) => history))
   const [locked, setLocked] = useState<CropDecision[]>([])
   const [busy, setBusy] = useState(false)
+  const [dirty, setDirty] = useState(false)
   const [error, setError] = useState<string>()
   const [draft, setDraft] = useState<PlanningDraft>()
   const [confirm, setConfirm] = useState(false)
+  const hasDraft = Boolean(draft && !draft.applied_at)
+  useEffect(() => { onDraftState?.({ dirty: dirty || hasDraft, busy }) }, [dirty, hasDraft, busy, onDraftState])
   const request = useRef<PlanningRequest | undefined>(undefined)
   const mounted = useRef(true)
   useEffect(() => { mounted.current = true; return () => { mounted.current = false } }, [])
@@ -87,7 +92,7 @@ function PlannerEditor({ context, onApplied, refresh, embedded, focusedField, se
   const total = selectedFields.reduce((sum, field) => sum + field.area_ha, 0)
   const years = Array.from({ length: seasonCount }, (_, index) => context.start_season + index)
 
-  function changed() { request.current = undefined; setDraft(undefined); setConfirm(false); setError(undefined) }
+  function changed() { setDirty(true); request.current = undefined; setDraft(undefined); setConfirm(false); setError(undefined) }
   function editRule(crop: PlanningCrop, property: keyof Omit<CropRule, 'crop'>, value: number | null) {
     changed(); setRules((current) => current.map((rule) => rule.crop === crop ? { ...rule, [property]: value } : rule))
   }
@@ -144,7 +149,7 @@ function PlannerEditor({ context, onApplied, refresh, embedded, focusedField, se
     setBusy(true); setError(undefined)
     try {
       const applied = await rotationPlanningApi.apply(draft.id)
-      if (mounted.current) { setDraft(applied); setConfirm(false); saved.reload(); onApplied() }
+      if (mounted.current) { setDraft(applied); setDirty(false); setConfirm(false); saved.reload(); onApplied() }
     } catch (failure) { if (mounted.current) setError(errorText(failure)) }
     finally { if (mounted.current) setBusy(false) }
   }

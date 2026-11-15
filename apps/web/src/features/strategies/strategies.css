@@ -56,3 +56,24 @@
 .strategies-page .strategy-crop-preview .planner-field-options { grid-template-columns: repeat(auto-fit, minmax(min(140px, 100%), 1fr)); }
 .strategies-page .strategy-crop-preview .planner-field-options label { padding: 10px; gap: 8px; min-height: 48px; }
 .strategies-page .strategy-crop-preview .crop-icon { width: 20px; height: 20px; flex-shrink: 0; }
+.strategies-workflows { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.planting-opportunities { display: grid; gap: 20px; min-width: 0; }
+.planting-opportunities .strategies-purpose { margin-bottom: 0; }
+.opportunity-group { min-width: 0; }
+.opportunity-group h3 { font-size: 1rem; margin-bottom: 14px; }
+.opportunity-group h3 span { font-weight: 400; }
+.opportunity-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 14px; margin-bottom: 12px; }
+.opportunity-card { padding: 20px; border: 1px solid var(--line, #ddd); border-radius: 16px; background: var(--card, white); min-width: 0; }
+.opportunity-card h4 { font-size: 1.35rem; margin: 10px 0; }
+.opportunity-card p, .opportunity-card li, .opportunity-card summary, .opportunity-method { font-size: .8rem; overflow-wrap: anywhere; }
+.opportunity-kind { font-weight: 600; margin: 0; }
+.opportunity-cycle, .opportunity-unavailable { color: var(--ink-2, #555); }
+.opportunity-card dl { margin: 16px 0; display: grid; gap: 6px; }
+.opportunity-card dt { font-size: .75rem; color: var(--ink-2, #555); }
+.opportunity-card dd { margin: 0 0 8px; font-size: .88rem; font-weight: 550; }
+.opportunity-card ul { padding-left: 20px; }
+.opportunity-card details { margin-top: 12px; border-top: 1px solid var(--line, #ddd); }
+.opportunity-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.opportunity-confirm { width: min(520px, calc(100% - 32px)); margin: auto; padding: 24px; border: 1px solid var(--line, #ddd); border-radius: 16px; color: var(--ink, #111); background: var(--card, white); }
+.opportunity-confirm::backdrop { background: #0007; }
+@media (max-width: 700px) { .strategies-workflows { grid-template-columns: 1fr; } .opportunity-card { padding: 16px; } }
