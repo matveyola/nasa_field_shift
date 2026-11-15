@@ -17,6 +17,7 @@ The executable entrypoint is `python3 infra/verify.py --mode fast --build` from 
 | `apps/api` | `uv sync --locked --extra dev` | `uv run --no-sync ruff check .`; `uv run --no-sync ruff format --check .`; `uv run --no-sync pytest -q -m "not integration"` |
 | `packages/field-shift-ml` | `uv sync --locked` | `uv run --no-sync ruff check .`; `uv run --no-sync ruff format --check .`; `uv run --no-sync pytest -q` |
 | `packages/field-shift-models` | `uv sync --locked` with Python `>=3.12,<3.13` | `uv run --no-sync ruff check .`; `uv run --no-sync ruff format --check .`; `uv run --no-sync pytest -q` |
+| `packages/field-shift-rotation-model` | `uv sync --locked --extra benchmark` | `uv run --no-sync ruff check .`; `uv run --no-sync ruff format --check .`; `uv run --no-sync pytest -q`; the frozen paired benchmark from current CI |
 | `services/agent` | `uv sync --locked` | `uv run --no-sync pytest -q` |
 | `apps/web` | `npm ci` | `npm test`; `npm run typecheck`; `npm run build` |
 | `services/agent` | `npm ci --ignore-scripts` | `npm run check:ts` |
@@ -40,6 +41,14 @@ At `apps/api`, run `uv run --no-sync pytest -q -m integration` with `FIELD_SHIFT
 At `services/agent/frontend`, run `npm run test:e2e` with the required Playwright browser installed. Default replay fixtures are deterministic. The checked-in Playwright config uses port 5173 and `reuseExistingServer: true`: serialize runs and verify the server belongs to the exact tested checkout, or use an explicitly isolated config/port. If the port belongs to the user, do not stop their server or claim it tests this revision.
 
 Worktrees do not isolate PostgreSQL, Redis, ports, Docker projects, volumes or image tags. Allocate those resources per run; builds can overwrite default image tags used by the running stack. Use existing infrastructure procedures and isolated resources for affected Docker builds. For migration and backup changes, follow the integration job's fresh-database restore procedure and validate restored data. A code revert is not a database rollback test.
+
+Do not overlap Docker/Compose container or network lifecycle changes with host
+Chromium suites using localhost unless their network environments are genuinely
+isolated. Chromium can report `ERR_NETWORK_CHANGED` while importing a local Vite
+module when host network interfaces change. Distinct projects and ports do not
+prevent that event. Preserve the failed trace and source identity, diagnose the
+interruption, finish lifecycle changes, then rerun only the affected suite without
+weakening product assertions. Do not present the interrupted attempt as passing.
 
 ## Optional execution and reporting
 
@@ -76,7 +85,7 @@ Packaging, resource, entry-point and dependency changes require
 Docker/live checks. Use pinned uv 0.11.0, matching CI and images, to preserve lock
 metadata. Clean wheels must work from a temporary unrelated directory under
 `python -I`, without editable imports or source-path overrides. The verifier checks
-all seven distributions and independent NumPy environments. It performs no training.
+all eight distributions and independent NumPy environments. It performs no training.
 
 For a prepared local assistant knowledge cache, export `AGENT_DATA_DIR` as the
 absolute `services/agent/data` path in that checkout before the full fast suite;
