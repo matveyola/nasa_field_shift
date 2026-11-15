@@ -14,7 +14,7 @@ from dataclasses import dataclass, field
 
 from contracts.models import CALC_FACT_PREFIX, Fact, Provenance, Quantity
 
-from . import plain, scenarios
+from . import grounding_dates, plain, scenarios
 
 # ------------------------------------------------------------------ formatting (shared with the dev agent)
 # What the text says after a value, in plain words (see plain.py). Plain data from a satellite or a weather service
@@ -192,11 +192,6 @@ FACT_TOKEN = re.compile(r"\{\{\s*fact\s*:\s*([^{}\s]{1,128})\s*\}\}")
 
 # A number not glued to a preceding letter (L4, V008) or letter-hyphen (FAO-56, poltava-01).
 _NUMBER = re.compile(r"(?<![^\W\d_])(?<![^\W\d_]-)(?<![\d.,])[-+±]?\d+(?:[.,]\d+)*")
-# ISO dates, d.m.yyyy, and the periods the app itself shows (plain.period): "01.07–31.07.2025", "1 Jul – 31 Jul 2025".
-_DATE = re.compile(
-    r"\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}\.\d{1,2}\.\d{4}\b|\b\d{1,2}\.\d{2}(?=\s?[–-]\s?\d{1,2}\.\d{2}\.\d{4})"
-    r"|\b\d{1,2}\s(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b(?:\s\d{4})?"
-)
 _YEAR = re.compile(r"(?:19|20)\d{2}")
 # Units after a number turn it into a measurement claim, whatever its size.
 _UNIT_AFTER = re.compile(
@@ -312,6 +307,111 @@ def visible_text(text: str) -> str:
     return "".join(ch for ch in text if unicodedata.category(ch) != "Cf")
 
 
+def _ground_dates(text, masked, retrieved, unverified):
+    """Mask full date spans only; unsupported spans remain explicit violations.
+
+    A sentence naming a fact cannot borrow dates from another fact, source
+    retrieval time, model version, field name, farmer text or old chat. Without
+    a fact token, only current retrieved temporal context can support a date.
+    """
+    violations = []
+    spans = grounding_dates.date_spans(masked)
+    sentences = list(_SENTENCE.finditer(text))
+    resolved = []
+    scoped_periods = []
+    for i, span in enumerate(spans):
+        sentence = next(s for s in sentences if s.start() <= span.start < s.end())
+        refs = list(FACT_TOKEN.finditer(text, sentence.start(), sentence.end()))
+        # A range describes one period. Resolve both ends against the same
+        # adjacent reference, not against the union of all dates mentioned in
+        # a comparison sentence (which would allow swapped days).
+        first, last = i, i
+        while first and grounding_dates.joins_range(
+            masked, spans[first - 1], spans[first]
+        ):
+            first -= 1
+        while last + 1 < len(spans) and grounding_dates.joins_range(
+            masked, spans[last], spans[last + 1]
+        ):
+            last += 1
+        start, end = spans[first].start, spans[last].end
+        nearby = []
+        for ref in refs:
+            gap = (
+                text[ref.end() : start]
+                if ref.end() <= start
+                else text[end : ref.start()]
+            )
+            if ";" not in gap and "\n" not in gap:
+                nearby.append((len(gap), ref.end() <= start, ref.start(), ref.group(1)))
+        ids = [min(nearby)[3]] if nearby else []
+        candidates = (
+            [retrieved[fid] for fid in ids if fid in retrieved]
+            if refs
+            else retrieved.values()
+        )
+        periods = {
+            (f.provenance.temporal.start, f.provenance.temporal.end)
+            for f in candidates
+            if f.id not in unverified
+            and f.provenance.temporal is not None
+            and f.provenance.data_status != "unavailable"
+            and f.provenance.kind != "farmer_input"
+        }
+        endpoints = {d for period in periods for d in period}
+        value = span.resolve(endpoints, grounding_dates.range_year(masked, spans, i))
+        # A date immediately used as money/a measurement is not a date escape.
+        if _UNIT_AFTER.match(masked[span.end : span.end + 12]):
+            value = None
+        resolved.append(value)
+        scoped_periods.append(periods)
+    invalid = {i for i, value in enumerate(resolved) if value is None}
+    for i in range(len(spans) - 1):
+        if grounding_dates.joins_range(masked, spans[i], spans[i + 1]):
+            pair = (resolved[i], resolved[i + 1])
+            if pair not in scoped_periods[i] or pair not in scoped_periods[i + 1]:
+                invalid.update((i, i + 1))
+    for i, span in enumerate(spans):
+        if i in invalid:
+            violations.append(
+                Violation(
+                    "ungrounded_date", text[span.start : span.end], span.start, span.end
+                )
+            )
+    # Rejected dates are already violations; do not also diagnose their digits
+    # as measurements. Nothing grants those digits authority elsewhere.
+    for span in reversed(spans):
+        masked = (
+            masked[: span.start] + "§" * (span.end - span.start) + masked[span.end :]
+        )
+    return masked, violations
+
+
+def _bare_fact_context(fact, retrieved, lang, unverified=False):
+    """Keep a standalone temporal value identifiable after sentence redaction."""
+    temporal = fact.provenance.temporal
+    if fact.provenance.data_status == "unavailable":
+        return ""
+    # Unknown labels are not inferred from ids. Existing translated vocabulary
+    # is the authority; provenance dates/sources remain useful independently.
+    parts = [plain.NAMES[lang].get(fact.label_key, "")]
+    if unverified or fact.provenance.kind == "farmer_input":
+        return parts[0]  # Do not reinsert dates rejected by the trust boundary.
+    if temporal is not None:
+        parts.append(plain.period(temporal.start, temporal.end, lang))
+    elif fact.domain in {"climate", "water"}:
+        parts.append("період не вказано" if lang == "uk" else "period not supplied")
+    sources = [fact.provenance.source]
+    if fact.provenance.kind == "deterministic_calc":
+        sources += [
+            retrieved[fid].provenance.source
+            for fid in fact.provenance.inputs
+            if fid in retrieved and retrieved[fid].provenance.temporal == temporal
+        ]
+    parts += list(dict.fromkeys(plain.source(s.product_id, lang) for s in sources if s))
+    return "; ".join(p for p in parts if p)
+
+
 def check(
     text: str,
     *,
@@ -359,16 +459,20 @@ def check(
         elif fid not in used:
             used.append(fid)
 
-    # 2. Numbers the model wrote itself (tokens, dates and inline code are masked first). A claim
+    # 2. Numbers the model wrote itself (tokens, verified dates and inline code are masked first). A claim
     #    number is allowed only inside a sentence citing a passage that contains it (row/column-aware).
     masked = FACT_TOKEN.sub(lambda m: "§" * len(m.group(0)), text)
     masked = citations.CITE_TOKEN.sub(lambda m: "§" * len(m.group(0)), masked)
-    masked = _DATE.sub(lambda m: "§" * len(m.group(0)), masked)
+    masked, date_violations = _ground_dates(text, masked, retrieved, unverified)
+    violations += date_violations
     masked = scenarios.NAMES.sub(
         lambda m: "§" * len(m.group(0)), masked
     )  # "спека +2,5 °C" is a name, not a value
     masked = re.sub(r"`[^`\n]{0,80}`", lambda m: "§" * len(m.group(0)), masked)
-    farmer_numbers = set(re.findall(r"\d+", farmer_text))
+    # A farmer's date is not a monetary or measurement input. Its component
+    # digits must not become an allowance for unrelated numeric claims.
+    farmer_scalars = grounding_dates.DATE.sub(" ", farmer_text)
+    farmer_numbers = set(re.findall(r"\d+", farmer_scalars))
     sentence_has_claims: dict[int, bool] = {}
     for m in _NUMBER.finditer(masked):
         if not _number_is_claim(masked, m, farmer_numbers):
@@ -464,16 +568,25 @@ def check(
     mixed = "fixture" in shown and any(
         s not in ("fixture", "unavailable") for s in shown
     )
-    rendered = FACT_TOKEN.sub(
-        lambda m: (
-            render_fact(
-                retrieved[m.group(1)], lang, m.group(1) in unverified, mark_demo=mixed
-            )
-            if m.group(1) in retrieved
-            else ""
-        ),
-        text,
-    )
+    bare_spans = [
+        (s.start(), s.end())
+        for s in _SENTENCE.finditer(text)
+        if not FACT_TOKEN.sub("", s.group(0)).strip(" \t\n.,:;–—-()")
+    ]
+
+    def render(m):
+        fid = m.group(1)
+        if fid not in retrieved:
+            return ""
+        fact = retrieved[fid]
+        value = render_fact(fact, lang, fid in unverified, mark_demo=mixed)
+        if any(start <= m.start() < end for start, end in bare_spans):
+            context = _bare_fact_context(fact, retrieved, lang, fid in unverified)
+            if context:
+                return f"{context}: {value}"
+        return value
+
+    rendered = FACT_TOKEN.sub(render, text)
 
     # 5. Citation tokens -> [n]; one Citation per chunk, quote = exact span closest to the claim.
     numbers: dict[str, int] = {}

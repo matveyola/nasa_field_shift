@@ -971,8 +971,9 @@ async def get_weather_forecast(
             }
             for d in days
         ],
-        "note": "Cite each value only with its cite_as token. Name days by their weekday only (in a table row label too: "
-        "no date or other numbers). spray_window is the longest "
+        "note": "Cite each value only with its cite_as token. In prose, show the exact returned date beside its fact token; "
+        "use that fact's temporal period, not the selected planning year or source retrieval date. "
+        "Table row labels remain words only (for example weekdays), with no date or other numbers. spray_window is the longest "
         "calm, dry stretch by rough general thresholds; alert names frost or heat. Say it is a forecast that can "
         "change, and for spraying tell the farmer to follow the product label and local rules.",
     }, list(by_id)
