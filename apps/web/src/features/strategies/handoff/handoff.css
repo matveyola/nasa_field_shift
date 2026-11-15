@@ -61,3 +61,12 @@
 @container strategy-workspace (max-width: 600px) {
   .handoff-brief-lead { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* Start with sowing inputs; secondary setup stays explicit and editable. */
+.handoff-workspace { gap: 12px; }
+.handoff-workspace .strategies-purpose h2 { font-size: 1.1rem; margin-bottom: 6px; }
+.handoff-workspace .handoff-entry-status { margin: 0; }
+.handoff-workspace .handoff-saved { padding-top: 0; }
+.handoff-workspace .handoff-saved > summary { padding-block: 8px; }
+.handoff-setup-value { display: block; color: var(--ink-2, #555); font-size: .8rem; font-weight: 400; margin-top: 4px; }
+.handoff-setup > .handoff-period { margin-top: 12px; }

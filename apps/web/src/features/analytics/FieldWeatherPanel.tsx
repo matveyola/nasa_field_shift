@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import type { Field } from '../../api/contracts'
-import { fieldWeatherApi, type WeatherScope, type RainHistory } from '../../api/fieldWeather'
+import { fieldWeatherApi, type WeatherScope, type RainHistory, type FieldWeather } from '../../api/fieldWeather'
 import { useResource } from '../../shared/useResource'
 import { useLocale } from '../../shared/locale'
 import { temperatureRange } from './weatherSummary'
@@ -16,17 +16,16 @@ export function WeatherSources({ data }: { data: WeatherScope }) {
       <p>{uk ? 'Сіткові дані поблизу поля, не вимірювання на полі.' : 'Grid data near the field, not measurements on the field.'} {data.latitude}, {data.longitude}</p>
       <p>{uk ? 'Ревізія межі' : 'Boundary revision'} {data.boundary_revision}</p></div></details>
 }
-export function FieldWeatherPanel({ field }: { field: Field }) {
+export function FieldWeatherPanel({ field, forecast }: { field: Field; forecast: { data?: FieldWeather; pending: boolean; error?: string; reload: () => void } }) {
   const { language, number, date: fullDate, shortDate } = useLocale(); const uk = language === 'uk'
   const label = (en: string, ua: string) => uk ? ua : en
   const num = (n: number | null | undefined, unit = '') => n == null ? label('Unavailable', 'Немає даних') : `${number(n, 1)}${unit ? ' ' + unit : ''}`
-  const forecastLoad = useCallback((signal: AbortSignal) => fieldWeatherApi.forecast(field.id, signal), [field.id, field.boundary_revision])
-  const forecast = useResource(forecastLoad)
   const current = matchesWeather(forecast.data, field) ? forecast.data : undefined
   const temperatures = temperatureRange(current?.hours ?? [])
   return <section className="field-weather-block" aria-labelledby="field-weather-heading">
-    <header className="weather-block-heading"><div><h2 id="field-weather-heading">{label('Field weather', 'Погода поля')}</h2>{!field.crop.trim() && <p>{label('Weather does not require a selected crop.', 'Погода доступна без обраної культури.')}</p>}</div>
-      <button className="button" type="button" onClick={forecast.reload}>{label('Refresh', 'Оновити')}</button></header>
+    <details className="analytics-disclosure weather-detail"><summary><h2 id="field-weather-heading">{label('Field weather', 'Погода поля')}</h2><span>{label('Hourly and daily weather', 'Погода за годинами та днями')}</span></summary><div className="analytics-details-body">
+    <button className="button" type="button" onClick={forecast.reload}>{label('Refresh', 'Оновити')}</button>
+    {!field.crop.trim() && <p>{label('Weather does not require a selected crop.', 'Погода доступна без обраної культури.')}</p>}
     {forecast.pending && <p role="status">{label('Loading forecast…', 'Завантаження прогнозу…')}</p>}
     {forecast.data && !current && <p role="status">{label('Forecast belongs to an earlier field boundary. Refresh it.', 'Прогноз відповідає попередній межі поля. Оновіть його.')}</p>}
     {forecast.error && <ErrorBox message={forecast.error} retry={forecast.reload} />}
@@ -47,7 +46,6 @@ export function FieldWeatherPanel({ field }: { field: Field }) {
       {current.hours.some(h => h.below_zero === true) && <p className="analytics-caution">{label('Below 0 °C is forecast. Check the hours below.', 'Прогнозується температура нижче 0 °C. Перевірте години нижче.')}</p>}
       <p>{label('Most precipitation', 'Найбільше опадів')}: {current.wettest_dates.length ? current.wettest_dates.map(shortDate).join(', ') : label('Unavailable', 'Немає даних')}</p>
       {current.missing_dates.length > 0 && <p role="status">{label('Missing forecast dates', 'Відсутні дати прогнозу')}: {current.missing_dates.map(shortDate).join(', ')}</p>}
-      <details className="analytics-disclosure weather-detail"><summary>{label('Hourly and daily weather', 'Погода за годинами та днями')}</summary><div className="analytics-details-body">
       <h4>{label('Hourly readings', 'Погодинні показники')}</h4><p className="analytics-meta">{current.timezone} · {current.hours[0] && new Intl.DateTimeFormat(uk ? 'uk-UA' : 'en-GB', {timeZone: current.timezone, dateStyle:'short',timeStyle:'short'}).format(new Date(current.hours[0].time))} — {current.hours.at(-1) && new Intl.DateTimeFormat(uk ? 'uk-UA' : 'en-GB', {timeZone: current.timezone, dateStyle:'short',timeStyle:'short'}).format(new Date(current.hours.at(-1)!.time))}</p>
       <div className="weather-hour-strip" role="list" aria-label={label('Hourly weather', 'Погодинна погода')}>{current.hours.map(h => <div role="listitem" className={h.below_zero ? 'weather-hour below-zero' : 'weather-hour'} key={h.time}>
         <time dateTime={h.time}>{new Intl.DateTimeFormat(uk ? 'uk-UA' : 'en-GB', { timeZone: current.timezone, day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(new Date(h.time))}</time>
@@ -55,9 +53,9 @@ export function FieldWeatherPanel({ field }: { field: Field }) {
       <div className="weather-daily-list">{current.forecast_days.map(d => <div key={d.date}><time dateTime={d.date}>{shortDate(d.date)}</time><strong>{num(d.rain_mm, label('mm', 'мм'))}</strong><span>{label('Rain chance', 'Імовірність опадів')}: {num(d.rain_probability_percent, '%')}</span></div>)}</div>
       <p>{label('Lowest daily maximum rain chance', 'Найменша денна максимальна ймовірність опадів')}: {current.lowest_probability_dates.length ? current.lowest_probability_dates.map(shortDate).join(', ') : label('Unavailable', 'Немає даних')}</p>
       <p>{label('The rain view requests five days for near-term planning. This is not a seasonal forecast or a claim that the provider cannot forecast further. Past rainfall has separate 7- and 30-day views; seasonal water uses saved model scenarios below.', 'Огляд опадів запитує п’ять днів для найближчих робіт. Це не сезонний прогноз і не обмеження можливостей постачальника. Минулі опади мають окремі огляди за 7 і 30 днів, а вода за сезон — збережені сценарії моделі нижче.')}</p>
-      </div></details>
       <WeatherSources data={current} />
     </>}
+    </div></details>
   </section>
 }
 

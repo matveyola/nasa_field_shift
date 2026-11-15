@@ -40,6 +40,8 @@ for (const language of ['en', 'uk'] as const) for (const variant of ['cold', 'co
       await expect(page.locator('.field-sheet-trigger')).not.toContainText('No water shortage expected')
       await expect(signal).not.toContainText('Modeled reserve')
       await page.goto('/analytics?section=water&field=F-01&season=2026&desktop=1')
+      await expect(page.locator('.current-reserve dd')).toHaveText(text('No estimate', 'Немає оцінки'))
+      await expect(page.locator('.current-field-overview')).toContainText(text('No current water estimate', 'Немає актуальної оцінки води'))
       await expect(page.locator('.water-today-reading')).toHaveCount(0)
       await page.getByText(text('Water controls, history and scenarios', 'Керування водою, історія та сценарії'), { exact: true }).click()
       await expect(page.locator('.water-forecast-panel')).toBeVisible()
@@ -71,14 +73,28 @@ for (const language of ['en', 'uk'] as const) for (const variant of ['cold', 'co
     } else if (variant === 'legacy') await expect(signal).toContainText(text('Temperature applicability is unknown', 'Температурна застосовність цього збереженого розрахунку невідома'))
     else await expect(signal).toContainText(text('do not establish crop suitability', 'не доводить придатності для культури'))
     await page.goto('/analytics?section=water&field=F-01&season=2026&desktop=1')
+    const overview = page.locator('.current-field-overview')
+    await expect(overview.locator('.current-reserve dd')).toHaveText(text(`${reserve} mm`, `${reserve} мм`))
+    await expect(overview.getByRole('note')).toBeVisible()
+    await expect(overview.getByRole('note')).toContainText(text('Freezing, thawing and dormancy are not modeled', 'Замерзання, відтавання і стан спокою не моделюються'))
+    await expect(overview.getByRole('note')).toContainText(text('not measured liquid water or a crop-growth assessment', 'не є виміряною рідкою водою чи оцінкою росту культури'))
+    if (cold) {
+      await expect(overview.getByRole('note')).toContainText('0–7')
+      await expect(overview.getByRole('note')).toContainText('≤0 °C')
+      await expect(overview.getByRole('note')).toContainText(text('whole root zone is not established', 'всієї кореневої зони не доведено'))
+    } else if (variant === 'legacy') await expect(overview.getByRole('note')).toContainText(text('Temperature applicability unknown', 'Температурна застосовність невідома'))
+    else await expect(overview.getByRole('note')).toContainText(text('Crop suitability and liquid water are not assessed', 'Придатність для культури та рідку воду не оцінено'))
+    await expect(overview).not.toContainText('No water shortage expected')
     const panel = page.locator('.field-water-block')
+    // The compact overview now precedes one closed daily-evidence disclosure.
+    // Preserve every original full-note, quantity and source assertion after opening it.
+    await panel.getByText(text('Daily calculation and assumptions', 'Щоденний розрахунок і припущення'), { exact: true }).click()
     await expect(panel.locator('.water-today-reading')).toHaveText(text(`${reserve} mmmodeled reserve at day end`, `${reserve} ммрозрахунковий запас на кінець дня`))
     await expect(panel).toContainText(text('not a measurement of liquid plant-available water', 'не є вимірюванням доступної рослинам рідкої води'))
     if (cold) await expect(panel.getByRole('note')).toContainText(text('shallow 0–7 cm', 'поверхневому шарі 0–7 см'))
     else if (variant === 'legacy') await expect(panel.getByRole('note')).toContainText(text('no shallow-soil diagnostic was stored', 'діагностику поверхневого ґрунту не збережено'))
     else await expect(panel.getByRole('note')).toContainText(text('do not establish crop suitability', 'не доводить придатності для культури'))
     if (variant !== 'legacy') {
-      await panel.getByText(text('Daily calculation and assumptions', 'Щоденний розрахунок і припущення'), { exact: true }).click()
       await expect(panel).toContainText('soil_temperature_0_to_7cm_mean')
       await expect(panel).toContainText(`${new Intl.NumberFormat(language === 'uk' ? 'uk-UA' : 'en-US', {maximumFractionDigits: 1}).format(temperature)} °C`)
     }
