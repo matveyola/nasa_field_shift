@@ -44,9 +44,11 @@ class VerifyTests(unittest.TestCase):
                 (
                     sys.executable,
                     "-c",
-                    "from pathlib import Path; "
-                    "assert Path('order').read_text() == str(Path.cwd()); "
-                    "Path('order').write_text('complete')",
+                    (
+                        "from pathlib import Path; "
+                        "assert Path('order').read_text() == str(Path.cwd()); "
+                        "Path('order').write_text('complete')"
+                    ),
                 ),
             ),
         ]
@@ -57,11 +59,17 @@ class VerifyTests(unittest.TestCase):
 
     def test_failure_stops_before_later_command(self) -> None:
         checks = [
-            verify.Check("failure", self.root, (sys.executable, "-c", "raise SystemExit(7)")),
+            verify.Check(
+                "failure", self.root, (sys.executable, "-c", "raise SystemExit(7)")
+            ),
             verify.Check(
                 "must not run",
                 self.root,
-                (sys.executable, "-c", "from pathlib import Path; Path('unexpected').touch()"),
+                (
+                    sys.executable,
+                    "-c",
+                    "from pathlib import Path; Path('unexpected').touch()",
+                ),
             ),
         ]
         self.assertEqual(verify.execute(checks), 7)
@@ -88,9 +96,13 @@ class VerifyTests(unittest.TestCase):
         plan = verify.build_plan(self.root, build=True)
         self.assertEqual(plan[0].argv, ("npm", "run", "check:validators"))
         self.assertEqual(plan[1].argv, ("npm", "run", "check:ts"))
-        first_unit = next(index for index, check in enumerate(plan) if "unit tests" in check.name)
+        first_unit = next(
+            index for index, check in enumerate(plan) if "unit tests" in check.name
+        )
         builds = [
-            index for index, check in enumerate(plan) if check.argv == ("npm", "run", "build")
+            index
+            for index, check in enumerate(plan)
+            if check.argv == ("npm", "run", "build")
         ]
         self.assertEqual(len(builds), 2)
         self.assertTrue(all(1 < index < first_unit for index in builds))
@@ -122,6 +134,7 @@ class VerifyTests(unittest.TestCase):
                 "apps/api",
                 "packages/field-shift-ml",
                 "packages/field-shift-models",
+                "packages/field-shift-rotation-model",
                 "services/agent",
                 "apps/web",
                 "services/agent/frontend",
@@ -140,9 +153,11 @@ class VerifyTests(unittest.TestCase):
         self.assertTrue(all(check.cwd == self.root for check in plan))
 
     def test_tooling_rejects_build_instead_of_ignoring_it(self) -> None:
-        with patch.object(verify.subprocess, "run") as run:
-            with self.assertRaises(SystemExit) as error:
-                verify.main(["--mode", "tooling", "--build"])
+        with (
+            patch.object(verify.subprocess, "run") as run,
+            self.assertRaises(SystemExit) as error,
+        ):
+            verify.main(["--mode", "tooling", "--build"])
         self.assertEqual(error.exception.code, 2)
         run.assert_not_called()
 

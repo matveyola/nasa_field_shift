@@ -457,6 +457,7 @@ subprocess.run(["alembic", "downgrade", "0010_precision_plans"], check=True)
                 ISSUE3_DATABASE_URL=f"postgresql+psycopg://field_shift:{password}@127.0.0.1:{pg_port}/planning_profiles",
                 ISSUE5_POSTGRES_ADMIN_URL=f"postgresql://field_shift:{password}@127.0.0.1:{pg_port}/planning_test",
                 FIELD_SHIFT_TEST_REDIS_URL=f"redis://127.0.0.1:{redis_port}/15",
+                FIELD_SHIFT_HANDOFF_TEST_DATABASE_URL=f"postgresql+psycopg://field_shift:{password}@127.0.0.1:{pg_port}/planning_test",
             )
             command(
                 [
@@ -471,6 +472,17 @@ subprocess.run(["alembic", "downgrade", "0010_precision_plans"], check=True)
                 env=test_env,
             )
             check("all impacted PostgreSQL/Redis integration and concurrency tests")
+            command(
+                [
+                    str(ROOT / "apps/api/.venv/bin/python"),
+                    "-m",
+                    "pytest",
+                    "-q",
+                    "apps/api/tests/test_rotation_handoff.py",
+                ],
+                env=test_env,
+            )
+            check("handoff owner, snapshot and final-attempt fences on PostgreSQL")
             compose("stop", "crop-model")
             unavailable = api("/planning-workspace")
             assert (

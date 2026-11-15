@@ -63,6 +63,7 @@ jobs:
       integration: ${{ steps.detect.outputs.integration }}
       ml: ${{ steps.detect.outputs.ml }}
       planning: ${{ steps.detect.outputs.planning }}
+      rotation_model: ${{ steps.detect.outputs.rotation_model }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -90,6 +91,7 @@ jobs:
             /^(packages\/field-shift-ml\/|apps\/api\/src\/field_shift\/modules\/(crops|fields|geo_ml|rotations|simulation|weather)\/|\.github\/workflows\/ci\.yml$)/ { ml = 1 }
             /^(contracts\/planning-v1\/|packages\/field-shift-models\/|services\/crop-model\/|apps\/api\/|apps\/web\/|compose\.yaml|infra\/|\.github\/workflows\/ci\.yml)/ { planning = 1 }
             /^packages\/field-shift-(contracts|science)\// { api = 1; ml = 1; planning = 1; integration = 1 }
+            /^(packages\/field-shift-rotation-model\/|services\/rotation-model\/|\.github\/workflows\/ci\.yml$)/ { rotation_model = 1; api = 1; planning = 1; integration = 1 }
             /^contracts\/planning-v1\// { api = 1; web = 1; integration = 1 }
             END {
               print "planning=" (planning ? "true" : "false")
@@ -100,6 +102,7 @@ jobs:
               print "web=" (web ? "true" : "false")
               print "integration=" (integration ? "true" : "false")
               print "ml=" (ml ? "true" : "false")
+              print "rotation_model=" (rotation_model ? "true" : "false")
             }' "$RUNNER_TEMP/changes" >> "$GITHUB_OUTPUT"
 
   api:
@@ -215,6 +218,72 @@ jobs:
       - name: Remove test containers and model volume
         if: always()
         run: docker compose down --volumes
+
+  rotation_model:
+    needs: changes
+    if: needs.changes.outputs.rotation_model == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+        with:
+          version: '0.11.0'
+          python-version: '3.12'
+          enable-cache: true
+          cache-dependency-glob: packages/field-shift-rotation-model/uv.lock
+      - run: uv sync --project packages/field-shift-rotation-model --locked --extra benchmark
+      - run: uv run --no-sync ruff check .
+        working-directory: packages/field-shift-rotation-model
+      - run: uv run --no-sync ruff format --check . && uv run --no-sync pytest -q
+        working-directory: packages/field-shift-rotation-model
+      - run: packages/field-shift-rotation-model/.venv/bin/python -m field_shift_rotation_model.benchmark --output "$RUNNER_TEMP/rotation-paired.json"
+      - name: Preserve the paired numerical baseline
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          actual = json.loads((Path(os.environ['RUNNER_TEMP']) / 'rotation-paired.json').read_text())
+          expected = json.loads(Path('packages/field-shift-rotation-model/reports/paired-v1.json').read_text())
+          assert actual == expected
+          PY
+      - run: docker build -f services/rotation-model/Dockerfile -t field-shift-rotation-model:ci .
+      - name: Check the installed private HTTP boundary without network access
+        run: |
+          export FIELD_SHIFT_ROTATION_MODEL_TOKEN="$(python3 -c 'import secrets; print(secrets.token_hex(32))')"
+          docker run -d --name rotation-model-ci --network none --read-only \
+            --tmpfs /tmp:size=256m --memory 2304m --cpus 1 --pids-limit 64 \
+            --cap-drop ALL --security-opt no-new-privileges \
+            --env FIELD_SHIFT_ROTATION_MODEL_TOKEN field-shift-rotation-model:ci
+          docker exec -i rotation-model-ci /opt/rotation-model/bin/python -I - <<'PY'
+          import json, os, time
+          from urllib.error import HTTPError, URLError
+          from urllib.request import Request, urlopen
+          base = 'http://127.0.0.1:8080'
+          headers = {'Authorization': 'Bearer ' + os.environ['FIELD_SHIFT_ROTATION_MODEL_TOKEN']}
+          for attempt in range(20):
+              try:
+                  with urlopen(Request(base + '/health', headers=headers), timeout=2) as response:
+                      assert json.load(response)['status'] == 'ready'
+                  break
+              except URLError:
+                  if attempt == 19:
+                      raise
+                  time.sleep(.5)
+          try:
+              urlopen(base + '/health', timeout=2)
+              raise AssertionError('Private health accepted an unauthenticated request')
+          except HTTPError as error:
+              assert error.code == 401
+          with urlopen(Request(base + '/catalog', data=b'{}', headers=headers), timeout=55) as response:
+              catalog = json.load(response)
+          assert len(catalog['crops']) == 13
+          assert catalog['empirical_status'] == 'not_validated'
+          PY
+      - if: always()
+        run: docker rm -f rotation-model-ci || true
 
   agent_reference:
     needs: changes
@@ -346,12 +415,18 @@ jobs:
       - run: uv sync --project apps/api --locked --extra dev
       - run: uv sync --project packages/field-shift-models --locked --python 3.12
       - run: packages/field-shift-models/.venv/bin/python -m pytest -q packages/field-shift-models/tests
-      - run: packages/field-shift-models/.venv/bin/python -m field_shift_models.cli benchmark --check packages/field-shift-models/reports/cpu-v5.json
+      - run: packages/field-shift-models/.venv/bin/python -m field_shift_models.cli benchmark --check packages/field-shift-models/reports/cpu-v6.json
       - run: npm ci --prefix apps/web && npm ci --prefix services/agent && npm ci --prefix services/agent/frontend
       - run: apps/api/.venv/bin/python -m field_shift_contracts.planning_v1.export --repo-root . --check
       - run: node contracts/planning-v1/check.mjs && apps/web/node_modules/.bin/tsc -p contracts/planning-v1/tsconfig.json
-      - run: node services/agent/frontend/node_modules/@playwright/test/cli.js install --with-deps chromium
+      - run: apps/web/node_modules/.bin/playwright install --with-deps chromium
       - run: npm run test:planning --prefix apps/web
+      - name: Check decision workspaces on desktop and mobile
+        working-directory: apps/web
+        run: |
+          for config in tests/analytics/playwright.config.ts tests/strategies/playwright.config.ts playwright.workspace.config.ts; do
+            ./node_modules/.bin/playwright test --config "$config"
+          done
       - run: apps/api/.venv/bin/ruff check --config apps/api/pyproject.toml services/crop-model/crop_runtime
       - run: python3 infra/verify-planning.py
         env:
@@ -361,14 +436,14 @@ jobs:
         with:
           name: planning-verification
           path: |
-            apps/web/test-results/planning-v1
+            apps/web/test-results
             /tmp/field-shift-planning-verification/report.json
           if-no-files-found: ignore
 
   required:
     name: Required checks
     if: always()
-    needs: [agent_tooling, python_packages, changes, api, ml, agent, boundary_model, agent_reference, web, integration, planning]
+    needs: [agent_tooling, python_packages, changes, api, ml, agent, boundary_model, rotation_model, agent_reference, web, integration, planning]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     env:

@@ -123,6 +123,7 @@ def build_plan(root: Path, mode: str = "fast", build: bool = False) -> list[Chec
         ("API", "apps/api"),
         ("ML", "packages/field-shift-ml"),
         ("models", "packages/field-shift-models"),
+        ("rotation model", "packages/field-shift-rotation-model"),
     )
     for name, directory in python_packages:
         add(f"{name} lint", directory, "uv", "run", "--no-sync", "ruff", "check", ".")

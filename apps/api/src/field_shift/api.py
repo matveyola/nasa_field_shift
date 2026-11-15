@@ -28,6 +28,7 @@ from field_shift.modules.planning_runtime.body_limit import PlanningBodyLimit
 from field_shift.modules.planning_runtime.routes import router as scenario_router
 from field_shift.modules.planning_runtime.routes import workspace_router
 from field_shift.modules.precision.routes import router as precision_router
+from field_shift.modules.rotations.handoff.routes import router as rotation_handoff_router
 from field_shift.modules.rotations.planning_routes import router as rotation_planning_router
 from field_shift.modules.rotations.routes import router as rotations_router
 from field_shift.modules.simulation.routes import router as simulation_router
@@ -90,6 +91,7 @@ def create_app(
         onboarding_router,
         field_history_router,
         rotation_planning_router,
+        rotation_handoff_router,
         precision_router,
         fields_router,
         field_weather_router,
