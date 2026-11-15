@@ -1,5 +1,7 @@
 .analytics-page { max-width: 1320px; margin-inline: auto; padding: 28px 36px 48px; }
-.analytics-heading { display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+.analytics-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 24px; }
+.analytics-heading > div { flex: 1 1 260px; }
+.analytics-heading > .button { flex-shrink: 0; max-width: 100%; overflow-wrap: normal; }
 .analytics-heading h1 { margin: 6px 0 12px; }
 .analytics-heading p, .analytics-meta { color: var(--ink-2); font-size: .88rem; }
 .analytics-eyebrow { color: var(--ink-2); font-size: .72rem; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; }

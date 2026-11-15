@@ -38,3 +38,29 @@ for (const width of [320, 360, 390, 430, 768, 1024, 1440, 1920]) test(`compact s
     return r.x >= 0 && r.x + r.width <= 320
   }).toBe(true)
 })
+
+for (const width of [320, 390]) test(`Ukrainian header action keeps whole words at ${width}px`, async ({ page }) => {
+  await page.setViewportSize({ width, height: 900 })
+  await page.addInitScript(() => localStorage.setItem('field-shift-language', 'uk'))
+  await page.route('**/api/**', route => new URL(route.request().url()).pathname.startsWith('/api/') ? route.fulfill({ json: null }) : route.continue())
+  await page.goto('/tests/analytics/index.html?section=water')
+  const action = page.locator('.analytics-heading > button')
+  await expect(action).toBeVisible()
+  const words = await action.evaluate(element => {
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT)
+    const result: Array<{ word: string; lines: number }> = []
+    let node: Node | null
+    while ((node = walker.nextNode())) for (const match of node.textContent!.matchAll(/\S+/gu)) {
+      const range = document.createRange()
+      range.setStart(node, match.index!); range.setEnd(node, match.index! + match[0].length)
+      result.push({ word: match[0], lines: range.getClientRects().length })
+    }
+    return result
+  })
+  expect(words.length).toBeGreaterThan(0)
+  expect(words.filter(word => word.lines !== 1)).toEqual([])
+  expect((await action.boundingBox())!.height).toBeGreaterThanOrEqual(44)
+  await action.focus(); await page.keyboard.press('Enter')
+  await expect(page.getByTestId('action')).toHaveText('agent:one:2026:dry_year:')
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+})
