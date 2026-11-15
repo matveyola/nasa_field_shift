@@ -8,6 +8,7 @@ token streaming). Tool events are streamed as tools run.
 """
 
 import logging
+import re
 import time
 import typing
 from collections.abc import AsyncIterator
@@ -27,15 +28,18 @@ from contracts.models import (
     block_fact_ids,
 )
 
-from . import citations, scenarios
+from . import citations, plain, scenarios
 from .agent import AgentFailure, AgentOutput, TurnEvidence
 from .attestation import UNTRUSTED, RequestTrust
 from .grounding import (
+    _SENTENCE,
+    FACT_TOKEN,
     Grounded,
     check,
     is_farmer_arithmetic,
     paragraph_chunks,
     redact,
+    render_fact,
     visible_text,
 )
 from .llm.provider import (
@@ -59,12 +63,139 @@ from .tools import (
     EXPLAINED_REFUSALS,
     Tool,
     TurnState,
+    current_source_presentations,
     default_registry,
     execute,
     never_runs,
+    repair_evidence,
+    source_presentation_text,
 )
 
 log = logging.getLogger("agent_service.llm_agent")
+
+# Deliberately limited grammar for whole-source denials, not a general natural
+# language availability classifier. Unknown qualifiers (hourly, next month,
+# measurements, soil moisture, prices, crops, etc.) leave the sentence intact.
+_DENIAL_WORDS = {
+    lang: frozenset(words.split())
+    for lang, words in {
+        "en": "the this current requested detailed a an is are not no unavailable missing available cannot can't can i we provide show display displayed shown failed did does do so therefore its it these those values value data information table here now right for of to in",
+        "uk": "цей ця це ці поточний поточна поточні запитаний запитана запитані детальний детальна детальні дані даних значення значень інформація інформації таблиця таблиці не ні немає нема відсутні відсутній відсутня недоступні недоступний недоступна доступні доступний доступна можу можемо надати показати відобразити відображається відобразилась відобразилася відобразився відображено тому тож я ми його її їх тут зараз для за з із у в",
+    }.items()
+}
+_SOURCE_WORDS = {
+    "en": {
+        "forecast": {"forecast", "weather"},
+        "history": {"archive", "historical", "weather"},
+        "sowing": {"soil", "temperature"},
+    },
+    "uk": {
+        "forecast": {"прогноз", "прогнозу", "погода", "погоди", "погодний", "погодні"},
+        "history": {
+            "архів",
+            "архіву",
+            "архівні",
+            "історичні",
+            "погода",
+            "погоди",
+            "погодний",
+            "погодні",
+        },
+        "sowing": {"ґрунту", "температура", "температури"},
+    },
+}
+_SOURCE_CALLS = {
+    "forecast": "get_weather_forecast",
+    "history": "get_season_weather",
+    "sowing": "check_sowing_soil",
+}
+
+
+def _without_whole_source_denial(draft, state, sources, lang):
+    available = {
+        key
+        for key, receipt in state.source_presentations.items()
+        if receipt in sources and _SOURCE_CALLS[key] not in state.source_failures
+    }
+    if not available:
+        return draft
+    kept = []
+    for span in _SENTENCE.finditer(draft):
+        sentence = span.group()
+        text = sentence.lower().translate(str.maketrans({"’": "'", "‘": "'", "ʼ": "'"}))
+        words = set(re.findall(r"[^\W\d_]+(?:'[^\W\d_]+)?", text))
+        # A numeric/date qualification, a fact reference or a citation is not
+        # an unqualified whole-source denial. Let existing grounding govern it.
+        denial = False
+        if (
+            not re.search(r'[\d?"“”«»]', sentence)
+            and not text.lstrip().startswith(">")
+            and not re.search(r"(?<!\w)'|'(?!\w)", text)
+            and not re.search(
+                r"\b(?:not|no)\s+(?:unavailable|missing)\b|\bне\s+(?:недоступ|відсут)",
+                text,
+            )
+            and not FACT_TOKEN.search(sentence)
+            and not citations.CITE_TOKEN.search(sentence)
+        ):
+            negative = re.search(
+                r"\b(?:unavailable|missing|not available|cannot provide|can't provide|cannot show|can't show)\b|\bno\b.*\bavailable\b"
+                if lang == "en"
+                else r"\b(?:недоступн[а-яіїєґ]*|відсутн[а-яіїєґ]*|немає|нема|не мож(?:у|емо) (?:надати|показати))\b",
+                text,
+            )
+            for key in available:
+                domain = _SOURCE_WORDS[lang][key]
+                explicit = (
+                    bool(
+                        words
+                        & ({"forecast"} if lang == "en" else {"прогноз", "прогнозу"})
+                    )
+                    if key == "forecast"
+                    else bool(
+                        words
+                        & (
+                            {"archive", "historical"}
+                            if lang == "en"
+                            else {"архів", "архіву", "архівні", "історичні"}
+                        )
+                    )
+                    if key == "history"
+                    else (
+                        {"soil", "temperature"} <= words
+                        if lang == "en"
+                        else "ґрунту" in words
+                        and bool(words & {"температура", "температури"})
+                    )
+                )
+                # A wholly unavailable weather source is contradicted by a
+                # current weather receipt only when no weather operation failed.
+                # Soil evidence alone and mixed success/failure remain ambiguous.
+                generic_weather = (
+                    key in {"forecast", "history"}
+                    and bool(
+                        words
+                        & (
+                            {"weather"}
+                            if lang == "en"
+                            else {"погода", "погоди", "погодні", "погодний"}
+                        )
+                    )
+                    and not (
+                        {"get_weather_forecast", "get_season_weather"}
+                        & state.source_failures.keys()
+                    )
+                )
+                if (
+                    negative
+                    and (explicit or generic_weather)
+                    and words <= _DENIAL_WORDS[lang] | domain
+                ):
+                    denial = True
+        if not denial:
+            kept.append(sentence)
+    return "".join(kept)
+
 
 MAX_MARKDOWN = 20_000
 CANNED = {
@@ -376,25 +507,37 @@ class LLMAgent:
                 )
                 transcript.append(
                     UserText(
-                        repair_message(grounded.violations)
+                        repair_message(grounded.violations, repair_evidence(state))
                         if grounded.violations
                         else "<grounding_check>\nYour answer was empty. Answer the farmer briefly.\n</grounding_check>"
                     )
                 )
                 continue
             extra = []
+            referenced_before_redaction = list(grounded.fact_ids)
             if grounded.violations:
                 categories = sorted({v.category for v in grounded.violations})
                 log.warning(
                     "grounding redaction turn_id=%s violations=%s", turn_id, categories
                 )
-                grounded = self._ground(redact(draft, grounded.violations), state, lang)
+                draft = redact(draft, grounded.violations)
+                grounded = self._ground(draft, state, lang)
                 extra.append(
                     AgentWarning(
                         code="ungrounded_number",
                         detail=f"Unsupported statements were removed ({', '.join(categories)})."[
                             :300
                         ],
+                    )
+                )
+            grounded, recovered = self._source_output(
+                draft, grounded, state, lang, referenced_before_redaction
+            )
+            if recovered:
+                extra.append(
+                    AgentWarning(
+                        code="low_confidence",
+                        detail="Verified source facts were retained after incomplete answer formatting.",
                     )
                 )
             text = grounded.markdown.strip() if not grounded.violations else ""
@@ -462,6 +605,89 @@ class LLMAgent:
             yield message
             return
         raise AgentFailure("llm_error", "error.agent_round_limit", retryable=False)
+
+    def _source_output(self, draft, grounded, state, lang, referenced):
+        """Recover data, not model claims, from successful source receipts.
+
+        This is ordinary server rendering of verbatim facts. It grants no
+        numeric/date exemptions to model prose and works for text-only clients.
+        """
+        sources = current_source_presentations(state)
+        if not sources:
+            return grounded, False
+        source_ids = {f.id for source in sources for f in source.facts}
+        block_ids = {fid for b in state.blocks for fid in block_fact_ids(b)}
+        shown = set(grounded.fact_ids) | block_ids
+        # Omitted facts only add a source view. They do not invalidate useful
+        # interpretation, caveats, or unrelated business questions.
+        kept = _without_whole_source_denial(draft, state, sources, lang)
+        corrected = kept != draft
+        preserved = self._ground(kept, state, lang) if corrected else grounded
+        recover = bool(source_ids - shown) or state.presentation_rejected or corrected
+        shown = set(preserved.fact_ids) | block_ids
+        sections = [
+            source_presentation_text(s, lang, source_ids - shown) for s in sources
+        ]
+        extra_ids = set(referenced) - source_ids - set(preserved.fact_ids) - block_ids
+        methods = set()
+        # If redaction removed a whole sentence, its actual non-weather values
+        # and source limitations still survive. Unverified browser assertions
+        # do not gain a date/source claim through this renderer.
+        for fid in referenced:
+            if fid not in extra_ids or fid not in state.retrieved:
+                continue
+            fact = state.retrieved[fid]
+            unverified = fid in state.unverified_real_fact_ids()
+            label = plain.NAMES[lang].get(fact.label_key)
+            if label:
+                sections.append(f"{label}: {render_fact(fact, lang, unverified)}")
+            if (
+                not unverified
+                and fact.provenance.method
+                and fact.provenance.method not in methods
+            ):
+                sections.append(
+                    (
+                        "Метод та обмеження джерела: "
+                        if lang == "uk"
+                        else "Source method and limits: "
+                    )
+                    + fact.provenance.method
+                )
+                methods.add(fact.provenance.method)
+        titles = {
+            "get_weather_forecast": ("Прогноз погоди", "Weather forecast"),
+            "get_season_weather": ("Погода за минулий період", "Past weather"),
+            "check_sowing_soil": (
+                "Перевірка температури ґрунту",
+                "Soil-temperature check",
+            ),
+        }
+        for tool in state.source_failures:
+            sections.append(
+                titles[tool][0 if lang == "uk" else 1]
+                + (
+                    ": цей запит не вдалося виконати; значення не підставлялися."
+                    if lang == "uk"
+                    else ": this request could not be completed; no values were substituted."
+                )
+            )
+        if preserved.markdown.strip():
+            sections.append(preserved.markdown)
+        return Grounded(
+            markdown="\n\n".join(sections),
+            fact_ids=list(
+                dict.fromkeys(
+                    [
+                        *preserved.fact_ids,
+                        *referenced,
+                        *(f.id for s in sources for f in s.facts),
+                    ]
+                )
+            ),
+            violations=preserved.violations,
+            citations=preserved.citations,
+        ), recover
 
     def _ground(self, text: str, state: TurnState, lang: str) -> Grounded:
         unverified = state.unverified_real_fact_ids()

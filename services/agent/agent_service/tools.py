@@ -8,6 +8,7 @@ The model chooses when to call a tool; the server decides what the tool can do. 
 """
 
 import asyncio
+import hashlib
 import json
 import logging
 import time
@@ -42,9 +43,9 @@ from contracts.models import (
 )
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, ValidationError
 
-from . import budget, constraint_evidence, scenarios
+from . import budget, constraint_evidence, plain, scenarios
 from .citations import uk_locator
-from .grounding import FACT_TOKEN, label_problem, product_name
+from .grounding import FACT_TOKEN, label_problem, product_name, render_fact
 from .integrations.normalize import check_comparison, check_profile, idempotency_key
 from .integrations.ports import IntegrationFailure
 from .llm.provider import ToolCall, ToolResult, ToolSpec
@@ -105,6 +106,17 @@ class ToolTrace:
     )  # fact / constraint / action ids returned
 
 
+@dataclass(frozen=True)
+class SourcePresentation:
+    """One successful weather operation's immutable, current-turn display inputs."""
+
+    title: str
+    facts: tuple[Fact, ...]
+    note: str
+    tables: tuple[TableBlock, ...] = ()
+    missing: tuple[str, ...] = ()
+
+
 @dataclass
 class TurnState:
     """Everything one turn has established. Built per request; never shared or persisted."""
@@ -125,6 +137,9 @@ class TurnState:
     missing_fact_ids: set[str] = field(default_factory=set)
     traces: list[ToolTrace] = field(default_factory=list)
     seen_calls: set[str] = field(default_factory=set)
+    source_presentations: dict[str, SourcePresentation] = field(default_factory=dict)
+    source_failures: dict[str, str] = field(default_factory=dict)
+    presentation_rejected: bool = False
     tool_calls: int = 0
     knowledge: Any = None  # KnowledgeBase, shared and read-only
     evidence: dict[str, Any] = field(
@@ -212,6 +227,18 @@ class FactsArgs(_Args):
     fact_ids: list[Annotated[str, Field(max_length=128)]] = Field(
         default_factory=list, max_length=MAX_FACTS_RETURNED
     )
+
+
+def _selected_facts(args: FactsArgs, state: TurnState) -> list[Fact]:
+    facts = state.facts
+    selected = (
+        [facts[fid] for fid in dict.fromkeys(args.fact_ids) if fid in facts]
+        if args.fact_ids
+        else list(facts.values())
+    )
+    return [f for f in selected if not args.domains or f.domain in args.domains][
+        :MAX_FACTS_RETURNED
+    ]
 
 
 def _fact_view(f: Fact, verification: str | None = None) -> dict[str, Any]:
@@ -310,17 +337,13 @@ async def get_field_facts(
     args: FactsArgs, state: TurnState
 ) -> tuple[dict[str, Any], list[str]]:
     geo = await _load_profile(state)
-    facts = list(state.facts.values())
     if args.fact_ids:
         by_id = state.facts
         missing = [fid for fid in args.fact_ids if fid not in by_id]
         state.missing_fact_ids.update(missing)
-        facts = [by_id[fid] for fid in dict.fromkeys(args.fact_ids) if fid in by_id]
     else:
         missing = []
-    if args.domains:
-        facts = [f for f in facts if f.domain in args.domains]
-    facts = facts[:MAX_FACTS_RETURNED]
+    facts = _selected_facts(args, state)
     for f in facts:
         state.retrieved[f.id] = f
     result = {
@@ -843,6 +866,7 @@ async def present_blocks(
         kind = raw.get("type") if isinstance(raw, dict) else None
 
         def reject(category: str, reason: str, *, index=i, item_kind=kind) -> None:
+            state.presentation_rejected = True
             rejected.append(
                 {
                     "index": index,
@@ -923,13 +947,179 @@ async def present_blocks(
         "accepted": accepted,
         "rejected": rejected,
         "note": "The app draws accepted blocks under your text, each value with its unit and origin. In your text "
-        "say what matters in words; do not list the same values again.",
+        "say what matters in words; do not list the same values again. Rejected formatting is not a source failure: "
+        "all successfully retrieved facts remain available. Reuse the returned source presentation template or "
+        "cite_as tokens; do not fetch the same data again or say the forecast is unavailable because a table failed.",
     }, [f"{a['type']}:{len(a['facts'])}" for a in accepted] + [
         f"rejected:{r['type']}:{r['category']}" for r in rejected
     ]
 
 
 # ------------------------------------------------------------------ get_weather_forecast
+
+
+def source_presentation_view(presentation: SourcePresentation) -> dict[str, Any]:
+    """A model can reuse this validated shape; no provider values are invented."""
+    return {
+        "source_available": bool(presentation.facts),
+        "title": presentation.title,
+        "fact_ids": [f.id for f in presentation.facts],
+        "tables": [t.model_dump(mode="json") for t in presentation.tables],
+        "note": presentation.note,
+        "missing": list(presentation.missing),
+    }
+
+
+def current_source_presentations(state: TurnState) -> list[SourcePresentation]:
+    # Never render an old receipt under facts overwritten by a later vintage,
+    # nor a browser assertion merely carrying the same id.
+    return [
+        p
+        for p in state.source_presentations.values()
+        if p.facts
+        and all(
+            state.external_facts.get(f.id) == f and state.retrieved.get(f.id) == f
+            for f in p.facts
+        )
+    ]
+
+
+def source_presentation_text(
+    presentation: SourcePresentation, lang: str, value_ids: set[str]
+) -> str:
+    lines = [presentation.title, presentation.note]
+    sources = {}
+    periods = []
+    for fact in presentation.facts:
+        p = fact.provenance
+        name = plain.NAMES[lang].get(fact.label_key)
+        if not name:
+            continue  # Never infer an unknown metric's meaning from its id.
+        period = (
+            plain.period(p.temporal.start, p.temporal.end, lang) if p.temporal else ""
+        )
+        if period and period not in periods:
+            periods.append(period)
+        if fact.id in value_ids:
+            lines.append(
+                f"- {name}{f' ({period})' if period else ''}: {render_fact(fact, lang)}"
+            )
+        if p.source:
+            sources[(p.source.product_id, p.source.version)] = p.retrieved_at
+    lines.extend(presentation.missing)
+    if periods:
+        lines.insert(
+            1,
+            ("Періоди джерела: " if lang == "uk" else "Source periods: ")
+            + "; ".join(periods),
+        )
+    for (product, version), retrieved in sources.items():
+        label = "Джерело" if lang == "uk" else "Source"
+        lines.append(
+            f"{label}: {plain.source(product, lang)} ({version}); "
+            f"{retrieved.astimezone(UTC):%Y-%m-%d %H:%M UTC}."
+        )
+    return "\n".join(lines)
+
+
+def repair_evidence(state: TurnState) -> dict[str, Any]:
+    """Bounded current-turn index; original successful tool results remain in the transcript."""
+    facts = list(state.retrieved.values())
+    return {
+        "facts": [
+            {
+                "cite_as": f"{{{{fact:{f.id}}}}}",
+                "period": f.provenance.temporal.model_dump(mode="json")
+                if f.provenance.temporal
+                else None,
+            }
+            for f in facts[:256]
+        ],
+        "additional_facts_in_prior_tool_results": max(0, len(facts) - 256),
+        "successful_sources": [
+            source_presentation_view(p) for p in current_source_presentations(state)
+        ],
+        "presentation_rejected": state.presentation_rejected,
+        "source_failures": state.source_failures,
+    }
+
+
+def _weather_presentation(facts, days, lang, hourly_available):
+    from .weather import _DAILY_FACTS
+
+    by_id = {f.id: f for f in facts}
+    if len(days) > 7:
+        raise ToolRejected(
+            "invalid_value", "The forecast exceeds the bounded seven-day view."
+        )
+    variables = [(name, label, unit) for name, label, unit, _ in _DAILY_FACTS.values()]
+    missing, tables = [], []
+    for offset in range(0, len(variables), 5):
+        columns = variables[offset : offset + 5]
+        rows = []
+        for day in days[:7]:
+            ids = []
+            for name, label, unit in columns:
+                fid = day["refs"].get(name)
+                if fid is not None:
+                    f = by_id[fid]
+                    if (
+                        f.quantity is None
+                        or f.quantity.unit != unit
+                        or f.provenance.temporal is None
+                        or f.provenance.temporal.start.isoformat() != day["date"]
+                        or f.provenance.temporal.end.isoformat() != day["date"]
+                    ):
+                        raise ToolRejected(
+                            "invalid_value", "Forecast fact/date/unit mismatch."
+                        )
+                else:
+                    missing.append(
+                        f"{day['date']}: {plain.name(label, lang)} — "
+                        + (
+                            "джерело не повернуло значення"
+                            if lang == "uk"
+                            else "not returned by the source"
+                        )
+                    )
+                ids.append(fid)
+            rows.append({"label": day["weekday"], "fact_ids": ids})
+        if rows:
+            tables.append(
+                TableBlock.model_validate_json(
+                    json.dumps(
+                        {
+                            "type": "table",
+                            "title": "Прогноз погоди"
+                            if lang == "uk"
+                            else "Weather forecast",
+                            "columns": [
+                                plain.name(label, lang) for _, label, _ in columns
+                            ],
+                            "rows": rows,
+                        }
+                    )
+                )
+            )
+    if not hourly_available:
+        missing.append(
+            "Погодинні дані відсутні; вікно обприскування не оцінено."
+            if lang == "uk"
+            else "Hourly inputs are missing; a spray window is not assessed."
+        )
+    return SourcePresentation(
+        "Прогноз погоди" if lang == "uk" else "Weather forecast",
+        tuple(
+            f.model_copy(deep=True)
+            for f in facts
+            if hourly_available or f.label_key != "fact.spray_window"
+        ),
+        "Оцінка погодної моделі, не вимірювання на полі. Орієнтовне вікно обприскування не є дозволом на обробку."
+        if lang == "uk"
+        else "Weather-model estimates, not field measurements. A rough spray window is not authorization to spray.",
+        tuple(tables),
+        tuple(missing),
+    )
 
 
 class WeatherArgs(_Args):
@@ -959,6 +1149,13 @@ async def get_weather_forecast(
         by_id
     )  # fetched by this server, not asserted by the app
     state.retrieved.update(by_id)
+    presentation = _weather_presentation(
+        facts,
+        days,
+        response_language(state.request),
+        bool(data.get("hourly", {}).get("time")),
+    )
+    state.source_presentations["forecast"] = presentation
     return {
         "source": "Open-Meteo weather forecast (CC BY 4.0) for the field's centre: a forecast, not a measurement.",
         "days": [
@@ -971,6 +1168,7 @@ async def get_weather_forecast(
             }
             for d in days
         ],
+        "presentation": source_presentation_view(presentation),
         "note": "Cite each value only with its cite_as token. In prose, show the exact returned date beside its fact token; "
         "use that fact's temporal period, not the selected planning year or source retrieval date. "
         "Table row labels remain words only (for example weekdays), with no date or other numbers. spray_window is the longest "
@@ -1027,9 +1225,19 @@ async def get_season_weather(
         by_id
     )  # fetched and computed by this server, not asserted by the app
     state.retrieved.update(by_id)
+    lang = response_language(state.request)
+    presentation = SourcePresentation(
+        "Погода за минулий період" if lang == "uk" else "Past weather",
+        tuple(f.model_copy(deep=True) for f in facts),
+        "Початок періоду задано у запиті. Архівні погодні оцінки, не вимірювання на полі; баланс опадів і випаровування не є запасом води у ґрунті чи вказівкою поливати."
+        if lang == "uk"
+        else "The start date came from the request. Archive-based weather estimates, not field measurements; rain minus evaporation is not soil water storage or an irrigation instruction.",
+    )
+    state.source_presentations["history"] = presentation
     return {
         "period": {"start": start.isoformat(), "end": end.isoformat()},
         "crop": args.crop,
+        "presentation": source_presentation_view(presentation),
         "values": {
             f.id.removeprefix("season."): {
                 "ref": f.id,
@@ -1074,8 +1282,19 @@ async def check_sowing_soil(
     by_id = {f.id: f for f in facts}
     state.external_facts.update(by_id)
     state.retrieved.update(by_id)
+    lang = response_language(state.request)
+    presentation = SourcePresentation(
+        ("Орієнтир для сівби: " if lang == "uk" else "Sowing reference: ")
+        + plain.crop(args.crop, lang),
+        tuple(f.model_copy(deep=True) for f in facts),
+        "Погодна оцінка температури на глибині 6 см, не ґрунтовий датчик. Поріг — регіональна рекомендація НААН для Черкащини (Лісостеп), шар 0–10 см; місцева придатність і врожай не підтверджені."
+        if lang == "uk"
+        else "Weather-model soil temperature at 6 cm, not a soil probe. The threshold is a NAAS regional reference for Cherkasy (Forest-Steppe), soil 0–10 cm; local suitability and yield are not established.",
+    )
+    state.source_presentations["sowing"] = presentation
     return {
         "crop": args.crop,
+        "presentation": source_presentation_view(presentation),
         "values": {
             f.id.removeprefix("sowing."): {
                 "ref": f.id,
@@ -1729,7 +1948,9 @@ BLOCKS_SPEC = ToolSpec(
         "with one unit compared across 2-8 options. 'callout': one short caution (tone warning) or notice (tone "
         "info), optionally with up to 3 fact refs. Use a block only when the farmer needs to scan, compare or choose; "
         "a single value or a how-to question needs only text. Values are only fact refs returned in this turn by "
-        "get_field_facts or compare_rotations; titles, labels and column names are a few plain words in the reply "
+        "any successful fact-returning tool; reuse returned presentation.tables for weather (split measures across "
+        "tables instead of exceeding five columns). A rejected visual block is not a source outage; "
+        "reuse its existing facts in text. Titles, labels and column names are a few plain words in the reply "
         'language, without any digits, not even a count or a date ("Прогноз на тиждень", "Субота"; an empty title '
         "shows none). The app renders each value with its unit and origin."
     ),
@@ -2052,10 +2273,23 @@ EXPLAINED_REFUSALS = frozenset(
 )
 
 
-def _call_key(call: ToolCall) -> str:
-    return call.name + json.dumps(
+def _call_key(call: ToolCall, state: TurnState) -> str:
+    key = call.name + json.dumps(
         call.arguments, sort_keys=True, ensure_ascii=False, default=str
     )
+    if call.name == "get_field_facts":
+        try:
+            args = FactsArgs.model_validate_json(json.dumps(call.arguments))
+        except (ValidationError, TypeError):
+            return key
+        # A pure read may change after another tool adds/updates authoritative
+        # facts. Unchanged selected views remain duplicates and make no progress.
+        view = [
+            (f.model_dump(mode="json"), state.verification(f.id))
+            for f in _selected_facts(args, state)
+        ]
+        key += hashlib.sha256(json.dumps(view, sort_keys=True).encode()).hexdigest()
+    return key
 
 
 def never_runs(call: ToolCall, state: TurnState, registry: dict[str, Tool]) -> bool:
@@ -2066,7 +2300,7 @@ def never_runs(call: ToolCall, state: TurnState, registry: dict[str, Tool]) -> b
     if (
         tool is None
         or not isinstance(call.arguments, dict)
-        or _call_key(call) in state.seen_calls
+        or _call_key(call, state) in state.seen_calls
     ):
         return True
     try:
@@ -2087,6 +2321,7 @@ async def execute(
 ) -> tuple[ToolResult, ToolTrace]:
     """Validate and run one tool call. Never raises for model mistakes; only cancellation propagates."""
     started = time.monotonic()
+    source_views_before = dict(state.source_presentations)
     trace = ToolTrace(
         turn_id=state.turn_id,
         call_id=call_id,
@@ -2101,6 +2336,17 @@ async def execute(
         error: str | None = None,
         refs: list[str] | None = None,
     ) -> tuple[ToolResult, ToolTrace]:
+        if call.name in {
+            "get_weather_forecast",
+            "get_season_weather",
+            "check_sowing_soil",
+        }:
+            if error:
+                state.source_presentations = source_views_before
+                if error not in {"duplicate_call", "invalid_arguments"}:
+                    state.source_failures[call.name] = error
+            else:
+                state.source_failures.pop(call.name, None)
         trace.duration_ms = int((time.monotonic() - started) * 1000)
         trace.status, trace.error_category, trace.refs = (
             ("error", error, []) if error else ("ok", None, refs or [])
@@ -2134,7 +2380,7 @@ async def execute(
         return finish(
             {"message": "Arguments must be a JSON object."}, error="invalid_arguments"
         )
-    key = _call_key(call)
+    key = _call_key(call, state)
     if key in state.seen_calls:
         return finish(
             {
@@ -2165,4 +2411,8 @@ async def execute(
             {"message": "Result too large; narrow the request."},
             error="result_too_large",
         )
+    if call.name == "get_field_facts":
+        # Profile acquisition may have changed the view during this read. Mark
+        # the returned view too, so its unchanged replay is not new progress.
+        state.seen_calls.add(_call_key(call, state))
     return finish(json.loads(text), refs=refs)
