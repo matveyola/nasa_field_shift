@@ -416,7 +416,7 @@ export interface FarmPlanningRequest {
   farm_id: string;
   as_of: string;
   start_season: number;
-  season_count: 1 | 3;
+  season_count: 1 | 2 | 3;
   /**
    * @minItems 1
    * @maxItems 30

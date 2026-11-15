@@ -2,10 +2,10 @@
   "contract_version": "1.0.0",
   "generator": "pydantic + json-schema-to-typescript (services/agent/package-lock.json)",
   "sha256": {
-    "contracts/planning-v1/planning-v1.schema.json": "a5be96b2bae98488ad7943d57e60423e6a11663793627a9836db46d833d155c6",
+    "contracts/planning-v1/planning-v1.schema.json": "9eeaece78fc2e24906365842adb75813193a2006de803a915297fba6534d7ea8",
     "contracts/planning-v1/cases.schema.json": "f62f6a48d769821da5e2517da6f34706a025df7228fbaa63579d383114fcbc55",
     "contracts/planning-v1/empirical-sites.schema.json": "e88db85bf17622cc756846981d211b61ccf3a1ea39de72e9967f396c05b96165",
-    "apps/web/src/api/planningV1.generated.ts": "1b36e871509da3b0bb81bf922ab2326980c416343713ad6235942f9a9f630ee2",
+    "apps/web/src/api/planningV1.generated.ts": "8626f647c26a533f91b7952e8361462b268c2709e4ca289349797c4c948528e4",
     "contracts/planning-v1/examples/roundtrip.generated.ts": "6edc671646656f4803a1fa9a7011652fb0cda5bea2093751dec173de9ca60b94",
     "contracts/planning-v1/weather-fixtures.generated.json": "53c6478d74184ab2101d56c5f0bd59ac8866794bfbf70a632e308bff56de8587"
   }

@@ -440,3 +440,20 @@ def test_cross_farm_alternatives_and_duplicate_plans_are_rejected(example):
     comparison["alternatives"][0]["assignments"][0]["field_id"] = "another-farm-field"
     with pytest.raises(ValidationError, match="all selected fields"):
         validate(model, comparison)
+
+
+@pytest.mark.parametrize("season_count", [1, 2, 3])
+def test_request_accepts_each_bounded_horizon_without_rewriting_it(example, season_count):
+    data = example["request"]
+    data["season_count"] = season_count
+    parsed = validate(FarmPlanningRequest, data)
+    assert parsed.season_count == season_count
+    assert parsed.model_dump(mode="json") == data
+
+
+@pytest.mark.parametrize("season_count", [0, 4, 6, "2"])
+def test_request_horizon_does_not_expand_model_capacity(example, season_count):
+    data = example["request"]
+    data["season_count"] = season_count
+    with pytest.raises(ValidationError):
+        validate(FarmPlanningRequest, data)

@@ -1,4 +1,4 @@
-import type { CropRef, Metric, SuitabilityAssessment, ApplyPlanRequest, TrainingObservation } from '../../../apps/web/src/api/planningV1.generated';
+import type { CropRef, Metric, SuitabilityAssessment, ApplyPlanRequest, TrainingObservation, FarmPlanningRequest } from '../../../apps/web/src/api/planningV1.generated';
 import { example } from './roundtrip.generated';
 
 export const rice: CropRef = { crop_id: 'Rice', cultivar_id: null, profile_version: null };
@@ -10,3 +10,7 @@ export const wrongStatus: SuitabilityAssessment = { ...example.suitability, stat
 export const unconfirmed: ApplyPlanRequest = { ...example.apply_request, confirmed_by_human: false };
 // @ts-expect-error moisture unit is explicit; percent is not silently m3/m3
 export const wrongUnit: TrainingObservation = { ...example.observation, unit: '%' };
+
+export const twoSeasons: FarmPlanningRequest = { ...example.request, season_count: 2 };
+// @ts-expect-error request capacity remains at most three model seasons
+export const fourSeasons: FarmPlanningRequest = { ...example.request, season_count: 4 };
