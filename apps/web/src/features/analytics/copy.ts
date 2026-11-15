@@ -1,6 +1,9 @@
 import { useLocale } from '../../shared/locale'
 
 const copy = {
+  'Analysis year': 'Рік аналізу',
+  'Water controls, history and scenarios': 'Керування водою, історія та сценарії',
+  'More field evidence': 'Додаткові дані поля',
   'Recorded crop': 'Записана культура',
   'Field context': 'Контекст поля', 'Profile revision': 'Ревізія паспорта', 'Geometry revision': 'Ревізія межі', 'Open map': 'Відкрити карту',
   measured: 'виміряні', modelled: 'змодельовані', user_entered: 'введені користувачем', synthetic: 'синтетичні', reference: 'довідкові',

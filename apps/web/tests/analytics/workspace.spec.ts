@@ -4,8 +4,9 @@ import { example } from '../../../../contracts/planning-v1/examples/roundtrip.ge
 const observations = ['2026-09-15', '2026-10-15'].map(date => ({ date, scene_id: `scene-${date}`, mean_ndvi: .6, p10_ndvi: .4, p90_ndvi: .8, valid_percent: 85, pixel_count: 100, catalog_url: 'https://example.test/scene', mean_msavi: .5 }))
 test.beforeEach(async ({ page }) => {
   await page.clock.install({ time: new Date('2026-11-15T12:00:00Z') })
-  await page.route('http://127.0.0.1:18103/api/**', async route => {
+  await page.route('**/api/**', async route => {
     const url = new URL(route.request().url())
+    if (!url.pathname.startsWith('/api/')) return route.continue()
     let body: unknown = null
     if (url.pathname.endsWith('/planning-workspace')) {
       const profile = structuredClone(example.field_profile)
@@ -29,16 +30,17 @@ test('all five sections retain context and fit the viewport', async ({ page }) =
   await page.goto('/tests/analytics/index.html')
   await expect(page.getByRole('heading', { level: 1, name: 'Analytics' })).toBeVisible()
   await page.getByRole('combobox', { name: 'Field', exact: true }).selectOption('two')
-  await page.getByRole('combobox', { name: 'Season', exact: true }).selectOption('2025')
+  await page.getByRole('combobox', { name: 'Analysis year', exact: true }).selectOption('2025')
   for (const name of ['Water', 'Vegetation', 'Rotations', 'Soil', 'Overview']) {
     await page.getByRole('navigation', { name: 'Analytics' }).getByRole('button', { name, exact: true }).click()
     await expect(page.getByRole('combobox', { name: 'Field', exact: true })).toHaveValue('two')
-    await expect(page.getByRole('combobox', { name: 'Season', exact: true })).toHaveValue('2025')
+    await expect(page.getByRole('combobox', { name: 'Analysis year', exact: true })).toHaveValue('2025')
     await expect(page.getByRole('combobox', { name: 'Scenario', exact: true })).toHaveValue('dry_year')
     expect(await page.locator('h1').count()).toBe(1)
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
   }
   await page.screenshot({ path: test.info().outputPath('analytics-overview.png'), fullPage: true })
+  await page.getByText('More field evidence', { exact: true }).click()
   await page.getByRole('button', { name: 'Review strategies', exact: true }).click()
   await expect(page.getByTestId('action')).toHaveText('strategies:two:2025:dry_year')
   await page.getByRole('button', { name: 'Ask the assistant', exact: true }).click()
@@ -80,7 +82,7 @@ test('Ukrainian headings and empty-state actions remain usable', async ({ page }
   await expect(page.getByRole('heading', { level: 1, name: 'Аналітика' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Переглянути стратегії' })).toBeVisible()
   await expect(page.getByText('Ґрунтових даних недостатньо для оцінки доступної води.')).toBeVisible()
-  await expect(page.getByRole('combobox', { name: 'Сезон', exact: true })).toHaveValue('2026')
+  await expect(page.getByRole('combobox', { name: 'Рік аналізу', exact: true })).toHaveValue('2026')
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
 })
 
@@ -92,15 +94,17 @@ test('historical water controls reset with season and keep scenario and saved-jo
     days: [{ date: '2025-08-01', reserve_mm: 80, opening_mm: 80, rain_mm: 0, irrigation_mm: 0, water_use_mm: 0, drainage_mm: 0 }] }
   const job = { id: 'saved-run', kind: 'simulation', field_id: 'two', boundary_revision: 0, analysis: 'water_balance', status: 'succeeded',
     attempts: 1, result, error: null, created_at: '2026-11-15T10:00:00Z', updated_at: '2026-11-15T10:00:00Z' }
-  await page.route('http://127.0.0.1:18103/api/jobs**', async route => {
+  await page.route('**/api/jobs**', async route => {
     if (route.request().method() === 'POST') { submitted = route.request().postDataJSON(); await route.fulfill({ json: job }) }
     else await route.fulfill({ json: new URL(route.request().url()).pathname.endsWith('/saved-run') ? job : [] })
   })
   await page.goto('/tests/analytics/index.html?section=water')
+  await page.getByText('Water controls, history and scenarios', { exact: true }).click()
   await page.getByRole('button', { name: 'Scenarios', exact: true }).click()
   await expect(page.getByLabel('From', { exact: true })).toHaveValue('2026-08-01')
   await page.getByRole('combobox', { name: 'Field', exact: true }).selectOption('two')
-  await page.getByRole('combobox', { name: 'Season', exact: true }).selectOption('2025')
+  await page.getByRole('combobox', { name: 'Analysis year', exact: true }).selectOption('2025')
+  await page.getByText('Water controls, history and scenarios', { exact: true }).click()
   await page.getByRole('button', { name: 'Scenarios', exact: true }).click()
   await expect(page.getByLabel('From', { exact: true })).toHaveValue('2025-08-01')
   await expect(page.getByRole('combobox', { name: 'Scenario', exact: true })).toHaveCount(1)
@@ -113,7 +117,7 @@ test('historical water controls reset with season and keep scenario and saved-jo
 })
 
 test('six-season reference sequences do not become measured stress evidence', async ({ page }) => {
-  await page.route('http://127.0.0.1:18103/api/rotations?**', route => route.fulfill({ json: {
+  await page.route('**/api/rotations?**', route => route.fulfill({ json: {
     demo: true, main_plan_id: 'reference', plans: [{ id: 'reference', name: 'Reference only', stress_days: 999,
       longest_episode: 999, sensitive_days: 999, crops: Array.from({ length: 6 }, (_, i) => ({ year: 2026 + i, crop: i % 2 ? 'Soy' : 'Maize' })) }],
   } }))

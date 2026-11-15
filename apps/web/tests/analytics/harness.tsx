@@ -18,7 +18,8 @@ function Harness() {
   const [section, onSection] = useState<AnalyticsSection>((params.get('section') ?? 'overview') as AnalyticsSection)
   const [job, showJob] = useState<string>()
   const [action, setAction] = useState('')
-  const field = fields.find(f => f.id === fieldId)!
+  const base = fields.find(f => f.id === fieldId)!
+  const field = params.get('crop') === 'unknown' ? { ...base, crop: 'Unknown' } : base
   const openMapLayer = (layer: string, focus?: MapFocus) => setAction(JSON.stringify({ layer, ...focus, fieldId, scenario }))
   return <><AnalyticsPage field={field} fields={fields} context={{ field_id: fieldId, season, scenario }} section={section}
     chooseField={chooseField} chooseSeason={chooseSeason} chooseScenario={chooseScenario} onSection={onSection}

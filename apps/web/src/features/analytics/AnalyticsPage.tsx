@@ -15,6 +15,9 @@ import { RotationsPage } from '../rotations/RotationsPage'
 import { useAnalyticsCopy } from './copy'
 import { overviewInsights, profileForField, vegetationEvidence } from './model'
 import { ProfileSources, RotationHistory, SoilProfile } from './ProfileEvidence'
+import { FieldWeatherPanel } from './FieldWeatherPanel'
+import { FieldWaterPanel } from './FieldWaterPanel'
+import './weather.css'
 import './analytics.css'
 
 const labels: Record<AnalyticsSection, string> = { overview: 'Overview', water: 'Water', vegetation: 'Vegetation', rotation: 'Rotations', soil: 'Soil' }
@@ -62,7 +65,7 @@ function AnalyticsWorkspace(props: AnalyticsPageProps) {
     </header>
     <div className="analytics-context" aria-label={text('Field context')}>
       <label className="control"><span>{text('Field')}</span><select value={context.field_id} onChange={e => props.chooseField(e.target.value)}>{fields.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}</select></label>
-      <label className="control"><span>{text('Season')}</span><select value={context.season} onChange={e => props.chooseSeason(Number(e.target.value))}>{seasons.map(year => <option key={year} value={year}>{year}</option>)}</select></label>
+      <label className="control"><span>{text('Analysis year')}</span><select value={context.season} onChange={e => props.chooseSeason(Number(e.target.value))}>{seasons.map(year => <option key={year} value={year}>{year}</option>)}</select></label>
       <ScenarioSelect value={context.scenario} onChange={props.chooseScenario} />
     </div>
     <nav className="analytics-sections" aria-label={text('Analytics')}>{analyticsSections.map(id => <button key={id} type="button" aria-current={section === id ? 'page' : undefined}
@@ -70,6 +73,10 @@ function AnalyticsWorkspace(props: AnalyticsPageProps) {
     <div className="analytics-content" key={section}>
       {['overview', 'soil', 'rotation'].includes(section) && profile?.sources.some(source => source.kind === 'synthetic') && <p className="analytics-caution" role="status">{text('Synthetic profile — demonstration inputs, not field measurements.')}</p>}
       {section === 'overview' && <>
+        <FieldWeatherPanel field={field} />
+        <FieldWaterPanel field={field} forecast={forecast.data} season={context.season} pending={forecast.pending} error={forecast.error} reload={forecast.reload} />
+        <details className="analytics-disclosure"><summary>{text('Water controls, history and scenarios')}</summary><div className="analytics-details-body"><WaterPage {...props} embedded /></div></details>
+        <details className="analytics-disclosure"><summary>{text('More field evidence')}</summary><div className="analytics-details-body">
         <section className="analytics-intro"><span className="analytics-eyebrow">{text('Overview')} · {context.season}</span><h2>{text('What needs attention')}</h2>
           <p>{text('Start with the evidence, then compare your next crop.')}</p><button className="button primary" type="button" onClick={props.openStrategies}>{text('Review strategies')}<ArrowRightIcon aria-hidden="true" /></button></section>
         {loading ? <Loading text={text('Loading evidence…')} /> : <ol className="analytics-priorities">
@@ -85,10 +92,16 @@ function AnalyticsWorkspace(props: AnalyticsPageProps) {
         </dl><button className="button subtle" type="button" onClick={() => { profiles.reload(); forecast.reload(); state.vegetation.reload() }}><ArrowPathIcon aria-hidden="true" />{text('Refresh')}</button></section>
         {forecast.error && <ErrorBox message={forecast.error} retry={forecast.reload} />}
         {state.vegetation.error && <ErrorBox message={state.vegetation.error} retry={state.vegetation.reload} />}
+        {profiles.error && <ErrorBox message={profiles.error} retry={profiles.reload} />}
+        </div></details>
       </>}
       {section === 'water' && <>
+        <FieldWeatherPanel field={field} />
+        <FieldWaterPanel field={field} forecast={forecast.data} season={context.season} pending={forecast.pending} error={forecast.error} reload={forecast.reload} />
+        <details className="analytics-disclosure" open={Boolean(props.jobId || props.forecastDay)}><summary>{text('Water controls, history and scenarios')}</summary><div className="analytics-details-body">
         <p className="analytics-meta">{text('The live forecast concerns the coming days. Historical scenarios below use the selected season and assumptions.')}</p>
         <WaterPage {...props} embedded />
+        </div></details>
       </>}
       {section === 'vegetation' && <>
         <section className="analytics-vegetation-lead"><div><span className="analytics-eyebrow">Sentinel-2 · {context.season}</span><h2>{text(satellite ? 'Inspect patterns before diagnosing a crop' : 'No usable satellite observation in this season')}</h2>
@@ -121,7 +134,7 @@ function AnalyticsWorkspace(props: AnalyticsPageProps) {
         <details className="analytics-disclosure"><summary>{text('Terrain evidence and processing')}</summary><div className="analytics-details-body"><FieldAnalysisPanel {...analysisProps} sections={['terrain']} /></div></details>
         {profile && <ProfileSources profile={profile} />}
       </>}
-      {['overview', 'soil', 'rotation'].includes(section) && profiles.error && <ErrorBox message={profiles.error} retry={profiles.reload} />}
+      {['soil', 'rotation'].includes(section) && profiles.error && <ErrorBox message={profiles.error} retry={profiles.reload} />}
 
     </div>
   </div>
