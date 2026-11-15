@@ -163,6 +163,17 @@ export type WaterProvenance = {
   limitations: string[]
 }
 
+export type WaterForecastApplicability = {
+  status: 'review_required' | 'not_assessed'
+  source_kind: 'forecast'
+  source_variable: 'soil_temperature_0_to_7cm_mean'
+  depth_cm: [0, 7]
+  unit: '°C'
+  aggregation: 'daily_mean'
+  initialized_at: string
+  soil_temperature: { date: string; mean_c: number }[]
+}
+
 export type WaterForecast = {
   analysis: 'water_forecast'
   field_id: string
@@ -184,6 +195,7 @@ export type WaterForecast = {
   wilting_point: number
   crop_coefficient: number
   limitations: string[]
+  applicability?: WaterForecastApplicability | null
   days: (WaterDay & {
     lead_days: number
     root_zone_estimate_mm: number | null

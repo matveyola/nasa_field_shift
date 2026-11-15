@@ -9,7 +9,12 @@ from field_shift_science.simulation.root_zone_inputs import (
     root_zone_storage_mm,
 )
 from field_shift_science.simulation.root_zone_model import active_root_zone_correction
-from field_shift_science.simulation.schemas import WaterForecast, WaterForecastDay
+from field_shift_science.simulation.schemas import (
+    ShallowSoilTemperature,
+    WaterForecast,
+    WaterForecastApplicability,
+    WaterForecastDay,
+)
 from field_shift_science.simulation.water_balance import (
     FAO56_BUCKET_VERSION,
     REFERENCE_FIELD_CAPACITY,
@@ -103,7 +108,22 @@ def run_water_forecast(
             "The opening reserve uses forecast soil layers from the initialization day.",
             "The bucket uses reference loam, fixed rooting depth and a midseason crop coefficient.",
             "The forecast assumes zero irrigation, snowmelt and runoff and uses grid data.",
+            "Freezing, thawing and crop dormancy are not modeled. The reference bucket does not "
+            "establish liquid plant-available water, root-zone frozen fraction "
+            "or crop suitability.",
         ],
+        applicability=WaterForecastApplicability(
+            status=(
+                "review_required"
+                if any(day.soil_temperature_c <= 0 for day in run.days)
+                else "not_assessed"
+            ),
+            initialized_at=datetime.combine(run.initialized_on, time(), UTC),
+            soil_temperature=[
+                ShallowSoilTemperature(date=day.date, mean_c=day.soil_temperature_c)
+                for day in run.days
+            ],
+        ),
         days=days,
     )
 

@@ -3,7 +3,7 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from field_shift_science.weather.scenarios import Scenario
 
@@ -79,6 +79,23 @@ class WaterForecastDay(WaterDay):
     root_zone_estimate_mm: float | None = None
 
 
+class ShallowSoilTemperature(BaseModel):
+    date: CalendarDate
+    mean_c: float = Field(allow_inf_nan=False)
+
+
+class WaterForecastApplicability(BaseModel):
+    # This is a source-temperature warning, not a soil-phase or crop-suitability test.
+    status: Literal["review_required", "not_assessed"]
+    source_kind: Literal["forecast"] = "forecast"
+    source_variable: Literal["soil_temperature_0_to_7cm_mean"] = "soil_temperature_0_to_7cm_mean"
+    depth_cm: tuple[Literal[0], Literal[7]] = (0, 7)
+    unit: Literal["°C"] = "°C"
+    aggregation: Literal["daily_mean"] = "daily_mean"
+    initialized_at: datetime
+    soil_temperature: list[ShallowSoilTemperature]
+
+
 class WaterForecast(BaseModel):
     analysis: Literal["water_forecast"] = "water_forecast"
     field_id: str
@@ -102,4 +119,5 @@ class WaterForecast(BaseModel):
     wilting_point: float
     crop_coefficient: float
     limitations: list[str]
+    applicability: WaterForecastApplicability | None = None
     days: list[WaterForecastDay]

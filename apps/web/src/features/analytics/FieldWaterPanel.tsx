@@ -22,6 +22,7 @@ export function FieldWaterPanel({ field, forecast, season, pending, error, reloa
   const days = outlook.kind !== 'unavailable' ? outlook.days : []
   const metrics = current ? waterMetrics(days, current.threshold_mm) : null
   const first = days[0]
+  const applicability = current?.applicability
   const seasonalLoad = useCallback((signal: AbortSignal) => fieldWeatherApi.seasonal(field.id, signal), [field.id, field.boundary_revision])
   const seasonal = useResource(seasonalLoad)
   const rows = seasonal.data?.field_id === field.id && seasonal.data.geometry_revision === field.boundary_revision
@@ -29,20 +30,26 @@ export function FieldWaterPanel({ field, forecast, season, pending, error, reloa
   const groups = seasonalGroups(rows)
   const ranged = (r: ReturnType<typeof range>, unit = mm) => r ? `${num(r.median, unit)}${r.count > 1 ? ` (${num(r.min)}–${num(r.max)} ${unit}; n=${r.count})` : ''}` : label('No estimate', 'Немає оцінки')
   return <section className="field-water-block" aria-labelledby="field-water-heading">
-    <header className="weather-block-heading"><div><h2 id="field-water-heading">{label('Water balance', 'Водний баланс')}</h2><p>{label('Physical root-zone reserve. Crop and soil assumptions are required.', 'Фізичний запас у кореневій зоні. Потрібні дані культури та припущення про ґрунт.')}</p></div>
+    <header className="weather-block-heading"><div><h2 id="field-water-heading">{label('Water balance', 'Водний баланс')}</h2><p>{label('Modeled root-zone reserve using reference crop and soil assumptions.', 'Розрахунковий запас у кореневій зоні за довідковими припущеннями про культуру та ґрунт.')}</p></div>
       <button className="button" type="button" onClick={() => {reload(); seasonal.reload()}}>{label('Refresh saved results', 'Оновити збережені результати')}</button></header>
     {pending && <p role="status">{label('Loading water reserve…', 'Завантаження запасу води…')}</p>}
     {error && <ErrorBox message={error} retry={reload} />}
     {!pending && !current && <p className="analytics-empty">{label('No current water estimate. Select a supported crop and calculate a forecast in the controls below. Weather remains available independently.', 'Немає актуальної оцінки води. Оберіть підтримувану культуру й розрахуйте прогноз у керуванні нижче. Погода доступна незалежно.')}</p>}
     {current && first && metrics && <>
+      <p role="note">{applicability?.status === 'review_required'
+        ? label('Review required: the grid forecast has daily mean soil temperature at or below 0 °C in the shallow 0–7 cm layer. This does not establish freezing throughout the root zone.', 'Потрібна перевірка: прогноз сітки має середньодобову температуру ґрунту 0 °C або нижче у поверхневому шарі 0–7 см. Це не доводить промерзання всієї кореневої зони.')
+        : !applicability
+          ? label('Temperature applicability is unknown for this saved run; no shallow-soil diagnostic was stored.', 'Температурна застосовність цього збереженого розрахунку невідома: діагностику поверхневого ґрунту не збережено.')
+          : label('Above-zero shallow soil temperatures do not establish crop suitability or liquid water throughout the root zone.', 'Додатна температура поверхневого ґрунту не доводить придатності для культури чи наявності рідкої води в усій кореневій зоні.')}</p>
+      <p>{label('This reference bucket does not model freezing, thawing or dormancy. Its reserve and threshold are not a measurement of liquid plant-available water or a crop-growth assessment.', 'Ця довідкова балансова модель не враховує замерзання, відтавання чи стан спокою. Її запас і поріг не є вимірюванням доступної рослинам рідкої води або оцінкою росту культури.')}</p>
       <h3>{label('Water reserve today', 'Запас води сьогодні')}</h3>
       <p>{label('Today', 'Сьогодні')}: <time dateTime={today}>{fullDate(today)}</time> · UTC · {crop(current.crop)}</p>
-      <div className="water-today-reading"><strong>{num(first.reserve_mm, mm)}</strong><span>{label('available reserve at day end', 'доступний запас на кінець дня')}</span></div>
+      <div className="water-today-reading"><strong>{num(first.reserve_mm, mm)}</strong><span>{label('modeled reserve at day end', 'розрахунковий запас на кінець дня')}</span></div>
       <div className="water-reading-line"><p>{label('Threshold', 'Поріг')}: <strong>{num(current.threshold_mm, mm)}</strong></p><p>{label('Margin above threshold', 'Запас над порогом')}: <strong>{num(first.reserve_mm - current.threshold_mm, mm)}</strong></p><p>{label('Daily change', 'Зміна за добу')}: <strong>{num(first.reserve_mm - first.opening_mm, mm)}</strong></p></div>
       <h3>{label('Water movement during the day', 'Рух води за день')}</h3>
       <p>{label('Opening reserve', 'Початковий запас')}: {num(first.opening_mm, mm)} · {label('Rain', 'Опади')}: {num(first.rain_mm, mm)} · {label('Irrigation', 'Полив')}: {num(first.irrigation_mm, mm)} · {label('Modeled water use', 'Розрахункове водоспоживання')}: {num(first.water_use_mm, mm)} · {label('Drainage', 'Дренаж')}: {num(first.drainage_mm, mm)} · {label('Closing reserve', 'Кінцевий запас')}: {num(first.reserve_mm, mm)}</p>
       <h3>{label('Water reserve for the coming days', 'Запас води на найближчі дні')}</h3><p>{fullDate(days[0].date)} — {fullDate(days.at(-1)!.date)} · UTC</p>
-      <svg className="water-reserve-line" viewBox="0 0 640 180" role="img" aria-label={label('Daily reserve and stress threshold; exact values in the table below', 'Щоденний запас і поріг стресу; точні значення в таблиці нижче')}>
+      <svg className="water-reserve-line" viewBox="0 0 640 180" role="img" aria-label={label('Modeled daily reserve and reference threshold; exact values in the table below', 'Розрахунковий щоденний запас і довідковий поріг; точні значення в таблиці нижче')}>
         <text x="8" y="16">{mm}</text>
         {[0, current.capacity_mm / 2, current.capacity_mm].map(value => <g key={value}>
           <line x1="60" x2="620" y1={160 - 130 * value / Math.max(1, current.capacity_mm)} y2={160 - 130 * value / Math.max(1, current.capacity_mm)} stroke="#ddd" />
@@ -65,6 +72,10 @@ export function FieldWaterPanel({ field, forecast, season, pending, error, reloa
         <p>{label('Capacity', 'Місткість')}: {num(current.capacity_mm, mm)} · {label('Root depth', 'Глибина коріння')}: {num(current.root_depth_m, label('m', 'м'))}</p>
         <p>{label('Forecast initialized', 'Прогноз ініціалізовано')}: {current.initialized_at} · {label('Calculated', 'Розраховано')}: {current.generated_at}</p>
         <p>{current.provider} · {current.physical_model_version} · <a href={current.source_url} target="_blank" rel="noreferrer">{label('Source', 'Джерело')}</a></p>
+        {applicability && <div>
+          <p>{label('Shallow soil temperature forecast', 'Прогноз температури поверхневого ґрунту')} · 0–7 cm · °C · {label('daily mean', 'середньодобова')} · {applicability.source_variable} · {applicability.initialized_at}</p>
+          <ul>{applicability.soil_temperature.map(day => <li key={day.date}><time dateTime={day.date}>{fullDate(day.date)}</time>: {num(day.mean_c, '°C')}</li>)}</ul>
+        </div>}
         <div className="analytics-table-scroll"><table><thead><tr>{[label('Date','Дата'),label('Opening','На початок'),label('Closing','На кінець'),label('Rain','Опади'),label('Irrigation','Полив'),label('Use','Витрата'),label('Drainage','Дренаж'),label('Source rain','Опади джерела'),'ET₀'].map(x=><th key={x}>{x} {x!==label('Date','Дата') && `(${mm})`}</th>)}</tr></thead>
           <tbody>{days.map(d=><tr key={d.date}><td>{shortDate(d.date)}</td>{[d.opening_mm,d.reserve_mm,d.rain_mm,d.irrigation_mm,d.water_use_mm,d.drainage_mm,d.source_rain_mm,d.reference_et0_mm].map((v,i)=><td key={i}>{num(v)}</td>)}</tr>)}</tbody></table></div>
         {current.limitations.map(s=><p key={s}>{s}</p>)}
