@@ -15,5 +15,5 @@ export function allocationSeasonSupported(season: number) {
 }
 
 export function initialStrategyView(focus?: StrategyFocus) {
-  return focus ? 'scenarios' : 'opportunities'
+  return focus ? 'scenarios' : 'handoff'
 }

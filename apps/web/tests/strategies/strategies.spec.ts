@@ -42,6 +42,7 @@ async function setup(page: Page, failFirst = false, openAllocation = true) {
   })
   await page.goto('/tests/strategies/index.html')
   if (openAllocation) await page.getByRole('button', { name: 'Crop allocation', exact: false }).click()
+  else await page.getByRole('button', { name: 'Next sowing opportunities', exact: false }).click()
   return { requests, contextYears, applied: () => applyCount }
 }
 
@@ -229,7 +230,7 @@ test('sowing dates come from saved assignments and remain distinct from weather 
   await expect(card.getByText('Saved assignment', { exact: false })).toContainText(data.run.request.rulebook_version)
 })
 
-test('calendar is the first entry, with separate reviewed, typical, passed and unsupported evidence', async ({ page }, testInfo) => {
+test('calendar entry retains separate reviewed, typical, passed and unsupported evidence', async ({ page }, testInfo) => {
   await setup(page, false, false)
   await page.getByLabel('Planning date', { exact: true }).fill('2027-06-15')
   await expect(page.getByRole('heading', { name: 'What could you consider sowing next?' })).toBeVisible()

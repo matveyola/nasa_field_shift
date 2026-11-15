@@ -8,7 +8,7 @@ import { fixture, now } from '../planning/fixtures.ts'
 test('allocation starts at the selected season and refuses unsupported years', () => {
   assert.equal(allocationSeasonSupported(2027), true)
   for (const value of [2000, 2101, 2027.5, NaN]) assert.equal(allocationSeasonSupported(value), false)
-  assert.equal(initialStrategyView(), 'opportunities')
+  assert.equal(initialStrategyView(), 'handoff')
   assert.equal(initialStrategyView('profiles'), 'scenarios')
   assert.equal(initialStrategyView('economics'), 'scenarios')
 })
@@ -87,3 +87,5 @@ test('financial assumptions are labeled only when linked to the displayed saved 
   assumption.yield_origin = 'model'
   assert.equal(usesUserYield(plan, run.request), false)
 })
+
+test('legacy native focus retains the configured scenario workspace', () => { assert.equal(initialStrategyView('native'), 'scenarios') })

@@ -7,12 +7,13 @@ import { allocationSeasonSupported, initialStrategyView } from './model'
 import { PlantingOpportunities } from './PlantingOpportunities'
 import type { PlantingOpportunity } from '../../api/plantingOpportunities'
 import { canReviewAllocation } from './opportunities'
+import { HandoffWorkspace } from './handoff/HandoffWorkspace'
 import './strategies.css'
 
 export function StrategiesPage({ field, fields, season, trajectory, focus, onContext, openAnalytics, openAgent }: StrategiesPageProps) {
   const { language } = useLocale()
   const uk = language === 'uk'
-  const [view, setView] = useState<'opportunities' | 'allocation' | 'scenarios'>(() => initialStrategyView(focus))
+  const [view, setView] = useState<'handoff' | 'opportunities' | 'allocation' | 'scenarios'>(() => initialStrategyView(focus))
   const [applied, setApplied] = useState(false)
   // The inspection season can change in a result matrix; only the explicit period control starts a new allocation.
   const [firstSeason, setFirstSeason] = useState(season)
@@ -56,10 +57,12 @@ export function StrategiesPage({ field, fields, season, trajectory, focus, onCon
         {!allocationSeasonSupported(firstSeason) && <option value={firstSeason} disabled>{firstSeason}</option>}
         {Array.from({ length: 101 - seasonCount }, (_, index) => 2001 + index).map(year => <option key={year} value={year}>{year}</option>)}
       </select></label>}
-      {view !== 'opportunities' && <p><strong>{view === 'allocation' ? `${firstSeason} → ${firstSeason + seasonCount - 1}` : season}</strong><span>{uk ? 'План для господарства · обране поле у фокусі' : 'Farm plan · selected field in focus'}</span></p>}
+      {(view === 'allocation' || view === 'scenarios') && <p><strong>{view === 'allocation' ? `${firstSeason} → ${firstSeason + seasonCount - 1}` : season}</strong><span>{uk ? 'План для господарства · обране поле у фокусі' : 'Farm plan · selected field in focus'}</span></p>}
     </div>
-    {view !== 'opportunities' && <p className="strategies-calendar-note">{uk ? 'Рік плану — рік урожаю. Озимі можуть висіватися попереднього року. Розподіл передбачає одну культуру на полі за рік.' : 'A planning year is the harvest year. Winter crops may be sown in the previous year. Allocation uses one crop per field per year.'}</p>}
+    {(view === 'allocation' || view === 'scenarios') && <p className="strategies-calendar-note">{uk ? 'Рік плану — рік урожаю. Озимі можуть висіватися попереднього року. Розподіл передбачає одну культуру на полі за рік.' : 'A planning year is the harvest year. Winter crops may be sown in the previous year. Allocation uses one crop per field per year.'}</p>}
     <div className="strategies-workflows" role="group" aria-label={uk ? 'Спосіб планування' : 'Planning workflow'}>
+      <button className="strategies-workflow" aria-pressed={view === 'handoff'} onClick={() => setView('handoff')}>
+        <strong>{uk ? 'Порівняти плани культур' : 'Compare crop plans'}</strong><span>{uk ? 'Експериментальна модель · датовані цикли та ваші ресурси' : 'Experimental model · dated cycles and your resources'}</span></button>
       <button className="strategies-workflow" aria-pressed={view === 'opportunities'} onClick={() => setView('opportunities')}>
         <strong>{uk ? 'Найближча сівба' : 'Next sowing opportunities'}</strong><span>{uk ? 'Календар поля · від обраної дати' : 'Field calendar · from your planning date'}</span></button>
       <button className="strategies-workflow" aria-pressed={view === 'allocation'} onClick={() => setView('allocation')}>
@@ -67,6 +70,7 @@ export function StrategiesPage({ field, fields, season, trajectory, focus, onCon
       <button className="strategies-workflow" aria-pressed={view === 'scenarios'} onClick={() => setView('scenarios')}>
         <strong>{uk ? 'Порівняння сценаріїв' : 'Scenario comparison'}</strong><span>{uk ? '1–3 роки · за наявності перевірених вхідних даних' : '1–3 years · with reviewed model inputs'}</span></button>
     </div>
+    <div hidden={view !== 'handoff'}><HandoffWorkspace field={field} openCalendar={() => setView('opportunities')} openAgent={openAgent} /></div>
     <div hidden={view !== 'opportunities'}>
       <PlantingOpportunities field={field} busy={draftState.busy} choose={item => { if (item.harvest_year !== null) requestPeriod(item.harvest_year, item) }} openAnalytics={() => openAnalytics('water')} openProfiles={() => { setInputFocus('profiles'); setView('scenarios') }} />
     </div>
