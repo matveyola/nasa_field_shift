@@ -66,6 +66,25 @@ boundaries cannot commit results. Saved lists and seasonal metrics are farm-scop
 and current-boundary-only. Source percentages are copied, never reconstructed;
 missing metrics stay null and overlapping stress classes are never added.
 
+## Private failure diagnostics
+
+The API sends the durable job UUID in the private `X-Request-ID` header through
+acquisition, evaluation and retries. Catalog calls without a job receive a fresh
+request UUID. The runtime validates canonical UUIDs and carries the identifier
+into its bounded child process. This label grants no authentication or attempt
+ownership; the existing token, lease and result fences remain authoritative.
+Attempt tokens are never used as correlation labels.
+
+Failures emit structured private log records with an allowlisted operation,
+category, HTTP status when known, bounded elapsed time and correlation UUID.
+Runtime records also identify the known boundary stage. These records do not
+include request bodies, coordinates, user/farm data, URLs, headers, exception
+messages or tracebacks. Invalid identifiers are replaced, and a failed logging
+sink cannot replace the original error. Successful results are not logged.
+An IO category is not a diagnosis of provider absence or resource exhaustion.
+The seven previously observed failed global jobs still have unknown causes;
+these diagnostics apply to future executions only.
+
 ## Reproducible comparison and limits
 
 Run `field-shift-rotation-benchmark --output /absolute/new/report.json` after
@@ -94,3 +113,10 @@ removing cwd field discovery, external-only CLI outputs, equivalent `cache`
 replacing unbounded `lru_cache`, and equivalent named sort keys replacing lambdas.
 All original source files and reference artifacts remain checksum-receipted;
 these mechanical checks supplement the numerical tests and do not prove accuracy.
+
+`reports/paired-v3.json` records an actual rerun after adding private server
+telemetry. Its installed engine identity changes because the server is part of
+the fingerprinted package. All other report fields equal the immutable
+`paired-v2.json` exactly: 126 cases, inputs, numerical comparisons, omissions,
+golden replay, empirical-data limitations and promotion status. This is an
+identity update with replay evidence, not a new accuracy claim or protocol.
