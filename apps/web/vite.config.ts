@@ -8,6 +8,8 @@ const widget = fileURLToPath(new URL('../../services/agent/frontend/src/widget',
 
 export default defineConfig({
   plugins: [react()],
+  cacheDir: 'node_modules/.vite-field-shift',
+  optimizeDeps: { include: ['leaflet'] },
   resolve: {
     alias: { '@field-shift/agent-widget': widget + '/index.ts' },
     dedupe: ['react', 'react-dom', 'ajv-formats'],
