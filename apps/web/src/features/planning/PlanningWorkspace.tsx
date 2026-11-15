@@ -13,6 +13,9 @@ import { tr, type PlanningLocale } from './i18n'
 import './planning.css'
 
 export interface PlanningWorkspaceProps {
+  embedded?: boolean
+  fieldNames?: Record<string, string>
+  focus?: 'profiles' | 'economics'
   initialRequest: FarmPlanningRequest
   initialRun?: PlanningRun
   /** Latest independently fetched snapshots. A revision change disables applying old results. */
@@ -37,9 +40,11 @@ export function PlanningWorkspace(props: PlanningWorkspaceProps) {
 }
 
 function WorkspaceSession({ initialRequest, initialRun, currentProfiles, cropOptions, context, onContextChange,
-  locale = 'uk', api = defaultApi, loadEvidence, onProfileSaved, onApplied, clock = defaultClock }: PlanningWorkspaceProps) {
+  embedded = false, fieldNames = {}, focus, locale = 'uk', api = defaultApi, loadEvidence, onProfileSaved, onApplied, clock = defaultClock }: PlanningWorkspaceProps) {
+  const Container = embedded ? 'section' : 'main'
   const t = tr(locale)
-  const [draft, setDraft] = useState<FarmPlanningRequest>(() => ({ ...clone(initialRequest), season_count: 3 }))
+  const fieldName = (id: string) => fieldNames[id] ?? id
+  const [draft, setDraft] = useState<FarmPlanningRequest>(() => clone(initialRequest))
   const [profiles, setProfiles] = useState(() => clone(initialRequest.fields))
   const [selectedFields, setSelectedFields] = useState(() => initialRequest.fields.map(f => f.field_id))
   const [run, setRun] = useState<PlanningRun | null>(initialRun ?? null)
@@ -171,25 +176,24 @@ function WorkspaceSession({ initialRequest, initialRun, currentProfiles, cropOpt
     if (onApplied) await refreshCommitments(signal)
   }
   const changeDraft = (value: FarmPlanningRequest) => { setDraft(value); setDirty(true); setNotice(''); setConfirm(false) }
-  return <main className="planning-workspace" lang={locale}>
-    <header className="pl-heading"><div><p className="pl-eyebrow">FIELD SHIFT</p><h1>{t('Crop planning')}</h1></div><span>{initialRequest.farm_id}</span></header>
+  return <Container className="planning-workspace" lang={locale}>
+    {embedded ? <header><h2>{t('Scenario comparison')}</h2><p>{t('Planning period')}: {draft.start_season}–{draft.start_season + draft.season_count - 1} · {t('No calibrated probabilities')}</p></header>
+      : <header className="pl-heading"><div><p className="pl-eyebrow">FIELD SHIFT</p><h1>{t('Crop planning')}</h1></div><span>{initialRequest.farm_id}</span></header>}
     {synthetic && <p className="pl-banner">{t('Synthetic demonstration — not measured accuracy')}</p>}
     <div className="pl-row"><Select label={t('Field')} value={active?.field_id ?? ''} onChange={fieldId => onContextChange({ ...context, fieldId })}>
-      {profiles.map(f => <option key={f.field_id} value={f.field_id}>{f.field_id}</option>)}</Select>
+      {profiles.map(f => <option key={f.field_id} value={f.field_id}>{fieldName(f.field_id)}</option>)}</Select>
       <Select label={t('Season')} value={String(context.season)} onChange={season => onContextChange({ ...context, season: Number(season) })}>
-        {[draft.start_season, draft.start_season + 1, draft.start_season + 2].map(y => <option key={y}>{y}</option>)}</Select>
+        {Array.from({ length: draft.season_count }, (_, index) => draft.start_season + index).map(y => <option key={y}>{y}</option>)}</Select>
       <Select label={t('Scenario')} value={context.trajectoryId} onChange={trajectoryId => onContextChange({ ...context, trajectoryId })}>
         {initialRequest.weather.scenarios.map(s => <option key={s.trajectory_id} value={s.trajectory_id}>{s.trajectory_id}</option>)}</Select></div>
     {error && !confirm && <div className="pl-error" role="alert">{t(error)}<Reasons reasons={errorReasons} /></div>}
     {notice && <p role="status" className="pl-banner">{t(notice)}</p>}
     {dirty && run && <p role="status">{t('New inputs — calculate again')}</p>}
     {stale && <p className="pl-error" role="status">{t('Stale report — refresh inputs and replan')}</p>}
-    <FieldDataCards fields={profiles} weather={initialRequest.weather} selected={context.fieldId} onSelect={fieldId => onContextChange({ ...context, fieldId })} locale={locale} />
-    {active && <details><summary>{t('Field profile')}</summary><FieldProfileEditor key={active.snapshot_id} profile={active} locale={locale} busy={busy} onSave={saveProfile} /></details>}
     {needsCommitments && <p role="status">{t('Refresh confirmed commitments before replanning')}
       {onApplied && <button className="button" disabled={busy} onClick={() => void operation(refreshCommitments)}>{t('Retry commitment refresh')}</button>}
     </p>}
-    <PlanSettings draft={draft} selectedFields={selectedFields} cropOptions={cropOptions} locale={locale} busy={busy || needsCommitments}
+    <PlanSettings compact={embedded} focus={focus} fieldNames={fieldNames} draft={draft} selectedFields={selectedFields} cropOptions={cropOptions} locale={locale} busy={busy || needsCommitments}
       lockedAtStart={[...initialRequest.locks, ...confirmedLocks, ...(run?.request.locks ?? [])]} onChange={changeDraft} onFields={ids => { setSelectedFields(ids); setDirty(true); setConfirm(false) }} onSubmit={() => void operation(submit)} replan={!!run} />
     <section className="pl-card"><div className="pl-row"><h2 role="status" aria-live="polite">{t(runLabel(run))}</h2>
       <button className="button subtle" disabled={busy} onClick={() => void operation(async signal => {
@@ -201,19 +205,23 @@ function WorkspaceSession({ initialRequest, initialRun, currentProfiles, cropOpt
       {savedRuns.length > 0 && <Select label={t('Saved plans')} value={run?.run_id ?? ''} onChange={id => {
         const saved = savedRuns.find(r => r.run_id === id)
         if (saved) { setRun(saved); setAlternativeId(saved.comparison?.alternatives[0]?.alternative_id ?? ''); setDirty(true); setConfirm(false) }
-      }}><option value="">—</option>{savedRuns.map(r => <option key={r.run_id} value={r.run_id}>{r.run_id} · {r.created_at}</option>)}</Select>}
+      }}><option value="">—</option>{savedRuns.map(r => <option key={r.run_id} value={r.run_id}>{r.request.start_season}–{r.request.start_season + r.request.season_count - 1} · {t(runLabel(r))} · {new Date(r.created_at).toLocaleString(locale)}</option>)}</Select>}
       {run?.error && <Reasons reasons={[run.error]} />}
-      {run && <PlanComparison run={run} evidence={evidence} locale={locale} context={context} onContext={onContextChange} alternativeId={alternativeId} onAlternative={id => { setAlternativeId(id); setConfirm(false) }} previous={previous} />}
+      {run && <PlanComparison run={run} evidence={evidence} locale={locale} context={context} onContext={onContextChange} alternativeId={alternativeId} onAlternative={id => { setAlternativeId(id); setConfirm(false) }} previous={previous} fieldNames={fieldNames} compact={embedded} />}
       <button className="button primary" disabled={busy || needsCommitments || dirty || stale || run?.status !== 'succeeded' || !selected || !['optimal', 'feasible', 'limit_reached'].includes(run?.comparison?.solver_status ?? '')}
         onClick={() => setConfirm(true)}>{t('Apply selected plan')}</button>
     </section>
+    <details open={focus === 'profiles' || !embedded}><summary>{t('Profiles and source evidence')}</summary>
+    <FieldDataCards fields={profiles} weather={initialRequest.weather} selected={context.fieldId} onSelect={fieldId => onContextChange({ ...context, fieldId })} locale={locale} />
+    {active && <details open={focus === 'profiles'}><summary>{t('Field profile')}</summary><FieldProfileEditor key={active.snapshot_id} profile={active} locale={locale} busy={busy} onSave={saveProfile} /></details>}
+    </details>
     <dialog ref={dialog} className="pl-dialog" aria-labelledby={dialogTitle} onCancel={event => { event.preventDefault(); setConfirm(false) }}><h2 id={dialogTitle}>{t('Confirm application')}</h2>
       {error && confirm && <div className="pl-error" role="alert">{t(error)}<Reasons reasons={errorReasons} /></div>}
       <p>{selected?.label} · {run?.run_id}</p><p>{t('No guaranteed profit')}</p>
-      <ul>{selected?.assignments.map(a => <li key={`${a.field_id}-${a.season}`}>{a.field_id} · {a.season} · {a.crop.crop_id}{a.locked ? ` · ${t('Locked')}: ${a.commitment_id}` : ''}</li>)}</ul>
+      <ul>{selected?.assignments.map(a => <li key={`${a.field_id}-${a.season}`}>{fieldName(a.field_id)} · {a.season} · {a.crop.crop_id}{a.locked ? ` · ${t('Locked')}: ${a.commitment_id}` : ''}</li>)}</ul>
       <label className="pl-check"><input type="checkbox" checked={checked} onChange={event => setChecked(event.target.checked)} />{t('I reviewed the plan and commitments')}</label>
       <div className="pl-row"><button className="button primary" disabled={!checked || busy || stale || dirty} onClick={() => void operation(apply)}>{t('Confirm application')}</button>
         <button className="button subtle" disabled={busy} onClick={() => setConfirm(false)}>{t('Cancel')}</button></div>
     </dialog>
-  </main>
+  </Container>
 }

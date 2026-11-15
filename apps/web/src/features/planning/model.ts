@@ -64,7 +64,6 @@ export function prepareRequest(draft: FarmPlanningRequest, selectedFields: strin
   const request = clone(draft)
   request.request_id = requestId
   request.as_of = now.toISOString()
-  request.season_count = 3
   request.fields = request.fields.filter(field => selectedFields.includes(field.field_id))
   const snapshotIds = new Set(request.fields.map(field => field.snapshot_id))
   request.weather.scenarios.forEach(s => { s.traces = s.traces.filter(t => snapshotIds.has(t.field_snapshot_id)) })
@@ -76,7 +75,7 @@ export function prepareRequest(draft: FarmPlanningRequest, selectedFields: strin
   const trajectories = new Set(request.weather.scenarios.map(s => s.trajectory_id))
   if (request.weather.scenarios.some(s => s.traces.length !== snapshotIds.size)) throw new Error('Weather is missing for selected fields')
   if (request.goal === 'reference_margin' && !trajectories.has(request.reference_trajectory_id ?? '')) throw new Error('Choose a reference scenario')
-  const seasons = new Set([request.start_season, request.start_season + 1, request.start_season + 2])
+  const seasons = new Set(Array.from({ length: request.season_count }, (_, i) => request.start_season + i))
   for (const lock of request.locks) {
     if (!seasons.has(lock.season) || !request.enabled_crops.some(c => cropKey(c) === cropKey(lock.crop))) throw new Error('A commitment conflicts with the selected seasons or crops')
   }
@@ -136,4 +135,38 @@ export function applyRequest(run: PlanningRun, alternativeId: string, requestId:
   return { schema_version: '1.0.0', request_id: requestId, farm_id: run.request.farm_id, run_id: run.run_id,
     alternative_id: alternativeId, expected_input_sha256: run.input_sha256,
     expected_snapshots: clone(run.comparison.snapshots), confirmed_by_human: true }
+}
+
+/** Show the solver's actual farm objective, without converting it into ROI or a probability. */
+export function objectiveSummary(plan: PlanAlternative, request: FarmPlanningRequest) {
+  const label = { reference_margin: 'Reference scenario margin', worst_case_margin: 'Worst tested margin', water_demand: 'Water demand' }[request.goal]
+  const currencies = new Set(plan.scenario_results.map(row => row.currency))
+  const currency = currencies.size === 1 ? [...currencies][0] : null
+  const unit = plan.objective_unit === 'currency' ? currency : plan.objective_unit === 'mm_ha' ? 'mm·ha' : 'days·ha'
+  return { label, value: unit && Number.isFinite(plan.objective_value) ? plan.objective_value : null, unit }
+}
+
+export function excludedAssessments(run: PlanningRun, evidence: PlanningEvidence, context: PlanningContext) {
+  const snapshot = run.request.fields.find(field => field.field_id === context.fieldId)?.snapshot_id
+  const assessments = evidence.candidates.filter(candidate => candidate.field_id === context.fieldId && candidate.field_snapshot_id === snapshot && candidate.rulebook_version === run.request.rulebook_version)
+    .flatMap(candidate => candidate.assessments).filter(assessment => assessment.season === context.season && assessment.status !== 'eligible')
+  return [...new Map(assessments.map(assessment => [assessment.assessment_id, assessment])).values()]
+}
+
+/** User changes only the request horizon; immutable commitments must stay inside it. */
+export function resizePlanningPeriod(draft: FarmPlanningRequest, seasonCount: FarmPlanningRequest['season_count']) {
+  const end = draft.start_season + seasonCount
+  const inside = (season: number) => season >= draft.start_season && season < end
+  if (draft.locks.some(lock => !inside(lock.season))) throw new Error('A commitment conflicts with the selected seasons or crops')
+  const next = clone(draft)
+  next.season_count = seasonCount
+  next.resources = next.resources.filter(row => inside(row.season))
+  next.economics = next.economics.filter(row => inside(row.season))
+  next.crop_areas = next.crop_areas.filter(row => inside(row.season))
+  return next
+}
+
+export function usesUserYield(plan: PlanAlternative, request: FarmPlanningRequest) {
+  const used = new Set(plan.scenario_results.flatMap(row => row.assumption_ids))
+  return request.economics.some(row => used.has(row.assumption_id) && row.yield_origin === 'user_assumption')
 }
