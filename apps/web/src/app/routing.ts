@@ -37,9 +37,10 @@ function identifier(value?: string | null): string | undefined {
 }
 export function canonicalRoute(route: Route): Route {
   if (route.page === 'water') return { ...route, page: 'analytics', section: 'water' }
-  if (route.page === 'rotations') return route.planning
-    ? { ...route, page: 'strategies', planning: undefined, section: undefined, strategyFocus: 'native' }
-    : { ...route, page: 'analytics', section: 'rotation' }
+  if (route.page === 'rotations') return {
+    ...route, page: 'strategies', planning: undefined, section: undefined,
+    strategyFocus: route.planning ? 'native' : undefined,
+  }
   return route
 }
 export function parseRoute(address: string): Route {

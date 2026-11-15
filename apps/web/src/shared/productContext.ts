@@ -1,8 +1,8 @@
-import type { Field, FieldContext, Scenario } from '../api/contracts'
+import type { Field, FieldContext } from '../api/contracts'
 import type { SpectralIndex } from '../api/analytics'
 
 /** Product sections share field, season and scenario; URL compatibility is owned by app/routing. */
-export const analyticsSections = ['overview', 'water', 'vegetation', 'rotation', 'soil'] as const
+export const analyticsSections = ['overview', 'water', 'vegetation', 'soil'] as const
 export type AnalyticsSection = (typeof analyticsSections)[number]
 export type StrategyFocus = 'profiles' | 'economics' | 'native'
 
@@ -26,20 +26,12 @@ export interface StrategiesPageProps {
 }
 
 export interface AnalyticsPageProps {
-  field: Field
+  field?: Field
   fields: Field[]
-  context: FieldContext
-  section: AnalyticsSection
+  context?: FieldContext
   jobId?: string
   forecastDay?: string
-  irrigationAvailable: boolean
   chooseField: (fieldId: string) => void
-  chooseSeason: (season: number) => void
-  chooseScenario: (scenario: Scenario) => void
-  onSection: (section: AnalyticsSection) => void
-  showJob: (jobId: string, scenario?: Scenario) => void
-  openFields: () => void
-  openStrategies: () => void
+  addField: () => void
   openAgent: (jobId?: string) => void
-  openMapLayer: (layer: 'ndvi_variability' | 'terrain', focus?: MapFocus) => void
 }

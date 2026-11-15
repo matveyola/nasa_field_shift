@@ -42,7 +42,8 @@ export function App() {
   const requestedField = fields.find(({ id }) => id === route.fieldId)
   const missingField = !route.home && route.page !== 'farm' && Boolean(route.fieldId) && !requestedField
   const selectedField = missingField ? undefined : requestedField ?? fields.find(({ id }) => id === lastField)
-  const field = route.page === 'strategies' || missingField ? selectedField : selectedField ?? fields[0]
+  const field = route.page === 'strategies' || route.page === 'analytics' || missingField
+    ? selectedField : selectedField ?? fields[0]
   const scenario = scenarioOrDefault(route.scenario)
   const season = route.season ?? (farm ? farm.season + (route.page === 'strategies' ? 1 : 0) : new Date().getUTCFullYear())
   const context = field ? { field_id: field.id, season, scenario } : undefined
@@ -77,12 +78,13 @@ export function App() {
     } else {
       // Normalize old bookmarks once, without creating a back-button loop.
       const canonical = routeAddress(route)
-      if (location.pathname !== canonical.split('?')[0]) setAddress(route, true)
+      const oldAnalyticsRotation = route.page === 'analytics' && new URLSearchParams(location.search).get('section') === 'rotation'
+      if (location.pathname !== canonical.split('?')[0] || oldAnalyticsRotation) setAddress(route, true)
     }
     if (route.page === 'strategies') setStrategiesVisited(true)
   }, [addressRoute, fields.length, setAddress])
   useEffect(() => {
-    const titles: Record<Page, string> = { fields: 'Fields', strategies: 'Strategies', analytics: 'Analytics', agent: 'Assistant', farm: 'Farm management', water: 'Analytics', rotations: 'Analytics' }
+    const titles: Record<Page, string> = { fields: 'Fields', strategies: 'Strategies', analytics: 'Analytics', agent: 'Assistant', farm: 'Farm management', water: 'Analytics', rotations: 'Strategies' }
     document.title = t(titles[route.page]) + ' · Field Shift'
   }, [route.page, t])
 
@@ -101,7 +103,8 @@ export function App() {
       && (!options.fieldId || options.fieldId === field?.id)
       && (!options.scenario || options.scenario === scenario)
     const nextSeason = options.season ?? route.season ?? (farm ? farm.season + (target.page === 'strategies' ? 1 : 0) : season)
-    setAddress({ page: target.page, fieldId: options.fieldId ?? (target.page === 'strategies' ? selectedField?.id : field?.id), season: nextSeason,
+    const nextField = target.page === 'strategies' || target.page === 'analytics' ? selectedField?.id : field?.id
+    setAddress({ page: target.page, fieldId: options.fieldId ?? nextField, season: nextSeason,
       scenario: options.scenario ?? scenario, trajectory: route.trajectory,
       section: target.page === 'analytics' ? options.section ?? target.section ?? 'overview' : undefined,
       jobId: options.jobId === null ? undefined : options.jobId ?? (sameWater ? route.jobId : undefined),
@@ -114,22 +117,16 @@ export function App() {
     go('analytics', { fieldId, section: 'water', forecastDay, jobId: null })
   }
   function chooseField(fieldId: string) { setAddress({ ...route, fieldId, scenario }) }
-  function chooseStrategyField(fieldId: string) {
+  function chooseWorkspaceField(fieldId: string) {
     if (!fieldId) { setLastField(undefined); rememberSelectedField('') }
-    chooseField(fieldId)
-  }
-  function chooseScenario(value: Scenario) { setAddress({ ...route, fieldId: field?.id, scenario: value }) }
-  function showWaterJob(jobId: string, value?: Scenario) {
-    if (routeAddress(route) !== routeAddress(parseRoute(location.href))) return
-    go('analytics', { section: 'water', jobId, scenario: value })
+    setAddress({ ...route, fieldId, scenario, jobId: undefined, forecastDay: undefined })
   }
   function openMapLayer(layer: 'ndvi_variability' | 'terrain', focus?: MapFocus) {
     go('fields', { layer, mapFocus: focus, season: focus?.season ?? season })
   }
   function openAssistantScreen(screen: AssistantScreen) {
-    // Old host action IDs retain their analytical meaning; new IDs expose strategy decisions.
     if (screen === 'water') go('analytics', { section: 'water' })
-    else if (screen === 'rotations') go('analytics', { section: 'rotation' })
+    else if (screen === 'rotations') go('strategies')
     else go(screen)
   }
   function addCreatedField(created: Field) {
@@ -174,7 +171,7 @@ export function App() {
   else if (farm) {
     if (route.setupId && canEdit) content = <Suspense fallback={<Loading />}><FieldOnboarding key={route.setupId} id={route.setupId} fields={fields} season={farm.season}
       onCancel={() => closeSetup({ page: 'fields', fieldId: field?.id, season, scenario })} onComplete={finishSetup} /></Suspense>
-    else if (missingField) content = <Empty><p>{t('The linked field is no longer available.')}</p><button className="button" type="button" onClick={() => go('fields')}>{t('Open Fields')}</button></Empty>
+    else if (missingField && route.page !== 'analytics') content = <Empty><p>{t('The linked field is no longer available.')}</p><button className="button" type="button" onClick={() => go('fields')}>{t('Open Fields')}</button></Empty>
     else if (route.page === 'fields' || route.page === 'agent') content = (
       <FieldsPage key={season + ':' + Boolean(route.addField)} fields={fields} selected={field} season={season} initialDrawing={route.addField}
         initialAnalysis={route.analysis} showNdviLayer={route.layer === 'ndvi_variability'} showTerrainLayer={route.layer === 'terrain'} mapFocus={route.mapFocus}
@@ -190,13 +187,10 @@ export function App() {
       onObservationSaved={observation => workspace.update(current => ({ ...current,
         farm: { ...current.farm, observations: [observation, ...current.farm.observations.filter(({ id }) => id !== observation.id)] } }))}
       onAddField={startSetup} openField={fieldId => go('fields', { fieldId })} openWater={openFieldForecast} />
-    else if (route.page !== 'strategies' && (!context || !field)) content = <Empty><p>{t('Add a field to use this workspace.')}</p><button className="button" type="button" onClick={() => go('fields', { addField: true })}>{t('Add field')}</button></Empty>
-    else if (route.page === 'analytics' && context && field) content = <Suspense fallback={<Loading text={t('Loading workspace…')} />}>
-      <AnalyticsPage fields={fields} field={field} context={context} section={route.section ?? 'overview'} jobId={route.jobId} forecastDay={route.forecastDay}
-        irrigationAvailable={field.irrigation_available ?? farm.defaults.irrigation_available} chooseField={chooseField} chooseSeason={year => setAddress({ ...route, season: year })}
-        chooseScenario={chooseScenario} onSection={section => go('analytics', { section })} showJob={showWaterJob}
-        openFields={() => go('fields')} openStrategies={() => go('strategies')}
-        openAgent={jobId => go('agent', { jobId })} openMapLayer={openMapLayer} />
+    else if (route.page === 'analytics') content = <Suspense fallback={<Loading text={t('Loading workspace…')} />}>
+      <AnalyticsPage fields={fields} field={field} context={context} jobId={route.jobId} forecastDay={route.forecastDay}
+        chooseField={chooseWorkspaceField} addField={() => go('fields', { addField: true })}
+        openAgent={jobId => go('agent', { jobId })} />
     </Suspense>
   }
   const keepStrategies = !route.setupId && farm && !missingField && (strategiesVisited || route.page === 'strategies')
@@ -209,7 +203,7 @@ export function App() {
       {content}
       {keepStrategies && <div hidden={route.page !== 'strategies'} inert={route.page !== 'strategies'} className="strategies-outlet">
         <Suspense fallback={<Loading text={t('Loading workspace…')} />}><StrategiesPage field={selectedField} fields={fields}
-          chooseField={chooseStrategyField} openAgent={() => setAssistantOpen(true)} /></Suspense>
+          chooseField={chooseWorkspaceField} openAgent={() => setAssistantOpen(true)} /></Suspense>
       </div>}
     </Shell>
     {farm && !route.setupId && <Assistant field={missingField ? undefined : field} season={season} scenario={scenario} runId={assistantRunId} open={assistantOpen} onOpenChange={setAssistantOpen}

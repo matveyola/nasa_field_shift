@@ -17,9 +17,11 @@ router = APIRouter(prefix="/water", tags=["water"])
 
 @router.get("/forecast", response_model=WaterForecast | None)
 def water_forecast(
-    session: SessionDep, field_id: Annotated[str, Query(min_length=1, max_length=24)]
+    session: SessionDep,
+    field_id: Annotated[str, Query(min_length=1, max_length=24)],
+    geometry_revision: Annotated[int | None, Query(ge=0)] = None,
 ) -> WaterForecast | None:
-    return latest_water_forecast(session, field_id)
+    return latest_water_forecast(session, field_id, geometry_revision=geometry_revision)
 
 
 @router.get("", response_model=WaterResult)

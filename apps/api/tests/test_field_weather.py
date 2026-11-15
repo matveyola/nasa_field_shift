@@ -321,6 +321,7 @@ def test_different_provider_requests_respect_global_concurrency_bound(monkeypatc
 
 def test_foreign_field_cannot_trigger_provider_calls(monkeypatch):
     from field_shift.modules.farm.models import Farm
+    from field_shift.modules.field_weather import dashboard
 
     factory = build_session_factory("sqlite://")
     metadata.create_all(factory.kw["bind"])
@@ -352,8 +353,20 @@ def test_foreign_field_cannot_trigger_provider_calls(monkeypatch):
         session.commit()
     monkeypatch.setattr(providers, "forecast", lambda *_: pytest.fail("Foreign provider call"))
     monkeypatch.setattr(providers, "archive", lambda *_: pytest.fail("Foreign provider call"))
+    monkeypatch.setattr(dashboard, "build", lambda *args, **kwargs: pytest.fail("Foreign call"))
     app = create_app(Settings(), session_factory=factory)
     with TestClient(app) as client:
         assert client.get("/api/fields/private/weather-summary").status_code == 404
         assert client.get("/api/fields/private/rainfall-history?typical=true").status_code == 404
+        assert (
+            client.get(
+                "/api/fields/private/weather-dashboard",
+                params={
+                    "start": "2026-11-15",
+                    "end": "2026-11-16",
+                    "geometry_revision": 0,
+                },
+            ).status_code
+            == 404
+        )
     factory.kw["bind"].dispose()

@@ -1,31 +1,56 @@
-# Territory Analytics
+# Field Analytics
 
-Analytics brings Overview, Water, Vegetation, Rotations and Soil into one field workspace. One field, season and scenario control bar applies across its sections. The app owns URL routing and context callbacks; Analytics never changes another context dimension when a user changes one selector. The assistant opens with the shared context. A completed water run has a separate contextual assistant action carrying its validated job ID.
+Select a field and a UTC period of 1–92 days. The default starts today and
+covers 30 days. Requests use the selected field and its current boundary
+revision. Old values clear when the field, boundary or applied dates change.
+Rotation and crop decisions open in Strategies. Existing water links can open a
+specific forecast date or a validated historical water run.
 
-Overview orders recorded conclusions: a current water threshold crossing, incomplete field/soil inputs, repeated crop records, and satellite availability. It uses the existing current-water policy and satellite quality filter. Missing, expired, other-season and other-boundary evidence cannot produce a healthy-state conclusion. These are inspection and data-completion prompts, not calibrated risk probabilities or crop recommendations.
+## Weather sources
 
-Water retains the actual forecast, linked forecast day, historical simulations, saved jobs, scenario comparison, daily water balance, budget and recovery controls. Live forecasts are explicitly separated from the selected historical season. Demo water remains an explicit opt-in source and is never used for overview conclusions. Embedded mode removes the legacy heading and duplicate field/scenario selectors. Changing the season resets historical period inputs and prevents an old-season result appearing as current.
+| Data | Source and granularity |
+| --- | --- |
+| Historical precipitation, air temperature and ET₀ | ERA5 reanalysis via Open-Meteo, daily from 1940, subject to a seven-day release lag |
+| Historical surface soil moisture | ERA5-Land reanalysis, daily mean volumetric moisture at 0–7 cm, in m³/m³ |
+| Operational weather | Open-Meteo daily precipitation, air temperature extrema and reference ET₀, up to 16 days including today |
+| Climate scenario | EC-Earth3P-HR HighResMIP via Open-Meteo for future dates missing compatible operational values. Displays simulated precipitation and temperature as means of intervals of up to seven days |
 
-Vegetation retains NDVI chart/date selection, comparison, CSV, spectral indices, within-field variability, cross-season history and precision operations. Chart selections do not leave the page. Explicit map actions transfer the season, chosen dates and index via `MapFocus`. Terrain and seasonal weather have their own disclosures instead of being repeated in every section. Missing imagery, old observations, assumed historical boundaries and source limitations stay visible. NDVI alone is not a crop diagnosis or yield loss.
+Charts list source spans next to missing intervals. The rain chart uses mm/day
+and the metric card shows totals per source span in mm. The air-temperature
+chart uses °C. The climate scenario uses one model and a high-emissions
+forcing. It provides a planning perspective outside the operational horizon.
+Historical data, ET₀, satellite products and soil moisture keep their own
+source boundaries.
 
-Rotation history comes from the saved field profile, includes only records before the selected season and distinguishes confirmed, reported and unknown crops. An intervening gap never establishes consecutive cropping. Future crop choice and application belong in Strategies. Saved sequence diagnostics retain historical comparison and yield-model provenance, but embedded Analytics has no farm planning form, sequence editor or main-plan mutation. Demo stress charts are suppressed until a historical comparison exists; reference sequences remain labeled.
+The owned-field API is
+`GET /api/fields/{field_id}/weather-dashboard?geometry_revision=…&start=…&end=…`.
+The response groups each metric into chronological spans with source or gap
+reason and dated points. Revision mismatches return HTTP 409. The adapter
+validates UTC, units and physical ranges, applies a bounded provider timeout,
+and caches provider responses in 15-minute buckets.
 
-Soil shows recorded depth intervals, quality, hydraulic inputs and optional texture/chemistry. Recorded volumetric moisture (m³/m³) and available reserve (mm) retain their own depth/time/source information. Profile snapshots with an outdated geometry revision are withheld and direct users to refresh in Strategies. Source records and missing-data reasons are accessible. Synthetic profiles are labeled before their content. Terrain shows surface-gradient evidence and its limitations; it is not a flood probability.
+## Water and drought
 
-The legacy Water, Rotations and FieldAnalysisPanel entry points retain default props. The new Analytics export uses the shared `AnalyticsPageProps` contract. Root routing must wire it to the five-destination navigation; this component lane alone does not replace the application routes.
+The root-zone forecast is a physical FAO-56 water balance in mm using the
+recorded crop and a reference soil profile. The chart names the rooting depth
+and reference threshold. The water budget shows the covered dates and sums
+modeled inputs, losses and net change over those dates. A saved historical
+run linked by ID may supply the water budget for its own dates.
+
+The warning uses modeled daily root-zone reserve below the model's threshold.
+It lists intervals of modeled deficit. The current warning checks the next
+30 days. A clear message requires all 30 consecutive days and sufficient
+model applicability. The available root-zone source currently provides a
+shorter operational run, so a lack of signal normally shows partial coverage.
+The selected-period warning states its own dates. Missing, stale and inapplicable
+forecasts have separate statuses. Details report the model's freeze, thaw and
+dormancy limitations. Climate scenario rows do not contribute to this check.
 
 ## Verification
 
-Run focused pure-model checks with Node24:
-
-```sh
-node --disable-warning=ExperimentalWarning --test apps/web/tests/analytics/*.test.ts
-```
-
-The isolated browser fixture harness exercises desktop and touch-mobile context retention, missing profiles, Ukrainian copy, no duplicate headings/selectors, date/index map handoffs, separation from future planning and historical job/assistant continuity:
-
-```sh
-node services/agent/frontend/node_modules/@playwright/test/cli.js test --config apps/web/tests/analytics/playwright.config.ts
-```
-
-It uses port18103 and the existing locked app/widget dependencies. API responses are synthetic presentation fixtures in these component tests. They are not an empirical model evaluation or a substitute for the integrated real-backend desktop/mobile checks. No production fixture data, model weights, new dependencies or backend contracts were added.
+Run the API weather dashboard, existing field-weather and water-forecast tests
+and Ruff. Run the web unit tests, TypeScript and production build, followed by
+the desktop and mobile workspace Playwright suite. The workspace
+`analytics-dashboard.spec.ts` uses synthetic provider replies to check the
+production route. The isolated legacy Analytics fixture still exercises
+existing rotation, soil, vegetation and water components.

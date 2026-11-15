@@ -38,19 +38,19 @@ export function useStartJob() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string>()
 
-  async function start(kind: JobKind, context: FieldContext, irrigation = 0, options: JobOptions = {}): Promise<Job | undefined> {
+  async function start(kind: JobKind, context: FieldContext, irrigation = 0, options: JobOptions = {}, revision?: number): Promise<Job | undefined> {
     if (!canEdit) { setError('Your role allows viewing only. Ask an administrator for edit access.'); return }
     if (inFlight.current) return
     inFlight.current = true
     setSubmitting(true)
     setError(undefined)
-    const signature = JSON.stringify([kind, context, irrigation, Object.entries(options).sort(([a], [b]) => a.localeCompare(b))])
+    const signature = JSON.stringify([kind, context, irrigation, revision, Object.entries(options).sort(([a], [b]) => a.localeCompare(b))])
     if (lastAttempt.current?.signature !== signature) {
       lastAttempt.current = { signature, key: crypto.randomUUID() }
     }
 
     try {
-      const job = await api.createJob(kind, context, lastAttempt.current.key, irrigation, options)
+      const job = await api.createJob(kind, context, lastAttempt.current.key, irrigation, options, revision)
       lastAttempt.current = null
       return job
     } catch (failure) {

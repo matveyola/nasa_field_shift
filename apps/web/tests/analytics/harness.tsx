@@ -1,9 +1,9 @@
 /** Synthetic presentation harness. Never imported by production. Routes are mocked by Playwright. */
 import { createRoot } from 'react-dom/client'
 import { useState } from 'react'
-import { AnalyticsPage } from '../../src/features/analytics/AnalyticsPage'
+import { AnalyticsPage } from './LegacyAnalyticsHarness'
 import { LocaleProvider } from '../../src/shared/locale'
-import type { AnalyticsSection, MapFocus } from '../../src/shared/productContext'
+import type { AnalyticsSection, MapFocus } from './legacyContext'
 import type { Field, Scenario } from '../../src/api/contracts'
 import '../../src/shared/styles.css'
 import '@fontsource-variable/inter'

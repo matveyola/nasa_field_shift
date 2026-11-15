@@ -24,6 +24,7 @@ from field_shift_science.simulation.water_balance import (
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from field_shift.errors import ConflictError
 from field_shift.jobs.models import Job, JobKind, JobStatus
 from field_shift.modules.fields.service import require_field
 from field_shift.modules.simulation.historical import HistoricalInputError
@@ -128,8 +129,12 @@ def run_water_forecast(
     )
 
 
-def latest_water_forecast(session: Session, field_id: str) -> WaterForecast | None:
+def latest_water_forecast(
+    session: Session, field_id: str, *, geometry_revision: int | None = None
+) -> WaterForecast | None:
     field = require_field(session, field_id)
+    if geometry_revision is not None and geometry_revision != field.boundary_revision:
+        raise ConflictError("Field boundary changed. Reload the field before requesting data.")
     data = session.scalar(
         select(Job.result)
         .where(

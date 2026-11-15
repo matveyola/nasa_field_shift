@@ -1,0 +1,73 @@
+.field-dashboard {
+  max-width: 1280px;
+  width: 100%;
+  margin-inline: auto;
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+}
+.field-dashboard h1, .field-dashboard h2, .field-dashboard h3, .field-dashboard p { margin: 0; }
+.field-dashboard h2 { font-size: 1.15rem; }
+.field-dashboard h3 { font-size: .98rem; }
+.dashboard-period {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: .75rem;
+  color: var(--ink, #25332c);
+}
+.dashboard-period .control { min-width: 0; margin: 0; }
+.dashboard-period .dashboard-field { flex: 1 1 14rem; }
+.dashboard-period .dashboard-date { flex: 1 1 8rem; }
+.dashboard-period input, .dashboard-period select { width: 100%; min-width: 0; }
+.dashboard-body, .dashboard-weather, .dashboard-water { display: grid; gap: .9rem; }
+.dashboard-cards, .dashboard-charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: .75rem;
+}
+.dashboard-card, .dashboard-chart, .dashboard-warning, .dashboard-balance {
+  min-width: 0;
+  margin: 0;
+  padding: 1rem;
+  border: 1px solid #d9e2db;
+  border-radius: .8rem;
+  background: #fff;
+}
+.dashboard-card strong { display: block; margin-block: .35rem; font-size: 1.32rem; }
+.field-dashboard small, .dashboard-card p, .dashboard-caption, .dashboard-chart figcaption p { color: #485c51; }
+.dashboard-warning {
+  border-inline-start: .3rem solid #536c7d;
+  background: #f5f8fa;
+  display: grid;
+  gap: .45rem;
+  justify-items: start;
+}
+.dashboard-warning.has-risk { border-inline-start-color: #a35a18; background: #fffaef; }
+.dashboard-warning ul { margin: 0; padding-inline-start: 1.3rem; }
+.dashboard-charts h3 small { font-weight: 500; }
+.dashboard-chart svg { display: block; width: 100%; margin-block-start: .4rem; }
+.dashboard-chart svg text { fill: #31453b; font-size: 13px; }
+.dashboard-gridline { stroke: #dce6df; }
+.dashboard-threshold { stroke: #985019; stroke-dasharray: 6 4; stroke-width: 1.8; }
+.dashboard-bar.is-reanalysis, .dashboard-sources .is-reanalysis .dashboard-marker { fill: #345d55; background: #345d55; }
+.dashboard-bar.is-forecast, .dashboard-sources .is-forecast .dashboard-marker { fill: #167396; background: #167396; }
+.dashboard-bar.is-climate { fill: #eee6f7; stroke: #714e93; stroke-width: 1.5; stroke-dasharray: 3 2; }
+.dashboard-sources .is-climate .dashboard-marker { background: #eee6f7; border: 1px dashed #714e93; }
+.dashboard-sources .is-gap .dashboard-marker { border: 1px solid #788980; }
+.dashboard-marker { width: .62rem; height: .62rem; border-radius: .12rem; flex: 0 0 .62rem; margin-block-start: .28rem; }
+.dashboard-sources { list-style: none; padding: 0; margin: .5rem 0 0; display: grid; gap: .35rem; font-size: .82rem; }
+.dashboard-sources li { display: flex; gap: .45rem; align-items: baseline; }
+.dashboard-details { margin-top: .65rem; font-size: .84rem; }
+.dashboard-details summary { cursor: pointer; width: fit-content; font-weight: 600; }
+.dashboard-details p { margin-block: .5rem; }
+.dashboard-details table { width: 100%; border-collapse: collapse; text-align: start; }
+.dashboard-details caption { text-align: start; font-weight: 600; }
+.dashboard-details td, .dashboard-details th { border-bottom: 1px solid #d9e2db; text-align: start; padding: .32rem; }
+.dashboard-balance dl { display: flex; gap: .75rem 1.25rem; flex-wrap: wrap; margin: .65rem 0 0; }
+.dashboard-balance dt { font-size: .82rem; color: #485c51; }
+.dashboard-balance dd { font-weight: 650; margin: 0; }
+@media (max-width: 600px) {
+  .dashboard-period .dashboard-field { flex-basis: 100%; }
+  .dashboard-warning, .dashboard-chart, .dashboard-card, .dashboard-balance { padding: .8rem; }
+}

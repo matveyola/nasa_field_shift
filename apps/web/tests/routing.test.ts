@@ -15,7 +15,7 @@ test('legacy water links retain field, year, scenario and exact saved run in Ana
   assert.equal(parseRoute(routeAddress({ ...route, page: 'agent' })).jobId, '42')
   assert.equal(parseRoute(routeAddress({ ...route, page: 'farm' })).jobId, undefined)
 })
-test('legacy planning opens Strategies while old rotation diagnostics stay analytical', () => {
+test('legacy rotation links lead to Strategies and retired Analytics diagnostics open the dashboard', () => {
   const route = parseRoute('/rotations?planning=1&field=F-02&season=2028&trajectory=reference')
   assert.equal(route.page, 'strategies')
   assert.equal(route.strategyFocus, 'native')
@@ -25,8 +25,10 @@ test('legacy planning opens Strategies while old rotation diagnostics stay analy
     assert.equal(next.fieldId, 'F-02'); assert.equal(next.season, 2028)
     assert.equal(next.trajectory, 'reference')
   }
-  assert.equal(parseRoute('/rotations').section, 'rotation')
-  assert.equal(parseRoute('/rotations').page, 'analytics')
+  assert.equal(parseRoute('/rotations').section, undefined)
+  assert.equal(parseRoute('/rotations').page, 'strategies')
+  assert.equal(parseRoute('/analytics?section=rotation&field=F-02').section, 'overview')
+  assert.equal(parseRoute('/analytics?section=rotation&field=F-02').fieldId, 'F-02')
 })
 test('vegetation details go to Analytics and map intent preserves exact scene and comparison', () => {
   const diagnostics = parseRoute('/fields?field=F-02&analysis=vegetation&job=old')

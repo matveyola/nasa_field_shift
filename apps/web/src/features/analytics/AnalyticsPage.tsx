@@ -1,158 +1,163 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { ArrowRightIcon, ArrowPathIcon, MapIcon, SparklesIcon } from '@heroicons/react/24/outline'
-import { api } from '../../api/client'
-import { planningBootstrap } from '../../api/planningWorkspace'
-import type { AnalyticsPageProps, AnalyticsSection, MapFocus } from '../../shared/productContext'
-import { analyticsSections } from '../../shared/productContext'
+import { useCallback, useState, type FormEvent } from 'react'
+import type { Field, FieldContext } from '../../api/contracts'
+import { fieldWeatherApi, type DashboardMetric, type DashboardSpan, type WeatherDashboard } from '../../api/fieldWeather'
+import type { AnalyticsPageProps } from '../../shared/productContext'
+import { useAccess } from '../access/AccessProvider'
+import { ErrorBox, Loading } from '../../shared/ui'
 import { useResource } from '../../shared/useResource'
-import { ErrorBox, Loading, ScenarioSelect } from '../../shared/ui'
-import { FieldAnalysisPanel } from '../fields/FieldAnalysisPanel'
-import { useFieldAnalytics } from '../fields/useFieldAnalytics'
-import { SeasonalWeatherPanel } from '../fields/SeasonalWeatherPanel'
-import { WaterPage } from '../water/WaterPage'
-import { getCurrentWaterOutlook } from '../water/waterOutlook'
-import { RotationsPage } from '../rotations/RotationsPage'
-import { useAnalyticsCopy } from './copy'
-import { overviewInsights, profileForField, vegetationEvidence } from './model'
-import { ProfileSources, RotationHistory, SoilProfile } from './ProfileEvidence'
-import { RainArchivePanel } from './FieldWeatherPanel'
-import { CurrentFieldOverview } from './CurrentFieldOverview'
-import './weather.css'
-import './analytics.css'
-
-const labels: Record<AnalyticsSection, string> = { overview: 'Overview', water: 'Water', vegetation: 'Vegetation', rotation: 'Rotations', soil: 'Soil' }
+import { DashboardChart, useDashboardLabels } from './DashboardChart'
+import { isDay, periodDays, shiftDay, weatherTotals, type Period } from './dashboardModel'
+import { WaterDashboard } from './WaterDashboard'
+import './dashboard.css'
 
 export function AnalyticsPage(props: AnalyticsPageProps) {
-  const [rainPeriod, chooseRainPeriod] = useState<7 | 30>(7)
-  // Scope every request, selection and job to the visible context. No old-season result flash.
-  return <AnalyticsWorkspace key={[props.field.id, props.field.boundary_revision, props.context.season, props.context.scenario].join(':')} {...props} rainPeriod={rainPeriod} chooseRainPeriod={chooseRainPeriod} />
+  return <AnalyticsWorkspace key={props.forecastDay ?? 'dashboard'} {...props} />
 }
 
-function AnalyticsWorkspace(props: AnalyticsPageProps & { rainPeriod: 7 | 30; chooseRainPeriod: (days: 7 | 30) => void }) {
-  const { field, fields, context, section } = props
-  const sectionsRef = useRef<HTMLElement>(null)
-  // Reveal deep-linked/back-forward sections without scrolling the page away from its context.
-  useEffect(() => {
-    const bar = sectionsRef.current
-    const selected = bar?.querySelector<HTMLElement>('[aria-current="page"]')
-    if (!bar || !selected) return
-    const reveal = () => {
-      const item = selected.getBoundingClientRect(), bounds = bar.getBoundingClientRect()
-      if (item.left < bounds.left + 6) bar.scrollLeft -= bounds.left + 6 - item.left
-      else if (item.right > bounds.right - 6) bar.scrollLeft += item.right - bounds.right + 6
-    }
-    reveal()
-    const observer = new ResizeObserver(reveal)
-    observer.observe(bar)
-    return () => observer.disconnect()
-  }, [section])
-  const { text, number, crop, date } = useAnalyticsCopy()
+function AnalyticsWorkspace({ field, fields, context, chooseField, addField, forecastDay, jobId, openAgent }: AnalyticsPageProps) {
+  const { label } = useDashboardLabels()
+  const { canEdit } = useAccess()
   const today = new Date().toISOString().slice(0, 10)
-  const currentYear = Number(today.slice(0, 4))
-  const seasons = Array.from(new Set([context.season, ...Array.from({ length: currentYear - 2017 + 4 }, (_, i) => currentYear + 3 - i)])).sort((a, b) => b - a)
-  const state = useFieldAnalytics(field, context.season)
-  const loadProfile = useCallback((signal: AbortSignal) => planningBootstrap(signal), [])
-  const profiles = useResource(loadProfile)
-  const profileState = profileForField(profiles.data?.profiles, field)
-  const profile = profileState.status === 'available' ? profileState.profile : undefined
-  const loadForecast = useCallback((signal: AbortSignal) => api.waterForecast(field.id, signal), [field.id, field.boundary_revision])
-  const forecast = useResource(loadForecast, 5 * 60 * 1000)
-  const outlook = getCurrentWaterOutlook(forecast.data, field.id, today, context.season)
-  const satellite = vegetationEvidence(state.vegetation.data, field, context.season, today)
-  const [diagnosticsOpen, setDiagnosticsOpen] = useState(false)
-  const loading = profiles.pending || forecast.pending || state.vegetation.pending
-  const mapFocus = (extra: MapFocus = {}): MapFocus => ({ season: context.season, observationDate: state.primary?.date,
-    comparisonDate: state.comparison?.date, comparison: false, index: 'ndvi', ...extra })
-  const analysisProps = { state, field, season: context.season, onSeason: props.chooseSeason, embedded: true,
-    heterogeneityVisible: false, terrainVisible: false,
-    onSelectObservation: () => {},
-    onHeterogeneity: () => props.openMapLayer('ndvi_variability', mapFocus()),
-    onShowComparison: () => props.openMapLayer('ndvi_variability', mapFocus({ comparison: true })),
-    onShowIndex: (index?: MapFocus['index']) => props.openMapLayer('ndvi_variability', mapFocus({ index: index ?? 'ndvi' })),
-    onTerrain: () => props.openMapLayer('terrain', { season: context.season }),
+  const defaults = { start: today, end: shiftDay(today, 29) }
+  const linked = forecastDay && isDay(forecastDay) ? { start: forecastDay, end: forecastDay } : defaults
+  const [selected, setSelected] = useState<Period>(linked)
+  const [draft, setDraft] = useState<Period>(linked)
+  const [invalid, setInvalid] = useState(false)
+  function select(period: Period) {
+    setSelected(period)
+    setDraft(period)
+    setInvalid(false)
   }
-  const profileNotice = !profiles.pending && !profiles.error && !profile && <p className="analytics-empty" role="status">{text(profileState.status === 'boundary_changed'
-    ? 'The saved profile uses an earlier boundary. Review and refresh it in Strategies.'
-    : 'No saved profile for this field. Add its soil and crop history in Strategies.')}</p>
 
-  return <div className="page-body analytics-page">
-    <header className="analytics-heading"><div><h1>{text('Analytics')}</h1>
-      <p>{number(field.planting?.season === context.season ? field.planting.area_ha : field.area_ha)} {text('ha')} · {text('Recorded crop')}: {crop(field.crop)}</p></div>
-      <button className="button" type="button" onClick={() => props.openAgent()}><SparklesIcon aria-hidden="true" />{text('Ask the assistant')}</button>
-    </header>
-    <div className="analytics-context" aria-label={text('Field context')}>
-      <label className="control"><span>{text('Field')}</span><select value={context.field_id} onChange={e => props.chooseField(e.target.value)}>{fields.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}</select></label>
-      <label className="control"><span>{text('Analysis year')}</span><select value={context.season} onChange={e => props.chooseSeason(Number(e.target.value))}>{seasons.map(year => <option key={year} value={year}>{year}</option>)}</select></label>
-      <ScenarioSelect value={context.scenario} onChange={props.chooseScenario} />
-    </div>
-    <nav ref={sectionsRef} className="analytics-sections" aria-label={text('Analytics')}>{analyticsSections.map(id => <button key={id} type="button" aria-current={section === id ? 'page' : undefined}
-      onClick={() => props.onSection(id)}>{text(labels[id])}</button>)}</nav>
-    <div className="analytics-content" key={section}>
-      {['overview', 'soil', 'rotation'].includes(section) && profile?.sources.some(source => source.kind === 'synthetic') && <p className="analytics-caution" role="status">{text('Synthetic profile — demonstration inputs, not field measurements.')}</p>}
-      {section === 'overview' && <>
-        <CurrentFieldOverview field={field} forecast={forecast.data} season={context.season} pending={forecast.pending} error={forecast.error} reload={forecast.reload} />
-        <RainArchivePanel field={field} periodDays={props.rainPeriod} setPeriodDays={props.chooseRainPeriod} />
-        <details className="analytics-disclosure"><summary>{text('Water controls, history and scenarios')}</summary><div className="analytics-details-body"><WaterPage {...props} embedded /></div></details>
-        <details className="analytics-disclosure"><summary>{text('More field evidence')}</summary><div className="analytics-details-body">
-        <section className="analytics-intro"><span className="analytics-eyebrow">{text('Overview')} · {context.season}</span><h2>{text('What needs attention')}</h2>
-          <p>{text('Start with the evidence, then compare your next crop.')}</p><button className="button primary" type="button" onClick={props.openStrategies}>{text('Review strategies')}<ArrowRightIcon aria-hidden="true" /></button></section>
-        {loading ? <Loading text={text('Loading evidence…')} /> : <ol className="analytics-priorities">
-          {overviewInsights(field, context.season, today, forecast.data, state.vegetation.data, profile).map((insight, index) => <li key={insight.section}>
-            <span className="analytics-priority-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-            <div><span className="analytics-eyebrow">{text(labels[insight.section])}</span><h3>{text(insight.code)}</h3></div>
-            <button className="button subtle" type="button" onClick={() => props.onSection(insight.section)} aria-label={`${text('Open section')}: ${text(labels[insight.section])}`}><span>{text(labels[insight.section])}</span><ArrowRightIcon aria-hidden="true" /></button>
-          </li>)}</ol>}
-        <section className="analytics-evidence-index"><h2>{text('Evidence for this field')}</h2><dl>
-          <div><dt>{text('Current forecast')}</dt><dd>{outlook.kind === 'unavailable' ? text('Not available') : `${date(outlook.firstDay.date)} – ${date(outlook.lastDay.date)}`}</dd></div>
-          <div><dt>{text('Satellite observation')}</dt><dd>{satellite ? `${date(satellite.latest.date)} · ${number(satellite.latest.valid_percent, 0)}% ${text('Clear coverage').toLowerCase()}` : text('Not available')}</dd></div>
-          <div><dt>{text('Saved profile')}</dt><dd>{profile ? `${text('Profile as of')} ${date(profile.as_of)}` : text('Not available')}</dd></div>
-        </dl><button className="button subtle" type="button" onClick={() => { profiles.reload(); forecast.reload(); state.vegetation.reload() }}><ArrowPathIcon aria-hidden="true" />{text('Refresh')}</button></section>
-        {forecast.error && <ErrorBox message={forecast.error} retry={forecast.reload} />}
-        {state.vegetation.error && <ErrorBox message={state.vegetation.error} retry={state.vegetation.reload} />}
-        {profiles.error && <ErrorBox message={profiles.error} retry={profiles.reload} />}
-        </div></details>
-      </>}
-      {section === 'water' && <>
-        <CurrentFieldOverview field={field} forecast={forecast.data} season={context.season} pending={forecast.pending} error={forecast.error} reload={forecast.reload} />
-        <RainArchivePanel field={field} periodDays={props.rainPeriod} setPeriodDays={props.chooseRainPeriod} />
-        <details className="analytics-disclosure" open={Boolean(props.jobId || props.forecastDay)}><summary>{text('Water controls, history and scenarios')}</summary><div className="analytics-details-body">
-        <p className="analytics-meta">{text('The live forecast concerns the coming days. Historical scenarios below use the selected season and assumptions.')}</p>
-        <WaterPage {...props} embedded />
-        </div></details>
-      </>}
-      {section === 'vegetation' && <>
-        <section className="analytics-vegetation-lead"><div><span className="analytics-eyebrow">Sentinel-2 · {context.season}</span><h2>{text(satellite ? 'Inspect patterns before diagnosing a crop' : 'No usable satellite observation in this season')}</h2>
-          <p>{text(satellite ? 'NDVI describes vegetation reflectance. A low value alone does not identify drought, disease or lost yield.' : 'Refresh satellite processing or inspect the field. Missing imagery is not evidence of healthy vegetation.')}</p>
-          {satellite && <p className="analytics-meta"><time dateTime={satellite.latest.date}>{date(satellite.latest.date)}</time> · {number(satellite.latest.valid_percent, 0)}% {text('Clear coverage')}</p>}
-          {satellite?.historical && <p className="analytics-caution">{text('Historical season — this is not current crop condition.')}</p>}
-          {satellite && !satellite.historical && satellite.ageDays > 30 && <p className="analytics-caution">{text('Older than 30 days — inspect before acting on this observation.')}</p>}
-          <button className="button" type="button" onClick={() => props.openMapLayer('ndvi_variability', mapFocus())}><MapIcon aria-hidden="true" />{text('Open vegetation map')}</button>
-        </div>{satellite && <div className="analytics-ndvi-figure"><strong>{number(satellite.latest.mean_ndvi, 2)}</strong><span>NDVI · {date(satellite.latest.date)}</span></div>}</section>
-        <FieldAnalysisPanel {...analysisProps} sections={['vegetation', 'precision']} />
-        <details className="analytics-disclosure"><summary>{text('Seasonal weather evidence')}</summary><div className="analytics-details-body"><SeasonalWeatherPanel field={field} season={context.season} /></div></details>
-      </>}
-      {section === 'rotation' && <>
-        {profiles.pending && <Loading text={text('Loading evidence…')} />}{profileNotice}
-        <RotationHistory profile={profile} season={context.season} />
-        <button className="button primary" type="button" onClick={props.openStrategies}>{text('Review strategies')}<ArrowRightIcon aria-hidden="true" /></button>
-        <details className="analytics-disclosure" onToggle={event => setDiagnosticsOpen(event.currentTarget.open)}><summary>{text('Saved sequence diagnostics')}</summary>
-          <div className="analytics-details-body"><p>{text('Compare saved sequences against historical weather. Edit future choices in Strategies.')}</p>
-            {diagnosticsOpen && <RotationsPage {...props} embedded openWater={() => props.onSection('water')} />}
-          </div>
-        </details>
-        {profile && <ProfileSources profile={profile} />}
-      </>}
-      {section === 'soil' && <>
-        {profiles.pending && <Loading text={text('Loading evidence…')} />}{profileNotice}
-        <SoilProfile profile={profile} />
-        <button className="button primary" type="button" onClick={props.openStrategies}>{text('Review strategies')}<ArrowRightIcon aria-hidden="true" /></button>
-        <section className="analytics-terrain-lead"><div><h2>{text('Terrain is a cue for inspection, not a flood forecast')}</h2><p>{text('Surface gradients do not measure drainage pipes, runoff or waterlogging probability.')}</p></div>
-          <button className="button" type="button" onClick={() => props.openMapLayer('terrain', { season: context.season })}><MapIcon aria-hidden="true" />{text('Open map')}</button></section>
-        <details className="analytics-disclosure"><summary>{text('Terrain evidence and processing')}</summary><div className="analytics-details-body"><FieldAnalysisPanel {...analysisProps} sections={['terrain']} /></div></details>
-        {profile && <ProfileSources profile={profile} />}
-      </>}
-      {['soil', 'rotation'].includes(section) && profiles.error && <ErrorBox message={profiles.error} retry={profiles.reload} />}
+  function apply(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!isDay(draft.start) || !isDay(draft.end) || periodDays(draft) < 1 || periodDays(draft) > 92) {
+      setInvalid(true)
+      return
+    }
+    select(draft)
+  }
 
-    </div>
+  return <div className="page-body field-dashboard">
+    <header><h1>{label('Analytics', 'Аналітика')}</h1></header>
+    <form className="dashboard-period" onSubmit={apply}>
+      <label className="control dashboard-field">
+        <span>{label('Field', 'Поле')}</span>
+        <select value={field?.id ?? ''} onChange={event => chooseField(event.target.value)}>
+          <option value="">{label('Select a field', 'Оберіть поле')}</option>
+          {fields.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
+        </select>
+      </label>
+      <label className="control dashboard-date"><span>{label('Start date', 'Початок періоду')}</span>
+        <input type="date" min="1900-01-01" max="2200-12-31" required disabled={!field} value={draft.start}
+          onChange={event => { setDraft(old => ({ ...old, start: event.target.value })); setInvalid(false) }} />
+      </label>
+      <label className="control dashboard-date"><span>{label('End date', 'Кінець періоду')}</span>
+        <input type="date" min="1900-01-01" max="2200-12-31" required disabled={!field} value={draft.end}
+          onChange={event => { setDraft(old => ({ ...old, end: event.target.value })); setInvalid(false) }} />
+      </label>
+      <button type="submit" className="button primary" disabled={!field}>{label('Apply', 'Застосувати')}</button>
+      <button type="button" className="button subtle" disabled={!field} onClick={() => select(defaults)}>{label('Next 30 days', 'Найближчі 30 днів')}</button>
+    </form>
+    {invalid && <p role="alert">{label('Select 1–92 days in date order.', 'Оберіть від 1 до 92 днів у порядку дат.')}</p>}
+    {!field || !context ? <section className="dashboard-card">
+      <p>{fields.length ? label('Choose a field to view its data.', 'Оберіть поле, щоб переглянути його дані.') : label('Add a field to view analytics.', 'Додайте поле, щоб переглянути аналітику.')}</p>
+      {!fields.length && canEdit && <button className="button" type="button" onClick={addField}>{label('Add field', 'Додати поле')}</button>}
+    </section> : <DashboardContent
+      key={[field.id, field.boundary_revision, context.season, context.scenario, jobId, today, selected.start, selected.end].join(':')}
+      field={field} context={context} today={today} period={selected} jobId={jobId} choosePeriod={select} openAgent={openAgent} />}
   </div>
+}
+
+function DashboardContent({ field, context, today, period, jobId, choosePeriod, openAgent }: {
+  field: Field; context: FieldContext; today: string; period: Period; jobId?: string
+  choosePeriod: (period: Period) => void; openAgent: (jobId?: string) => void
+}) {
+  const { label, dates, number, source } = useDashboardLabels()
+  const load = useCallback((signal: AbortSignal) =>
+    fieldWeatherApi.dashboard(field.id, field.boundary_revision, period.start, period.end, signal),
+  [field.id, field.boundary_revision, period.start, period.end])
+  const weather = useResource(load)
+  const inScope = weather.data?.field_id === field.id && weather.data.boundary_revision === field.boundary_revision &&
+    weather.data.start === period.start && weather.data.end === period.end
+  const data = inScope ? weather.data : undefined
+  const rains = weatherTotals(data?.series.precipitation ?? [])
+  const hottest = maximum(data?.series.temperature_max ?? [])
+  const moisture = data?.series.surface_moisture.flatMap(span => span.points).at(-1)
+  return <div className="dashboard-body">
+    {weather.pending && <Loading text={label('Loading field metrics…', 'Завантажуємо показники поля…')} />}
+    {!weather.pending && !data && <ErrorBox message={label('Field weather is temporarily unavailable.', 'Погодні дані поля тимчасово недоступні.')} retry={weather.reload} />}
+    {data && <div className="dashboard-cards">
+      <article className="dashboard-card">
+        <h2>{label('Precipitation · period totals', 'Опади · суми за період')}</h2>
+        {!rains.length && <p>{label('No data for these dates', 'Немає даних для цих дат')}</p>}
+        {rains.map(span => <div key={span.start}><strong>{number(span.total)} {label('mm', 'мм')}</strong>
+          <p>{source(span.source)} · {dates(span)}</p></div>)}
+        {rains.length > 0 && rains.reduce((count, span) => count + periodDays(span), 0) < periodDays(period) &&
+          <p>{label('Partial coverage', 'Часткове покриття')}</p>}
+      </article>
+      <article className="dashboard-card">
+        <h2>{label('Peak of daily maximum temperatures', 'Найвища з добових максимальних температур')}</h2>
+        {hottest ? <>
+          <strong>{number(hottest.point.value)} °C</strong>
+          <p>{source(hottest.source)} · {dates(hottest.point)}</p>
+        </> : <p>{label('No operational or historical data', 'Немає оперативних чи історичних даних')}</p>}
+      </article>
+      <article className="dashboard-card">
+        <h2>{label('Surface soil moisture · 0–7 cm', 'Поверхнева вологість ґрунту · 0–7 см')}</h2>
+        {moisture ? <><strong>{number(moisture.value, 3)} {label('m³/m³', 'м³/м³')}</strong>
+          <p>{source('reanalysis')} · {dates(moisture)}</p></> : <p>{label('No historical value for these dates', 'Немає історичного значення для цих дат')}</p>}
+      </article>
+    </div>}
+    <WaterDashboard field={field} context={context} today={today} period={period} jobId={jobId}
+      choosePeriod={choosePeriod} openAgent={openAgent} />
+    {data && <WeatherCharts data={data} period={period} />}
+  </div>
+}
+
+function maximum(spans: DashboardSpan[]) {
+  const points = spans.flatMap(({ source, points }) => source && source !== 'climate'
+    ? points.map(point => ({ point, source })) : [])
+  return points.reduce<typeof points[number] | undefined>((peak, value) => !peak || value.point.value > peak.point.value ? value : peak, undefined)
+}
+
+function WeatherCharts({ data, period }: { data: WeatherDashboard; period: Period }) {
+  const { label, source, date } = useDashboardLabels()
+  const hasClimate = Object.values(data.series).some(series => series.some(span => span.source === 'climate'))
+  const rainUnit = label('mm/day', 'мм/добу')
+  const charts: { id: DashboardMetric; title: string; unit: string; digits?: number }[] = [
+    { id: 'precipitation', title: label('Precipitation', 'Опади'), unit: rainUnit },
+    { id: 'reference_et0', title: label('Reference evapotranspiration · ET₀', 'Еталонна евапотранспірація · ET₀'), unit: rainUnit },
+    { id: 'temperature_min', title: label('Daily minimum air temperature', 'Добова мінімальна температура повітря'), unit: '°C' },
+    { id: 'temperature_max', title: label('Daily maximum air temperature', 'Добова максимальна температура повітря'), unit: '°C' },
+    { id: 'surface_moisture', title: label('Surface soil moisture · 0–7 cm', 'Поверхнева вологість ґрунту · 0–7 см'), unit: label('m³/m³', 'м³/м³'), digits: 3 },
+  ]
+  const gaps = {
+    archive_lag: label('No data · archive publishes with a 7-day lag', 'Немає даних · архів публікується із затримкою 7 днів'),
+    outside_coverage: label('No data · outside source coverage', 'Немає даних · поза покриттям джерела'),
+    unsupported: label('No data · no compatible source', 'Немає даних · немає сумісного джерела'),
+    provider_gap: label('No data · source temporarily unavailable or incomplete', 'Немає даних · джерело тимчасово недоступне або неповне'),
+  }
+  return <section className="dashboard-weather" aria-labelledby="weather-charts-title">
+    <h2 id="weather-charts-title">{label('Weather and surface moisture', 'Погода й поверхнева вологість')}</h2>
+    {hasClimate && <p className="dashboard-caption">{label('A long-term climate scenario covers part of this period.', 'Для частини цього періоду використано довгостроковий кліматичний сценарій.')}</p>}
+    <div className="dashboard-charts">{charts.map(chart => {
+      const spans = data.series[chart.id]
+      const describe = (span: DashboardSpan) => span.source ? source(span.source)
+        : span.reason ? gaps[span.reason] : label('No data for these dates', 'Немає даних для цих дат')
+      const used = new Set(spans.map(item => item.source))
+      return <DashboardChart key={chart.id} title={chart.title} unit={chart.unit} digits={chart.digits}
+        period={period} spans={spans} describe={describe}
+        details={<>
+          {used.has('reanalysis') && <p>{source('reanalysis')} · <a href="https://open-meteo.com/en/docs/historical-weather-api">{chart.id === 'surface_moisture' ? 'ERA5-Land' : 'ERA5'}</a></p>}
+          {used.has('forecast') && <p>{source('forecast')} · <a href="https://open-meteo.com/en/docs">Open-Meteo</a> · {label('16-day maximum horizon', 'Горизонт до 16 днів')}</p>}
+          {used.has('climate') && <p>{source('climate')} · <a href="https://open-meteo.com/en/docs/climate-api">EC-Earth3P-HR · HighResMIP</a>. {label('Simulated averages over intervals of up to seven days. Dates locate the scenario on the chart. This single high-emissions simulation has no uncertainty range.', 'Середні за змодельовані інтервали до семи днів. Дати позначають, де на графіку діє сценарій. Для однієї симуляції з високими викидами діапазону невизначеності немає.')}</p>}
+          {used.has(null) && <p>{label('Archive coverage begins in', 'Покриття архіву починається у')} {chart.id === 'surface_moisture' ? '1950' : '1940'}. {
+            ['precipitation', 'temperature_min', 'temperature_max'].includes(chart.id)
+            && label('The available climate series ends in 2049.', 'Доступний кліматичний ряд закінчується у 2049 році.')
+          } {chart.id === 'reference_et0' && label('ET₀ forecast covers up to 16 days.', 'Прогноз ET₀ охоплює до 16 днів.')}</p>}
+          {used.size > 1 || !used.has(null) ? <p>{label('Dashboard updated', 'Дашборд оновлено')} · {date(data.generated_at, true)} UTC</p> : null}
+        </>} />
+    })}</div>
+  </section>
 }

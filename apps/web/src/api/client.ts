@@ -81,8 +81,10 @@ export const api = {
   observationPhoto: (id: number) => `${apiBase}/farm/observations/${id}/photo`,
   water: (context: FieldContext, signal?: AbortSignal) =>
     request<WaterResult>('/water?' + contextQuery(context), { signal }),
-  waterForecast: (fieldId: string, signal?: AbortSignal) =>
-    request<WaterForecast | null>('/water/forecast?' + new URLSearchParams({ field_id: fieldId }), { signal }),
+  waterForecast: (fieldId: string, signal?: AbortSignal, revision?: number) =>
+    request<WaterForecast | null>('/water/forecast?' + new URLSearchParams({
+      field_id: fieldId, ...(revision === undefined ? {} : { geometry_revision: String(revision) }),
+    }), { signal }),
   rotations: (context: FieldContext, signal?: AbortSignal) =>
     request<Rotations>('/rotations?' + contextQuery(context), { signal }),
   rotationYield: (fieldId: string, season: number, signal?: AbortSignal) =>
@@ -98,8 +100,8 @@ export const api = {
   agentStatus: (signal?: AbortSignal) => request<AgentStatus>('/agent/status', { signal }),
   chat: (body: FieldContext & { message: string; locale?: 'en' | 'uk'; run_id?: string; conversation_id?: string }, signal?: AbortSignal) =>
     request<AgentReply>('/agent/chat', { method: 'POST', body: JSON.stringify(body), signal }),
-  createJob: (kind: JobKind, context: FieldContext, key: string, irrigationMm = 0, options: JobOptions = {}) =>
-    request<Job>('/jobs', {
+  createJob: (kind: JobKind, context: FieldContext, key: string, irrigationMm = 0, options: JobOptions = {}, revision?: number) =>
+    request<Job>(revision === undefined ? '/jobs' : '/jobs?geometry_revision=' + revision, {
       method: 'POST',
       headers: { 'Idempotency-Key': key },
       body: JSON.stringify({

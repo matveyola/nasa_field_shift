@@ -1,6 +1,7 @@
 /** Test-only composition for legacy allocation, planting calendar and multi-plan behavior. */
 import { useEffect, useRef, useState } from 'react'
 import type { StrategiesPageProps } from '../../src/shared/productContext'
+import type { AnalyticsSection } from '../analytics/legacyContext'
 import { useLocale } from '../../src/shared/locale'
 import { FarmRotationPlanner, type AllocationDraftState } from '../../src/features/rotations/FarmRotationPlanner'
 import { PlanningPage } from '../../src/features/planning-integration/PlanningPage'
@@ -11,7 +12,11 @@ import { canReviewAllocation } from '../../src/features/strategies/opportunities
 import { HandoffWorkspace } from '../../src/features/strategies/handoff/HandoffWorkspace'
 import '../../src/features/strategies/strategies.css'
 
-export function LegacyStrategiesHarness({ field, fields, season, trajectory, focus, onContext, openAnalytics, openAgent }: StrategiesPageProps) {
+type LegacyStrategiesProps = Omit<StrategiesPageProps, 'openAnalytics'> & {
+  openAnalytics: (section?: AnalyticsSection) => void
+}
+
+export function LegacyStrategiesHarness({ field, fields, season, trajectory, focus, onContext, openAnalytics, openAgent }: LegacyStrategiesProps) {
   const { language } = useLocale()
   const uk = language === 'uk'
   const [view, setView] = useState<'handoff' | 'opportunities' | 'allocation' | 'scenarios'>(() => initialStrategyView(focus))

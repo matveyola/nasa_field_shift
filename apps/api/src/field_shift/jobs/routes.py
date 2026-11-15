@@ -5,6 +5,7 @@ from fastapi import APIRouter, Header, HTTPException, Query
 from sqlalchemy import select
 
 from field_shift.db import SessionDep
+from field_shift.errors import ConflictError
 from field_shift.jobs import repository
 from field_shift.jobs.models import Job
 from field_shift.jobs.schemas import JobResponse, JobSubmission
@@ -22,11 +23,16 @@ PageLimit = Annotated[int, Query(ge=1, le=100)]
 
 @router.post("", response_model=JobResponse, status_code=202)
 def create_job(
-    body: JobSubmission, session: SessionDep, idempotency_key: IdempotencyHeader = None
+    body: JobSubmission,
+    session: SessionDep,
+    idempotency_key: IdempotencyHeader = None,
+    geometry_revision: Annotated[int | None, Query(ge=0)] = None,
 ) -> Job:
     if idempotency_key is not None and idempotency_key.startswith(repository.INTERNAL_KEY_PREFIX):
         raise HTTPException(status_code=400, detail="This idempotency key prefix is reserved.")
     field = require_field(session, body.field_id)
+    if geometry_revision is not None and geometry_revision != field.boundary_revision:
+        raise ConflictError("Field boundary changed. Reload the field before starting a run.")
     if body.inputs.analysis == "vegetation":
         from field_shift.modules.imagery.vegetation import vegetation_footprint
 
