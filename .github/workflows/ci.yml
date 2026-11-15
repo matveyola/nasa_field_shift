@@ -27,8 +27,8 @@ jobs:
           version: '0.11.0'
           python-version: '3.12'
       - run: uv run --no-project --python 3.12 python infra/verify.py --mode tooling
-      - run: uvx --from ruff==0.17.4 ruff check --config apps/api/pyproject.toml infra/check_agent_tree.py infra/test_agent_tree.py infra/verify.py infra/test_verify.py
-      - run: uvx --from ruff==0.17.4 ruff format --check --config apps/api/pyproject.toml infra/check_agent_tree.py infra/test_agent_tree.py infra/verify.py infra/test_verify.py
+      - run: uvx --from ruff==0.17.4 ruff check --config apps/api/pyproject.toml infra/check_agent_tree.py infra/test_agent_tree.py infra/test_ci_paths.py infra/verify.py infra/test_verify.py
+      - run: uvx --from ruff==0.17.4 ruff format --check --config apps/api/pyproject.toml infra/check_agent_tree.py infra/test_agent_tree.py infra/test_ci_paths.py infra/verify.py infra/test_verify.py
 
   python_packages:
     name: Installed Python distributions

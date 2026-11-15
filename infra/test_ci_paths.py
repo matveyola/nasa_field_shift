@@ -8,12 +8,8 @@ from pathlib import Path
 
 class CIPathChecks(unittest.TestCase):
     def test_shared_science_runs_paired_rotation_verification(self):
-        workflow = (
-            Path(__file__).resolve().parents[1] / ".github/workflows/ci.yml"
-        ).read_text()
-        program = workflow.split("          awk '", 1)[1].split(
-            '\' "$RUNNER_TEMP/changes"', 1
-        )[0]
+        workflow = (Path(__file__).resolve().parents[1] / ".github/workflows/ci.yml").read_text()
+        program = workflow.split("          awk '", 1)[1].split('\' "$RUNNER_TEMP/changes"', 1)[0]
         for path, expected in (
             (
                 "packages/field-shift-science/src/field_shift_science/water/balance.py",
@@ -37,14 +33,10 @@ class CIPathChecks(unittest.TestCase):
                 self.assertEqual(flags["rotation_model"], expected)
 
     def test_every_consumed_change_output_is_forwarded(self):
-        workflow = (
-            Path(__file__).resolve().parents[1] / ".github/workflows/ci.yml"
-        ).read_text()
+        workflow = (Path(__file__).resolve().parents[1] / ".github/workflows/ci.yml").read_text()
         changes = workflow.split("  changes:\n", 1)[1].split("    steps:", 1)[0]
         output_names = re.findall(r"^      (\w+):", changes, re.MULTILINE)
-        self.assertEqual(
-            len(output_names), len(set(output_names)), "Duplicate CI output keys"
-        )
+        self.assertEqual(len(output_names), len(set(output_names)), "Duplicate CI output keys")
         forwarded = set(
             re.findall(
                 r"^      (\w+): \$\{\{ steps.detect.outputs.\1 \}\}",
@@ -54,14 +46,10 @@ class CIPathChecks(unittest.TestCase):
         )
         consumed = set(re.findall(r"needs.changes.outputs.(\w+)", workflow))
         self.assertTrue(consumed)
-        self.assertFalse(
-            consumed - forwarded, f"Checks will silently skip: {consumed - forwarded}"
-        )
+        self.assertFalse(consumed - forwarded, f"Checks will silently skip: {consumed - forwarded}")
 
     def test_installed_package_check_is_required(self):
-        workflow = (
-            Path(__file__).resolve().parents[1] / ".github/workflows/ci.yml"
-        ).read_text()
+        workflow = (Path(__file__).resolve().parents[1] / ".github/workflows/ci.yml").read_text()
         required = workflow.split("  required:\n", 1)[1]
         self.assertRegex(required, r"needs: \[[^\]]*python_packages")
         self.assertIn("python3 infra/verify_python_wheels.py", workflow)
