@@ -58,8 +58,21 @@ date-grounding checkpoint `9782f6b`, the answer retained the archive interval bu
 omitted the forecast after a rejected table and a blocked repeated fact read.
 Logs establish the table's schema-validation failure, not its exact malformed
 arguments. Both failed receipts are preserved; HTTP 200 and valid response
-schemas were not counted as answer-quality success. Final live acceptance must
-cover the corrected presentation path.
+schemas were not counted as answer-quality success.
+
+The corrected checkpoint `c06a482` passed independent code and installed-package
+review, followed by two fresh real-provider turns on the rebuilt isolated
+deployment. T01 retained all 41 facts: five actual forecast dates, a five-row
+table with 25 numerical cells, dated remaining forecast quantities and the exact
+archive interval and sources. G07 retained seven actual facts, including
+−42.1 °C soil temperature, its 6 cm reference depth, returned dates and the NAAS
+regional threshold. The answer separates the hypothetical sunflower check from
+registered barley and preserves the shallow-cold/liquid-water limitations.
+Its water prose names the month; the exact five-day water interval remains in
+fact evidence, not explicit narrative dates. Both responses still report
+redaction/recovery warnings. This is a scoped recovery-quality pass, not proof
+that arbitrary model prose is always complete or that the model is calibrated.
+The earlier failed runs remain unchanged.
 
 Existing conversations can be opened read-only without importing their evidence
 into the currently selected field. New widget turns remain session-local rather
