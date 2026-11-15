@@ -12,3 +12,4 @@ export { checkComparisonResponse, fieldContextProblem } from "./contracts";
 export type { Locale } from "./i18n/strings";
 export { FieldMark } from "./ui/icons"; // the assistant's mark, for a host button that opens it
 export type * from "./contracts";
+export type { CropOption } from "./actions/editing";

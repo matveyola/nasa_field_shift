@@ -4,6 +4,7 @@ import { api } from '../api/client'
 import { scenarioOrDefault, type Field, type Scenario } from '../api/contracts'
 import type { AnalyticsSection, MapFocus, StrategyFocus } from '../shared/productContext'
 import { Assistant, type AssistantScreen } from '../features/assistant/Assistant'
+import { currentAssistantRun, type AssistantRun } from '../features/assistant/assistantRun'
 import { FarmPage } from '../features/farm/FarmPage'
 import { FieldsPage } from '../features/fields/FieldsPage'
 import { Empty, ErrorBox, Loading } from '../shared/ui'
@@ -45,6 +46,14 @@ export function App() {
   const season = route.season ?? (farm ? farm.season + (route.page === 'strategies' ? 1 : 0) : new Date().getUTCFullYear())
   const context = field ? { field_id: field.id, season, scenario } : undefined
   const [assistantOpen, setAssistantOpen] = useState(route.page === 'agent')
+  const [assistantRun, setAssistantRun] = useState<AssistantRun>()
+  const assistantRunId = currentAssistantRun(assistantRun, {
+    fieldId: missingField ? undefined : field?.id, season, scenario,
+    page: route.page, section: route.section, jobId: route.jobId,
+  })
+  useEffect(() => {
+    if (assistantRun && !assistantRunId) setAssistantRun(undefined)
+  }, [assistantRun, assistantRunId])
   const setAddress = useCallback((next: Route, replace = false) => {
     const address = routeAddress(next)
     if (address !== location.pathname + location.search) {
@@ -78,6 +87,9 @@ export function App() {
 
   function go(page: Page, options: DestinationOptions = {}) {
     if (page === 'agent') {
+      const runField = options.fieldId ?? field?.id
+      setAssistantRun(options.jobId && runField ? { id: options.jobId, fieldId: runField,
+        season: options.season ?? season, scenario: options.scenario ?? scenario } : undefined)
       if (options.fieldId || options.season !== undefined || options.scenario) setAddress({ ...route, fieldId: options.fieldId ?? field?.id, scenario: options.scenario ?? scenario, season: options.season ?? season })
       setAssistantOpen(true)
       return
@@ -179,7 +191,7 @@ export function App() {
         irrigationAvailable={field.irrigation_available ?? farm.defaults.irrigation_available} chooseField={chooseField} chooseSeason={year => setAddress({ ...route, season: year })}
         chooseScenario={chooseScenario} onSection={section => go('analytics', { section })} showJob={showWaterJob}
         openFields={() => go('fields')} openStrategies={() => go('strategies')}
-        openAgent={jobId => { if (jobId) showWaterJob(jobId); setAssistantOpen(true) }} openMapLayer={openMapLayer} />
+        openAgent={jobId => go('agent', { jobId })} openMapLayer={openMapLayer} />
     </Suspense>
   }
   const keepStrategies = !route.setupId && farm && field && !missingField && (strategiesVisited || route.page === 'strategies')
@@ -197,8 +209,9 @@ export function App() {
           openAnalytics={(section = 'overview') => go('analytics', { section })} openAgent={() => setAssistantOpen(true)} /></Suspense>
       </div>}
     </Shell>
-    {farm && !route.setupId && <Assistant field={missingField ? undefined : field} season={season} scenario={scenario} open={assistantOpen} onOpenChange={setAssistantOpen}
+    {farm && !route.setupId && <Assistant field={missingField ? undefined : field} season={season} scenario={scenario} runId={assistantRunId} open={assistantOpen} onOpenChange={setAssistantOpen}
       openScreen={openAssistantScreen} openVegetation={ndvi => ndvi ? openMapLayer('ndvi_variability') : go('analytics', { section: 'vegetation' })}
-      openForecast={day => { if (field) openFieldForecast(field.id, day) }} />}
+      openForecast={day => { if (field) openFieldForecast(field.id, day) }}
+      openRun={jobId => go('analytics', { section: 'water', jobId })} clearRun={() => setAssistantRun(undefined)} />}
   </NotificationProvider>
 }

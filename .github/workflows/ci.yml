@@ -80,10 +80,13 @@ jobs:
           fi
           awk '
             /^(apps\/api\/|\.github\/workflows\/ci\.yml)/ { api = 1 }
+            /^services\/agent\/contracts\// { api = 1 }
+            /^services\/agent\/tests\/fixtures\/(host_constraints|host_signed_turn)\.json$/ { api = 1 }
             /^(services\/boundary-model\/|compose(\.boundary-model)?\.yaml$|apps\/web\/public\/bondurant-usgs-aerial\.webp$|\.github\/workflows\/ci\.yml$)/ { boundary_model = 1 }
             /^services\/agent\/(agent_service|contracts|tests|integration_stub)\// { agent = 1 }
             /^services\/agent\/evals\// && !/^services\/agent\/evals\/reports\// { agent = 1 }
             /^(services\/agent\/(Dockerfile|\.dockerignore|pyproject\.toml|uv\.lock)$|compose\.yaml$|infra\/configure-agent\.py$|\.github\/workflows\/ci\.yml$)/ { agent = 1 }
+            /^apps\/api\/src\/field_shift\/modules\/agent\/(signing|constraints|field_context|service)\.py$/ { agent = 1 }
             /^services\/agent\/frontend\// && !/^services\/agent\/frontend\/docs\// { agent_reference = 1 }
             /^(services\/agent\/(contracts\/|package(-lock)?\.json$|tsconfig\.json$|examples\/client\.ts$)|\.github\/workflows\/ci\.yml$)/ { agent_reference = 1 }
             /^(apps\/web\/|services\/agent\/frontend\/src\/widget\/|\.github\/workflows\/ci\.yml)/ { web = 1 }

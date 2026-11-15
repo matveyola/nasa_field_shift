@@ -21,7 +21,8 @@ export type RejectReason =
   | "not_permitted" // e.g. constraints the farmer has not confirmed
   | "expired" // references a simulation result past its expires_at
   | "invalid" // not a contract-valid envelope
-  | "failed"; // the host tried and failed
+  | "failed" // the host tried and failed
+  | "cancelled"; // the farmer chose not to go ahead (e.g. kept an earlier decision this would replace)
 
 export interface ActionRequest {
   /** Revision already re-checked by the widget; the host checks it again against its live store. */
@@ -153,13 +154,24 @@ export function isCurrent(ctx: FieldContext | null, fieldId: string, validRevisi
   return !!ctx && ctx.field_id === fieldId && validRevisions.includes(ctx.revision);
 }
 
-/** A farmer's confirmation of one proposed constraint, as the typed action the host applies. */
-export function confirmationEnvelope(constraint: Constraint, ctx: FieldContext, label: string): UIActionEnvelope {
+/** What a farmer decides about a proposed constraint: keep it as a planning condition, or reject it. */
+export type ConstraintDecision = "confirmed" | "rejected";
+
+/**
+ * A farmer's decision about one proposed constraint, as the typed action the host applies. Only the farmer's own
+ * click builds one (a `chip`); the agent's actions never decide for the farmer.
+ */
+export function confirmationEnvelope(
+  constraint: Constraint,
+  ctx: FieldContext,
+  label: string,
+  decision: ConstraintDecision = "confirmed",
+): UIActionEnvelope {
   return {
-    id: `confirm.${constraint.id}`,
+    id: `${decision === "confirmed" ? "confirm" : "reject"}.${constraint.id}`,
     field_context_revision: ctx.revision,
     trigger: "chip",
     label: label.slice(0, 300),
-    action: { type: "compare.set_constraints", constraints: [{ ...constraint, status: "confirmed" }] },
+    action: { type: "compare.set_constraints", constraints: [{ ...constraint, status: decision }] },
   };
 }

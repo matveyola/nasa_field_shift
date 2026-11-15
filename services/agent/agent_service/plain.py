@@ -35,6 +35,15 @@ NAMES: dict[str, dict[str, str]] = {
         "fact.rotation_water_risk": "ризик нестачі води",
         "fact.rotation_yield_loss_water": "втрата врожаю через нестачу води",
         "fact.slope_mean": "середній ухил",
+        "fact.elevation_min": "найнижча точка поля",
+        "fact.elevation_max": "найвища точка поля",
+        "fact.surface_soil_moisture": "вологість верхнього шару ґрунту (0–7 см, оцінка погодної моделі)",
+        "fact.farmer_amount": "сума з ваших слів",
+        "fact.farmer_amount_per_hectare": "сума на гектар з ваших слів",
+        "fact.farmer_area": "площа з ваших слів",
+        "fact.budget_per_hectare": "сума на гектар (розрахунок з ваших чисел)",
+        "fact.budget_total_for_area": "сума на всю площу (розрахунок з ваших чисел)",
+        "fact.budget_difference": "різниця (розрахунок з ваших чисел)",
         "fact.soil_clay": "вміст глини",
         "fact.soil_ph": "кислотність ґрунту (pH)",
         "fact.water_stress_days": "дні з водним стресом",
@@ -81,6 +90,15 @@ NAMES: dict[str, dict[str, str]] = {
         "fact.rotation_water_risk": "risk of water shortage",
         "fact.rotation_yield_loss_water": "harvest lost to water shortage",
         "fact.slope_mean": "average slope",
+        "fact.elevation_min": "lowest point of the field",
+        "fact.elevation_max": "highest point of the field",
+        "fact.surface_soil_moisture": "topsoil moisture (0–7 cm, weather-model estimate)",
+        "fact.farmer_amount": "amount you gave",
+        "fact.farmer_amount_per_hectare": "amount per hectare you gave",
+        "fact.farmer_area": "area you gave",
+        "fact.budget_per_hectare": "amount per hectare (calculated from your figures)",
+        "fact.budget_total_for_area": "amount for the whole area (calculated from your figures)",
+        "fact.budget_difference": "difference (calculated from your figures)",
         "fact.soil_clay": "clay content",
         "fact.soil_ph": "soil acidity (pH)",
         "fact.water_stress_days": "days with water stress",
@@ -111,36 +129,139 @@ NAMES: dict[str, dict[str, str]] = {
 SOURCES: tuple[tuple[str, dict[str, str]], ...] = (
     ("SPL4SMGP", {"uk": "супутник NASA SMAP", "en": "NASA SMAP satellite"}),
     ("GPM_", {"uk": "супутники NASA GPM", "en": "NASA GPM satellites"}),
-    ("HLS", {"uk": "супутникові знімки NASA (Landsat і Sentinel)", "en": "NASA satellite images (Landsat and Sentinel)"}),
+    (
+        "HLS",
+        {
+            "uk": "супутникові знімки NASA (Landsat і Sentinel)",
+            "en": "NASA satellite images (Landsat and Sentinel)",
+        },
+    ),
     ("NASADEM", {"uk": "карта рельєфу NASA", "en": "NASA terrain map"}),
-    ("SoilGrids", {"uk": "світова карта ґрунтів SoilGrids", "en": "SoilGrids world soil map"}),
+    (
+        "Copernicus DEM",
+        {"uk": "карта рельєфу Copernicus", "en": "Copernicus terrain map"},
+    ),
+    (
+        "ERA5-Land",
+        {
+            "uk": "оцінка погодної моделі ERA5-Land, не супутник і не заміри на полі",
+            "en": "ERA5-Land weather-model estimate, not a satellite or field measurement",
+        },
+    ),
+    (
+        "SoilGrids",
+        {"uk": "світова карта ґрунтів SoilGrids", "en": "SoilGrids world soil map"},
+    ),
     ("HYSOGs", {"uk": "світова карта ґрунтів HYSOGs", "en": "HYSOGs world soil map"}),
     ("T2M", {"uk": "погодні дані NASA POWER", "en": "NASA POWER weather data"}),
-    ("cherkasy-naas", {"uk": "рекомендації Черкаської дослідної станції НААН (2024)",
-                       "en": "recommendations of the Cherkasy research station of NAAS (2024)"}),
-    ("open-meteo-archive", {"uk": "архів погоди Open-Meteo (ERA5)", "en": "Open-Meteo weather archive (ERA5)"}),
-    ("open-meteo", {"uk": "прогноз погоди Open-Meteo", "en": "Open-Meteo weather forecast"}),
+    (
+        "cherkasy-naas",
+        {
+            "uk": "рекомендації Черкаської дослідної станції НААН (2024)",
+            "en": "recommendations of the Cherkasy research station of NAAS (2024)",
+        },
+    ),
+    (
+        "open-meteo-archive",
+        {
+            "uk": "архів погоди Open-Meteo (ERA5)",
+            "en": "Open-Meteo weather archive (ERA5)",
+        },
+    ),
+    (
+        "open-meteo",
+        {"uk": "прогноз погоди Open-Meteo", "en": "Open-Meteo weather forecast"},
+    ),
 )
 
 UNITS = {
-    "uk": {"1": "", "[pH]": "", "m3/m3": " м³/м³", "Cel": " °C", "Cel.d": " °C·днів", "deg": "°", "%": "%",
-           "mm": " мм", "g/kg": " г/кг", "kg/ha": " кг/га", "d": " днів", "m/s": " м/с"},
-    "en": {"1": "", "[pH]": "", "m3/m3": " m³/m³", "Cel": " °C", "Cel.d": " °C·d", "deg": "°", "%": "%",
-           "mm": " mm", "g/kg": " g/kg", "kg/ha": " kg/ha", "d": " days", "m/s": " m/s"},
+    "uk": {
+        "1": "",
+        "[pH]": "",
+        "m3/m3": " м³/м³",
+        "Cel": " °C",
+        "Cel.d": " °C·днів",
+        "deg": "°",
+        "%": "%",
+        "mm": " мм",
+        "g/kg": " г/кг",
+        "kg/ha": " кг/га",
+        "d": " днів",
+        "m/s": " м/с",
+        "m": " м",
+        "ha": " га",
+        "UAH": " грн",
+        "UAH/ha": " грн/га",
+        "USD": " дол. США",
+        "USD/ha": " дол. США/га",
+    },
+    "en": {
+        "1": "",
+        "[pH]": "",
+        "m3/m3": " m³/m³",
+        "Cel": " °C",
+        "Cel.d": " °C·d",
+        "deg": "°",
+        "%": "%",
+        "mm": " mm",
+        "g/kg": " g/kg",
+        "kg/ha": " kg/ha",
+        "d": " days",
+        "m/s": " m/s",
+        "m": " m",
+        "ha": " ha",
+        "UAH": " UAH",
+        "UAH/ha": " UAH/ha",
+        "USD": " USD",
+        "USD/ha": " USD/ha",
+    },
 }
 
 CROPS = {
-    "uk": {"maize": "кукурудза", "sorghum": "сорго", "soybean": "соя", "sunflower": "соняшник", "winter_pea": "озимий горох",
-           "winter_rye_vetch": "озиме жито з викою (покривна культура)", "winter_wheat": "озима пшениця"},
-    "en": {"maize": "maize", "sorghum": "sorghum", "soybean": "soybean", "sunflower": "sunflower", "winter_pea": "winter pea",
-           "winter_rye_vetch": "winter rye with vetch (cover crop)", "winter_wheat": "winter wheat"},
+    "uk": {
+        "maize": "кукурудза",
+        "sorghum": "сорго",
+        "soybean": "соя",
+        "sunflower": "соняшник",
+        "winter_pea": "озимий горох",
+        "winter_rye_vetch": "озиме жито з викою (покривна культура)",
+        "winter_wheat": "озима пшениця",
+    },
+    "en": {
+        "maize": "maize",
+        "sorghum": "sorghum",
+        "soybean": "soybean",
+        "sunflower": "sunflower",
+        "winter_pea": "winter pea",
+        "winter_rye_vetch": "winter rye with vetch (cover crop)",
+        "winter_wheat": "winter wheat",
+    },
 }
 ROTATIONS = {
-    "uk": {"rot_adaptive": "Адаптивна сівозміна", "rot_conventional": "Звичайна сівозміна"},
-    "en": {"rot_adaptive": "Adaptive rotation", "rot_conventional": "Conventional rotation"},
+    "uk": {
+        "rot_adaptive": "Адаптивна сівозміна",
+        "rot_conventional": "Звичайна сівозміна",
+    },
+    "en": {
+        "rot_adaptive": "Adaptive rotation",
+        "rot_conventional": "Conventional rotation",
+    },
 }
 
-_MONTHS_EN = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+_MONTHS_EN = (
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+)
 
 
 def name(key: str, lang: str) -> str:
@@ -151,11 +272,16 @@ def name(key: str, lang: str) -> str:
 def source(product_id: str | None, lang: str) -> str:
     if not product_id:
         return ""
-    return next((names[lang] for prefix, names in SOURCES if product_id.startswith(prefix)), product_id)
+    return next(
+        (names[lang] for prefix, names in SOURCES if product_id.startswith(prefix)),
+        product_id,
+    )
 
 
 def unit(code: str, lang: str, value: float | None = None) -> str:
-    if code == "d" and value is not None:  # days agree with the number: 1 день, 2 дні, 5 днів; 1 day, 2 days
+    if (
+        code == "d" and value is not None
+    ):  # days agree with the number: 1 день, 2 дні, 5 днів; 1 day, 2 days
         return " " + _days(value, lang)
     return UNITS[lang].get(code, " " + code)
 
@@ -174,7 +300,11 @@ def _days(value: float, lang: str) -> str:
 def period(start: dt.date, end: dt.date, lang: str) -> str:
     """'01.05–31.07.2026' / '1 May – 31 Jul 2026' (years repeated only when they differ); one day: '11.11.2026'."""
     if start == end:
-        return f"{start:%d.%m.%Y}" if lang == "uk" else f"{start.day} {_MONTHS_EN[start.month - 1]} {start.year}"
+        return (
+            f"{start:%d.%m.%Y}"
+            if lang == "uk"
+            else f"{start.day} {_MONTHS_EN[start.month - 1]} {start.year}"
+        )
     if lang == "uk":
         if start.year == end.year:
             return f"{start:%d.%m}–{end:%d.%m.%Y}"
@@ -189,4 +319,7 @@ def crop(crop_id: str, lang: str) -> str:
 
 
 def rotation(rotation_id: str, lang: str) -> str:
-    return ROTATIONS[lang].get(rotation_id) or rotation_id.removeprefix("rot_").replace("_", " ").capitalize()
+    return (
+        ROTATIONS[lang].get(rotation_id)
+        or rotation_id.removeprefix("rot_").replace("_", " ").capitalize()
+    )

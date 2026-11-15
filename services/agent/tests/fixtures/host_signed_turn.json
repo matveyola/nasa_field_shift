@@ -1,0 +1,717 @@
+{
+  "kind": "synthetic_test_only_signature_vector_not_provider_evidence",
+  "now": 1800000000,
+  "key": "ssssssssssssssssssssssssssssssssssssssss",
+  "context": {
+    "schema_version": "0.1",
+    "field_id": "demo-poltava-01",
+    "revision": 3,
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            34.54,
+            49.6
+          ],
+          [
+            34.548,
+            49.6
+          ],
+          [
+            34.548,
+            49.605
+          ],
+          [
+            34.54,
+            49.605
+          ],
+          [
+            34.54,
+            49.6
+          ]
+        ]
+      ]
+    },
+    "centroid": [
+      34.544,
+      49.6025
+    ],
+    "area_ha": 32.1,
+    "region": {
+      "country_iso2": "UA",
+      "admin1": "Poltava Oblast"
+    },
+    "facts": [
+      {
+        "id": "f_sm_rootzone_2025_07",
+        "domain": "water",
+        "label_key": "fact.root_zone_soil_moisture",
+        "quantity": {
+          "value": 0.21,
+          "unit": "m3/m3"
+        },
+        "depth_cm": [
+          0,
+          100
+        ],
+        "provenance": {
+          "kind": "satellite_product",
+          "data_status": "fixture",
+          "source": {
+            "provider": "NASA NSIDC DAAC",
+            "product_id": "SPL4SMGP",
+            "version": "008",
+            "level": "L4 (model-assimilated)"
+          },
+          "method": "Synthetic fixture value for development; not a real measurement.",
+          "spatial": {
+            "resolution_m": 9000,
+            "note": "9 km grid; the radiometer footprint is about 33 km"
+          },
+          "temporal": {
+            "start": "2025-07-01",
+            "end": "2025-07-31",
+            "aggregation": "monthly_mean"
+          },
+          "retrieved_at": "2026-11-06T09:00:00Z"
+        }
+      },
+      {
+        "id": "f_precip_2025_07",
+        "domain": "water",
+        "label_key": "fact.precipitation_total",
+        "quantity": {
+          "value": 38.0,
+          "unit": "mm"
+        },
+        "provenance": {
+          "kind": "satellite_product",
+          "data_status": "fixture",
+          "source": {
+            "provider": "NASA GES DISC",
+            "product_id": "GPM_3IMERGDF",
+            "version": "07",
+            "level": "L3 (Final, daily)"
+          },
+          "method": "Synthetic fixture value for development; not a real measurement.",
+          "spatial": {
+            "resolution_m": 11000,
+            "note": "0.1 degree grid"
+          },
+          "temporal": {
+            "start": "2025-07-01",
+            "end": "2025-07-31",
+            "aggregation": "sum"
+          },
+          "retrieved_at": "2026-11-06T09:00:00Z"
+        }
+      },
+      {
+        "id": "f_ph_0_30",
+        "domain": "soil",
+        "label_key": "fact.soil_ph",
+        "quantity": {
+          "value": 6.9,
+          "unit": "[pH]",
+          "uncertainty": {
+            "kind": "range",
+            "low": 6.4,
+            "high": 7.3,
+            "note": "Q05-Q95"
+          }
+        },
+        "depth_cm": [
+          0,
+          30
+        ],
+        "provenance": {
+          "kind": "satellite_product",
+          "data_status": "fixture",
+          "source": {
+            "provider": "ISRIC",
+            "product_id": "SoilGrids phh2o",
+            "version": "2.0"
+          },
+          "method": "Synthetic fixture value for development; not a real measurement.",
+          "spatial": {
+            "resolution_m": 250
+          },
+          "retrieved_at": "2026-11-06T09:00:00Z"
+        }
+      },
+      {
+        "id": "f_clay_0_30",
+        "domain": "soil",
+        "label_key": "fact.soil_clay",
+        "quantity": {
+          "value": 290,
+          "unit": "g/kg"
+        },
+        "depth_cm": [
+          0,
+          30
+        ],
+        "provenance": {
+          "kind": "satellite_product",
+          "data_status": "fixture",
+          "source": {
+            "provider": "ISRIC",
+            "product_id": "SoilGrids clay",
+            "version": "2.0"
+          },
+          "method": "Synthetic fixture value for development; not a real measurement.",
+          "spatial": {
+            "resolution_m": 250
+          },
+          "retrieved_at": "2026-11-06T09:00:00Z"
+        }
+      },
+      {
+        "id": "f_slope_mean",
+        "domain": "terrain",
+        "label_key": "fact.slope_mean",
+        "quantity": {
+          "value": 3.1,
+          "unit": "deg"
+        },
+        "provenance": {
+          "kind": "satellite_product",
+          "data_status": "fixture",
+          "source": {
+            "provider": "NASA LP DAAC",
+            "product_id": "NASADEM_SC",
+            "version": "001"
+          },
+          "method": "Synthetic fixture value for development; not a real measurement.",
+          "spatial": {
+            "resolution_m": 30
+          },
+          "retrieved_at": "2026-11-06T09:00:00Z"
+        }
+      },
+      {
+        "id": "f_et0_2025_07",
+        "domain": "climate",
+        "label_key": "fact.reference_et0",
+        "quantity": {
+          "value": 165,
+          "unit": "mm"
+        },
+        "provenance": {
+          "kind": "deterministic_calc",
+          "data_status": "fixture",
+          "method": "FAO-56 Penman-Monteith (Eq. 6), daily, summed; synthetic fixture value",
+          "inputs": [
+            "power_t2m",
+            "power_rh2m",
+            "power_ws2m",
+            "power_allsky_sfc_sw_dwn"
+          ],
+          "temporal": {
+            "start": "2025-07-01",
+            "end": "2025-07-31",
+            "aggregation": "sum"
+          },
+          "retrieved_at": "2026-11-06T09:00:00Z"
+        }
+      },
+      {
+        "id": "f_sm_30m_mean_2025_07",
+        "domain": "water",
+        "label_key": "fact.root_zone_soil_moisture_downscaled",
+        "quantity": {
+          "value": 0.19,
+          "unit": "m3/m3",
+          "uncertainty": {
+            "kind": "sd",
+            "sd": 0.05
+          }
+        },
+        "provenance": {
+          "kind": "ml_estimate",
+          "data_status": "fixture",
+          "method": "Synthetic fixture value for development; not a real model output.",
+          "model": {
+            "name": "smap-downscaling",
+            "version": "0.0-fixture"
+          },
+          "inputs": [
+            "f_sm_rootzone_2025_07"
+          ],
+          "spatial": {
+            "resolution_m": 30
+          },
+          "temporal": {
+            "start": "2025-07-01",
+            "end": "2025-07-31",
+            "aggregation": "monthly_mean"
+          },
+          "retrieved_at": "2026-11-06T09:00:00Z"
+        }
+      },
+      {
+        "id": "f_ndvi_peak_2025",
+        "domain": "vegetation",
+        "label_key": "fact.ndvi_peak",
+        "quantity": {
+          "value": 0.78,
+          "unit": "1"
+        },
+        "provenance": {
+          "kind": "satellite_product",
+          "data_status": "fixture",
+          "source": {
+            "provider": "NASA LP DAAC",
+            "product_id": "HLSS30_VI",
+            "version": "002"
+          },
+          "method": "Synthetic fixture value for development; not a real measurement.",
+          "spatial": {
+            "resolution_m": 30
+          },
+          "temporal": {
+            "start": "2025-03-01",
+            "end": "2025-10-31",
+            "aggregation": "max"
+          },
+          "retrieved_at": "2026-11-06T09:00:00Z"
+        }
+      }
+    ],
+    "timeseries_index": [
+      {
+        "metric_id": "m_sm_rootzone",
+        "label_key": "metric.root_zone_soil_moisture",
+        "unit": "m3/m3",
+        "range": {
+          "start": "2025-03-01",
+          "end": "2025-10-31"
+        },
+        "provenance": {
+          "kind": "satellite_product",
+          "data_status": "fixture",
+          "source": {
+            "provider": "NASA NSIDC DAAC",
+            "product_id": "SPL4SMGP",
+            "version": "008",
+            "level": "L4 (model-assimilated)"
+          },
+          "retrieved_at": "2026-11-06T09:00:00Z"
+        }
+      },
+      {
+        "metric_id": "m_precip",
+        "label_key": "metric.precipitation",
+        "unit": "mm",
+        "range": {
+          "start": "2025-03-01",
+          "end": "2025-10-31"
+        },
+        "provenance": {
+          "kind": "satellite_product",
+          "data_status": "fixture",
+          "source": {
+            "provider": "NASA GES DISC",
+            "product_id": "GPM_3IMERGDF",
+            "version": "07"
+          },
+          "retrieved_at": "2026-11-06T09:00:00Z"
+        }
+      },
+      {
+        "metric_id": "m_ndvi",
+        "label_key": "metric.ndvi",
+        "unit": "1",
+        "range": {
+          "start": "2025-03-01",
+          "end": "2025-10-31"
+        },
+        "provenance": {
+          "kind": "satellite_product",
+          "data_status": "fixture",
+          "source": {
+            "provider": "NASA LP DAAC",
+            "product_id": "HLSS30_VI",
+            "version": "002"
+          },
+          "retrieved_at": "2026-11-06T09:00:00Z"
+        }
+      }
+    ],
+    "available_layers": [
+      {
+        "layer_id": "l_hls_ndvi",
+        "label_key": "layer.hls_ndvi",
+        "kind": "raster",
+        "provenance": {
+          "kind": "satellite_product",
+          "data_status": "fixture",
+          "source": {
+            "provider": "NASA LP DAAC",
+            "product_id": "HLSS30_VI",
+            "version": "002"
+          },
+          "retrieved_at": "2026-11-06T09:00:00Z"
+        }
+      },
+      {
+        "layer_id": "l_smap_rootzone",
+        "label_key": "layer.smap_rootzone",
+        "kind": "raster",
+        "provenance": {
+          "kind": "satellite_product",
+          "data_status": "fixture",
+          "source": {
+            "provider": "NASA NSIDC DAAC",
+            "product_id": "SPL4SMGP",
+            "version": "008"
+          },
+          "retrieved_at": "2026-11-06T09:00:00Z"
+        }
+      },
+      {
+        "layer_id": "l_sm_30m",
+        "label_key": "layer.soil_moisture_downscaled",
+        "kind": "raster",
+        "provenance": {
+          "kind": "ml_estimate",
+          "data_status": "fixture",
+          "model": {
+            "name": "smap-downscaling",
+            "version": "0.0-fixture"
+          },
+          "retrieved_at": "2026-11-06T09:00:00Z"
+        }
+      },
+      {
+        "layer_id": "l_nasadem_slope",
+        "label_key": "layer.slope",
+        "kind": "3d",
+        "provenance": {
+          "kind": "satellite_product",
+          "data_status": "fixture",
+          "source": {
+            "provider": "NASA LP DAAC",
+            "product_id": "NASADEM_SC",
+            "version": "001"
+          },
+          "retrieved_at": "2026-11-06T09:00:00Z"
+        }
+      }
+    ],
+    "available_charts": [
+      {
+        "chart_id": "c_water_season",
+        "metric_ids": [
+          "m_sm_rootzone",
+          "m_precip"
+        ]
+      },
+      {
+        "chart_id": "c_vegetation",
+        "metric_ids": [
+          "m_ndvi"
+        ]
+      }
+    ],
+    "crop_history": [
+      {
+        "season": "2024-2025",
+        "crop_id": "winter_wheat",
+        "source": "farmer_input"
+      }
+    ],
+    "constraints": [
+      {
+        "id": "k_irrigation",
+        "type": "irrigation_available",
+        "value": false,
+        "status": "confirmed",
+        "source": "farmer_text",
+        "evidence": "Поливу немає"
+      },
+      {
+        "id": "k_fertilizer",
+        "type": "fertilizer_budget",
+        "value": "minimize_n",
+        "status": "proposed",
+        "source": "farmer_text",
+        "evidence": "хочу зменшити витрати на добрива",
+        "confidence": 0.86
+      }
+    ],
+    "ui_state": {
+      "active_layer_ids": [
+        "l_hls_ndvi"
+      ],
+      "time_range": {
+        "start": "2025-03-01",
+        "end": "2025-10-31"
+      },
+      "chart_focus": null,
+      "selected_rotation_ids": [],
+      "scenario": "typical"
+    },
+    "locale": "uk"
+  },
+  "widget": {
+    "request_id": "req_test",
+    "session_id": "sess_test",
+    "locale": "uk",
+    "message": {
+      "text": "Що відомо про моє поле?"
+    },
+    "history": [],
+    "field_context": {
+      "schema_version": "0.1",
+      "field_id": "demo-poltava-01",
+      "revision": 3,
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              34.54,
+              49.6
+            ],
+            [
+              34.548,
+              49.6
+            ],
+            [
+              34.548,
+              49.605
+            ],
+            [
+              34.54,
+              49.605
+            ],
+            [
+              34.54,
+              49.6
+            ]
+          ]
+        ]
+      },
+      "centroid": [
+        34.544,
+        49.6025
+      ],
+      "area_ha": 32.1,
+      "region": {
+        "country_iso2": "UA",
+        "admin1": "Poltava Oblast"
+      },
+      "facts": [],
+      "timeseries_index": [
+        {
+          "metric_id": "m_sm_rootzone",
+          "label_key": "metric.root_zone_soil_moisture",
+          "unit": "m3/m3",
+          "range": {
+            "start": "2025-03-01",
+            "end": "2025-10-31"
+          },
+          "provenance": {
+            "kind": "satellite_product",
+            "data_status": "fixture",
+            "source": {
+              "provider": "NASA NSIDC DAAC",
+              "product_id": "SPL4SMGP",
+              "version": "008",
+              "level": "L4 (model-assimilated)"
+            },
+            "retrieved_at": "2026-11-06T09:00:00Z"
+          }
+        },
+        {
+          "metric_id": "m_precip",
+          "label_key": "metric.precipitation",
+          "unit": "mm",
+          "range": {
+            "start": "2025-03-01",
+            "end": "2025-10-31"
+          },
+          "provenance": {
+            "kind": "satellite_product",
+            "data_status": "fixture",
+            "source": {
+              "provider": "NASA GES DISC",
+              "product_id": "GPM_3IMERGDF",
+              "version": "07"
+            },
+            "retrieved_at": "2026-11-06T09:00:00Z"
+          }
+        },
+        {
+          "metric_id": "m_ndvi",
+          "label_key": "metric.ndvi",
+          "unit": "1",
+          "range": {
+            "start": "2025-03-01",
+            "end": "2025-10-31"
+          },
+          "provenance": {
+            "kind": "satellite_product",
+            "data_status": "fixture",
+            "source": {
+              "provider": "NASA LP DAAC",
+              "product_id": "HLSS30_VI",
+              "version": "002"
+            },
+            "retrieved_at": "2026-11-06T09:00:00Z"
+          }
+        }
+      ],
+      "available_layers": [
+        {
+          "layer_id": "l_hls_ndvi",
+          "label_key": "layer.hls_ndvi",
+          "kind": "raster",
+          "provenance": {
+            "kind": "satellite_product",
+            "data_status": "fixture",
+            "source": {
+              "provider": "NASA LP DAAC",
+              "product_id": "HLSS30_VI",
+              "version": "002"
+            },
+            "retrieved_at": "2026-11-06T09:00:00Z"
+          }
+        },
+        {
+          "layer_id": "l_smap_rootzone",
+          "label_key": "layer.smap_rootzone",
+          "kind": "raster",
+          "provenance": {
+            "kind": "satellite_product",
+            "data_status": "fixture",
+            "source": {
+              "provider": "NASA NSIDC DAAC",
+              "product_id": "SPL4SMGP",
+              "version": "008"
+            },
+            "retrieved_at": "2026-11-06T09:00:00Z"
+          }
+        },
+        {
+          "layer_id": "l_sm_30m",
+          "label_key": "layer.soil_moisture_downscaled",
+          "kind": "raster",
+          "provenance": {
+            "kind": "ml_estimate",
+            "data_status": "fixture",
+            "model": {
+              "name": "smap-downscaling",
+              "version": "0.0-fixture"
+            },
+            "retrieved_at": "2026-11-06T09:00:00Z"
+          }
+        },
+        {
+          "layer_id": "l_nasadem_slope",
+          "label_key": "layer.slope",
+          "kind": "3d",
+          "provenance": {
+            "kind": "satellite_product",
+            "data_status": "fixture",
+            "source": {
+              "provider": "NASA LP DAAC",
+              "product_id": "NASADEM_SC",
+              "version": "001"
+            },
+            "retrieved_at": "2026-11-06T09:00:00Z"
+          }
+        }
+      ],
+      "available_charts": [
+        {
+          "chart_id": "c_water_season",
+          "metric_ids": [
+            "m_sm_rootzone",
+            "m_precip"
+          ]
+        },
+        {
+          "chart_id": "c_vegetation",
+          "metric_ids": [
+            "m_ndvi"
+          ]
+        }
+      ],
+      "crop_history": [
+        {
+          "season": "2024-2025",
+          "crop_id": "winter_wheat",
+          "source": "farmer_input"
+        }
+      ],
+      "constraints": [
+        {
+          "id": "k_irrigation",
+          "type": "irrigation_available",
+          "value": false,
+          "status": "confirmed",
+          "source": "farmer_text",
+          "evidence": "Поливу немає"
+        },
+        {
+          "id": "k_fertilizer",
+          "type": "fertilizer_budget",
+          "value": "minimize_n",
+          "status": "proposed",
+          "source": "farmer_text",
+          "evidence": "хочу зменшити витрати на добрива",
+          "confidence": 0.86
+        }
+      ],
+      "ui_state": {
+        "active_layer_ids": [
+          "l_hls_ndvi"
+        ],
+        "time_range": {
+          "start": "2025-03-01",
+          "end": "2025-10-31"
+        },
+        "chart_focus": null,
+        "selected_rotation_ids": [],
+        "scenario": "typical"
+      },
+      "locale": "uk"
+    },
+    "client": {
+      "widget_version": "w",
+      "capabilities": {
+        "actions": [
+          "map.set_layers",
+          "compare.set_constraints"
+        ],
+        "screens": [
+          {
+            "screen_id": "admin",
+            "label": "x"
+          }
+        ]
+      }
+    }
+  },
+  "signed_body": "{\"request_id\":\"req_test\",\"session_id\":\"sess_test\",\"locale\":\"uk\",\"message\":{\"text\":\"Що відомо про моє поле?\"},\"history\":[],\"client\":{\"widget_version\":\"w\",\"capabilities\":{\"actions\":[\"map.set_layers\"],\"screens\":[]}},\"field_context\":{\"schema_version\":\"0.1\",\"field_id\":\"demo-poltava-01\",\"revision\":3,\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[34.54,49.6],[34.548,49.6],[34.548,49.605],[34.54,49.605],[34.54,49.6]]]},\"centroid\":[34.544,49.6025],\"area_ha\":32.1,\"region\":{\"country_iso2\":\"UA\",\"admin1\":\"Poltava Oblast\"},\"facts\":[{\"id\":\"f_sm_rootzone_2025_07\",\"domain\":\"water\",\"label_key\":\"fact.root_zone_soil_moisture\",\"quantity\":{\"value\":0.21,\"unit\":\"m3/m3\"},\"depth_cm\":[0,100],\"provenance\":{\"kind\":\"satellite_product\",\"data_status\":\"fixture\",\"source\":{\"provider\":\"NASA NSIDC DAAC\",\"product_id\":\"SPL4SMGP\",\"version\":\"008\",\"level\":\"L4 (model-assimilated)\"},\"method\":\"Synthetic fixture value for development; not a real measurement.\",\"spatial\":{\"resolution_m\":9000,\"note\":\"9 km grid; the radiometer footprint is about 33 km\"},\"temporal\":{\"start\":\"2025-07-01\",\"end\":\"2025-07-31\",\"aggregation\":\"monthly_mean\"},\"retrieved_at\":\"2026-11-06T09:00:00Z\"}},{\"id\":\"f_precip_2025_07\",\"domain\":\"water\",\"label_key\":\"fact.precipitation_total\",\"quantity\":{\"value\":38.0,\"unit\":\"mm\"},\"provenance\":{\"kind\":\"satellite_product\",\"data_status\":\"fixture\",\"source\":{\"provider\":\"NASA GES DISC\",\"product_id\":\"GPM_3IMERGDF\",\"version\":\"07\",\"level\":\"L3 (Final, daily)\"},\"method\":\"Synthetic fixture value for development; not a real measurement.\",\"spatial\":{\"resolution_m\":11000,\"note\":\"0.1 degree grid\"},\"temporal\":{\"start\":\"2025-07-01\",\"end\":\"2025-07-31\",\"aggregation\":\"sum\"},\"retrieved_at\":\"2026-11-06T09:00:00Z\"}},{\"id\":\"f_ph_0_30\",\"domain\":\"soil\",\"label_key\":\"fact.soil_ph\",\"quantity\":{\"value\":6.9,\"unit\":\"[pH]\",\"uncertainty\":{\"kind\":\"range\",\"low\":6.4,\"high\":7.3,\"note\":\"Q05-Q95\"}},\"depth_cm\":[0,30],\"provenance\":{\"kind\":\"satellite_product\",\"data_status\":\"fixture\",\"source\":{\"provider\":\"ISRIC\",\"product_id\":\"SoilGrids phh2o\",\"version\":\"2.0\"},\"method\":\"Synthetic fixture value for development; not a real measurement.\",\"spatial\":{\"resolution_m\":250},\"retrieved_at\":\"2026-11-06T09:00:00Z\"}},{\"id\":\"f_clay_0_30\",\"domain\":\"soil\",\"label_key\":\"fact.soil_clay\",\"quantity\":{\"value\":290,\"unit\":\"g/kg\"},\"depth_cm\":[0,30],\"provenance\":{\"kind\":\"satellite_product\",\"data_status\":\"fixture\",\"source\":{\"provider\":\"ISRIC\",\"product_id\":\"SoilGrids clay\",\"version\":\"2.0\"},\"method\":\"Synthetic fixture value for development; not a real measurement.\",\"spatial\":{\"resolution_m\":250},\"retrieved_at\":\"2026-11-06T09:00:00Z\"}},{\"id\":\"f_slope_mean\",\"domain\":\"terrain\",\"label_key\":\"fact.slope_mean\",\"quantity\":{\"value\":3.1,\"unit\":\"deg\"},\"provenance\":{\"kind\":\"satellite_product\",\"data_status\":\"fixture\",\"source\":{\"provider\":\"NASA LP DAAC\",\"product_id\":\"NASADEM_SC\",\"version\":\"001\"},\"method\":\"Synthetic fixture value for development; not a real measurement.\",\"spatial\":{\"resolution_m\":30},\"retrieved_at\":\"2026-11-06T09:00:00Z\"}},{\"id\":\"f_et0_2025_07\",\"domain\":\"climate\",\"label_key\":\"fact.reference_et0\",\"quantity\":{\"value\":165,\"unit\":\"mm\"},\"provenance\":{\"kind\":\"deterministic_calc\",\"data_status\":\"fixture\",\"method\":\"FAO-56 Penman-Monteith (Eq. 6), daily, summed; synthetic fixture value\",\"inputs\":[\"power_t2m\",\"power_rh2m\",\"power_ws2m\",\"power_allsky_sfc_sw_dwn\"],\"temporal\":{\"start\":\"2025-07-01\",\"end\":\"2025-07-31\",\"aggregation\":\"sum\"},\"retrieved_at\":\"2026-11-06T09:00:00Z\"}},{\"id\":\"f_sm_30m_mean_2025_07\",\"domain\":\"water\",\"label_key\":\"fact.root_zone_soil_moisture_downscaled\",\"quantity\":{\"value\":0.19,\"unit\":\"m3/m3\",\"uncertainty\":{\"kind\":\"sd\",\"sd\":0.05}},\"provenance\":{\"kind\":\"ml_estimate\",\"data_status\":\"fixture\",\"method\":\"Synthetic fixture value for development; not a real model output.\",\"model\":{\"name\":\"smap-downscaling\",\"version\":\"0.0-fixture\"},\"inputs\":[\"f_sm_rootzone_2025_07\"],\"spatial\":{\"resolution_m\":30},\"temporal\":{\"start\":\"2025-07-01\",\"end\":\"2025-07-31\",\"aggregation\":\"monthly_mean\"},\"retrieved_at\":\"2026-11-06T09:00:00Z\"}},{\"id\":\"f_ndvi_peak_2025\",\"domain\":\"vegetation\",\"label_key\":\"fact.ndvi_peak\",\"quantity\":{\"value\":0.78,\"unit\":\"1\"},\"provenance\":{\"kind\":\"satellite_product\",\"data_status\":\"fixture\",\"source\":{\"provider\":\"NASA LP DAAC\",\"product_id\":\"HLSS30_VI\",\"version\":\"002\"},\"method\":\"Synthetic fixture value for development; not a real measurement.\",\"spatial\":{\"resolution_m\":30},\"temporal\":{\"start\":\"2025-03-01\",\"end\":\"2025-10-31\",\"aggregation\":\"max\"},\"retrieved_at\":\"2026-11-06T09:00:00Z\"}}],\"timeseries_index\":[{\"metric_id\":\"m_sm_rootzone\",\"label_key\":\"metric.root_zone_soil_moisture\",\"unit\":\"m3/m3\",\"range\":{\"start\":\"2025-03-01\",\"end\":\"2025-10-31\"},\"provenance\":{\"kind\":\"satellite_product\",\"data_status\":\"fixture\",\"source\":{\"provider\":\"NASA NSIDC DAAC\",\"product_id\":\"SPL4SMGP\",\"version\":\"008\",\"level\":\"L4 (model-assimilated)\"},\"retrieved_at\":\"2026-11-06T09:00:00Z\"}},{\"metric_id\":\"m_precip\",\"label_key\":\"metric.precipitation\",\"unit\":\"mm\",\"range\":{\"start\":\"2025-03-01\",\"end\":\"2025-10-31\"},\"provenance\":{\"kind\":\"satellite_product\",\"data_status\":\"fixture\",\"source\":{\"provider\":\"NASA GES DISC\",\"product_id\":\"GPM_3IMERGDF\",\"version\":\"07\"},\"retrieved_at\":\"2026-11-06T09:00:00Z\"}},{\"metric_id\":\"m_ndvi\",\"label_key\":\"metric.ndvi\",\"unit\":\"1\",\"range\":{\"start\":\"2025-03-01\",\"end\":\"2025-10-31\"},\"provenance\":{\"kind\":\"satellite_product\",\"data_status\":\"fixture\",\"source\":{\"provider\":\"NASA LP DAAC\",\"product_id\":\"HLSS30_VI\",\"version\":\"002\"},\"retrieved_at\":\"2026-11-06T09:00:00Z\"}}],\"available_layers\":[{\"layer_id\":\"l_hls_ndvi\",\"label_key\":\"layer.hls_ndvi\",\"kind\":\"raster\",\"provenance\":{\"kind\":\"satellite_product\",\"data_status\":\"fixture\",\"source\":{\"provider\":\"NASA LP DAAC\",\"product_id\":\"HLSS30_VI\",\"version\":\"002\"},\"retrieved_at\":\"2026-11-06T09:00:00Z\"}},{\"layer_id\":\"l_smap_rootzone\",\"label_key\":\"layer.smap_rootzone\",\"kind\":\"raster\",\"provenance\":{\"kind\":\"satellite_product\",\"data_status\":\"fixture\",\"source\":{\"provider\":\"NASA NSIDC DAAC\",\"product_id\":\"SPL4SMGP\",\"version\":\"008\"},\"retrieved_at\":\"2026-11-06T09:00:00Z\"}},{\"layer_id\":\"l_sm_30m\",\"label_key\":\"layer.soil_moisture_downscaled\",\"kind\":\"raster\",\"provenance\":{\"kind\":\"ml_estimate\",\"data_status\":\"fixture\",\"model\":{\"name\":\"smap-downscaling\",\"version\":\"0.0-fixture\"},\"retrieved_at\":\"2026-11-06T09:00:00Z\"}},{\"layer_id\":\"l_nasadem_slope\",\"label_key\":\"layer.slope\",\"kind\":\"3d\",\"provenance\":{\"kind\":\"satellite_product\",\"data_status\":\"fixture\",\"source\":{\"provider\":\"NASA LP DAAC\",\"product_id\":\"NASADEM_SC\",\"version\":\"001\"},\"retrieved_at\":\"2026-11-06T09:00:00Z\"}}],\"available_charts\":[{\"chart_id\":\"c_water_season\",\"metric_ids\":[\"m_sm_rootzone\",\"m_precip\"]},{\"chart_id\":\"c_vegetation\",\"metric_ids\":[\"m_ndvi\"]}],\"crop_history\":[{\"season\":\"2024-2025\",\"crop_id\":\"winter_wheat\",\"source\":\"farmer_input\"}],\"constraints\":[{\"id\":\"k_irrigation\",\"type\":\"irrigation_available\",\"value\":false,\"status\":\"confirmed\",\"source\":\"farmer_text\",\"evidence\":\"Поливу немає\"},{\"id\":\"k_fertilizer\",\"type\":\"fertilizer_budget\",\"value\":\"minimize_n\",\"status\":\"proposed\",\"source\":\"farmer_text\",\"evidence\":\"хочу зменшити витрати на добрива\",\"confidence\":0.86}],\"ui_state\":{\"active_layer_ids\":[\"l_hls_ndvi\"],\"time_range\":{\"start\":\"2025-03-01\",\"end\":\"2025-10-31\"},\"chart_focus\":null,\"selected_rotation_ids\":[],\"scenario\":\"typical\"},\"locale\":\"uk\"}}",
+  "tokens": {
+    "local": {
+      "principal": "field-shift-local-farm",
+      "nonce": "test-only-local",
+      "token": "v1.eyJib2R5X3NoYTI1NiI6IjAxZDA4MWRhNDUxN2FjYjE3MzA4YjlmODIzYjI4MWJiNGRmMzRhN2NiYjk2ZWU0YmVhMGQyMzllN2Q0YjFiZWIiLCJleHAiOjE4MDAwMDAxMjAsImZpZWxkX2NvbnRleHRfcmV2aXNpb24iOjMsImZpZWxkX2lkIjoiZGVtby1wb2x0YXZhLTAxIiwiaWF0IjoxODAwMDAwMDAwLCJqdGkiOiJ0ZXN0LW9ubHktbG9jYWwiLCJwcmluY2lwYWwiOiJmaWVsZC1zaGlmdC1sb2NhbC1mYXJtIiwidiI6MX0.1WcSqkmkiFEk8reGUE4s-ExwgPbkHG_2M0Zi-PsGTvs"
+    },
+    "member7": {
+      "principal": "farm-1:user-7",
+      "nonce": "test-only-member7",
+      "token": "v1.eyJib2R5X3NoYTI1NiI6IjAxZDA4MWRhNDUxN2FjYjE3MzA4YjlmODIzYjI4MWJiNGRmMzRhN2NiYjk2ZWU0YmVhMGQyMzllN2Q0YjFiZWIiLCJleHAiOjE4MDAwMDAxMjAsImZpZWxkX2NvbnRleHRfcmV2aXNpb24iOjMsImZpZWxkX2lkIjoiZGVtby1wb2x0YXZhLTAxIiwiaWF0IjoxODAwMDAwMDAwLCJqdGkiOiJ0ZXN0LW9ubHktbWVtYmVyNyIsInByaW5jaXBhbCI6ImZhcm0tMTp1c2VyLTciLCJ2IjoxfQ.RPEgdLJyxjFMbNXqzbnTFD9g-3YFsnXJbMsfv_getCg"
+    },
+    "member8": {
+      "principal": "farm-1:user-8",
+      "nonce": "test-only-member8",
+      "token": "v1.eyJib2R5X3NoYTI1NiI6IjAxZDA4MWRhNDUxN2FjYjE3MzA4YjlmODIzYjI4MWJiNGRmMzRhN2NiYjk2ZWU0YmVhMGQyMzllN2Q0YjFiZWIiLCJleHAiOjE4MDAwMDAxMjAsImZpZWxkX2NvbnRleHRfcmV2aXNpb24iOjMsImZpZWxkX2lkIjoiZGVtby1wb2x0YXZhLTAxIiwiaWF0IjoxODAwMDAwMDAwLCJqdGkiOiJ0ZXN0LW9ubHktbWVtYmVyOCIsInByaW5jaXBhbCI6ImZhcm0tMTp1c2VyLTgiLCJ2IjoxfQ.s8wtr7Aozb3fG7pnXGcFvIDd0nklA6s8DeQbNRdJedA"
+    }
+  }
+}

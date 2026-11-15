@@ -7,12 +7,14 @@ from urllib.parse import urlsplit
 
 from field_shift_science.fields.geometry import area_hectares
 from field_shift_science.fields.schemas import FieldRead
+from field_shift_science.geo_ml.schemas import GeoResult
 from field_shift_science.simulation.schemas import WaterDay, WaterForecast, WaterResult, WaterSource
 from field_shift_science.weather.scenarios import Scenario
 from shapely.geometry import Polygon as ShapelyPolygon
 
 from field_shift.modules.farm.schemas import ScoutingEvidence
 from field_shift.modules.imagery.vegetation_schemas import METHOD_VERSION, VegetationSeason
+from field_shift.modules.terrain.schemas import TerrainResult
 
 NDVI_LAYER = "l_ndvi_variability"
 VEGETATION_CHART = "c_vegetation"
@@ -43,27 +45,30 @@ def _range(start: date, end: date) -> dict:
 def _provenance(
     source: dict,
     method: str,
-    start: date,
-    end: date,
+    start: date | None,
+    end: date | None,
     retrieved: datetime,
     *,
     resolution_m: float | None = None,
+    kind: str = "deterministic_calc",
 ) -> dict:
     provenance = {
-        "kind": "deterministic_calc",
+        "kind": kind,
         "data_status": "cached",
         "source": source,
         "method": method[:300],
-        "temporal": _range(start, end),
         "retrieved_at": retrieved.astimezone(UTC).isoformat(),
     }
+    if start is not None and end is not None:
+        provenance["temporal"] = _range(start, end)
     if resolution_m is not None and isfinite(resolution_m) and resolution_m > 0:
         provenance["spatial"] = {"resolution_m": resolution_m}
     return provenance
 
 
 # Shown as stored: no more digits than the measurement or model supports (142.3 mm, not 142.308 mm).
-DIGITS = {"mm": 1, "%": 1, "1": 2, "d": 0}
+# A 30 m surface model is not accurate to the metre; ERA5-Land moisture is not to 1e-4 m3/m3.
+DIGITS = {"mm": 1, "%": 1, "1": 2, "d": 0, "m": 0, "m3/m3": 3}
 
 
 def _fact(domain: str, metric: str, value: float, unit: str, provenance: dict) -> dict:
@@ -74,6 +79,11 @@ def _fact(domain: str, metric: str, value: float, unit: str, provenance: dict) -
         "quantity": {"value": round(value, DIGITS.get(unit, 2)), "unit": unit},
         "provenance": provenance,
     }
+
+
+def _retrieved(saved: datetime | None, now: datetime) -> datetime:
+    """When the host computed the stored record; the read time if that is missing or implausible."""
+    return saved if saved is not None and saved.tzinfo is not None and saved <= now else now
 
 
 def _series(metric: str, label: str, unit: str, provenance: dict) -> dict:
@@ -179,7 +189,9 @@ def _add_historical(
         or water.source != WaterSource.HISTORICAL
         or water.field_id != context["field_id"]
         or water.season != season
-        or (scenario is not None and water.scenario != scenario)
+        # The selected scenario must be known and identical; dry_year is never another scenario.
+        or scenario is None
+        or water.scenario != scenario
         or historical is None
     ):
         return
@@ -301,6 +313,78 @@ def _add_vegetation(
     )
 
 
+def _add_surface_moisture(context: dict, result: GeoResult, season: int, now: datetime) -> None:
+    source = result.source
+    value = result.minimum
+    if (
+        result.demo
+        or result.field_id != context["field_id"]
+        or result.season != season
+        or result.date.year != season
+        or result.date > now.date()
+        or tuple(result.depth_cm) != (0, 7)
+        or source is None
+        or source.kind != "reanalysis"
+        or source.name != "ERA5-Land"
+        or not (isfinite(source.resolution_degrees) and source.resolution_degrees > 0)
+        # One reanalysis cell covers the field; a spread would mean another product.
+        or result.maximum != value
+        or not (isfinite(value) and 0 <= value <= 1)
+    ):
+        return
+    age_days = (now.date() - result.date).days
+    resolution_m = source.resolution_degrees * 111_000
+    provenance = _provenance(
+        # The stored record names no ERA5-Land release, so the version is not guessed.
+        _source(source.provider, f"{source.name} soil_moisture_0_to_7cm", "unverified", source.url),
+        f"ERA5-Land weather-model estimate (reanalysis), not a satellite or on-field measurement: "
+        f"daily mean of {source.sample_count} hourly values for the 0-7 cm layer in the nearest "
+        f"{source.resolution_degrees:g} degree grid cell (about {resolution_m / 1000:.0f} km); "
+        f"{age_days} days old. One value for the whole area, not root-zone water.",
+        result.date,
+        result.date,
+        _retrieved(source.generated_at, now),
+        resolution_m=resolution_m,
+        # A weather-model reanalysis, as distributed (like the weather archive the agent reads), not
+        # satellite data: "satellite_product" would show the farmer a "Satellite data" badge.
+        kind="weather_data",
+    )
+    provenance["temporal"]["aggregation"] = "daily_mean"
+    fact = _fact("soil", "surface_soil_moisture", value, "m3/m3", provenance)
+    context["facts"].append({**fact, "depth_cm": [0, 7]})
+
+
+def _add_terrain(context: dict, result: TerrainResult, field: FieldRead, now: datetime) -> None:
+    low, high = result.elevation_min_m, result.elevation_max_m
+    if (
+        result.field_id != field.id
+        or result.boundary_revision != field.boundary_revision
+        or result.status != "ready"
+        or result.coverage_percent < 90
+        or result.source_resolution_m <= 0
+        or low is None
+        or high is None
+        or not (isfinite(low) and isfinite(high) and low <= high)
+    ):
+        return
+    provenance = _provenance(
+        _source("Copernicus", result.source, result.source_release, result.source_url),
+        f"Lowest and highest {result.source_resolution_m} m elevation cells inside the current "
+        f"boundary ({result.coverage_percent:g}% covered). A static surface model that includes "
+        "vegetation and buildings; it does not describe current field changes.",
+        None,
+        None,
+        _retrieved(result.generated_at, now),
+        resolution_m=result.source_resolution_m,
+    )
+    context["facts"].extend(
+        (
+            _fact("terrain", "elevation_min", low, "m", provenance),
+            _fact("terrain", "elevation_max", high, "m", provenance),
+        )
+    )
+
+
 def build_field_context(
     field: FieldRead,
     *,
@@ -310,9 +394,12 @@ def build_field_context(
     forecast: WaterForecast | None = None,
     vegetation: VegetationSeason | None = None,
     water: WaterResult | None = None,
+    surface_moisture: GeoResult | None = None,
+    terrain: TerrainResult | None = None,
     scenario: Scenario | None = None,
     revision: int | None = None,
     scouting: tuple[ScoutingEvidence, ...] = (),
+    constraints: list[dict] | None = None,
 ) -> dict:
     """Only detached host records enter this mapping, never browser-supplied facts."""
     if now.tzinfo is None:
@@ -342,6 +429,10 @@ def build_field_context(
         _add_forecast(context, forecast, season, now)
     if vegetation is not None:
         _add_vegetation(context, vegetation, field, season, now)
+    if surface_moisture is not None:
+        _add_surface_moisture(context, surface_moisture, season, now)
+    if terrain is not None:
+        _add_terrain(context, terrain, field, now)
     for report in scouting:
         # Structured farmer input only. Free text, GPS and images stay in the farm record.
         context["facts"].append(
@@ -358,4 +449,8 @@ def build_field_context(
                 },
             }
         )
+    if constraints:
+        # The farmer's recorded decisions (confirmed or rejected), built by the host from its own
+        # store for this field, season and boundary; the agent ignores rejected ones.
+        context["constraints"] = constraints
     return context

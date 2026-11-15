@@ -13,6 +13,7 @@ from field_shift.modules.agent.schemas import (
     AgentProviderName,
     MessageRead,
 )
+from field_shift.modules.agent.signing import LOCAL_PRINCIPAL
 from field_shift.modules.farm.schemas import ScoutingEvidence
 from field_shift.modules.imagery.vegetation_schemas import VegetationSeason
 
@@ -33,6 +34,7 @@ class AgentContext:
     locale: Literal["uk", "en"] | None = None
     conversation_id: UUID | None = None
     scouting: tuple[ScoutingEvidence, ...] = ()
+    principal: str = LOCAL_PRINCIPAL  # the attested caller (signing.agent_principal)
 
 
 @dataclass(frozen=True, slots=True)

@@ -136,9 +136,22 @@ Exported helpers: `actionProblem`, `isCurrent`, `requiresClick`, `streamTurn`, `
    been run."
 
 Farmer conditions: the agent's `constraints_proposed` render as dashed "Proposed" chips with
-Confirm / Dismiss. Nothing reaches the host until Confirm, which sends
-`compare.set_constraints` with that constraint as `status: "confirmed"`. Dismiss is local. A chip
-shows "Confirmed" only when the host's `FieldContext.constraints` holds it confirmed.
+Confirm / Reject / Hide. Nothing reaches the host until the farmer clicks Confirm or Reject,
+which send `compare.set_constraints` with that constraint as `status: "confirmed"` or
+`status: "rejected"` for the host to save. Hide only hides the chip in this conversation: nothing
+is sent or saved. A chip shows "Confirmed" or "Rejected by you · saved" only when the host's
+`FieldContext.constraints` holds that decision; until then it shows "Saving…". The agent's own
+actions never confirm or reject. If the decision would replace an earlier one, the host asks the
+farmer to approve the replacement separately; if the farmer keeps the earlier decision, the host
+returns `cancelled` and the chip offers the choice again.
+
+Edit (before deciding): opens an editor suited to the type (yes/no, fertiliser budget, 2–6 years,
+crops, previous crop, machinery text). Editing saves nothing; the farmer still confirms or rejects.
+A changed value becomes `source: "farmer_ui"` with no quoted evidence or confidence; an unchanged one
+keeps the proposal's source and words. Crops come only from the host's `planningCrops` (crops whose
+identity the host shares with the agent); a proposal naming any other crop cannot be edited and
+can still be decided as proposed, never with a crop dropped or swapped. A decision the host already
+held before this answer reads "Already confirmed/rejected earlier · nothing new saved".
 
 ## Streaming and the turn lifecycle
 
