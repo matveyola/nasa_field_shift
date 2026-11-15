@@ -313,7 +313,7 @@ def test_list_resumes_only_owned_current_boundary_jobs(factory):
         assert list_saved(session, OWNER, "F-01") == []
 
 
-def test_execute_checkpoints_then_retries_without_reacquisition(factory):
+def test_execute_checkpoints_then_retries_without_reacquisition(factory, monkeypatch):
     from field_shift.jobs.worker import ModelDataUnavailable
     from field_shift.modules.rotations.handoff.worker import execute
 
@@ -350,11 +350,21 @@ def test_execute_checkpoints_then_retries_without_reacquisition(factory):
             } | {"status": "available", "data_kind": "hybrid_scenario", "limitations": []}
 
     client = Client()
+    correlations = []
+
+    def create_client(*, correlation_id):
+        correlations.append(correlation_id)
+        return client
+
+    # The durable job UUID crosses the private boundary; the attempt token never does.
+    monkeypatch.setattr("field_shift.modules.rotations.handoff.worker.HandoffClient", create_client)
     with pytest.raises(ModelDataUnavailable):
-        execute(factory, lease, client)
+        execute(factory, lease)
     client.fail = False
-    result = execute(factory, lease, client)
+    result = execute(factory, lease)
     assert phases == ["acquire", "evaluate", "evaluate"]
+    assert correlations == [lease.job_id, lease.job_id]
+    assert lease.token not in correlations
     with factory.begin() as session:
         assert succeed(session, lease, result)
         assert (
