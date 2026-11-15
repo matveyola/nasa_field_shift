@@ -1,0 +1,351 @@
+{
+  "return_guidance": [
+    {
+      "crop_group": "sunflower",
+      "scope_code": "US",
+      "scope_name": "United States",
+      "minimum_return_interval_years": 3,
+      "published_return_interval_years": [3, 4],
+      "note": "The guide advises planting sunflower no more than once every three to four years in the same field to help reduce disease. Soybean, canola and other broadleaf crops can also host white mold.",
+      "source_url": "https://www.extension.iastate.edu/alternativeag/files/documents/sunflower_crop_guide.pdf"
+    },
+    {
+      "crop_group": "maize_grain",
+      "scope_code": "US-IA",
+      "scope_name": "Iowa, United States",
+      "note": "Iowa State recommends alternating corn with soybean to lower disease risk compared with two consecutive corn seasons followed by soybean. The source gives management guidance for continuous corn.",
+      "source_url": "https://crops.extension.iastate.edu/encyclopedia/corn-following-corn-management"
+    },
+    {
+      "crop_group": "soybeans",
+      "scope_code": "US-IA",
+      "scope_name": "Iowa, United States",
+      "note": "For fields infested with soybean cyst nematode, rotate soybean with a nonhost crop such as corn. Management also depends on egg counts and the resistance source of the soybean variety.",
+      "source_url": "https://crops.extension.iastate.edu/cropnews/2022/06/go-offensive-against-soybean-cyst-nematode"
+    },
+    {
+      "crop_group": "oats",
+      "scope_code": "US-IA",
+      "scope_name": "Iowa, United States",
+      "topic": "diversification",
+      "note": "USDA NRCS lists spring oats after soybean as an option for diversifying an Iowa rotation.",
+      "source_url": "https://www.nrcs.usda.gov/sites/default/files/2024-10/WholeFarmConsPractice_CLG105.pdf"
+    },
+    {
+      "crop_group": "rapeseed_canola",
+      "scope_code": "US-ND",
+      "scope_name": "North Dakota, United States",
+      "minimum_return_interval_years": 4,
+      "published_return_interval_years": [4, 4],
+      "note": "The North Dakota field guide recommends a four-year rotation for blackleg. A separate disease guide reports that a three-year rotation also helps.",
+      "source_url": "https://www.ndsu.edu/agriculture/sites/default/files/2022-08/a1280.pdf",
+      "related_source_urls": [
+        "https://www.ndsu.edu/agriculture/sites/default/files/2022-11/pp1988.pdf"
+      ]
+    },
+    {
+      "crop_group": "potato",
+      "scope_code": "US-CA",
+      "scope_name": "California, United States",
+      "note": "For Verticillium wilt, the UC guidance describes at least three seasons without potato or other susceptible crops. Evaluating this guidance needs the identity of the intervening crops and field disease history.",
+      "source_url": "https://ipm.ucanr.edu/agriculture/potato/verticillium-wilt/"
+    },
+    {
+      "crop_group": "wheat",
+      "scope_code": "US-MN",
+      "scope_name": "Minnesota, United States",
+      "note": "University of Minnesota Extension advises avoiding wheat after another small grain or corn where Fusarium head blight is a concern.",
+      "source_url": "https://extension.umn.edu/agriculture/crop-production/small-grains/small-grain-crop-rotations"
+    },
+    {
+      "crop_group": "barley",
+      "scope_code": "US-MN",
+      "scope_name": "Minnesota, United States",
+      "note": "University of Minnesota Extension advises avoiding barley after another small grain or corn where Fusarium head blight is a concern.",
+      "source_url": "https://extension.umn.edu/agriculture/crop-production/small-grains/small-grain-crop-rotations"
+    }
+  ],
+  "hybrid_references": [
+    {
+      "crop_id": "maize_grain",
+      "region_code": "US-IA",
+      "trial_location": "Johnston, Iowa",
+      "trial_years": [2016, 2017, 2018],
+      "name": "Pioneer P1197AM",
+      "relative_maturity_rating": 111,
+      "rating_system": "Pioneer comparative relative maturity",
+      "source_url": "https://www.pioneer.com/us/agronomy/corn-response-reduced-n-environments.html",
+      "rating_source_url": "https://www.pioneer.com/content/dam/dpagco/pioneer/na/us/en/files/products/corn/DOC-Corn-Hybrid-Herbicide-Mgmt-Guide-Pioneer-NA_US-V1.pdf",
+      "rating_meaning_source_url": "https://www.pioneer.com/us/agronomy/maturity-pioneer-corn-products.html"
+    },
+    {
+      "crop_id": "maize_grain",
+      "region_code": "US-IA",
+      "trial_location": "Story County, Iowa",
+      "trial_years": [2016],
+      "name": "Pioneer P1197AMXT",
+      "relative_maturity_rating": 111,
+      "rating_system": "Pioneer comparative relative maturity",
+      "thermal_time_to_silking_c_days": 760,
+      "thermal_time_to_physiological_maturity_c_days": 1499,
+      "source_url": "https://doi.org/10.3390/rs14020394",
+      "rating_source_url": "https://www.mdpi.com/2072-4292/14/2/394",
+      "rating_meaning_source_url": "https://www.pioneer.com/us/agronomy/maturity-pioneer-corn-products.html"
+    },
+    {
+      "crop_id": "maize_grain",
+      "region_code": "US-IA",
+      "trial_location": "Boone County, Iowa",
+      "trial_years": [2015],
+      "name": "Pioneer P0987AMX",
+      "relative_maturity_rating": 105,
+      "rating_system": "Pioneer comparative relative maturity",
+      "thermal_time_to_silking_c_days": 726,
+      "thermal_time_to_physiological_maturity_c_days": 1443,
+      "source_url": "https://doi.org/10.3390/rs14020394",
+      "rating_source_url": "https://www.mdpi.com/2072-4292/14/2/394",
+      "rating_meaning_source_url": "https://www.pioneer.com/us/agronomy/maturity-pioneer-corn-products.html"
+    },
+    {
+      "crop_id": "sunflower",
+      "region_code": "US-ND",
+      "trial_location": "Carrington, North Dakota",
+      "trial_years": [
+        2025
+      ],
+      "name": "Nuseed N4H205 E",
+      "kind": "hybrid",
+      "trial_planting_date": "2025-06-06",
+      "observed_days_after_planting_to_flowering": 70,
+      "observed_days_after_planting_to_maturity": 115,
+      "source_url": "https://www.ag.ndsu.edu/energy/variety-trials/carrington-rec/2025%20trial%20results/2025-trial-results-sunflower-oil-carrington/at_download/file#page=2"
+    },
+    {
+      "crop_id": "sunflower",
+      "region_code": "US-ND",
+      "trial_location": "Carrington, North Dakota",
+      "trial_years": [
+        2025
+      ],
+      "name": "CROPLAN CP5249CL",
+      "kind": "hybrid",
+      "trial_planting_date": "2025-06-06",
+      "observed_days_after_planting_to_flowering": 67,
+      "observed_days_after_planting_to_maturity": 119,
+      "source_url": "https://www.ag.ndsu.edu/energy/variety-trials/carrington-rec/2025%20trial%20results/2025-trial-results-sunflower-oil-carrington/at_download/file#page=2"
+    },
+    {
+      "crop_id": "sunflower",
+      "region_code": "US-ND",
+      "trial_location": "Carrington, North Dakota",
+      "trial_years": [
+        2025
+      ],
+      "name": "Sunrich 4425CL",
+      "kind": "hybrid",
+      "trial_planting_date": "2025-06-06",
+      "observed_days_after_planting_to_flowering": 67,
+      "observed_days_after_planting_to_maturity": 121,
+      "source_url": "https://www.ag.ndsu.edu/energy/variety-trials/carrington-rec/2025%20trial%20results/2025-trial-results-sunflower-oil-carrington/at_download/file#page=3"
+    },
+    {
+      "crop_id": "sunflower",
+      "region_code": "US-ND",
+      "trial_location": "Carrington, North Dakota",
+      "trial_years": [
+        2025
+      ],
+      "name": "Dyna-Gro H49HO19 CL",
+      "kind": "hybrid",
+      "trial_planting_date": "2025-06-06",
+      "observed_days_after_planting_to_flowering": 73,
+      "observed_days_after_planting_to_maturity": 122,
+      "source_url": "https://www.ag.ndsu.edu/energy/variety-trials/carrington-rec/2025%20trial%20results/2025-trial-results-sunflower-oil-carrington/at_download/file#page=3"
+    },
+    {
+      "crop_id": "sunflower",
+      "region_code": "US-ND",
+      "trial_location": "Carrington, North Dakota",
+      "trial_years": [
+        2025
+      ],
+      "name": "Dyna-Gro H47HO11 EX",
+      "kind": "hybrid",
+      "trial_planting_date": "2025-06-06",
+      "observed_days_after_planting_to_flowering": 70,
+      "observed_days_after_planting_to_maturity": 131,
+      "source_url": "https://www.ag.ndsu.edu/energy/variety-trials/carrington-rec/2025%20trial%20results/2025-trial-results-sunflower-oil-carrington/at_download/file#page=3"
+    },
+    {
+      "crop_id": "rapeseed_canola",
+      "region_code": "US-ND",
+      "trial_location": "Hettinger, North Dakota",
+      "trial_years": [
+        2025
+      ],
+      "name": "BASF InVigor L340PC",
+      "kind": "hybrid",
+      "trial_planting_date": "2025-05-09",
+      "observed_days_after_planting_to_flowering": 48,
+      "observed_days_after_planting_to_maturity": 89,
+      "observed_flowering_duration_days": 23,
+      "source_url": "https://www.ndsu.edu/agriculture/sites/default/files/2025-12/a1125-25.pdf#page=5"
+    },
+    {
+      "crop_id": "rapeseed_canola",
+      "region_code": "US-ND",
+      "trial_location": "Hettinger, North Dakota",
+      "trial_years": [
+        2025
+      ],
+      "name": "BASF InVigor L343PC",
+      "kind": "hybrid",
+      "trial_planting_date": "2025-05-09",
+      "observed_days_after_planting_to_flowering": 48,
+      "observed_days_after_planting_to_maturity": 85,
+      "observed_flowering_duration_days": 18,
+      "source_url": "https://www.ndsu.edu/agriculture/sites/default/files/2025-12/a1125-25.pdf#page=5"
+    },
+    {
+      "crop_id": "rapeseed_canola",
+      "region_code": "US-ND",
+      "trial_location": "Hettinger, North Dakota",
+      "trial_years": [
+        2025
+      ],
+      "name": "CROPLAN CP7250LL",
+      "kind": "hybrid",
+      "trial_planting_date": "2025-05-09",
+      "observed_days_after_planting_to_flowering": 49,
+      "observed_days_after_planting_to_maturity": 88,
+      "observed_flowering_duration_days": 22,
+      "source_url": "https://www.ndsu.edu/agriculture/sites/default/files/2025-12/a1125-25.pdf#page=5"
+    },
+    {
+      "crop_id": "rapeseed_canola",
+      "region_code": "US-ND",
+      "trial_location": "Hettinger, North Dakota",
+      "trial_years": [
+        2025
+      ],
+      "name": "BrettYoung BY 7204LL",
+      "kind": "hybrid",
+      "trial_planting_date": "2025-05-09",
+      "observed_days_after_planting_to_flowering": 48,
+      "observed_days_after_planting_to_maturity": 85,
+      "observed_flowering_duration_days": 19,
+      "source_url": "https://www.ndsu.edu/agriculture/sites/default/files/2025-12/a1125-25.pdf#page=5"
+    },
+    {
+      "crop_id": "soybeans",
+      "region_code": "US-IA",
+      "trial_location": "Sutherland, Iowa",
+      "trial_years": [
+        2025
+      ],
+      "name": "Nutech/G2 Genetics 22N04E",
+      "kind": "cultivar",
+      "relative_maturity_rating": 2.2,
+      "rating_system": "Soybean maturity group (MG)",
+      "rating_source_url": "https://croptesting.iastate.edu/Soybean/Docs/2025_ISU_soybean_final_report.pdf",
+      "observed_yield_bu_ac": 72.6,
+      "source_url": "https://croptesting.iastate.edu/Soybean/Docs/2025_ISU_soybean_final_report.pdf"
+    },
+    {
+      "crop_id": "soybeans",
+      "region_code": "US-IA",
+      "trial_location": "Sutherland, Iowa",
+      "trial_years": [
+        2025
+      ],
+      "name": "Pioneer P21A53E",
+      "kind": "cultivar",
+      "relative_maturity_rating": 2.1,
+      "rating_system": "Soybean maturity group (MG)",
+      "rating_source_url": "https://croptesting.iastate.edu/Soybean/Docs/2025_ISU_soybean_final_report.pdf",
+      "observed_yield_bu_ac": 73.2,
+      "source_url": "https://croptesting.iastate.edu/Soybean/Docs/2025_ISU_soybean_final_report.pdf"
+    },
+    {
+      "crop_id": "soybeans",
+      "region_code": "US-IA",
+      "trial_location": "Sutherland, Iowa",
+      "trial_years": [
+        2025
+      ],
+      "name": "Viking/Blue River 2022N",
+      "kind": "cultivar",
+      "relative_maturity_rating": 2.0,
+      "rating_system": "Soybean maturity group (MG)",
+      "rating_source_url": "https://croptesting.iastate.edu/Soybean/Docs/2025_ISU_soybean_final_report.pdf",
+      "observed_yield_bu_ac": 69.1,
+      "source_url": "https://croptesting.iastate.edu/Soybean/Docs/2025_ISU_soybean_final_report.pdf"
+    },
+    {
+      "crop_id": "soybeans",
+      "region_code": "US-IA",
+      "trial_location": "Sutherland, Iowa",
+      "trial_years": [
+        2025
+      ],
+      "name": "Xitavo XO 1776E",
+      "kind": "cultivar",
+      "relative_maturity_rating": 1.7,
+      "rating_system": "Soybean maturity group (MG)",
+      "rating_source_url": "https://croptesting.iastate.edu/Soybean/Docs/2025_ISU_soybean_final_report.pdf",
+      "observed_yield_bu_ac": 70.0,
+      "source_url": "https://croptesting.iastate.edu/Soybean/Docs/2025_ISU_soybean_final_report.pdf"
+    },
+    {
+      "crop_id": "soybeans",
+      "region_code": "US-IA",
+      "trial_location": "Sutherland, Iowa",
+      "trial_years": [
+        2025
+      ],
+      "name": "Renk RS194NXF",
+      "kind": "cultivar",
+      "relative_maturity_rating": 1.9,
+      "rating_system": "Soybean maturity group (MG)",
+      "rating_source_url": "https://croptesting.iastate.edu/Soybean/Docs/2025_ISU_soybean_final_report.pdf",
+      "observed_yield_bu_ac": 71.0,
+      "source_url": "https://croptesting.iastate.edu/Soybean/Docs/2025_ISU_soybean_final_report.pdf"
+    },
+    {
+      "crop_id": "wheat_spring",
+      "region_code": "US-SD",
+      "trial_location": "Brookings, South Dakota",
+      "trial_years": [
+        2025
+      ],
+      "name": "LCS Trigger",
+      "kind": "cultivar",
+      "observed_yield_bu_ac": 75.2,
+      "source_url": "https://extension.sdstate.edu/sites/default/files/2025-09/S-0002-2025-04-SW-Brookings.pdf#page=2"
+    },
+    {
+      "crop_id": "wheat_spring",
+      "region_code": "US-SD",
+      "trial_location": "Brookings, South Dakota",
+      "trial_years": [
+        2025
+      ],
+      "name": "Ascend-SD",
+      "kind": "cultivar",
+      "observed_yield_bu_ac": 72.7,
+      "source_url": "https://extension.sdstate.edu/sites/default/files/2025-09/S-0002-2025-04-SW-Brookings.pdf#page=2"
+    },
+    {
+      "crop_id": "wheat_spring",
+      "region_code": "US-SD",
+      "trial_location": "Brookings, South Dakota",
+      "trial_years": [
+        2025
+      ],
+      "name": "Brawn-SD",
+      "kind": "cultivar",
+      "observed_yield_bu_ac": 71.9,
+      "source_url": "https://extension.sdstate.edu/sites/default/files/2025-09/S-0002-2025-04-SW-Brookings.pdf#page=2"
+    }
+  ]
+}

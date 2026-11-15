@@ -1,0 +1,894 @@
+{
+  "schema_version": 1,
+  "field_id": "marsden_demo",
+  "crops": {
+    "wheat_winter_frozen": {
+      "marketable_yield_t_ha": 3.47688,
+      "farmgate_price_per_t": 198.048599,
+      "included_cost_per_ha": 694.687359,
+      "currency": "USD",
+      "source": "2024 USDA NASS U.S. winter wheat yield and farm price proxy. NDSU 2026 southeast North Dakota winter wheat budget excluding land and operator labor. Assumed 13.5% grain moisture for nutrient removal.",
+      "yield_moisture_pct": 13.5,
+      "raw": {
+        "yield": {
+          "year": 2024,
+          "value": 51.7,
+          "unit": "bu/acre",
+          "geography": "United States",
+          "publication": "USDA NASS Crop Production 2025 Summary, January 12, 2026",
+          "source_url": "https://www.nass.usda.gov/Publications/Todays_Reports/reports/cropan26.pdf",
+          "table": "Crop Area Planted and Harvested, Yield, and Production in Domestic Units – United States: 2024 and 2025 (continued)",
+          "row": "Winter wheat",
+          "column": "Yield per acre / 2024",
+          "printed_page": 95,
+          "notes": "National proxy for Marsden. Value represents harvested acres.",
+          "conversion": {
+            "lb_per_unit": 60,
+            "kg_per_lb": 0.45359237,
+            "ha_per_acre": 0.40468564224,
+            "formula": "value * lb_per_unit * kg_per_lb / (1000 * ha_per_acre)",
+            "bushel_weight_source_url": "https://www.nass.usda.gov/Surveys/Guide_to_NASS_Surveys/Prices/Price_Program_Methodology_v10.pdf"
+          },
+          "moisture_basis": {
+            "percent": 13.5,
+            "source_url": "https://www.nass.usda.gov/Surveys/Guide_to_NASS_Surveys/Prices/Price_Program_Methodology_v10.pdf",
+            "type": "assumed reference for harvested-weight conversion",
+            "notes": "USDA NASS market reporting guideline (Standard weight/moisture, p. 2G-33). Reported regional yield is an aggregate and its specific grain moisture is unspecified."
+          }
+        },
+        "price": {
+          "year": 2024,
+          "value": 5.39,
+          "unit": "USD/bu",
+          "geography": "United States",
+          "publication": "USDA NASS Crop Values 2025 Summary, February 26, 2026",
+          "source_url": "https://www.nass.usda.gov/Publications/Todays_Reports/reports/cpvl0226.pdf",
+          "table": "Winter Wheat Price per Bushel and Value of Production – States and United States: 2023–2025",
+          "row": "United States",
+          "column": "Price per bushel / 2024",
+          "printed_page": 21,
+          "notes": "National winter wheat marketing-year farm price proxy for Marsden.",
+          "conversion": {
+            "lb_per_unit": 60,
+            "kg_per_lb": 0.45359237,
+            "formula": "value * 1000 / (lb_per_unit * kg_per_lb)",
+            "bushel_weight_source_url": "https://www.nass.usda.gov/Surveys/Guide_to_NASS_Surveys/Prices/Price_Program_Methodology_v10.pdf"
+          }
+        },
+        "cost": {
+          "year": 2026,
+          "cost_type": "projected extension enterprise budget",
+          "unit": "USD/acre",
+          "geography": "Southeast North Dakota",
+          "publication": "NDSU Extension EC1659, Projected 2026 Crop Budgets: South East North Dakota",
+          "source_url": "https://www.ndsu.edu/agriculture/sites/default/files/2026-02/ec1659.pdf",
+          "table": "Winter Wheat",
+          "printed_page": 10,
+          "column": "Winter Wheat / Per Acre",
+          "rows": {
+            "SUM OF ALL LISTED COSTS": 389.13,
+            "Land Charge": 108.0,
+            "operator_labor_included": false
+          },
+          "notes": "Southeast North Dakota cost proxy for Marsden. The budget reports return to labor and management below its cost total.",
+          "conversion": "(listed_total_usd_per_acre - land_usd_per_acre - operator_labor_usd_per_acre) / 0.40468564224",
+          "scope": "Partial non-irrigated production cost excluding land and operator labor. Scope of remaining expenses may vary between budgets. Uses the published budget as-is for its management and rotation assumptions.",
+          "included_value_usd_per_acre": 281.13
+        }
+      }
+    },
+    "wheat_winter_nonfrozen": {
+      "marketable_yield_t_ha": 3.47688,
+      "farmgate_price_per_t": 198.048599,
+      "included_cost_per_ha": 694.687359,
+      "currency": "USD",
+      "source": "2024 USDA NASS U.S. winter wheat yield and farm price proxy. NDSU 2026 southeast North Dakota winter wheat budget excluding land and operator labor. Assumed 13.5% grain moisture for nutrient removal.",
+      "yield_moisture_pct": 13.5,
+      "raw": {
+        "yield": {
+          "year": 2024,
+          "value": 51.7,
+          "unit": "bu/acre",
+          "geography": "United States",
+          "publication": "USDA NASS Crop Production 2025 Summary, January 12, 2026",
+          "source_url": "https://www.nass.usda.gov/Publications/Todays_Reports/reports/cropan26.pdf",
+          "table": "Crop Area Planted and Harvested, Yield, and Production in Domestic Units – United States: 2024 and 2025 (continued)",
+          "row": "Winter wheat",
+          "column": "Yield per acre / 2024",
+          "printed_page": 95,
+          "notes": "National proxy for Marsden. Value represents harvested acres.",
+          "conversion": {
+            "lb_per_unit": 60,
+            "kg_per_lb": 0.45359237,
+            "ha_per_acre": 0.40468564224,
+            "formula": "value * lb_per_unit * kg_per_lb / (1000 * ha_per_acre)",
+            "bushel_weight_source_url": "https://www.nass.usda.gov/Surveys/Guide_to_NASS_Surveys/Prices/Price_Program_Methodology_v10.pdf"
+          },
+          "moisture_basis": {
+            "percent": 13.5,
+            "source_url": "https://www.nass.usda.gov/Surveys/Guide_to_NASS_Surveys/Prices/Price_Program_Methodology_v10.pdf",
+            "type": "assumed reference for harvested-weight conversion",
+            "notes": "USDA NASS market reporting guideline (Standard weight/moisture, p. 2G-33). Reported regional yield is an aggregate and its specific grain moisture is unspecified."
+          }
+        },
+        "price": {
+          "year": 2024,
+          "value": 5.39,
+          "unit": "USD/bu",
+          "geography": "United States",
+          "publication": "USDA NASS Crop Values 2025 Summary, February 26, 2026",
+          "source_url": "https://www.nass.usda.gov/Publications/Todays_Reports/reports/cpvl0226.pdf",
+          "table": "Winter Wheat Price per Bushel and Value of Production – States and United States: 2023–2025",
+          "row": "United States",
+          "column": "Price per bushel / 2024",
+          "printed_page": 21,
+          "notes": "National winter wheat marketing-year farm price proxy for Marsden.",
+          "conversion": {
+            "lb_per_unit": 60,
+            "kg_per_lb": 0.45359237,
+            "formula": "value * 1000 / (lb_per_unit * kg_per_lb)",
+            "bushel_weight_source_url": "https://www.nass.usda.gov/Surveys/Guide_to_NASS_Surveys/Prices/Price_Program_Methodology_v10.pdf"
+          }
+        },
+        "cost": {
+          "year": 2026,
+          "cost_type": "projected extension enterprise budget",
+          "unit": "USD/acre",
+          "geography": "Southeast North Dakota",
+          "publication": "NDSU Extension EC1659, Projected 2026 Crop Budgets: South East North Dakota",
+          "source_url": "https://www.ndsu.edu/agriculture/sites/default/files/2026-02/ec1659.pdf",
+          "table": "Winter Wheat",
+          "printed_page": 10,
+          "column": "Winter Wheat / Per Acre",
+          "rows": {
+            "SUM OF ALL LISTED COSTS": 389.13,
+            "Land Charge": 108.0,
+            "operator_labor_included": false
+          },
+          "notes": "Southeast North Dakota cost proxy for Marsden. The budget reports return to labor and management below its cost total.",
+          "conversion": "(listed_total_usd_per_acre - land_usd_per_acre - operator_labor_usd_per_acre) / 0.40468564224",
+          "scope": "Partial non-irrigated production cost excluding land and operator labor. Scope of remaining expenses may vary between budgets. Uses the published budget as-is for its management and rotation assumptions.",
+          "included_value_usd_per_acre": 281.13
+        }
+      }
+    },
+    "wheat_spring": {
+      "marketable_yield_t_ha": 3.523956,
+      "farmgate_price_per_t": 208.704275,
+      "included_cost_per_ha": 701.18623,
+      "currency": "USD",
+      "source": "2024 USDA NASS U.S. spring wheat excluding durum yield and farm price proxy. NDSU 2026 southeast North Dakota spring wheat budget excluding land and operator labor. Assumed 13.5% grain moisture for nutrient removal.",
+      "yield_moisture_pct": 13.5,
+      "raw": {
+        "yield": {
+          "year": 2024,
+          "value": 52.4,
+          "unit": "bu/acre",
+          "geography": "United States",
+          "publication": "USDA NASS Crop Production 2025 Summary, January 12, 2026",
+          "source_url": "https://www.nass.usda.gov/Publications/Todays_Reports/reports/cropan26.pdf",
+          "table": "Crop Area Planted and Harvested, Yield, and Production in Domestic Units – United States: 2024 and 2025 (continued)",
+          "row": "Other spring wheat",
+          "column": "Yield per acre / 2024",
+          "printed_page": 95,
+          "notes": "National proxy for Marsden. Value represents harvested acres.",
+          "conversion": {
+            "lb_per_unit": 60,
+            "kg_per_lb": 0.45359237,
+            "ha_per_acre": 0.40468564224,
+            "formula": "value * lb_per_unit * kg_per_lb / (1000 * ha_per_acre)",
+            "bushel_weight_source_url": "https://www.nass.usda.gov/Surveys/Guide_to_NASS_Surveys/Prices/Price_Program_Methodology_v10.pdf"
+          },
+          "moisture_basis": {
+            "percent": 13.5,
+            "source_url": "https://www.nass.usda.gov/Surveys/Guide_to_NASS_Surveys/Prices/Price_Program_Methodology_v10.pdf",
+            "type": "assumed reference for harvested-weight conversion",
+            "notes": "USDA NASS market reporting guideline (Standard weight/moisture, p. 2G-33). Reported regional yield is an aggregate and its specific grain moisture is unspecified."
+          }
+        },
+        "price": {
+          "year": 2024,
+          "value": 5.68,
+          "unit": "USD/bu",
+          "geography": "United States",
+          "publication": "USDA NASS Crop Values 2025 Summary, February 26, 2026",
+          "source_url": "https://www.nass.usda.gov/Publications/Todays_Reports/reports/cpvl0226.pdf",
+          "table": "Other Spring Wheat Price per Bushel and Value of Production – States and United States: 2023–2025",
+          "row": "United States",
+          "column": "Price per bushel / 2024",
+          "printed_page": 22,
+          "notes": "National other spring wheat marketing-year farm price proxy for Marsden.",
+          "conversion": {
+            "lb_per_unit": 60,
+            "kg_per_lb": 0.45359237,
+            "formula": "value * 1000 / (lb_per_unit * kg_per_lb)",
+            "bushel_weight_source_url": "https://www.nass.usda.gov/Surveys/Guide_to_NASS_Surveys/Prices/Price_Program_Methodology_v10.pdf"
+          }
+        },
+        "cost": {
+          "year": 2026,
+          "cost_type": "projected extension enterprise budget",
+          "unit": "USD/acre",
+          "geography": "Southeast North Dakota",
+          "publication": "NDSU Extension EC1659, Projected 2026 Crop Budgets: South East North Dakota",
+          "source_url": "https://www.ndsu.edu/agriculture/sites/default/files/2026-02/ec1659.pdf",
+          "table": "Spring Wheat / Durum",
+          "printed_page": 3,
+          "column": "Spring Wheat / Per Acre",
+          "rows": {
+            "SUM OF ALL LISTED COSTS": 391.76,
+            "Land Charge": 108.0,
+            "operator_labor_included": false
+          },
+          "notes": "Southeast North Dakota cost proxy for Marsden. The budget reports return to labor and management below its cost total.",
+          "conversion": "(listed_total_usd_per_acre - land_usd_per_acre - operator_labor_usd_per_acre) / 0.40468564224",
+          "scope": "Partial non-irrigated production cost excluding land and operator labor. Scope of remaining expenses may vary between budgets. Uses the published budget as-is for its management and rotation assumptions.",
+          "included_value_usd_per_acre": 283.76
+        }
+      }
+    },
+    "barley": {
+      "marketable_yield_t_ha": 4.121146,
+      "farmgate_price_per_t": 289.816015,
+      "included_cost_per_ha": 637.309489,
+      "currency": "USD",
+      "source": "2024 USDA NASS U.S. barley yield and farm price proxy. NDSU 2026 southeast North Dakota malting barley cost proxy excluding land and operator labor.",
+      "yield_moisture_pct": null,
+      "raw": {
+        "yield": {
+          "year": 2024,
+          "value": 76.6,
+          "unit": "bu/acre",
+          "geography": "United States",
+          "publication": "USDA NASS Crop Production 2025 Summary, January 12, 2026",
+          "source_url": "https://www.nass.usda.gov/Publications/Todays_Reports/reports/cropan26.pdf",
+          "table": "Crop Area Planted and Harvested, Yield, and Production in Domestic Units – United States: 2024 and 2025 (continued)",
+          "row": "Barley",
+          "column": "Yield per acre / 2024",
+          "printed_page": 95,
+          "notes": "National proxy for Marsden. Value represents harvested acres.",
+          "conversion": {
+            "lb_per_unit": 48,
+            "kg_per_lb": 0.45359237,
+            "ha_per_acre": 0.40468564224,
+            "formula": "value * lb_per_unit * kg_per_lb / (1000 * ha_per_acre)",
+            "bushel_weight_source_url": "https://www.nass.usda.gov/Surveys/Guide_to_NASS_Surveys/Prices/Price_Program_Methodology_v10.pdf"
+          }
+        },
+        "price": {
+          "year": 2024,
+          "value": 6.31,
+          "unit": "USD/bu",
+          "geography": "United States",
+          "publication": "USDA NASS Crop Values 2025 Summary, February 26, 2026",
+          "source_url": "https://www.nass.usda.gov/Publications/Todays_Reports/reports/cpvl0226.pdf",
+          "table": "Barley Price per Bushel and Value of Production – States and United States: 2023–2025",
+          "row": "United States",
+          "column": "Price per bushel / 2024",
+          "printed_page": 19,
+          "notes": "National barley marketing-year farm price proxy for Marsden.",
+          "conversion": {
+            "lb_per_unit": 48,
+            "kg_per_lb": 0.45359237,
+            "formula": "value * 1000 / (lb_per_unit * kg_per_lb)",
+            "bushel_weight_source_url": "https://www.nass.usda.gov/Surveys/Guide_to_NASS_Surveys/Prices/Price_Program_Methodology_v10.pdf"
+          }
+        },
+        "cost": {
+          "year": 2026,
+          "cost_type": "projected extension enterprise budget",
+          "unit": "USD/acre",
+          "geography": "Southeast North Dakota",
+          "publication": "NDSU Extension EC1659, Projected 2026 Crop Budgets: South East North Dakota",
+          "source_url": "https://www.ndsu.edu/agriculture/sites/default/files/2026-02/ec1659.pdf",
+          "table": "Malting Barley / Corn Grain",
+          "printed_page": 4,
+          "column": "Malting Barley / Per Acre",
+          "rows": {
+            "SUM OF ALL LISTED COSTS": 365.91,
+            "Land Charge": 108.0,
+            "operator_labor_included": false
+          },
+          "notes": "Southeast North Dakota malting barley costs used as a management proxy for generic barley. The budget reports return to labor and management below its cost total.",
+          "conversion": "(listed_total_usd_per_acre - land_usd_per_acre - operator_labor_usd_per_acre) / 0.40468564224",
+          "scope": "Partial non-irrigated production cost excluding land and operator labor. Scope of remaining expenses may vary between budgets. Uses the published budget as-is for its management and rotation assumptions.",
+          "included_value_usd_per_acre": 257.91
+        }
+      }
+    },
+    "maize_grain": {
+      "marketable_yield_t_ha": 13.658244,
+      "farmgate_price_per_t": 166.921427,
+      "included_cost_per_ha": 1554.045744,
+      "currency": "USD",
+      "source": "2024 USDA NASS Boone County corn yield and Central Iowa farm price. ISU 2026 Iowa corn-after-corn budget excluding land and operator labor. Assumed 15.5% grain moisture for nutrient removal.",
+      "yield_moisture_pct": 15.5,
+      "raw": {
+        "yield": {
+          "year": 2024,
+          "value": 217.6,
+          "unit": "bu/acre",
+          "geography": "Boone County, Iowa",
+          "publication": "ISU Extension Ag Decision Maker File A1-12, USDA NASS county yields",
+          "source_url": "https://www.extension.iastate.edu/agdm/crops/pdf/a1-12.pdf",
+          "table": "Table 5. Central Iowa Crop Reporting District Average Yields by County, USDA NASS, 2016–2025",
+          "row": "Boone / Corn",
+          "column": "2024",
+          "notes": "County average; non-irrigated yield series as identified by ISU.",
+          "conversion": {
+            "lb_per_unit": 56,
+            "kg_per_lb": 0.45359237,
+            "ha_per_acre": 0.40468564224,
+            "formula": "value * lb_per_unit * kg_per_lb / (1000 * ha_per_acre)",
+            "bushel_weight_source_url": "https://www.nass.usda.gov/Surveys/Guide_to_NASS_Surveys/Prices/Price_Program_Methodology_v10.pdf"
+          },
+          "moisture_basis": {
+            "percent": 15.5,
+            "source_url": "https://ask.ifas.ufl.edu/publication/AG442",
+            "type": "assumed reference for harvested-weight conversion",
+            "notes": "Standard field corn reference from Table 1. Reported regional yield is an aggregate and its specific grain moisture is unspecified."
+          }
+        },
+        "price": {
+          "year": 2024,
+          "value": 4.24,
+          "unit": "USD/bu",
+          "geography": "Central crop reporting district, Iowa",
+          "publication": "USDA NASS 2024 Iowa District Market Year Average Prices",
+          "source_url": "https://data.nass.usda.gov/Statistics_by_State/Iowa/Publications/Economics/2026/IA-District-MYA-Prices-2024.pdf",
+          "table": "Crop Prices Received – Iowa: Market Year Average, 2024",
+          "row": "Central",
+          "column": "Corn",
+          "printed_page": 1,
+          "notes": "Marketing year 2024-09-01 to 2025-08-31.",
+          "conversion": {
+            "lb_per_unit": 56,
+            "kg_per_lb": 0.45359237,
+            "formula": "value * 1000 / (lb_per_unit * kg_per_lb)",
+            "bushel_weight_source_url": "https://www.nass.usda.gov/Surveys/Guide_to_NASS_Surveys/Prices/Price_Program_Methodology_v10.pdf"
+          }
+        },
+        "cost": {
+          "year": 2026,
+          "cost_type": "projected extension enterprise budget",
+          "unit": "USD/acre",
+          "geography": "Iowa",
+          "publication": "Iowa State University Extension A1-20, Estimated Costs of Crop Production in Iowa–2026",
+          "source_url": "https://www.extension.iastate.edu/AGDM/crops/pdf/a1-20.pdf",
+          "table": "Corn Following Corn",
+          "printed_page": 2,
+          "column": "193 bu/acre budget (middle column)",
+          "rows": {
+            "Total cost per acre": 960.02,
+            "Cash rent equivalent": 274.0,
+            "Labor": 57.12
+          },
+          "notes": "Conventional continuous corn budget, used as a fixed benchmark for unknown predecessors.",
+          "conversion": "(listed_total_usd_per_acre - land_usd_per_acre - operator_labor_usd_per_acre) / 0.40468564224",
+          "scope": "Partial non-irrigated production cost excluding land and operator labor. Scope of remaining expenses may vary between budgets. Uses the published budget as-is for its management and rotation assumptions.",
+          "included_value_usd_per_acre": 628.9
+        }
+      }
+    },
+    "sunflower": {
+      "marketable_yield_t_ha": 1.865096,
+      "farmgate_price_per_t": 500.449335,
+      "included_cost_per_ha": 700.593178,
+      "currency": "USD",
+      "source": "2024 USDA NASS U.S. oil sunflower yield and farm price proxy. NDSU 2026 southeast North Dakota oil sunflower budget excluding land and operator labor. Assumed 10% reference moisture for nutrient removal.",
+      "yield_moisture_pct": 10,
+      "raw": {
+        "yield": {
+          "year": 2024,
+          "value": 1664,
+          "unit": "lb/acre",
+          "geography": "United States",
+          "publication": "USDA NASS Crop Production 2025 Summary, January 12, 2026",
+          "source_url": "https://www.nass.usda.gov/Publications/Todays_Reports/reports/cropan26.pdf",
+          "table": "Sunflower Area Planted and Harvested, Yield, and Production by Type – States and United States: 2023–2025 (continued)",
+          "row": "Oil / United States",
+          "column": "Yield per acre / 2024",
+          "printed_page": 49,
+          "notes": "National oil sunflower proxy for Marsden.",
+          "conversion": {
+            "lb_per_unit": 1,
+            "kg_per_lb": 0.45359237,
+            "ha_per_acre": 0.40468564224,
+            "formula": "value * lb_per_unit * kg_per_lb / (1000 * ha_per_acre)"
+          },
+          "moisture_basis": {
+            "percent": 10,
+            "source_url": "https://www.agronext.iastate.edu/soilfertility/info/Mallarino%20Soil%20Samp%20%26%20Testing-Soil%20Fertility%20Short%20Course.pdf",
+            "type": "assumed reference for harvested-weight conversion",
+            "notes": "Iowa State nutrient-removal table sunflower reference basis. Reported regional yield is an aggregate and its specific grain moisture is unspecified."
+          }
+        },
+        "price": {
+          "year": 2024,
+          "value": 22.7,
+          "unit": "USD/cwt",
+          "geography": "United States",
+          "publication": "USDA NASS Crop Values 2025 Summary, February 26, 2026",
+          "source_url": "https://www.nass.usda.gov/Publications/Todays_Reports/reports/cpvl0226.pdf",
+          "table": "Sunflower Price per Cwt and Value of Production by Type – States and United States: 2023–2025",
+          "row": "Oil / United States",
+          "column": "Price per cwt / 2024",
+          "printed_page": 27,
+          "notes": "National oil sunflower marketing-year farm price proxy for Marsden.",
+          "conversion": {
+            "lb_per_unit": 100,
+            "kg_per_lb": 0.45359237,
+            "formula": "value * 1000 / (lb_per_unit * kg_per_lb)"
+          }
+        },
+        "cost": {
+          "year": 2026,
+          "cost_type": "projected extension enterprise budget",
+          "unit": "USD/acre",
+          "geography": "Southeast North Dakota",
+          "publication": "NDSU Extension EC1659, Projected 2026 Crop Budgets: South East North Dakota",
+          "source_url": "https://www.ndsu.edu/agriculture/sites/default/files/2026-02/ec1659.pdf",
+          "table": "Oil Sunflower / Confectionery Sunflower",
+          "printed_page": 6,
+          "column": "Oil Sunflower / Per Acre",
+          "rows": {
+            "SUM OF ALL LISTED COSTS": 391.52,
+            "Land Charge": 108.0,
+            "operator_labor_included": false
+          },
+          "notes": "Southeast North Dakota cost proxy for Marsden. The budget reports return to labor and management below its cost total.",
+          "conversion": "(listed_total_usd_per_acre - land_usd_per_acre - operator_labor_usd_per_acre) / 0.40468564224",
+          "scope": "Partial non-irrigated production cost excluding land and operator labor. Scope of remaining expenses may vary between budgets. Uses the published budget as-is for its management and rotation assumptions.",
+          "included_value_usd_per_acre": 283.52
+        }
+      }
+    },
+    "soybeans": {
+      "marketable_yield_t_ha": 4.458746,
+      "farmgate_price_per_t": 365.967355,
+      "included_cost_per_ha": 890.147716,
+      "currency": "USD",
+      "source": "2024 USDA NASS Boone County soybean yield and Central Iowa farm price. ISU 2026 Iowa soybean-after-corn budget excluding land and operator labor. Assumed 13% grain moisture for nutrient removal.",
+      "yield_moisture_pct": 13,
+      "raw": {
+        "yield": {
+          "year": 2024,
+          "value": 66.3,
+          "unit": "bu/acre",
+          "geography": "Boone County, Iowa",
+          "publication": "ISU Extension Ag Decision Maker File A1-12, USDA NASS county yields",
+          "source_url": "https://www.extension.iastate.edu/agdm/crops/pdf/a1-12.pdf",
+          "table": "Table 5. Central Iowa Crop Reporting District Average Yields by County, USDA NASS, 2016–2025",
+          "row": "Boone / Soybeans",
+          "column": "2024",
+          "notes": "County average; non-irrigated yield series as identified by ISU.",
+          "conversion": {
+            "lb_per_unit": 60,
+            "kg_per_lb": 0.45359237,
+            "ha_per_acre": 0.40468564224,
+            "formula": "value * lb_per_unit * kg_per_lb / (1000 * ha_per_acre)",
+            "bushel_weight_source_url": "https://www.nass.usda.gov/Surveys/Guide_to_NASS_Surveys/Prices/Price_Program_Methodology_v10.pdf"
+          },
+          "moisture_basis": {
+            "percent": 13,
+            "source_url": "https://ask.ifas.ufl.edu/publication/AG442",
+            "type": "assumed reference for harvested-weight conversion",
+            "notes": "Standard soybean reference from Table 1. Reported regional yield is an aggregate and its specific grain moisture is unspecified."
+          }
+        },
+        "price": {
+          "year": 2024,
+          "value": 9.96,
+          "unit": "USD/bu",
+          "geography": "Central crop reporting district, Iowa",
+          "publication": "USDA NASS 2024 Iowa District Market Year Average Prices",
+          "source_url": "https://data.nass.usda.gov/Statistics_by_State/Iowa/Publications/Economics/2026/IA-District-MYA-Prices-2024.pdf",
+          "table": "Crop Prices Received – Iowa: Market Year Average, 2024",
+          "row": "Central",
+          "column": "Soybeans",
+          "printed_page": 1,
+          "notes": "Marketing year 2024-09-01 to 2025-08-31.",
+          "conversion": {
+            "lb_per_unit": 60,
+            "kg_per_lb": 0.45359237,
+            "formula": "value * 1000 / (lb_per_unit * kg_per_lb)",
+            "bushel_weight_source_url": "https://www.nass.usda.gov/Surveys/Guide_to_NASS_Surveys/Prices/Price_Program_Methodology_v10.pdf"
+          }
+        },
+        "cost": {
+          "year": 2026,
+          "cost_type": "projected extension enterprise budget",
+          "unit": "USD/acre",
+          "geography": "Iowa",
+          "publication": "Iowa State University Extension A1-20, Estimated Costs of Crop Production in Iowa–2026",
+          "source_url": "https://www.extension.iastate.edu/AGDM/crops/pdf/a1-20.pdf",
+          "table": "Herbicide Tolerant Soybeans Following Corn",
+          "printed_page": 5,
+          "column": "61 bu/acre budget (middle column)",
+          "rows": {
+            "Total cost per acre": 679.11,
+            "Cash rent equivalent": 274.0,
+            "Labor": 44.88
+          },
+          "notes": "Herbicide-tolerant soybean following corn, used as a fixed benchmark.",
+          "conversion": "(listed_total_usd_per_acre - land_usd_per_acre - operator_labor_usd_per_acre) / 0.40468564224",
+          "scope": "Partial non-irrigated production cost excluding land and operator labor. Scope of remaining expenses may vary between budgets. Uses the published budget as-is for its management and rotation assumptions.",
+          "included_value_usd_per_acre": 360.23
+        }
+      }
+    },
+    "rapeseed_canola": {
+      "marketable_yield_t_ha": 2.008565,
+      "farmgate_price_per_t": 445.33377,
+      "included_cost_per_ha": 745.467515,
+      "currency": "USD",
+      "source": "2024 USDA NASS U.S. canola yield and farm price proxy. NDSU 2026 southeast North Dakota canola budget excluding land and operator labor. Canola marketing specification assumed for this crop ID.",
+      "yield_moisture_pct": null,
+      "raw": {
+        "yield": {
+          "year": 2024,
+          "value": 1792,
+          "unit": "lb/acre",
+          "geography": "United States",
+          "publication": "USDA NASS Crop Production 2025 Summary, January 12, 2026",
+          "source_url": "https://www.nass.usda.gov/Publications/Todays_Reports/reports/cropan26.pdf",
+          "table": "Crop Area Planted and Harvested, Yield, and Production in Domestic Units – United States: 2024 and 2025 (continued)",
+          "row": "Canola",
+          "column": "Yield per acre / 2024",
+          "printed_page": 95,
+          "notes": "National proxy for Marsden. Value represents harvested acres.",
+          "conversion": {
+            "lb_per_unit": 1,
+            "kg_per_lb": 0.45359237,
+            "ha_per_acre": 0.40468564224,
+            "formula": "value * lb_per_unit * kg_per_lb / (1000 * ha_per_acre)"
+          }
+        },
+        "price": {
+          "year": 2024,
+          "value": 20.2,
+          "unit": "USD/cwt",
+          "geography": "United States",
+          "publication": "USDA NASS Crop Values 2025 Summary, February 26, 2026",
+          "source_url": "https://www.nass.usda.gov/Publications/Todays_Reports/reports/cpvl0226.pdf",
+          "table": "Canola Price per Cwt and Value of Production – States and United States: 2023–2025",
+          "row": "United States",
+          "column": "Price per cwt / 2024",
+          "printed_page": 28,
+          "notes": "National canola marketing-year farm price proxy for Marsden.",
+          "conversion": {
+            "lb_per_unit": 100,
+            "kg_per_lb": 0.45359237,
+            "formula": "value * 1000 / (lb_per_unit * kg_per_lb)"
+          }
+        },
+        "cost": {
+          "year": 2026,
+          "cost_type": "projected extension enterprise budget",
+          "unit": "USD/acre",
+          "geography": "Southeast North Dakota",
+          "publication": "NDSU Extension EC1659, Projected 2026 Crop Budgets: South East North Dakota",
+          "source_url": "https://www.ndsu.edu/agriculture/sites/default/files/2026-02/ec1659.pdf",
+          "table": "Canola / Flax cost comparison",
+          "printed_page": 7,
+          "column": "Canola / Per Acre",
+          "rows": {
+            "SUM OF ALL LISTED COSTS": 409.68,
+            "Land Charge": 108.0,
+            "operator_labor_included": false
+          },
+          "notes": "Southeast North Dakota cost proxy for Marsden. The budget reports return to labor and management below its cost total.",
+          "conversion": "(listed_total_usd_per_acre - land_usd_per_acre - operator_labor_usd_per_acre) / 0.40468564224",
+          "scope": "Partial non-irrigated production cost excluding land and operator labor. Scope of remaining expenses may vary between budgets. Uses the published budget as-is for its management and rotation assumptions.",
+          "included_value_usd_per_acre": 301.68
+        }
+      }
+    },
+    "peas_dry": {
+      "marketable_yield_t_ha": 1.990632,
+      "farmgate_price_per_t": 299.828677,
+      "included_cost_per_ha": 563.919191,
+      "currency": "USD",
+      "source": "2024 USDA NASS U.S. dry edible pea yield and farm price proxy. NDSU 2026 southeast North Dakota field pea budget excluding land and operator labor.",
+      "yield_moisture_pct": null,
+      "raw": {
+        "yield": {
+          "year": 2024,
+          "value": 1776,
+          "unit": "lb/acre",
+          "geography": "United States",
+          "publication": "USDA NASS Crop Production 2025 Summary, January 12, 2026",
+          "source_url": "https://www.nass.usda.gov/Publications/Todays_Reports/reports/cropan26.pdf",
+          "table": "Crop Area Planted and Harvested, Yield, and Production in Domestic Units – United States: 2024 and 2025 (continued)",
+          "row": "Dry edible peas",
+          "column": "Yield per acre / 2024",
+          "printed_page": 95,
+          "notes": "National proxy for Marsden. Value represents harvested acres.",
+          "conversion": {
+            "lb_per_unit": 1,
+            "kg_per_lb": 0.45359237,
+            "ha_per_acre": 0.40468564224,
+            "formula": "value * lb_per_unit * kg_per_lb / (1000 * ha_per_acre)"
+          }
+        },
+        "price": {
+          "year": 2024,
+          "value": 13.6,
+          "unit": "USD/cwt",
+          "geography": "United States",
+          "publication": "USDA NASS Crop Values 2025 Summary, February 26, 2026",
+          "source_url": "https://www.nass.usda.gov/Publications/Todays_Reports/reports/cpvl0226.pdf",
+          "table": "Dry Edible Pea Price per Cwt and Value of Production – States and United States: 2023–2025",
+          "row": "United States",
+          "column": "Price per cwt / 2024",
+          "printed_page": 38,
+          "notes": "National dry edible peas marketing-year farm price proxy for Marsden.",
+          "conversion": {
+            "lb_per_unit": 100,
+            "kg_per_lb": 0.45359237,
+            "formula": "value * 1000 / (lb_per_unit * kg_per_lb)"
+          }
+        },
+        "cost": {
+          "year": 2026,
+          "cost_type": "projected extension enterprise budget",
+          "unit": "USD/acre",
+          "geography": "Southeast North Dakota",
+          "publication": "NDSU Extension EC1659, Projected 2026 Crop Budgets: South East North Dakota",
+          "source_url": "https://www.ndsu.edu/agriculture/sites/default/files/2026-02/ec1659.pdf",
+          "table": "Field Pea / Oat",
+          "printed_page": 8,
+          "column": "Field Pea / Per Acre",
+          "rows": {
+            "SUM OF ALL LISTED COSTS": 336.21,
+            "Land Charge": 108.0,
+            "operator_labor_included": false
+          },
+          "notes": "Southeast North Dakota cost proxy for Marsden. The budget reports return to labor and management below its cost total.",
+          "conversion": "(listed_total_usd_per_acre - land_usd_per_acre - operator_labor_usd_per_acre) / 0.40468564224",
+          "scope": "Partial non-irrigated production cost excluding land and operator labor. Scope of remaining expenses may vary between budgets. Uses the published budget as-is for its management and rotation assumptions.",
+          "included_value_usd_per_acre": 228.21
+        }
+      }
+    },
+    "sugar_beet": {
+      "marketable_yield_t_ha": 72.855325,
+      "farmgate_price_per_t": 76.500405,
+      "included_cost_per_ha": null,
+      "currency": "USD",
+      "source": "2024 USDA NASS U.S. sugarbeet yield and farm price proxy. Included cost unavailable.",
+      "yield_moisture_pct": null,
+      "raw": {
+        "yield": {
+          "year": 2024,
+          "value": 32.5,
+          "unit": "short ton/acre",
+          "geography": "United States",
+          "publication": "USDA NASS Crop Production 2025 Summary, January 12, 2026",
+          "source_url": "https://www.nass.usda.gov/Publications/Todays_Reports/reports/cropan26.pdf",
+          "table": "Crop Area Planted and Harvested, Yield, and Production in Domestic Units – United States: 2024 and 2025 (continued)",
+          "row": "Sugarbeets",
+          "column": "Yield per acre / 2024",
+          "printed_page": 95,
+          "notes": "National proxy for Marsden. Value represents harvested acres.",
+          "conversion": {
+            "lb_per_unit": 2000,
+            "kg_per_lb": 0.45359237,
+            "ha_per_acre": 0.40468564224,
+            "formula": "value * lb_per_unit * kg_per_lb / (1000 * ha_per_acre)"
+          }
+        },
+        "price": {
+          "year": 2024,
+          "value": 69.4,
+          "unit": "USD/short ton",
+          "geography": "United States",
+          "publication": "USDA NASS Crop Values 2025 Summary, February 26, 2026",
+          "source_url": "https://www.nass.usda.gov/Publications/Todays_Reports/reports/cpvl0226.pdf",
+          "table": "Sugarbeet Price per Ton and Value of Production – States and United States: 2023 and 2024",
+          "row": "United States",
+          "column": "Price per ton / 2024",
+          "printed_page": 41,
+          "notes": "National sugarbeet marketing-year farm price proxy for Marsden.",
+          "conversion": {
+            "lb_per_unit": 2000,
+            "kg_per_lb": 0.45359237,
+            "formula": "value * 1000 / (lb_per_unit * kg_per_lb)"
+          }
+        },
+        "cost": null
+      }
+    },
+    "potato": {
+      "marketable_yield_t_ha": 50.886642,
+      "farmgate_price_per_t": 257.940847,
+      "included_cost_per_ha": null,
+      "currency": "USD",
+      "source": "2024 USDA NASS U.S. all potato yield and farm price proxy, mixed market classes. Included cost unavailable.",
+      "yield_moisture_pct": null,
+      "raw": {
+        "yield": {
+          "year": 2024,
+          "value": 454,
+          "unit": "cwt/acre",
+          "geography": "United States",
+          "publication": "USDA NASS Crop Production 2025 Summary, January 12, 2026",
+          "source_url": "https://www.nass.usda.gov/Publications/Todays_Reports/reports/cropan26.pdf",
+          "table": "Crop Area Planted and Harvested, Yield, and Production in Domestic Units – United States: 2024 and 2025 (continued)",
+          "row": "Potatoes",
+          "column": "Yield per acre / 2024",
+          "printed_page": 95,
+          "notes": "National proxy for Marsden. Value represents harvested acres.",
+          "conversion": {
+            "lb_per_unit": 100,
+            "kg_per_lb": 0.45359237,
+            "ha_per_acre": 0.40468564224,
+            "formula": "value * lb_per_unit * kg_per_lb / (1000 * ha_per_acre)"
+          }
+        },
+        "price": {
+          "year": 2024,
+          "value": 11.7,
+          "unit": "USD/cwt",
+          "geography": "United States",
+          "publication": "USDA NASS Crop Values 2025 Summary, February 26, 2026",
+          "source_url": "https://www.nass.usda.gov/Publications/Todays_Reports/reports/cpvl0226.pdf",
+          "table": "All Potatoes Price per Cwt and Value of Production – States and United States: 2023–2025",
+          "row": "United States",
+          "column": "Price per cwt / 2024",
+          "printed_page": 39,
+          "notes": "National potato marketing-year farm price proxy for Marsden.",
+          "conversion": {
+            "lb_per_unit": 100,
+            "kg_per_lb": 0.45359237,
+            "formula": "value * 1000 / (lb_per_unit * kg_per_lb)"
+          }
+        },
+        "cost": null
+      }
+    },
+    "oats": {
+      "marketable_yield_t_ha": 2.941113,
+      "farmgate_price_per_t": 305.891389,
+      "included_cost_per_ha": 520.033275,
+      "currency": "USD",
+      "source": "2024 USDA NASS Iowa oats yield and Central Iowa farm price. NDSU 2026 southeast North Dakota oat cost proxy excluding land and operator labor. Assumed 14% grain moisture for nutrient removal.",
+      "yield_moisture_pct": 14,
+      "raw": {
+        "yield": {
+          "year": 2024,
+          "value": 82,
+          "unit": "bu/acre",
+          "geography": "Iowa",
+          "publication": "USDA NASS Crop Production 2025 Summary, January 12, 2026",
+          "source_url": "https://www.nass.usda.gov/Publications/Todays_Reports/reports/cropan26.pdf",
+          "table": "Oat Area Planted and Harvested, Yield, and Production – States and United States: 2023–2025 (continued)",
+          "row": "Iowa",
+          "column": "Yield per acre / 2024",
+          "printed_page": 20,
+          "conversion": {
+            "lb_per_unit": 32,
+            "kg_per_lb": 0.45359237,
+            "ha_per_acre": 0.40468564224,
+            "formula": "value * lb_per_unit * kg_per_lb / (1000 * ha_per_acre)",
+            "bushel_weight_source_url": "https://www.nass.usda.gov/Surveys/Guide_to_NASS_Surveys/Prices/Price_Program_Methodology_v10.pdf"
+          },
+          "moisture_basis": {
+            "percent": 14,
+            "source_url": "https://www.nass.usda.gov/Surveys/Guide_to_NASS_Surveys/Prices/Price_Program_Methodology_v10.pdf",
+            "type": "assumed reference for harvested-weight conversion",
+            "notes": "USDA NASS market reporting guideline (Standard weight/moisture, p. 2G-33). Reported regional yield is an aggregate and its specific grain moisture is unspecified."
+          }
+        },
+        "price": {
+          "year": 2024,
+          "value": 4.44,
+          "unit": "USD/bu",
+          "geography": "Central crop reporting district, Iowa",
+          "publication": "USDA NASS 2024 Iowa District Market Year Average Prices",
+          "source_url": "https://data.nass.usda.gov/Statistics_by_State/Iowa/Publications/Economics/2026/IA-District-MYA-Prices-2024.pdf",
+          "table": "Crop Prices Received – Iowa: Market Year Average, 2024",
+          "row": "Central",
+          "column": "Oats",
+          "printed_page": 1,
+          "notes": "Marketing year 2024-07-01 to 2025-06-30.",
+          "conversion": {
+            "lb_per_unit": 32,
+            "kg_per_lb": 0.45359237,
+            "formula": "value * 1000 / (lb_per_unit * kg_per_lb)",
+            "bushel_weight_source_url": "https://www.nass.usda.gov/Surveys/Guide_to_NASS_Surveys/Prices/Price_Program_Methodology_v10.pdf"
+          }
+        },
+        "cost": {
+          "year": 2026,
+          "cost_type": "projected extension enterprise budget",
+          "unit": "USD/acre",
+          "geography": "Southeast North Dakota",
+          "publication": "NDSU Extension EC1659, Projected 2026 Crop Budgets: South East North Dakota",
+          "source_url": "https://www.ndsu.edu/agriculture/sites/default/files/2026-02/ec1659.pdf",
+          "table": "Field Pea / Oat",
+          "printed_page": 8,
+          "column": "Oat / Per Acre",
+          "rows": {
+            "SUM OF ALL LISTED COSTS": 318.45,
+            "Land Charge": 108.0,
+            "operator_labor_included": false
+          },
+          "notes": "Southeast North Dakota cost proxy for Marsden. The budget reports return to labor and management below its cost total.",
+          "conversion": "(listed_total_usd_per_acre - land_usd_per_acre - operator_labor_usd_per_acre) / 0.40468564224",
+          "scope": "Partial non-irrigated production cost excluding land and operator labor. Scope of remaining expenses may vary between budgets. Uses the published budget as-is for its management and rotation assumptions.",
+          "included_value_usd_per_acre": 210.45
+        }
+      }
+    },
+    "millet": {
+      "marketable_yield_t_ha": 1.8438,
+      "farmgate_price_per_t": 164.023923,
+      "included_cost_per_ha": 414.445146,
+      "currency": "USD",
+      "source": "2024 USDA NASS U.S. proso millet yield and farm price proxy. NDSU 2026 southeast North Dakota millet costs excluding land and operator labor. Proso marketing specification assumed.",
+      "yield_moisture_pct": null,
+      "raw": {
+        "yield": {
+          "year": 2024,
+          "value": 32.9,
+          "unit": "bu/acre",
+          "geography": "United States",
+          "publication": "USDA NASS Crop Production 2025 Summary, January 12, 2026",
+          "source_url": "https://www.nass.usda.gov/Publications/Todays_Reports/reports/cropan26.pdf",
+          "table": "Crop Area Planted and Harvested, Yield, and Production in Domestic Units – United States: 2024 and 2025 (continued)",
+          "row": "Proso millet",
+          "column": "Yield per acre / 2024",
+          "printed_page": 95,
+          "notes": "National proxy for Marsden. Value represents harvested acres.",
+          "conversion": {
+            "lb_per_unit": 50,
+            "kg_per_lb": 0.45359237,
+            "ha_per_acre": 0.40468564224,
+            "formula": "value * lb_per_unit * kg_per_lb / (1000 * ha_per_acre)",
+            "bushel_weight_source_url": "https://www.ecfr.gov/current/title-7/subtitle-B/chapter-IV/part-457/section-457.165"
+          }
+        },
+        "price": {
+          "year": 2024,
+          "value": 3.72,
+          "unit": "USD/bu",
+          "geography": "United States",
+          "publication": "USDA NASS Crop Values 2025 Summary, February 26, 2026",
+          "source_url": "https://www.nass.usda.gov/Publications/Todays_Reports/reports/cpvl0226.pdf",
+          "table": "Proso Millet Price per Bushel and Value of Production – States and United States: 2023–2025",
+          "row": "United States",
+          "column": "Price per bushel / 2024",
+          "printed_page": 24,
+          "notes": "National proso millet marketing-year farm price proxy for Marsden.",
+          "conversion": {
+            "lb_per_unit": 50,
+            "kg_per_lb": 0.45359237,
+            "formula": "value * 1000 / (lb_per_unit * kg_per_lb)",
+            "bushel_weight_source_url": "https://www.ecfr.gov/current/title-7/subtitle-B/chapter-IV/part-457/section-457.165"
+          }
+        },
+        "cost": {
+          "year": 2026,
+          "cost_type": "projected extension enterprise budget",
+          "unit": "USD/acre",
+          "geography": "Southeast North Dakota",
+          "publication": "NDSU Extension EC1659, Projected 2026 Crop Budgets: South East North Dakota",
+          "source_url": "https://www.ndsu.edu/agriculture/sites/default/files/2026-02/ec1659.pdf",
+          "table": "Buckwheat and Millet cost comparison table",
+          "printed_page": 9,
+          "column": "Millet / Per Acre",
+          "rows": {
+            "SUM OF ALL LISTED COSTS": 275.72,
+            "Land Charge": 108.0,
+            "operator_labor_included": false
+          },
+          "notes": "Southeast North Dakota cost proxy for Marsden. The budget reports return to labor and management below its cost total.",
+          "conversion": "(listed_total_usd_per_acre - land_usd_per_acre - operator_labor_usd_per_acre) / 0.40468564224",
+          "scope": "Partial non-irrigated production cost excluding land and operator labor. Scope of remaining expenses may vary between budgets. Uses the published budget as-is for its management and rotation assumptions.",
+          "included_value_usd_per_acre": 167.72
+        }
+      }
+    }
+  }
+}
