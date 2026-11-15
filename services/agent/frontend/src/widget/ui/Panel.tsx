@@ -36,7 +36,7 @@ function Header({ onClose, titleId, onOpenHistory }: { onClose(): void; titleId:
           {text}
         </span>
       </div>
-      {onOpenHistory && <button type="button" className="fsa-iconbtn" style={{ width: 44, height: 44 }}
+      {onOpenHistory && <button type="button" className="fsa-iconbtn"
         disabled={busy} onClick={onOpenHistory}
         aria-label={locale === "uk" ? "Збережені розмови" : "Saved conversations"}
         title={locale === "uk" ? "Збережені розмови" : "Saved conversations"}>
