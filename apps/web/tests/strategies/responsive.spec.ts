@@ -101,3 +101,37 @@ test('every catalog crop and a three-plan result fit narrow cards', async ({ pag
   await contained(page)
   await expect(page.locator('[data-handoff-plan="plan-c"] h4')).not.toContainText('Rank')
 })
+
+for (const language of ['en', 'uk']) test(`compact workflow choice preserves evidence and drafts in ${language}`, async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 900 })
+  await prepare(page)
+  await page.getByLabel(/Language|Мова/).selectOption(language)
+  const uk = language === 'uk'
+  const workflows = page.getByRole('group', { name: uk ? 'Спосіб планування' : 'Planning workflow' })
+  const buttons = workflows.getByRole('button')
+  await expect(buttons).toHaveCount(4)
+  // Navigation must leave room for the actual task, including wrapped Ukrainian labels.
+  expect((await workflows.boundingBox())!.height).toBeLessThanOrEqual(180)
+  for (const button of await buttons.all()) expect((await button.boundingBox())!.height).toBeGreaterThanOrEqual(44)
+  await page.getByLabel(uk ? 'Дата сівби · 1' : 'Planting date · 1').fill('2027-05-01')
+  for (const letter of ['A', 'B']) {
+    const choice = page.getByLabel(`${uk ? 'Профіль культури' : 'Crop profile'} · ${letter}1`)
+    await choice.selectOption('maize_grain')
+    await page.locator('.handoff-plan').filter({ has: choice }).getByLabel(uk ? 'Календар тривалості росту' : 'Growth-duration calendar').selectOption(catalogFixture().crops.find(crop => crop.id === 'maize_grain')!.profile.calendars![0].id)
+  }
+  await page.getByRole('button', { name: uk ? 'Розрахувати порівняння' : 'Calculate comparison', exact: true }).click()
+  const plan = page.locator('[data-handoff-plan="plan-a"]')
+  await expect(plan.getByText(uk ? 'Медіанний дефіцит води' : 'Median water shortfall', { exact: true })).toBeVisible()
+  await expect(plan.getByText(uk ? 'Медіана частки днів водного стресу' : 'Median water-stress days', { exact: true })).toBeVisible()
+  const detail = plan.locator('details').filter({ has: page.locator('summary', { hasText: uk ? 'Діапазон сценаріїв і полив' : 'Scenario range and irrigation' }) })
+  await expect(detail).not.toHaveAttribute('open')
+  await detail.locator('summary').focus()
+  await page.keyboard.press('Enter')
+  await expect(detail.getByText('0 mm', { exact: true })).toBeVisible()
+  await expect(detail.getByText('0 % – 5 %', { exact: true })).toBeVisible()
+  await expect(page.getByText(uk ? 'Експериментально · польова точність не перевірена' : 'Experimental · field accuracy not validated', { exact: true })).toBeVisible()
+  await page.getByRole('button', { name: uk ? 'Переглянути поточні дані' : 'Review current inputs', exact: true }).click()
+  await expect(page.getByRole('form', { name: uk ? 'Поточні дані порівняння' : 'Current comparison inputs' })).toBeFocused()
+  await expect(page.getByLabel(uk ? 'Дата сівби · 1' : 'Planting date · 1')).toHaveValue('2027-05-01')
+  await contained(page)
+})

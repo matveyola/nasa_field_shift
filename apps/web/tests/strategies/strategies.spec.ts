@@ -106,6 +106,8 @@ test('Ukrainian guidance, detailed constraints, profile readiness and explicit p
   await page.getByText('Паспорти полів та перевірка вхідних даних', { exact: true }).click()
   await expect(page.getByRole('button', { name: 'Створити паспорт поля' })).toBeVisible()
   await expect(page.getByText('Розподіл культур доступний окремо.', { exact: false })).toBeVisible()
+  // The operating checklist is disclosed on demand in the compact layout.
+  await page.getByText('Перед рішенням про сівбу', { exact: true }).click()
   await page.getByRole('button', { name: 'Переглянути водні умови' }).click()
   await expect(page.locator('output')).toHaveText('analytics:water')
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)

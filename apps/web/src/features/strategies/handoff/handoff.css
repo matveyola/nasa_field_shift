@@ -1,4 +1,3 @@
-.strategies-page .strategies-workflows { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .handoff-workspace { display: grid; gap: 20px; min-width: 0; }
 .handoff-workspace fieldset { min-width: 0; border: 0; margin: 0; padding: 0; }
 .handoff-workspace legend { font-weight: 650; padding: 0 0 12px; }
@@ -33,8 +32,7 @@
 .handoff-provenance { font-size: .8rem; }
 .handoff-provenance a { display: block; margin: 8px 0; overflow-wrap: anywhere; }
 .handoff-receipts { padding-left: 18px; }
-@media (max-width: 900px) { .strategies-page .strategies-workflows { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 600px) { .strategies-page .strategies-workflows { grid-template-columns: 1fr; } .handoff-calculate { flex-direction: column; align-items: stretch; } }
+@media (max-width: 600px) { .handoff-calculate { flex-direction: column; align-items: stretch; } }
 
 .handoff-workspace, .handoff-form { grid-template-columns: minmax(0, 1fr); }
 .handoff-workspace form, .handoff-workspace details, .handoff-workspace dl > *,
@@ -50,3 +48,16 @@
 .handoff-brief-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
 .handoff-brief-actions .button { max-width: 100%; white-space: normal; }
 .handoff-workspace form[tabindex]:focus-visible { outline: 2px solid var(--primary, #316847); outline-offset: 4px; }
+
+.handoff-workspace .strategies-purpose { margin-bottom: 0; }
+.handoff-workspace .strategies-purpose h2 { margin-top: 0; }
+.handoff-results > p { margin-block: 8px; }
+.handoff-brief-lead { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; }
+.handoff-brief-lead .handoff-brief-actions { margin: 0; }
+.handoff-brief-checks { padding-left: 20px; color: var(--ink-2, #555); }
+.handoff-metrics dd { font-size: 1.25rem; letter-spacing: -.02em; color: var(--ink, #111); }
+.handoff-outcome > .handoff-metrics { margin-block: 12px; }
+.handoff-outcome .handoff-secondary-metrics dd { font-size: .9rem; }
+@container strategy-workspace (max-width: 600px) {
+  .handoff-brief-lead { grid-template-columns: minmax(0, 1fr); }
+}
