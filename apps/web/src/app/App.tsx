@@ -8,9 +8,13 @@ import { FarmPage } from '../features/farm/FarmPage'
 import { FieldsPage } from '../features/fields/FieldsPage'
 import { Empty, ErrorBox, Loading } from '../shared/ui'
 import { useResource } from '../shared/useResource'
-import { canonicalRoute, parseRoute, routeAddress, type Page, type Route } from './routing'
+import { canonicalRoute, resolveHomeRoute, parseRoute, routeAddress, type Page, type Route } from './routing'
 import { Shell } from './Shell'
 import { NotificationProvider } from '../features/notifications/Notifications'
+
+import { useAccess } from '../features/access/AccessProvider'
+import { lastSelectedField, pendingSetup, rememberSelectedField, rememberSetup } from '../features/onboarding/setupStorage'
+const FieldOnboarding = lazy(() => import('../features/onboarding/FieldOnboarding').then(m => ({ default: m.FieldOnboarding })))
 
 const StrategiesPage = lazy(() => import('../features/strategies/StrategiesPage').then(m => ({ default: m.StrategiesPage })))
 const AnalyticsPage = lazy(() => import('../features/analytics/AnalyticsPage').then(m => ({ default: m.AnalyticsPage })))
@@ -24,15 +28,19 @@ function loadWorkspace(signal: AbortSignal) {
   return Promise.all([api.fields(signal), api.farm(signal)]).then(([fields, farm]) => ({ fields, farm }))
 }
 export function App() {
-  const { t } = useLocale()
-  const [route, setRoute] = useState(() => parseRoute(location.href))
-  const [strategiesVisited, setStrategiesVisited] = useState(route.page === 'strategies')
+  const { t, language } = useLocale()
+  const { canEdit } = useAccess()
+  const [addressRoute, setRoute] = useState(() => parseRoute(location.href))
+  const [strategiesVisited, setStrategiesVisited] = useState(addressRoute.page === 'strategies')
   const workspace = useResource(loadWorkspace)
   const fields = workspace.data?.fields ?? noFields
   const farm = workspace.data?.farm
+  const route = resolveHomeRoute(addressRoute, fields.length > 0)
+  const [lastField, setLastField] = useState(lastSelectedField)
+  const [setupInProgress, setSetupInProgress] = useState(pendingSetup)
   const requestedField = fields.find(({ id }) => id === route.fieldId)
-  const missingField = route.page !== 'farm' && Boolean(route.fieldId) && !requestedField
-  const field = missingField ? undefined : requestedField ?? fields.find(({ id }) => id === 'F-03') ?? fields[0]
+  const missingField = !route.home && route.page !== 'farm' && Boolean(route.fieldId) && !requestedField
+  const field = missingField ? undefined : requestedField ?? fields.find(({ id }) => id === lastField) ?? fields[0]
   const scenario = scenarioOrDefault(route.scenario)
   const season = route.season ?? (farm ? farm.season + (route.page === 'strategies' ? 1 : 0) : new Date().getUTCFullYear())
   const context = field ? { field_id: field.id, season, scenario } : undefined
@@ -44,6 +52,9 @@ export function App() {
     }
     setRoute(parseRoute(address))
   }, [])
+  useEffect(() => {
+    if (requestedField) { setLastField(requestedField.id); rememberSelectedField(requestedField.id) }
+  }, [requestedField?.id])
   useEffect(() => {
     const listener = () => setRoute(parseRoute(location.href))
     window.addEventListener('popstate', listener)
@@ -59,7 +70,7 @@ export function App() {
       if (location.pathname !== canonical.split('?')[0]) setAddress(route, true)
     }
     if (route.page === 'strategies') setStrategiesVisited(true)
-  }, [route, setAddress])
+  }, [addressRoute, fields.length, setAddress])
   useEffect(() => {
     const titles: Record<Page, string> = { fields: 'Fields', strategies: 'Strategies', analytics: 'Analytics', agent: 'Assistant', farm: 'Farm management', water: 'Analytics', rotations: 'Analytics' }
     document.title = t(titles[route.page]) + ' · Field Shift'
@@ -104,9 +115,33 @@ export function App() {
     else if (screen === 'rotations') go('analytics', { section: 'rotation' })
     else go(screen)
   }
-  function createField(fieldId: string) {
-    if (parseRoute(location.href).page === 'fields') go('fields', { fieldId })
-    workspace.reload()
+  function addCreatedField(created: Field) {
+    workspace.update(current => current.fields.some(item => item.id === created.id) ? current : {
+      fields: [...current.fields, created], farm: { ...current.farm, total_area_ha: current.farm.total_area_ha + created.area_ha },
+    })
+  }
+  function createField(created: Field) {
+    addCreatedField(created)
+    if (parseRoute(location.href).page === 'fields') go(fields.length ? 'fields' : 'strategies', { fieldId: created.id })
+  }
+  function startSetup() {
+    if (!canEdit) return
+    const id = setupInProgress ?? crypto.randomUUID()
+    rememberSetup(id); setSetupInProgress(id); setAssistantOpen(false)
+    setAddress({ page: 'fields', setupId: id, fieldId: field?.id, season, scenario })
+    window.scrollTo(0, 0)
+  }
+  function closeSetup(next: Route) { setAddress(next, true); window.scrollTo(0, 0) }
+  function finishSetup(created: Field) {
+    if (parseRoute(location.href).setupId !== route.setupId) return
+    addCreatedField(created); setSetupInProgress(pendingSetup())
+    setLastField(created.id); rememberSelectedField(created.id)
+    closeSetup({ page: 'strategies', fieldId: created.id, scenario, season: Math.max(season, farm?.season ?? season) })
+    setStrategiesVisited(true)
+  }
+  function goHome() {
+    setAssistantOpen(false)
+    setAddress({ page: fields.length ? 'strategies' : 'fields', home: true, fieldId: field?.id, season, scenario })
   }
   function updateField(updated: Field) {
     workspace.update(({ fields, farm }) => {
@@ -120,11 +155,14 @@ export function App() {
   if (workspace.pending) content = <Loading text={t('Loading workspace…')} />
   else if (workspace.error) content = <ErrorBox message={workspace.error} retry={workspace.reload} />
   else if (farm) {
-    if (missingField) content = <Empty><p>{t('The linked field is no longer available.')}</p><button className="button" type="button" onClick={() => go('fields')}>{t('Open Fields')}</button></Empty>
+    if (route.setupId && canEdit) content = <Suspense fallback={<Loading />}><FieldOnboarding key={route.setupId} id={route.setupId} fields={fields} season={season}
+      onCancel={() => closeSetup({ page: 'fields', fieldId: field?.id, season, scenario })} onComplete={finishSetup} /></Suspense>
+    else if (missingField) content = <Empty><p>{t('The linked field is no longer available.')}</p><button className="button" type="button" onClick={() => go('fields')}>{t('Open Fields')}</button></Empty>
     else if (route.page === 'fields' || route.page === 'agent') content = (
-      <FieldsPage key={season} fields={fields} selected={field} season={season} initialDrawing={route.addField}
+      <FieldsPage key={season + ':' + Boolean(route.addField)} fields={fields} selected={field} season={season} initialDrawing={route.addField}
         initialAnalysis={route.analysis} showNdviLayer={route.layer === 'ndvi_variability'} showTerrainLayer={route.layer === 'terrain'} mapFocus={route.mapFocus}
-        chooseField={chooseField} onCreate={createField} onUpdate={updateField} reloadFields={workspace.reload} openForecast={openFieldForecast}
+        chooseField={chooseField} onCreate={createField} onUpdate={updateField} reloadFields={workspace.reload} openForecast={openFieldForecast} onSetup={canEdit ? startSetup : undefined}
+        setupLabel={setupInProgress ? (language === 'uk' ? 'Продовжити налаштування поля' : 'Continue field setup') : undefined}
         openStrategies={() => go('strategies', { season: Math.max(season, farm.season + 1) })}
         openAnalytics={(section = 'overview') => go('analytics', { section })} openAgent={() => setAssistantOpen(true)} />
     )
@@ -134,23 +172,23 @@ export function App() {
       onDefaultsSaved={defaults => workspace.update(current => ({ ...current, farm: { ...current.farm, defaults } }))}
       onObservationSaved={observation => workspace.update(current => ({ ...current,
         farm: { ...current.farm, observations: [observation, ...current.farm.observations.filter(({ id }) => id !== observation.id)] } }))}
-      onAddField={() => go('fields', { addField: true })} openField={fieldId => go('fields', { fieldId })} openWater={openFieldForecast} />
+      onAddField={startSetup} openField={fieldId => go('fields', { fieldId })} openWater={openFieldForecast} />
     else if (!context || !field) content = <Empty><p>{t('Add a field to use this workspace.')}</p><button className="button" type="button" onClick={() => go('fields', { addField: true })}>{t('Add field')}</button></Empty>
     else if (route.page === 'analytics') content = <Suspense fallback={<Loading text={t('Loading workspace…')} />}>
       <AnalyticsPage fields={fields} field={field} context={context} section={route.section ?? 'overview'} jobId={route.jobId} forecastDay={route.forecastDay}
-        irrigationAvailable={farm.defaults.irrigation_available} chooseField={chooseField} chooseSeason={year => setAddress({ ...route, season: year })}
+        irrigationAvailable={field.irrigation_available ?? farm.defaults.irrigation_available} chooseField={chooseField} chooseSeason={year => setAddress({ ...route, season: year })}
         chooseScenario={chooseScenario} onSection={section => go('analytics', { section })} showJob={showWaterJob}
         openFields={() => go('fields')} openStrategies={() => go('strategies')}
         openAgent={jobId => { if (jobId) showWaterJob(jobId); setAssistantOpen(true) }} openMapLayer={openMapLayer} />
     </Suspense>
   }
-  const keepStrategies = farm && field && !missingField && (strategiesVisited || route.page === 'strategies')
+  const keepStrategies = !route.setupId && farm && field && !missingField && (strategiesVisited || route.page === 'strategies')
   return <NotificationProvider fields={fields} season={farm?.season ?? new Date().getUTCFullYear()} farmKey={farm?.name ?? 'workspace'}
     openAgent={item => { go('agent', { fieldId: item.fieldId, season: farm?.season, scenario: 'baseline', signal: item.kind === 'water' ? 'water' : 'vegetation' }) }}
     openAnalysis={item => item.kind === 'water'
       ? go('analytics', { fieldId: item.fieldId, season: farm?.season, section: 'water', forecastDay: item.date, jobId: null })
       : go('analytics', { fieldId: item.fieldId, season: farm?.season, section: 'vegetation' })}>
-    <Shell route={route} farmName={farm?.name} navigate={go} assistantOpen={assistantOpen} openAssistant={() => setAssistantOpen(true)}>
+    <Shell route={route} homeAddress={routeAddress({ page: 'strategies', home: true, fieldId: field?.id, season, scenario })} navigateHome={goHome} farmName={farm?.name} navigate={go} assistantOpen={assistantOpen} openAssistant={() => setAssistantOpen(true)}>
       {content}
       {keepStrategies && <div hidden={route.page !== 'strategies'} inert={route.page !== 'strategies'} className="strategies-outlet">
         <Suspense fallback={<Loading text={t('Loading workspace…')} />}><StrategiesPage field={field} fields={fields} season={season}
@@ -159,7 +197,7 @@ export function App() {
           openAnalytics={(section = 'overview') => go('analytics', { section })} openAgent={() => setAssistantOpen(true)} /></Suspense>
       </div>}
     </Shell>
-    {farm && <Assistant field={missingField ? undefined : field} season={season} scenario={scenario} open={assistantOpen} onOpenChange={setAssistantOpen}
+    {farm && !route.setupId && <Assistant field={missingField ? undefined : field} season={season} scenario={scenario} open={assistantOpen} onOpenChange={setAssistantOpen}
       openScreen={openAssistantScreen} openVegetation={ndvi => ndvi ? openMapLayer('ndvi_variability') : go('analytics', { section: 'vegetation' })}
       openForecast={day => { if (field) openFieldForecast(field.id, day) }} />}
   </NotificationProvider>

@@ -1,0 +1,51 @@
+.field-setup-map { display: grid; gap: 16px; min-width: 0; }
+.setup-location-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.setup-location-picker { display: grid; gap: 7px; min-width: 0; position: relative; }
+.setup-location-picker label, .setup-coordinate-search > label { font-size: .88rem; font-weight: 600; }
+.setup-location-input { position: relative; }
+.setup-location-input svg { width: 16px; height: 16px; position: absolute; right: 13px; top: calc(50% - 8px); pointer-events: none; }
+.setup-location-input input, .setup-coordinate-search input { width: 100%; min-width: 0; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #ddd); border-radius: 12px; background: var(--card, #fff); color: var(--ink, #111); font: inherit; }
+.setup-location-input input { padding-right: 36px; }
+.setup-location-input input:disabled { opacity: .55; }
+.setup-location-menu { position: absolute; z-index: 700; left: 0; right: 0; top: calc(100% + 4px); max-height: min(280px, 30vh); overflow-y: auto; overscroll-behavior: contain; border: 1px solid var(--line, #ddd); border-radius: 12px; background: var(--card, #fff); box-shadow: 0 8px 22px #0002; }
+.setup-location-menu ul { margin: 0; padding: 4px; list-style: none; }
+.setup-location-menu [role="option"] { padding: 9px 10px; min-height: 40px; cursor: pointer; border-radius: 8px; font-size: .9rem; }
+.setup-location-menu [role="option"].is-highlighted { background: var(--sunken, #f2f2f0); }
+.setup-location-menu [aria-selected="true"] { font-weight: 650; }
+.setup-location-menu p { padding: 4px 12px 12px; margin: 0; font-size: .85rem; color: var(--ink-2, #666); }
+.setup-map-note { margin: 0; color: var(--ink-2, #666); font-size: .82rem; line-height: 1.55; }
+.setup-map-toolbar { display: grid; gap: 12px; }
+.setup-map-toolbar p { margin: 0; line-height: 1.5; font-size: .94rem; }
+.setup-map-toolbar > div { display: flex; flex-wrap: wrap; gap: 8px; }
+.setup-map-toolbar .button { min-height: 38px; }
+.setup-coordinate-search { display: grid; gap: 7px; }
+.setup-coordinate-search > div { display: flex; align-items: stretch; gap: 8px; }
+.setup-coordinate-search input { width: min(100%, 220px); }
+.setup-coordinate-search .button { flex-shrink: 0; }
+.setup-coordinate-search small { color: var(--danger, #9b302a); }
+.setup-map-canvas.fields-content { display: block; position: relative; width: 100%; height: clamp(340px, 48vh, 530px); min-height: 340px; border-radius: 18px; overflow: hidden; isolation: isolate; background: var(--sunken, #e8e8e5); }
+.setup-map-canvas .real-map { height: 100%; width: 100%; }
+.setup-map-canvas .map-controls { z-index: 500; }
+.setup-map-canvas .leaflet-control-attribution { max-width: calc(100% - 15px); font-size: 9px; }
+.setup-map-loading { padding: 28px; }
+.setup-map-progress { position: absolute; z-index: 600; left: 12px; top: 12px; right: 12px; display: flex; align-items: center; gap: 9px; padding: 9px 12px; border-radius: 12px; background: rgb(255 255 255 / .95); box-shadow: 0 3px 14px #0002; color: #222; font-size: .82rem; }
+.setup-map-progress > svg { flex: 0 0 18px; width: 18px; height: 18px; }
+.setup-map-progress .button { margin-left: auto; flex-shrink: 0; padding: 5px 9px; }
+.setup-boundary-review { display: grid; gap: 10px; padding: 16px; border: 1px solid var(--line, #ddd); border-radius: 16px; }
+.setup-boundary-review .field-geometry-editor { margin: 0; padding: 0; border: 0; box-shadow: none; }
+.setup-boundary-review .field-editor-instructions { line-height: 1.5; }
+.setup-boundary-review .field-editor-actions { flex-wrap: wrap; }
+.setup-map-error { margin: 0; color: var(--danger, #9b302a); font-size: .88rem; }
+.setup-map-confirm { display: flex; align-items: center; justify-content: space-between; gap: 16px; border-top: 1px solid var(--line, #ddd); padding-top: 18px; }
+.setup-map-confirm p { display: grid; gap: 4px; margin: 0; font-size: .87rem; color: var(--ink-2, #666); }
+.setup-map-confirm strong { font-size: 1.18rem; color: var(--ink, #111); }
+.setup-map-confirm .button { flex-shrink: 0; min-height: 46px; }
+@media (max-width: 640px) {
+  .setup-location-controls { grid-template-columns: 1fr; gap: 12px; }
+  .setup-map-canvas.fields-content { height: 390px; border-radius: 14px; }
+  .setup-map-toolbar .button { font-size: .8rem; padding: 8px 10px; }
+  .setup-map-confirm { align-items: stretch; flex-direction: column; }
+  .setup-map-confirm .button { width: 100%; }
+  .setup-map-progress { flex-wrap: wrap; }
+  .setup-boundary-review { padding: 12px; }
+}

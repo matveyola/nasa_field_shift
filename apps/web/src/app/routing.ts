@@ -7,6 +7,8 @@ export type ProductPage = (typeof pages)[number]
 export type Page = ProductPage | 'water' | 'rotations'
 export type Route = {
   page: Page
+  home?: boolean
+  setupId?: string
   planning?: boolean
   section?: AnalyticsSection
   strategyFocus?: StrategyFocus
@@ -43,11 +45,14 @@ export function canonicalRoute(route: Route): Route {
 export function parseRoute(address: string): Route {
   const url = new URL(address, 'https://field-shift.local')
   const path = url.pathname.replace(/^\/+|\/+$/g, '')
+  const explicit = path === 'onboarding' || path === 'water' || path === 'rotations' || pages.some(p => p === path)
+  const setup = path === 'onboarding' ? url.searchParams.get('setup') : null
+  const setupId = setup && /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(setup) ? setup : undefined
   const legacy = path === 'water' || path === 'rotations' ? path : undefined
   const hasMap = url.searchParams.get('layer') === 'ndvi_variability' || url.searchParams.get('layer') === 'terrain'
   const oldVegetation = path === 'fields' && url.searchParams.get('analysis') === 'vegetation' && !hasMap
   const initial: Route = {
-    page: legacy ?? (pages.find(p => p === path) ?? 'fields'),
+    page: legacy ?? (pages.find(p => p === path) ?? (path === 'onboarding' ? 'fields' : 'strategies')),
     ...(url.searchParams.get('planning') === '1' && legacy === 'rotations' ? { planning: true } : {}),
   }
   const target = canonicalRoute(initial)
@@ -61,6 +66,8 @@ export function parseRoute(address: string): Route {
       ? url.searchParams.get('job') || undefined : undefined,
     ...(target.section ? { section: target.section } : {}),
   }
+  if (!explicit) route.home = true
+  if (setupId) route.setupId = setupId
   const season = validSeason(url.searchParams.get('season'))
   if (season !== undefined) route.season = season
   const trajectory = identifier(url.searchParams.get('trajectory'))
@@ -88,10 +95,14 @@ export function parseRoute(address: string): Route {
   }
   return route
 }
+export function resolveHomeRoute(route: Route, hasFields: boolean): Route {
+  return route.home ? { ...route, page: hasFields ? 'strategies' : 'fields' } : route
+}
 export function routeAddress(intent: Route): string {
   const route = canonicalRoute(intent)
   const params = new URLSearchParams()
   if (route.page === 'analytics') params.set('section', route.section ?? 'overview')
+  if (route.setupId) params.set('setup', route.setupId)
   if (route.page === 'strategies' && route.strategyFocus) params.set('setup', route.strategyFocus)
   if (route.season !== undefined && Number.isInteger(route.season) && route.season >= 1900 && route.season <= 2200) params.set('season', String(route.season))
   if (identifier(route.trajectory)) params.set('trajectory', route.trajectory!)
@@ -111,5 +122,5 @@ export function routeAddress(intent: Route): string {
       if (route.mapFocus?.comparison) params.set('compare', '1')
     } else if (route.analysis) return routeAddress({ ...route, page: 'analytics', section: 'vegetation' })
   }
-  return '/' + route.page + (params.size ? '?' + params : '')
+  return '/' + (route.setupId ? 'onboarding' : route.home ? '' : route.page) + (params.size ? '?' + params : '')
 }

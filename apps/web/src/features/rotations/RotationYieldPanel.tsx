@@ -3,15 +3,18 @@ import { ArrowRightIcon } from '@heroicons/react/24/outline'
 import { api } from '../../api/client'
 import type { RotationPlan } from '../../api/contracts'
 import { CropIcon } from '../../shared/CropIcon'
+import { ContextHelp } from '../../shared/ContextHelp'
 import { useLocale } from '../../shared/locale'
 import { Empty, ErrorBox, Loading } from '../../shared/ui'
 import { useResource } from '../../shared/useResource'
 import { rotationPlanColors } from './RotationComparison'
+import { rotationHelp } from './rotationHelp'
 
 export function RotationYieldPanel({
   fieldId, season, plans,
 }: { fieldId: string; season: number; plans: RotationPlan[] }) {
-  const { t, crop, number } = useLocale()
+  const { t, crop, number, language } = useLocale()
+  const help = rotationHelp[language].yieldChange
   const load = useCallback((signal: AbortSignal) => api.rotationYield(fieldId, season, signal), [fieldId, season])
   const resource = useResource(load)
   const data = resource.data?.field_id === fieldId && resource.data.season === season ? resource.data : undefined
@@ -36,7 +39,9 @@ export function RotationYieldPanel({
     <section className="rotation-yield-section" aria-labelledby="rotation-yield-heading">
       <div className="section-heading">
         <div>
-          <h2 id="rotation-yield-heading">{t('Yield change')}</h2>
+          <div className="context-help-row"><h2 id="rotation-yield-heading">{t('Yield change')}</h2>
+            <ContextHelp label={help.title}><p>{help.description}</p></ContextHelp>
+          </div>
           <p>{t('Compared with continuous maize')}</p>
         </div>
         {data?.status === 'validated' && <span className="chip source-chip">{t('Field-validated model')}</span>}

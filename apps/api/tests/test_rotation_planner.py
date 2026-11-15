@@ -297,3 +297,27 @@ def test_truncated_candidates_cannot_prove_farm_quota_infeasible():
     complete = optimize(payload, fields)
     assert complete.status == "optimal"
     assert sum(row.area_ha for row in complete.assignments if row.crop == "Soy") >= 10
+
+
+@pytest.mark.parametrize("season_count", [1, 2, 6])
+def test_setup_crop_restrictions_survive_variable_horizons_and_bounded_generation(season_count):
+    scoped = field().model_copy(update={"allowed_crops": ["Soy", "Maize"]})
+    payload = request(
+        season_count=season_count,
+        require_two_crops=season_count > 1,
+        crops=[{"crop": "Soy"}, {"crop": "Maize"}, {"crop": "Sunflower", "preference": 10}],
+    )
+    result = optimize(payload, [scoped])
+    assert result.status == "optimal"
+    assert len(result.assignments) == season_count
+    assert {row.crop for row in result.assignments} <= {"Soy", "Maize"}
+    assert all("Allowed by the field setup" in row.reasons for row in result.assignments)
+    disallowed = payload.model_copy(
+        update={
+            "locked": [
+                CropDecision(field_id=scoped.id, season=payload.start_season, crop="Sunflower")
+            ]
+        }
+    )
+    rejected = optimize(disallowed, [scoped])
+    assert rejected.status == "infeasible" and not rejected.assignments

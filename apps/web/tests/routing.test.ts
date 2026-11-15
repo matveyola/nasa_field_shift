@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { pages, parseRoute, routeAddress } from '../src/app/routing.ts'
+import { pages, parseRoute, resolveHomeRoute, routeAddress } from '../src/app/routing.ts'
 
 test('five business destinations keep the assistant central', () => {
   assert.deepEqual(pages, ['fields', 'strategies', 'agent', 'analytics', 'farm'])
@@ -43,7 +43,7 @@ test('untrusted dates, horizons, sections and indices do not become map or forec
   const invalid = parseRoute('/fields?layer=terrain&observation=2026-02-30&index=untrusted&season=NaN&trajectory=%3Cscript%3E')
   assert.equal(invalid.mapFocus, undefined); assert.equal(invalid.season, undefined); assert.equal(invalid.trajectory, undefined)
   assert.equal(parseRoute('/analytics?section=untrusted').section, 'overview')
-  assert.equal(parseRoute('/unknown?field=&scenario=').page, 'fields')
+  assert.equal(parseRoute('/unknown?field=&scenario=').home, true)
   assert.equal(parseRoute('/rotations?season=2201').season, undefined)
 })
 test('agent alerts and setup links keep only their applicable intents', () => {
@@ -53,4 +53,25 @@ test('agent alerts and setup links keep only their applicable intents', () => {
   assert.equal(parseRoute('/strategies?setup=economics').strategyFocus, 'economics')
   assert.equal(parseRoute('/fields?setup=economics').strategyFocus, undefined)
   assert.equal(parseRoute('/fields?add=1').addField, true)
+})
+
+test('onboarding refresh preserves the setup and return field without becoming a planning setup', () => {
+  const id = 'fe1d4840-3928-4d02-8a09-67f883e0245b'
+  const address = '/onboarding?setup=' + id + '&field=F-03'
+  const route = parseRoute(address)
+  assert.equal(route.page, 'fields'); assert.equal(route.setupId, id)
+  assert.equal(routeAddress(route), address)
+  assert.equal(parseRoute('/fields?setup=' + id).setupId, undefined)
+  assert.equal(parseRoute('/onboarding?setup=invalid').setupId, undefined)
+})
+test('farm home leads to strategies while an empty farm starts with fields', () => {
+  const home = parseRoute('/?field=F-03&season=2028&scenario=less_rain')
+  assert.equal(home.home, true); assert.equal(routeAddress(home), '/?season=2028&field=F-03&scenario=less_rain')
+  assert.equal(resolveHomeRoute(home, true).page, 'strategies')
+  assert.equal(resolveHomeRoute(home, false).page, 'fields')
+  for (const page of pages) {
+    const explicit = parseRoute('/' + page + '?field=F-03')
+    assert.deepEqual(resolveHomeRoute(explicit, false), explicit)
+    assert.deepEqual(resolveHomeRoute(explicit, true), explicit)
+  }
 })

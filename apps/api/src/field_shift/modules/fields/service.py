@@ -14,6 +14,7 @@ from field_shift.errors import ConflictError, NotFoundError
 from field_shift.modules.farm.models import FARM_ID, Farm
 from field_shift.modules.fields.history import boundary_for_season, ensure_baseline, record_boundary
 from field_shift.modules.fields.models import Field, FieldPlanting
+from field_shift.modules.onboarding.profiles import completed_setup_inputs
 
 
 def require_field(session: Session, field_id: str) -> Field:
@@ -23,10 +24,23 @@ def require_field(session: Session, field_id: str) -> Field:
     return field
 
 
-def _field_read(field: Field, planting: FieldPlanting | None) -> FieldRead:
+def field_read(
+    field: Field,
+    *,
+    planting: FieldPlanting | None = None,
+    irrigation_available: bool | None = None,
+) -> FieldRead:
     return FieldRead.model_validate(field).model_copy(
-        update={"planting": FieldPlantingRead.model_validate(planting) if planting else None}
+        update={
+            "planting": FieldPlantingRead.model_validate(planting) if planting else None,
+            "irrigation_available": irrigation_available,
+        }
     )
+
+
+def _field_irrigation_override(session: Session, field_id: str) -> bool | None:
+    profile = completed_setup_inputs(session, (field_id,)).get(field_id)
+    return profile.irrigation if profile is not None else None
 
 
 def list_fields(session: Session) -> list[FieldRead]:
@@ -39,8 +53,16 @@ def list_fields(session: Session) -> list[FieldRead]:
         )
         .where(Field.farm_id == FARM_ID)
         .order_by(Field.id)
-    )
-    return [_field_read(field, planting) for field, planting in fields]
+    ).all()
+    profiles = completed_setup_inputs(session, (field.id for field, _ in fields))
+    return [
+        field_read(
+            field,
+            planting=planting,
+            irrigation_available=profiles[field.id].irrigation if field.id in profiles else None,
+        )
+        for field, planting in fields
+    ]
 
 
 def _lock_field(session: Session, field_id: str, boundary_revision: int) -> tuple[Field, int]:
@@ -59,7 +81,7 @@ def _lock_field(session: Session, field_id: str, boundary_revision: int) -> tupl
     return field, season
 
 
-def create_field(session: Session, payload: FieldCreate) -> Field:
+def create_field(session: Session, payload: FieldCreate, *, commit: bool = True) -> Field:
     sequence = session.execute(
         update(Farm)
         .where(Farm.id == FARM_ID)
@@ -80,7 +102,8 @@ def create_field(session: Session, payload: FieldCreate) -> Field:
     session.add(field)
     session.flush()
     record_boundary(session, field, field.season, field.geometry, field.area_ha, "created")
-    session.commit()
+    if commit:
+        session.commit()
     return field
 
 
@@ -123,7 +146,11 @@ def update_boundary(session: Session, field_id: str, payload: FieldBoundaryUpdat
             ):
                 raise ConflictError("The seasonal boundary would exclude a saved planted area.")
         field.geometry, field.area_ha, _ = boundary_for_season(session, field, season)
-    result = _field_read(field, session.get(FieldPlanting, (field.id, season)))
+    result = field_read(
+        field,
+        planting=session.get(FieldPlanting, (field.id, season)),
+        irrigation_available=_field_irrigation_override(session, field.id),
+    )
     session.commit()
     return result
 
@@ -151,6 +178,8 @@ def update_planting(
         planting.geometry = payload.geometry.model_dump(mode="json")
         planting.area_ha = area_hectares(footprint)
 
-    result = _field_read(field, planting)
+    result = field_read(
+        field, planting=planting, irrigation_available=_field_irrigation_override(session, field.id)
+    )
     session.commit()
     return result

@@ -14,6 +14,8 @@ export type PlanningRequest = {
 export type PlanningField = {
   id: string; name: string; area_ha: number; boundary_revision: number
   crop: string; crop_season: number; history: CropDecision[]
+  allowed_crops?: PlanningCrop[] | null
+  priority?: 'water' | 'soil' | 'low_change' | null
 }
 export type PlanningContext = {
   start_season: number; season_count: number; min_season_count: 1; max_season_count: 6; fields: PlanningField[]; crops: { crop: PlanningCrop; family: string }[]
