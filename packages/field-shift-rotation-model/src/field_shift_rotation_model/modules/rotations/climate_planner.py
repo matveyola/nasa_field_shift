@@ -38,7 +38,10 @@ from field_shift_rotation_model.modules.rotations.historical_fields import (
     SoilLayer,
     load_fields,
 )
-from field_shift_rotation_model.modules.rotations.hybrid_profiles import StageLengths
+from field_shift_rotation_model.modules.rotations.hybrid_profiles import (
+    StageLengths,
+    strategy_hybrids,
+)
 from field_shift_rotation_model.modules.rotations.marsden_defaults import MARSDEN_COORDINATES
 from field_shift_rotation_model.modules.rotations.rotation_agronomy import (
     AgronomySeason,
@@ -177,6 +180,14 @@ class ClimateSelection(ClimateChoice):
     planting_date: date
 
 
+def catalog_hybrid_choice(choice_id: str, preset: dict) -> ClimateChoice:
+    return ClimateChoice(
+        crop_id=preset["crop_id"],
+        choice_id=choice_id,
+        hybrid=DocumentedHybrid(name=preset["name"], source_url=preset["source"]),
+    )
+
+
 class ClimateContext(Input):
     field_id: Identifier | None = None
     field: ClimateLocation | None = None
@@ -224,9 +235,11 @@ def validate_planting(planting_date: date, *, strategy=False):
         raise ValueError(f"Choose a planting date from {first_year} to 2049.")
 
 
-def validate_history_dates(history, dates):
+def validate_history_dates(history, dates, *, allow_same_year=False):
     years = [day.year for day in dates]
-    if years != sorted(set(years)):
+    if allow_same_year and dates != sorted(set(dates)):
+        raise ValueError("Provide sowing dates in chronological order.")
+    if not allow_same_year and years != sorted(set(years)):
         raise ValueError("Provide decisions in chronological order, with one crop per year.")
     if len({row.season_year for row in history}) != len(history) or any(
         row.season_year >= years[0] for row in history
@@ -283,10 +296,12 @@ class ClimateStepRequest(ClimateContext):
         validate_history_dates(
             self.observed_crop_history,
             [*(p.planting_date for p in self.selected), self.planting_date],
+            allow_same_year=self.strategy_mode == "sequence",
         )
-        if len({choice.choice_id or choice.crop_id for choice in self.candidates}) != len(
-            self.candidates
-        ):
+        candidates = (
+            self.candidate_choices() if self.strategy_mode == "compare" else self.candidates
+        )
+        if len({choice.choice_id or choice.crop_id for choice in candidates}) != len(candidates):
             raise ValueError(
                 "Use distinct choice_id values when comparing options of the same crop."
             )
@@ -299,22 +314,44 @@ class ClimateStepRequest(ClimateContext):
         if self.strategy_mode == "sequence":
             if "candidates" in self.model_fields_set:
                 raise ValueError("A sequence uses the model's supported crop catalogue.")
-        elif (
-            self.selected
-            or len(self.candidates) != 2
-            or len({c.crop_id for c in self.candidates}) != 2
-        ):
-            raise ValueError("Compare two distinct crops without any previous scenario selections.")
-        for choice in (*self.selected, *self.candidates):
+        elif self.selected or len(self.candidates) != 2:
+            raise ValueError(
+                "Compare two distinct options without any previous scenario selections."
+            )
+        for choice in (*self.selected, *candidates):
             if choice.crop_id not in climate_balance.STRATEGY_CROPS:
                 raise ValueError(f"Unsupported strategy crop: {choice.crop_id}.")
-            if choice.stage_lengths is not None or choice.hybrid is not None:
+            if choice.stage_lengths is not None:
                 raise ValueError("Strategy crops use standard sourced calendars.")
+            if choice.choice_id not in (None, choice.crop_id) or choice.hybrid is not None:
+                preset = strategy_hybrids().get(choice.choice_id)
+                if (
+                    preset is None
+                    or preset["crop_id"] != choice.crop_id
+                    or choice.calendar_id is not None
+                    or choice.hybrid
+                    != DocumentedHybrid(name=preset["name"], source_url=preset["source"])
+                ):
+                    raise ValueError("Select a supported hybrid from the strategy catalogue.")
         return self
 
     def candidate_choices(self):
         if self.strategy_mode == "sequence":
-            return [ClimateChoice(crop_id=crop) for crop in climate_balance.STRATEGY_CROPS]
+            return [
+                *(ClimateChoice(crop_id=crop) for crop in climate_balance.STRATEGY_CROPS),
+                *(
+                    catalog_hybrid_choice(choice_id, preset)
+                    for choice_id, preset in strategy_hybrids().items()
+                ),
+            ]
+        if self.strategy_mode == "compare":
+            presets = strategy_hybrids()
+            return [
+                catalog_hybrid_choice(choice.crop_id, presets[choice.crop_id])
+                if choice.crop_id in presets and choice.model_fields_set == {"crop_id"}
+                else choice
+                for choice in self.candidates
+            ]
         return self.candidates
 
 
@@ -579,6 +616,7 @@ def candidate_result(inputs, choice, planting_date, raw, history, irrigation=Non
         candidate=proposed_season(choice, planting_date, end),
         region_code=inputs.details["agronomy_region_code"],
         country_code=inputs.details["country_code"],
+        allow_same_year=irrigation is not None,
     )
     erosion = summarize_soil(PlanSoilInputs(erosion=choice.erosion), planting_date, planting_date)
     season_agronomy = agronomy.candidate
@@ -774,7 +812,9 @@ def step(request: ClimateStepRequest) -> dict:
                 candidate["reason"] = (
                     "The crop did not complete a viable thermal cycle in all members."
                 )
-            if calendar := candidate.get("phenology", {}).get("calendar_id"):
+            if candidate["choice"].get("hybrid") is None and (
+                calendar := candidate.get("phenology", {}).get("calendar_id")
+            ):
                 candidate["choice"]["calendar_id"] = calendar
     ranking = rank(request, candidates, "choice_id", irrigation)
     output = output_context(inputs, result) | {
@@ -784,7 +824,11 @@ def step(request: ClimateStepRequest) -> dict:
         "selected": request.selected,
         "selected_water_by_scenario": selected_cases,
         "has_next_step_after_selection": len(request.selected) + 1 < maximum_steps
-        and request.planting_date.year < 2049,
+        and (
+            request.planting_date < date(2049, 7, 31)
+            if is_strategy
+            else request.planting_date.year < 2049
+        ),
         "candidates": candidates,
         "ranking": ranking,
         "top_candidates": [

@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from functools import lru_cache
 from importlib.resources import files
+from json import loads
 from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
@@ -75,6 +76,21 @@ def _load_catalog() -> dict[str, ForecastCrop]:
 
 def crop_catalog() -> list[ForecastCrop]:
     return list(_load_catalog().values())
+
+
+@lru_cache(maxsize=1)
+def strategy_hybrids() -> dict:
+    resource = files(__package__).joinpath("artifacts", "strategy-hybrids.json")
+    return {
+        choice_id: {
+            **{key: value for key, value in source.items() if key != "hybrids"},
+            "name": name,
+            "flowering_gdd": flowering,
+            "maturity_gdd": maturity,
+        }
+        for source in loads(resource.read_text(encoding="utf-8")).values()
+        for choice_id, (name, flowering, maturity) in source["hybrids"].items()
+    }
 
 
 def resolve_profile(

@@ -22,6 +22,7 @@ export interface HandoffCrop {
     [key: string]: unknown
   }
 }
+export type HandoffHybrid = { choice_id: string; crop_id: string; name: string; source_url: string }
 export interface HandoffCatalog {
   status: 'available' | 'unavailable'
   engine_version: string
@@ -29,6 +30,7 @@ export interface HandoffCatalog {
   empirical_status: 'not_validated'
   operations: HandoffOperation[]
   crops: HandoffCrop[]
+  strategy_hybrids?: HandoffHybrid[]
   request_schemas: Record<string, unknown>
   equipment?: Array<{ id: string; name: string; purpose: string }>
   cultivar_references?: Array<Record<string, unknown>>
@@ -65,7 +67,7 @@ export interface HandoffJob {
 export type StrategyMode = 'sequence' | 'compare'
 export type StrategyPriority = 'water_stress' | 'water_deficit' | 'water_saving' | 'yield' | 'revenue' | 'revenue_after_seed' | 'soil_cover'
 export type StrategyIrrigation = { status: 'unknown' | 'none' | 'available'; daily_m3?: number; method?: string }
-export type StrategyChoice = { job_id: string; crop_id: string }
+export type StrategyChoice = { job_id: string; crop_id: string; choice_id?: string | null }
 export type StrategyContext = {
   field_id: string; geometry_revision: number; area_ha: number
   min_year: number; max_year: number; min_month: number; max_month: number; max_steps: number; max_calendar_years: number
@@ -79,9 +81,23 @@ export type StrategySubmission = {
 }
 export type StrategyCandidate = {
   crop_id: string; choice_id?: string; rank: number | null; status: 'ok' | 'unsupported' | 'unavailable'; reason?: string | null
+  choice?: { hybrid?: { name: string; source_url: string } | null }
   warnings?: string[]; blockers?: string[]
   water?: Record<string, number | null>; economics?: Record<string, unknown>
-  agronomy?: Record<string, unknown>; scenarios?: Record<string, unknown>; erosion?: Record<string, unknown>
+  agronomy?: Record<string, unknown>; scenarios?: Record<string, StrategyWeatherScenario>; erosion?: Record<string, unknown>
+}
+type StrategyWeatherScenario = {
+  end_date?: string
+  modeled_flowering_on?: string | null
+  fallow_days_before_planting?: number | null
+  recharged_to_80pct_after_previous_end_on?: string | null
+  post_crop_recharge?: {
+    target_reached_on?: string | null
+    target_available_water_pct?: number
+    days_after_modeled_crop_end?: number | null
+    searched_through?: string
+    status?: string
+  }
 }
 export type StrategyScenario = {
   id: string; field_id: string; geometry_revision: number; created_at: string

@@ -6,6 +6,7 @@ import hashlib
 from collections import defaultdict
 from contextlib import contextmanager
 from datetime import date, timedelta
+from functools import cache
 from itertools import pairwise
 from math import floor, fsum, isfinite
 from pathlib import Path
@@ -13,7 +14,7 @@ from statistics import mean
 from threading import Lock
 from types import SimpleNamespace
 
-from .hybrid_profiles import crop_catalog, resolve_profile
+from .hybrid_profiles import crop_catalog, resolve_profile, strategy_hybrids
 from .supplied_balance import BalanceDay, summarize_days
 
 
@@ -50,7 +51,7 @@ STRATEGY_PROFILES = {
 }
 STRATEGY_CROPS = SUPPORTED_CROPS + tuple(STRATEGY_PROFILES)
 MAX_STRATEGY_STEPS = 6
-MAX_STRATEGY_CANDIDATES = 10
+MAX_STRATEGY_CANDIDATES = len(STRATEGY_CROPS) + len(strategy_hybrids())
 _ENGINE_LOCK = Lock()
 
 
@@ -96,7 +97,9 @@ def required_weather_dates(planting_date, selected=(), *, strategy=False):
     dates = [_as_date(row.get("planting_date")) for row in selected] + [_as_date(planting_date)]
     if any(not (3 <= day.month <= 7) for day in dates):
         raise ClimateBalanceError("This mode supports March through July sowing.")
-    if any(later.year <= earlier.year for earlier, later in pairwise(dates)):
+    if strategy and any(later <= earlier for earlier, later in pairwise(dates)):
+        raise ClimateBalanceError("Sowing dates must be in ascending order.")
+    if not strategy and any(later.year <= earlier.year for earlier, later in pairwise(dates)):
         raise ClimateBalanceError("Use one sowing per year, in ascending order.")
     if strategy and dates[-1].year - dates[0].year > 9:
         raise ClimateBalanceError("Strategy decisions may span up to ten calendar years.")
@@ -237,18 +240,29 @@ def _local_phenology(engine, historical_temperatures):
     """Ruslan stores crop definitions and temperature calibration at module scope."""
     originals = engine.crops.CROPS.copy()
     original_temperatures = engine.weather._NORMALS
+    calibrate = engine.crops.thermal_stages
+    hybrid_thresholds = {}
+
+    @cache
+    def thermal_stages(key):
+        return hybrid_thresholds[key] if key in hybrid_thresholds else calibrate(key)
+
     engine.weather.set_normals(historical_temperatures)
     engine.crops.reset_calibration()
+    engine.crops.thermal_stages = thermal_stages
     try:
-        yield
+        yield hybrid_thresholds
     finally:
+        engine.crops.thermal_stages = calibrate
         engine.crops.CROPS.clear()
         engine.crops.CROPS.update(originals)
         engine.weather.set_normals(original_temperatures)
         engine.crops.reset_calibration()
 
 
-def _crop_record(engine, catalogue, choice, day, depth, tag, *, strategy=False):
+def _crop_record(
+    engine, catalogue, choice, day, depth, tag, *, strategy=False, hybrid_thresholds=None
+):
     crop_id = choice.get("crop_id")
     parameters = THERMAL_PARAMETERS.get(crop_id)
     thermal_source = None
@@ -259,6 +273,7 @@ def _crop_record(engine, catalogue, choice, day, depth, tag, *, strategy=False):
     if parameters is None:
         raise ClimateBalanceError(f"No supported spring/summer thermal profile for {crop_id!r}.")
     base, cap, thermal_reference, cover_class, proxy = parameters
+    hybrid = strategy_hybrids().get(choice.get("choice_id")) if strategy else None
     profile = catalogue[crop_id]
     stage_lengths = choice.get("stage_lengths")
     calendar_id = choice.get("calendar_id")
@@ -274,6 +289,21 @@ def _crop_record(engine, catalogue, choice, day, depth, tag, *, strategy=False):
         else choice.get("stage_lengths_source") or "User-supplied durations (source not provided)"
     )
     thermal_source = thermal_source or f"{AQUACROP} (Annex {thermal_reference})"
+    flowering = None
+    if hybrid:
+        base, cap = hybrid["base_c"], hybrid["cap_c"]
+        flowering = hybrid["flowering_gdd"]
+        maturity = hybrid["maturity_gdd"]
+        thermal_source = hybrid["source"]
+        initial, development, mid, late = resolved.stage_lengths
+        # The sources anchor flowering and maturity. Split the intervals with the
+        # corresponding FAO-56 calendar proportions for the water-use curve.
+        hybrid_thresholds[f"field_shift_climate_{tag}"] = (
+            round(flowering * initial / (initial + development), 2),
+            flowering,
+            round(flowering + (maturity - flowering) * mid / (mid + late), 2),
+            maturity,
+        )
     val = engine.crops.Val
     omitted = val(None, "Outside the water balance outputs.")
     user_date = val((day.month, day.day), "Supplied sowing date")
@@ -300,7 +330,9 @@ def _crop_record(engine, catalogue, choice, day, depth, tag, *, strategy=False):
         planting=user_date,
         planting_range=val((mmdd, mmdd), "Supplied sowing date"),
         end_event=val("harvest", "Season termination per Ruslan model"),
-        flowering=omitted,
+        flowering=val({"method": "gdd", "gdd_c": flowering, "window_days": 1}, thermal_source)
+        if hybrid
+        else omitted,
         sensitive_phase=omitted,
         heat_threshold_c=omitted,
         legume=val(crop_id in {"soybeans", "peas_dry"}, "Botany"),
@@ -317,7 +349,11 @@ def _crop_record(engine, catalogue, choice, day, depth, tag, *, strategy=False):
         )
     return record, {
         "calendar_id": calendar_id,
-        "calendar_kind": "reference_proxy" if calendar else "supplied_durations",
+        "calendar_kind": "hybrid_thermal_reference"
+        if hybrid
+        else "reference_proxy"
+        if calendar
+        else "supplied_durations",
         "reference_region": calendar.reference_region if calendar else None,
         "reference_planting_months": calendar.reference_planting_months if calendar else None,
         "stage_lengths_days": resolved.stage_lengths,
@@ -325,6 +361,7 @@ def _crop_record(engine, catalogue, choice, day, depth, tag, *, strategy=False):
         "base_temperature_c": base,
         "cap_temperature_c": cap,
         "thermal_source": thermal_source,
+        **({"hybrid_thermal_reference": hybrid} if hybrid else {}),
         "calibrated_stage_end_degree_days_c": thresholds,
         "root_depth_m": maximum_root,
         "root_depth_source": profile.root_depth_source_url,
@@ -421,15 +458,29 @@ def _season_result(planting, earlier_planting, next_planting, simulated, capacit
     after_end = next(
         (
             day
-            for day in _date_range(end + timedelta(days=1), recharge_end)
+            for day in _date_range(end if strategy else end + timedelta(days=1), recharge_end)
             if simulated[day].profile_mm >= 0.8 * capacity
         ),
         None,
+    )
+    flowering = planting.crop.flowering.value if strategy else None
+    flowering_on = (
+        next(
+            (
+                day.isoformat()
+                for day in _date_range(sowing, end)
+                if planting.thermal(day) >= flowering["gdd_c"]
+            ),
+            None,
+        )
+        if flowering and flowering["method"] == "gdd"
+        else None
     )
     return {
         "crop_id": planting.crop.name_en,
         "planting_date": sowing.isoformat(),
         "end_date": end.isoformat(),
+        **({"modeled_flowering_on": flowering_on} if flowering else {}),
         "end_reason": planting.end_reason,
         "end_date_is_estimated": True,
         "previous_end_date": previous_end.isoformat() if previous_end else None,
@@ -529,7 +580,6 @@ def compare_candidates(
         or not all(isinstance(key, str) and key for key in candidate_ids)
         or not all(isinstance(key, str) and key for key in choice_ids)
         or len(set(choice_ids)) != len(choice_ids)
-        or (strategy and len(set(candidate_ids)) != len(candidate_ids))
     ):
         raise ClimateBalanceError(f"Supply one to {limit} unique candidate choices.")
     temperatures, historical = _historical_reference(historical_weather, latitude, longitude)
@@ -554,7 +604,7 @@ def compare_candidates(
         member_temperatures = {
             key: {day.date: (day.tmax, day.tmin) for day in wx} for key, wx in weather.items()
         }
-        with _local_phenology(engine, temperatures):
+        with _local_phenology(engine, temperatures) as hybrid_thresholds:
             prior = []
             prior_profiles = []
             for index, choice in enumerate(selected):
@@ -568,6 +618,7 @@ def compare_candidates(
                         soil_depth,
                         f"previous_{index}",
                         strategy=strategy,
+                        hybrid_thresholds=hybrid_thresholds,
                     )
                 except ValueError as error:
                     raise ClimateBalanceError(f"Invalid selected crop at {day}: {error}") from error
@@ -590,6 +641,7 @@ def compare_candidates(
                         soil_depth,
                         f"candidate_{index}",
                         strategy=strategy,
+                        hybrid_thresholds=hybrid_thresholds,
                     )
                     scenarios = {}
                     replayed_selected = {}
@@ -597,6 +649,8 @@ def compare_candidates(
                         candidate = _plantings(
                             [(record, planting_date)], member_temperatures[key], engine
                         )[0]
+                        if prior_plantings[key] and prior_plantings[key][-1].end >= planting_date:
+                            raise ClimateBalanceError("Sowing overlaps the previous modeled crop.")
                         plantings = [*prior_plantings[key], candidate]
                         results = _scenario_rows(
                             plantings,
@@ -609,7 +663,12 @@ def compare_candidates(
                         )
                         replayed_selected[key], scenarios[key] = results[:-1], results[-1]
                     selected_scenarios = replayed_selected
-                    minimum_next = date(planting_date.year + 1, 3, 1)
+                    minimum_next = (
+                        max(_as_date(row["end_date"]) for row in scenarios.values())
+                        + timedelta(days=1)
+                        if strategy
+                        else date(planting_date.year + 1, 3, 1)
+                    )
                     output.append(
                         {
                             "crop_id": crop_id,
@@ -685,7 +744,10 @@ def compare_candidates(
             ),
             "planting_scope": (
                 "Northern Hemisphere spring/summer crops only, March–July "
-                "planting, one crop per calendar year."
+                "planting. In Strategies, successive crops must not overlap."
+                if strategy
+                else "Northern Hemisphere spring/summer crops only, March–July planting, "
+                "one crop per calendar year."
             ),
             "crop_end": (
                 "Thermal maturity or Ruslan’s generic September-onward killing "

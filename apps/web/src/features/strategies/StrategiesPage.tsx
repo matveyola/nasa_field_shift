@@ -14,7 +14,7 @@ export function StrategiesPage({ field, fields, chooseField }: {
   const text = (en: string, ua: string) => language === 'uk' ? ua : en
   const [tab, setTab] = useState<StrategyTab>('date')
   const buttons = useRef<Partial<Record<StrategyTab, HTMLButtonElement>>>({})
-  const labels = { date: text('Sowing date', 'Дата сівби'), scenarios: text('Scenarios', 'Сценарії') }
+  const labels = { date: text('Quick crop comparison', 'Швидке порівняння культур'), scenarios: text('Crop rotations', 'Сівозміни') }
 
   function navigate(event: KeyboardEvent<HTMLButtonElement>, current: StrategyTab) {
     let next: StrategyTab

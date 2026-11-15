@@ -39,7 +39,9 @@ _CROP_IDS = {
 _UNKNOWN_CROPS = {"", "unknown", "unspecified"}
 _SNAPSHOT_METRICS = (
     "choice_id",
+    "choice",
     "crop_id",
+    "phenology",
     "status",
     "rank",
     "water",
@@ -179,13 +181,14 @@ def job_choice(session, field, decision):
     result = (job.result or {}).get("envelope", {})
     payload = result.get("payload", {})
     options = set(payload.get("ranking", {}).get("selection_ids", []))
+    choice_id = decision.choice_id or decision.crop_id
     candidate = next(
-        (row for row in payload.get("candidates", []) if row.get("choice_id") == decision.crop_id),
+        (row for row in payload.get("candidates", []) if row.get("choice_id") == choice_id),
         None,
     )
     if (
         result.get("status") != "available"
-        or decision.crop_id not in options
+        or choice_id not in options
         or candidate is None
         or candidate.get("choice", {}).get("crop_id") != decision.crop_id
     ):
@@ -204,7 +207,7 @@ def decision_chain(session, field, decisions):
         ):
             raise HTTPException(409, "The selected steps do not form the same scenario")
         records.append((job, candidate))
-        prefix.append(decision.model_dump(mode="json"))
+        prefix.append(decision.model_dump(mode="json", exclude_none=True))
     return records
 
 
@@ -217,8 +220,17 @@ def submit(session, principal, field_id, body):
         for job, candidate in records
     ]
     sowing = body.planting_date.isoformat()
-    if selected and int(selected[-1]["planting_date"][:4]) >= body.planting_date.year:
-        raise HTTPException(422, "The model supports one sowing per year in ascending order")
+    if selected:
+        previous_end = max(
+            (
+                scenario["end_date"]
+                for scenario in records[-1][1].get("scenarios", {}).values()
+                if scenario.get("end_date")
+            ),
+            default=selected[-1]["planting_date"],
+        )
+        if sowing <= previous_end:
+            raise HTTPException(422, "Sow after the previous crop ends in all scenarios")
     first_sowing = (
         date.fromisoformat(selected[0]["planting_date"]) if selected else body.planting_date
     )
@@ -251,7 +263,7 @@ def submit(session, principal, field_id, body):
         },
     }
     if body.comparison_crops is not None:
-        parameters["candidates"] = [{"crop_id": crop} for crop in body.comparison_crops]
+        parameters["candidates"] = [{"crop_id": option} for option in body.comparison_crops]
     return service.submit(
         session,
         principal,
@@ -266,7 +278,9 @@ def submit(session, principal, field_id, body):
         strategy={
             "mode": body.mode,
             "settings": settings,
-            "previous": [decision.model_dump(mode="json") for decision in body.previous],
+            "previous": [
+                decision.model_dump(mode="json", exclude_none=True) for decision in body.previous
+            ],
         },
     )
 
@@ -293,7 +307,9 @@ def save(session, principal, field_id, body):
     settings = records[0][0].inputs["strategy"]["settings"]
     if len(records) != settings["step_count"]:
         raise HTTPException(422, "Complete all steps before saving a scenario")
-    fingerprint = service.digest([choice.model_dump(mode="json") for choice in body.choices])
+    fingerprint = service.digest(
+        [choice.model_dump(mode="json", exclude_none=True) for choice in body.choices]
+    )
     existing = select(StrategyScenario).where(
         StrategyScenario.field_id == field.id,
         StrategyScenario.geometry_revision == field.boundary_revision,
@@ -323,6 +339,7 @@ def save(session, principal, field_id, body):
             SavedChoice(
                 job_id=job.id,
                 crop_id=decision.crop_id,
+                choice_id=decision.choice_id,
                 planting_date=job.inputs["parameters"]["planting_date"],
                 metrics={key: candidate[key] for key in _SNAPSHOT_METRICS if key in candidate},
             )

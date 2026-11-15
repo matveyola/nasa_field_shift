@@ -100,6 +100,8 @@
 }
 
 .strategy-form, .strategy-flow, .strategy-result { display: grid; gap: 14px; min-width: 0; }
+.strategy-input-control { display: grid; gap: 8px; min-width: 0; flex: 1 1 160px; }
+.strategy-input-control .context-help-row > label { flex: 0 1 auto; }
 .strategies-workflows.strategy-modes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .strategy-form > .button, .strategy-result > .button { justify-self: start; }
 .strategy-result > h3, .strategy-flow > p, .strategy-result > p { margin: 0; }

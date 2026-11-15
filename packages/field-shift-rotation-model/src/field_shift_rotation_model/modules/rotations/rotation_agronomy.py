@@ -370,7 +370,9 @@ def _assess_season(
     if last_same:
         assessment.previous_same_crop_season_year = last_same.season_year
         assessment.same_crop_return_interval_years = season.season_year - last_same.season_year
-        assessment.intervening_calendar_seasons = assessment.same_crop_return_interval_years - 1
+        assessment.intervening_calendar_seasons = max(
+            0, assessment.same_crop_return_interval_years - 1
+        )
     if previous is not None:
         assessment.previous_crop_season_year = previous.season_year
         assessment.previous_crop_harvest_date = previous.harvest_date
@@ -432,14 +434,26 @@ def assess_rotation_agronomy(
     candidate: AgronomySeason | None = None,
     region_code: str | None = None,
     country_code: str | None = None,
+    allow_same_year: bool = False,
 ) -> AgronomyAssessment:
-    """Assess one record per season, using only earlier records for comparisons."""
-    ordered = sorted(history, key=lambda row: row.season_year)
+    """Assess each growing season using only earlier records for comparisons."""
+    ordered = sorted(history, key=lambda row: (row.season_year, row.planting_date or date.min))
     history_years = {row.season_year for row in ordered}
-    if len(history_years) != len(ordered):
+    if not allow_same_year and len(history_years) != len(ordered):
         raise ValueError("Crop history supports one record per season_year.")
-    if candidate is not None and ordered and candidate.season_year <= ordered[-1].season_year:
-        raise ValueError("The candidate must follow the selected history.")
+    timeline = [*ordered, candidate] if candidate is not None else ordered
+    for earlier, later in zip(timeline, timeline[1:]):
+        if earlier.season_year < later.season_year:
+            continue
+        if (
+            allow_same_year
+            and earlier.season_year == later.season_year
+            and earlier.planting_date is not None
+            and later.planting_date is not None
+            and earlier.planting_date < later.planting_date
+        ):
+            continue
+        raise ValueError("Growing seasons must have distinct, chronological sowing dates.")
 
     region_code = region_code.upper().strip() if region_code else None
     country_code = country_code.upper().strip() if country_code else None

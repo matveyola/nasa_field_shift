@@ -121,6 +121,13 @@ class EquipmentCapability(Input):
     purpose: str
 
 
+class StrategyHybridCapability(Input):
+    choice_id: str
+    crop_id: str
+    name: str
+    source_url: str
+
+
 class HandoffCatalog(Input):
     status: Literal["available", "unavailable"]
     engine_version: str
@@ -128,6 +135,7 @@ class HandoffCatalog(Input):
     empirical_status: Literal["not_validated"] = "not_validated"
     operations: list[Operation]
     crops: list[CropCapability]
+    strategy_hybrids: list[StrategyHybridCapability] = Field(default_factory=list)
     request_schemas: dict[str, Any]
     equipment: list[EquipmentCapability] = Field(default_factory=list)
     cultivar_references: list[dict[str, Any]] = Field(default_factory=list)

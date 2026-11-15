@@ -62,6 +62,7 @@ class Irrigation(Input):
 class Decision(Input):
     job_id: str = Field(min_length=1, max_length=36)
     crop_id: CropId
+    choice_id: CropId | None = None
 
 
 class StrategyRun(Input):
@@ -72,7 +73,9 @@ class StrategyRun(Input):
     step_count: int = Field(ge=1, le=MAX_STEPS)
     priority: Priority
     previous: list[Decision] = Field(default_factory=list, max_length=MAX_STEPS - 1)
-    comparison_crops: tuple[CropId, CropId] | None = None
+    comparison_crops: tuple[CropId, CropId] | None = Field(
+        default=None, description="Two distinct crop IDs or supported hybrid choice IDs."
+    )
     history_crop_id: CropId | None = None
     history_sowing_date: date | None = None
     irrigation: Irrigation = Field(default_factory=Irrigation)
@@ -89,11 +92,9 @@ class StrategyRun(Input):
                 or self.comparison_crops is None
                 or len(set(self.comparison_crops)) != 2
             ):
-                raise ValueError("Compare exactly two distinct crops on one sowing date")
+                raise ValueError("Compare exactly two distinct options on one sowing date")
         elif self.comparison_crops is not None or len(self.previous) >= self.step_count:
             raise ValueError("A sequence predicts only its next unselected step")
-        if planting.year + self.step_count - len(self.previous) - 1 > MAX_YEAR:
-            raise ValueError("The remaining steps exceed the supported climate horizon")
         return self
 
 

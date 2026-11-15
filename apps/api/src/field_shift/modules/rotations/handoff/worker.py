@@ -73,16 +73,63 @@ def validate_snapshot(lease, snapshot):
         raise HandoffInvalid("Acquired evidence differs from the bound field request")
 
 
+def previous_evidence(session, lease, decision_date):
+    strategy = lease.inputs.get("strategy", {})
+    if lease.inputs["operation"] != "climate_step" or strategy.get("mode") not in {
+        "sequence",
+        "compare",
+    }:
+        return None
+    year = lease.inputs["parameters"]["planting_date"][:4]
+    # These weather files cover the full calendar year. Recalculations on this
+    # boundary can reuse captured bytes, even when the farmer edits a sowing day.
+    same_year = session.scalar(
+        select(Job)
+        .where(
+            Job.status == JobStatus.SUCCEEDED,
+            Job.field_id == lease.field_id,
+            Job.inputs["farm_id"].as_integer() == lease.inputs["farm_id"],
+            Job.inputs["geometry_sha256"].as_string() == lease.inputs["geometry_sha256"],
+            Job.matches_boundary_revision(lease.boundary_revision),
+            Job.inputs["operation"].as_string() == "climate_step",
+            Job.inputs["strategy"]["mode"].as_string().in_(("sequence", "compare")),
+            Job.inputs["parameters"]["planting_date"].as_string().like(f"{year}-%"),
+            Job.result["evidence"]["decision_date"].as_string() == decision_date,
+        )
+        .order_by(Job.created_at.desc())
+        .limit(1)
+    )
+    if same_year is not None:
+        return same_year.result["evidence"]
+    previous = strategy.get("previous")
+    if not previous:
+        return None
+    job = session.get(Job, previous[-1]["job_id"])
+    if (
+        job is None
+        or job.status != JobStatus.SUCCEEDED
+        or job.field_id != lease.field_id
+        or job.boundary_revision != lease.boundary_revision
+        or job.inputs.get("geometry_sha256") != lease.inputs["geometry_sha256"]
+        or job.inputs.get("farm_id") != lease.inputs["farm_id"]
+    ):
+        return None
+    evidence = (job.result or {}).get("evidence")
+    return evidence if evidence and evidence.get("decision_date") == decision_date else None
+
+
 def execute(factory, lease, client=None):
     if get_job_settings().task_time_limit_seconds < 115:
         raise InvalidModelInput(
             "Rotation execution requires a worker task bound of at least 115 seconds"
         )
     client = client or HandoffClient(correlation_id=lease.job_id)
+    decision_date = datetime.now(UTC).date().isoformat()
     with factory() as session:
         current_field(session, lease)
         job = session.get(Job, lease.job_id)
         snapshot = (job.result or {}).get("evidence")
+        reusable = previous_evidence(session, lease, decision_date) if snapshot is None else None
     try:
         if snapshot is None:
             snapshot = client.call(
@@ -92,7 +139,8 @@ def execute(factory, lease, client=None):
                     "parameters": lease.inputs["parameters"],
                     "allow_public_data": lease.inputs["allow_public_data"],
                     "land_status": lease.inputs.get("land_status", "unknown"),
-                    "decision_date": datetime.now(UTC).date().isoformat(),
+                    "decision_date": decision_date,
+                    **({"previous_evidence": reusable} if reusable is not None else {}),
                 },
             )
             validate_snapshot(lease, snapshot)

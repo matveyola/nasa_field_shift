@@ -115,20 +115,22 @@ def strategy_request(**changes):
     )
 
 
-def finish_strategy_step(session, job_id, crop):
+def finish_strategy_step(session, job_id, crop, *, variant=None, end=None):
     """Supply a synthetic private result; these tests cover application policy only."""
     job = session.get(Job, job_id)
     job.status = JobStatus.SUCCEEDED
+    choice_id = variant["choice_id"] if variant else crop
     job.result = {
         "envelope": {
             "status": "available",
             "limitations": ["Conditional climate scenario"],
             "payload": {
-                "ranking": {"selection_ids": [crop]},
+                "ranking": {"selection_ids": [choice_id]},
                 "candidates": [
                     {
-                        "choice_id": crop,
-                        "choice": {"crop_id": crop, "calendar_id": "C01"},
+                        "choice_id": choice_id,
+                        "choice": {"crop_id": crop} | (variant or {"calendar_id": "C01"}),
+                        "scenarios": {"reference": {"end_date": end}} if end else {},
                         "water": {"water_deficit_pct": 12},
                         "economics": {"revenue_after_seed_per_ha": None},
                     }
@@ -208,6 +210,54 @@ def test_strategy_replays_owned_choices_and_saves_only_explicit_completion(facto
         assert not strategy.list_saved(session, OWNER, "F-01")
         with pytest.raises(HTTPException, match="boundary changed"):
             strategy.save(session, OWNER, "F-01", confirmed)
+
+
+def test_strategy_preserves_selected_hybrid_and_allows_same_year_after_harvest(factory):
+    variant = {
+        "choice_id": "maize-p0987amx",
+        "hybrid": {
+            "name": "Pioneer P0987AMX",
+            "source_url": "https://www.mdpi.com/2072-4292/14/2/394",
+        },
+    }
+    with factory.begin() as session:
+        first = strategy.submit(session, OWNER, "F-01", strategy_request())
+        finish_strategy_step(
+            session, first.job_id, "maize_grain", variant=variant, end="2040-07-11"
+        )
+    choice = {"job_id": first.job_id, "crop_id": "maize_grain", "choice_id": variant["choice_id"]}
+    with factory.begin() as session:
+        with pytest.raises(HTTPException, match="after the previous crop ends"):
+            strategy.submit(
+                session,
+                OWNER,
+                "F-01",
+                strategy_request(
+                    request_id="overlap", planting_date="2040-07-11", previous=[choice]
+                ),
+            )
+        second = strategy.submit(
+            session,
+            OWNER,
+            "F-01",
+            strategy_request(request_id="second", planting_date="2040-07-12", previous=[choice]),
+        )
+        assert session.get(Job, second.job_id).inputs["parameters"]["selected"] == [
+            {"crop_id": "maize_grain", "planting_date": "2040-04-15"} | variant
+        ]
+        finish_strategy_step(session, second.job_id, "soybeans")
+    with factory() as session:
+        saved = strategy.save(
+            session,
+            OWNER,
+            "F-01",
+            SaveStrategy(
+                geometry_revision=2,
+                choices=[choice, {"job_id": second.job_id, "crop_id": "soybeans"}],
+            ),
+        )
+        assert saved.choices[0].choice_id == variant["choice_id"]
+        assert saved.choices[0].metrics["choice"]["hybrid"] == variant["hybrid"]
 
 
 def test_strategy_queues_without_a_passport_or_known_crop(factory):

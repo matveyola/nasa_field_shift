@@ -14,7 +14,7 @@ from .modules.rotations import (
 )
 from .modules.rotations.equipment import EQUIPMENT
 from .modules.rotations.historical_fields import load_fields
-from .modules.rotations.hybrid_profiles import crop_catalog
+from .modules.rotations.hybrid_profiles import crop_catalog, strategy_hybrids
 from .modules.rotations.rotation_agronomy import cultivar_references
 from .network import canonical, evidence_session
 from .replay_sutherland_2026_28 import run_sutherland_2027
@@ -141,6 +141,15 @@ def catalog():
             for c in crop_catalog()
         ],
         "request_schemas": {k: v.model_json_schema() for k, v in SCHEMAS.items()},
+        "strategy_hybrids": [
+            {
+                "choice_id": key,
+                "crop_id": row["crop_id"],
+                "name": row["name"],
+                "source_url": row["source"],
+            }
+            for key, row in strategy_hybrids().items()
+        ],
         "equipment": [row.model_dump(mode="json") for row in EQUIPMENT],
         "cultivar_references": [row.model_dump(mode="json") for row in cultivar_references()],
         "limitations": LIMITATIONS,
@@ -176,12 +185,48 @@ def calculate(operation, parameters, decision_date):
     return result.model_dump(mode="json") if hasattr(result, "model_dump") else result
 
 
+def previous_records(document, decision_date):
+    previous = document.get("previous_evidence")
+    parameters = document["parameters"]
+    if (
+        not isinstance(previous, dict)
+        or document["operation"] != "climate_step"
+        or parameters.get("strategy_mode") not in {"sequence", "compare"}
+        or previous.get("operation") != "climate_step"
+        or previous.get("decision_date") != decision_date
+        or previous.get("source_commit") != SOURCE_COMMIT
+    ):
+        return None
+    old_parameters = previous.get("parameters", {})
+    old_planting = old_parameters.get("planting_date", "")
+    current_planting = parameters.get("planting_date", "")
+    selected = parameters.get("selected") or []
+    if not old_planting or (
+        old_planting[:4] != current_planting[:4]
+        and (not selected or old_planting != selected[-1].get("planting_date"))
+    ):
+        return None
+    if (
+        old_parameters.get("strategy_mode") not in {"sequence", "compare"}
+        or old_parameters.get("field") != parameters.get("field")
+        or digest({k: v for k, v in previous.items() if k != "evidence_sha256"})
+        != previous.get("evidence_sha256")
+    ):
+        return None
+    # Requests are reused only for an identical URL, method and body. Captured bytes
+    # retain their original timestamps and are validated by the evidence session.
+    return previous.get("records")
+
+
 def acquire(document):
     # Current acquisition only: never present today's revised inputs as a vintage forecast.
     today = datetime.now(UTC).date()
     if document["decision_date"] != today.isoformat():
         raise ValueError("New public acquisition requires the actual current UTC decision date")
-    with evidence_session(acquire=document.get("allow_public_data", False)) as session:
+    with evidence_session(
+        acquire=document.get("allow_public_data", False),
+        records=previous_records(document, today.isoformat()),
+    ) as session:
         with collect_forecast_diagnostics() as diagnostics:
             preview = calculate(document["operation"], document["parameters"], today)
     if document["operation"] in {"climate_step", "climate_compare", "sutherland_2027"}:

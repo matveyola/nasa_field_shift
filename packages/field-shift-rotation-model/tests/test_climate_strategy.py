@@ -9,7 +9,7 @@ from field_shift_rotation_model.modules.rotations.climate_planner import Climate
 SUTHERLAND = {"field_id": "sutherland_nw", "planting_date": "2040-05-01"}
 
 
-def test_sequence_acquires_and_replays_ten_modelled_crops(monkeypatch):
+def test_sequence_acquires_and_replays_crops_and_catalogue_hybrids(monkeypatch):
     def denied(*args, **kwargs):
         raise AssertionError("Packaged Sutherland weather should require no provider request")
 
@@ -26,10 +26,15 @@ def test_sequence_acquires_and_replays_ten_modelled_crops(monkeypatch):
     result = report["payload"]
     assert report["ranking_usable"] is True
     assert result["max_steps"] == 6
-    assert result["eligible_count"] == len(result["top_candidates"]) == 10
+    assert len(result["candidates"]) == 17
+    assert result["eligible_count"] == len(result["top_candidates"])
     assert {c["crop_id"] for c in result["top_candidates"]} >= {"peas_dry", "oats", "millet"}
     assert len({c["crop_id"] for c in result["top_candidates"]}) == 10
-    assert all(c["choice"]["calendar_id"] and c["scenarios"] for c in result["top_candidates"])
+    assert len({c["choice_id"] for c in result["top_candidates"]}) == result["eligible_count"]
+    assert all(c["scenarios"] for c in result["top_candidates"])
+    assert {c["choice_id"] for c in result["candidates"] if c["choice"].get("hybrid")} == {
+        h["choice_id"] for h in runtime.catalog()["strategy_hybrids"]
+    }
     deficits = [c["water"]["water_deficit_pct"] for c in result["top_candidates"]]
     assert deficits == sorted(deficits)
     assert result["irrigation"]["status"] == "unknown"
@@ -97,7 +102,7 @@ def test_strategy_validates_distinct_crops_dates_and_supported_progression():
         ClimateStepRequest.model_validate(
             SUTHERLAND | {"strategy_mode": "sequence", "planting_date": "2021-05-01"}
         )
-    with pytest.raises(ValidationError, match="distinct crops"):
+    with pytest.raises(ValidationError, match="supported hybrid"):
         ClimateStepRequest.model_validate(
             SUTHERLAND
             | {
@@ -116,3 +121,14 @@ def test_strategy_validates_distinct_crops_dates_and_supported_progression():
                 "irrigation": {"status": "available", "daily_mm": 0},
             }
         )
+
+
+def test_compare_calculates_each_documented_maize_hybrid_separately():
+    hybrids = [{"crop_id": "maize-p0987amx"}, {"crop_id": "maize-p1197amxt"}]
+    parameters = SUTHERLAND | {"strategy_mode": "compare", "candidates": hybrids}
+    with pytest.raises(ValidationError, match="distinct choice_id"):
+        ClimateStepRequest.model_validate(parameters | {"candidates": hybrids[:1] * 2})
+    first, second = runtime.calculate("climate_step", parameters, date(2026, 11, 15))["candidates"]
+    assert first["crop_id"] == second["crop_id"] == "maize_grain"
+    assert [first["choice_id"], second["choice_id"]] == [h["crop_id"] for h in hybrids]
+    assert first["water"]["water_deficit_pct"] != second["water"]["water_deficit_pct"]

@@ -5,10 +5,13 @@ import {
   type StrategyContext, type StrategyIrrigation, type StrategyPriority, type StrategyScenario,
 } from '../../api/rotationHandoff'
 import { ErrorBox, Loading } from '../../shared/ui'
+import { TermInfo } from '../../shared/TermInfo'
 import { errorText, useResource } from '../../shared/useResource'
 import { useAccess } from '../access/AccessProvider'
+import { QuickCropComparison } from './QuickCropComparison'
+import { SowingDateField } from './SowingDateField'
 import { StrategyCandidateCard, StrategyResultCards, useStrategyLabels } from './StrategyResultCards'
-import { nextPlantingDate, plantingBounds, priorityMetrics, validPlantingDate } from './strategyResults'
+import { afterCrop, initialPlantingDate, priorityMetrics, strategyChoiceId, validPlantingDate } from './strategyResults'
 import { useStrategyJob } from './useStrategyJob'
 
 type Selection = StrategyChoice & { planting_date: string; metrics: StrategyCandidate }
@@ -16,6 +19,10 @@ export type StrategyTab = 'date' | 'scenarios'
 type Draft = {
   count: number; priority: StrategyPriority; plantingDate: string
   irrigationStatus: StrategyIrrigation['status']; dailyM3: string; method: string
+}
+
+function decision({ job_id, crop_id, choice_id }: Selection): StrategyChoice {
+  return { job_id, crop_id, ...(choice_id ? { choice_id } : {}) }
 }
 
 function sameScope(item: { field_id: string; geometry_revision: number }, field: Field) {
@@ -31,7 +38,7 @@ function IrrigationSummary({ irrigation }: { irrigation: StrategyIrrigation }) {
 }
 
 export function StrategyWorkspace({ field, tab }: { field: Field; tab: StrategyTab }) {
-  const { text } = useStrategyLabels()
+  const { text, cropName } = useStrategyLabels()
   const [saveRevision, setSaveRevision] = useState(0)
   const [started, setStarted] = useState(false)
   const onSave = () => setSaveRevision(revision => revision + 1)
@@ -44,8 +51,12 @@ export function StrategyWorkspace({ field, tab }: { field: Field; tab: StrategyT
   const model = useResource(rotationHandoffApi.catalog)
   const context = fieldContext.data
   const catalog = model.data
+  const cultivarReferences = (catalog?.cultivar_references ?? []).filter(
+    row => typeof row.name === 'string' && typeof row.crop_id === 'string',
+  )
   const ready = catalog?.status === 'available' && catalog.operations.includes('climate_step')
-  function flow(advanced: boolean) {
+  const crops = (catalog?.crops ?? []).filter(crop => crop.strategy_supported ?? crop.climate_supported)
+  function flow(comparison: boolean) {
     if (fieldContext.pending) return <Loading text={text('Loading field…', 'Завантажуємо поле…')} />
     if (!context) return <ErrorBox message={fieldContext.error ?? text('Field context unavailable', 'Дані поля недоступні')} retry={fieldContext.reload} />
     return <>
@@ -54,30 +65,40 @@ export function StrategyWorkspace({ field, tab }: { field: Field; tab: StrategyT
         {catalog?.reasons.map(reason => <p key={reason}>{reason}</p>)}
         <button type="button" className="button" onClick={model.reload}>{text('Retry connection', 'Перевірити з’єднання')}</button>
       </div>}
-      <StrategyFlow field={field} context={context} ready={ready} advanced={advanced} onSave={onSave} />
+      {comparison ? <QuickCropComparison field={field} context={context} crops={crops} hybrids={catalog?.strategy_hybrids ?? []} ready={ready} />
+        : <StrategyFlow field={field} context={context} ready={ready} onSave={onSave} />}
     </>
   }
   return <>
-    <div id="strategy-panel-date" role="tabpanel" aria-labelledby="strategy-tab-date" hidden={tab !== 'date'}>{flow(false)}</div>
+    <div id="strategy-panel-date" role="tabpanel" aria-labelledby="strategy-tab-date" hidden={tab !== 'date'}>{flow(true)}</div>
     <div id="strategy-panel-scenarios" role="tabpanel" aria-labelledby="strategy-tab-scenarios" hidden={tab !== 'scenarios'}>
       <details className="strategy-new" onToggle={event => { if (event.currentTarget.open) setStarted(true) }}>
-        <summary>{text('Create a scenario', 'Створити сценарій')}</summary>
-        {started && flow(true)}
+        <summary>{text('Plan a crop rotation', 'Спланувати сівозміну')}</summary>
+        {started && flow(false)}
       </details>
+      {cultivarReferences.length > 0 && <details>
+        <summary>{text('Variety and hybrid references', 'Довідник сортів і гібридів')} · {cultivarReferences.length}</summary>
+        <p>{text('The rotation estimates development separately for selected maize and sunflower hybrids. This reference list also includes varieties from other field trials.',
+          'Сівозміна окремо оцінює розвиток деяких гібридів кукурудзи й соняшнику. У цьому довіднику є також сорти з інших польових випробувань.')}</p>
+        <ul>{cultivarReferences.map(row => <li key={`${row.crop_id}-${row.name}`}>
+          {cropName(String(row.crop_id))} · {String(row.name)}
+          {typeof row.trial_location === 'string' && ` · ${row.trial_location}`}
+        </li>)}</ul>
+      </details>}
       <section className="strategy-saved">
-        <h2>{text('Saved scenarios', 'Збережені сценарії')}</h2>
+        <h2>{text('Saved crop rotations', 'Збережені сівозміни')}</h2>
         {tab === 'scenarios' && <SavedScenarioList key={saveRevision} field={field} />}
       </section>
     </div>
   </>
 }
 
-function StrategyFlow({ field, context, advanced, ready, onSave }: {
-  field: Field; context: StrategyContext; advanced: boolean; ready: boolean; onSave: () => void
+function StrategyFlow({ field, context, ready, onSave }: {
+  field: Field; context: StrategyContext; ready: boolean; onSave: () => void
 }) {
-  const { text, cropName, priorityName, date, number } = useStrategyLabels()
+  const { text, candidateName, priorityName, date, number } = useStrategyLabels()
   const { canEdit } = useAccess()
-  const [draft, setDraft] = useState<Draft>(() => ({ count: 1, priority: 'water_deficit', plantingDate: advanced ? nextPlantingDate(context, 1) : '',
+  const [draft, setDraft] = useState<Draft>(() => ({ count: 1, priority: 'water_deficit', plantingDate: initialPlantingDate(context),
     irrigationStatus: 'unknown', dailyM3: '', method: '' }))
   const [choices, setChoices] = useState<Selection[]>([])
   const [saved, setSaved] = useState<StrategyScenario>()
@@ -88,14 +109,13 @@ function StrategyFlow({ field, context, advanced, ready, onSave }: {
   useEffect(() => () => saveController.current?.abort(), [])
 
   const count = draft.count
-  const remaining = Math.max(1, count - choices.length)
   const complete = choices.length === count
-  const previousDate = choices.at(-1)?.planting_date
+  const previous = choices.at(-1)
   const firstDate = choices[0]?.planting_date
-  const bounds = plantingBounds(context, remaining, previousDate, firstDate)
+  const next = previous && firstDate ? afterCrop(context, previous.metrics, previous.planting_date, firstDate) : undefined
   const dailyM3 = Number(draft.dailyM3)
   const irrigationValid = !draft.dailyM3 || (dailyM3 > 0 && dailyM3 <= 1_000_000)
-  const dateValid = validPlantingDate(draft.plantingDate, context, remaining, previousDate, firstDate)
+  const dateValid = validPlantingDate(draft.plantingDate, context, next?.previousEnd, firstDate)
   const canCalculate = ready && canEdit && !calculation.busy && !saving && !complete && dateValid &&
     (draft.irrigationStatus !== 'available' || irrigationValid)
   const irrigation: StrategyIrrigation = draft.irrigationStatus === 'available' ? {
@@ -110,28 +130,42 @@ function StrategyFlow({ field, context, advanced, ready, onSave }: {
 
   function changeDate(value: string) { edit({ plantingDate: value }, false) }
 
+  function assess(plantingDate: string, selected: Selection[]) {
+    void calculation.send({ request_id: crypto.randomUUID(), geometry_revision: field.boundary_revision,
+      mode: 'sequence', planting_date: plantingDate, step_count: count, priority: draft.priority,
+      previous: selected.map(decision), irrigation,
+    })
+  }
+
   function calculate(event: FormEvent) {
     event.preventDefault()
-    if (!canCalculate) return
-    void calculation.send({ request_id: crypto.randomUUID(), geometry_revision: field.boundary_revision,
-      mode: 'sequence', planting_date: draft.plantingDate, step_count: count, priority: draft.priority,
-      previous: choices.map(({ job_id, crop_id }) => ({ job_id, crop_id })), irrigation,
-    })
+    if (canCalculate) assess(draft.plantingDate, choices)
   }
 
   function choose(candidate: StrategyCandidate) {
     const jobId = calculation.job?.job_id
     const plantingDate = calculation.plantingDate
-    if (!jobId || !plantingDate || complete) return
-    const updated = [...choices, { job_id: jobId, crop_id: candidate.crop_id, planting_date: plantingDate, metrics: candidate }]
+    if (!jobId || !plantingDate || complete || !ready || !canEdit) return
+    const choiceId = strategyChoiceId(candidate)
+    const updated = [...choices, {
+      job_id: jobId, crop_id: candidate.crop_id, planting_date: plantingDate, metrics: candidate,
+      ...(choiceId !== candidate.crop_id ? { choice_id: choiceId } : {}),
+    }]
     setChoices(updated); calculation.clear()
-    if (updated.length < count) setDraft(current => ({ ...current, plantingDate: nextPlantingDate(context, count - updated.length, plantingDate, undefined, updated[0].planting_date) }))
+    if (updated.length < count) {
+      const nextDate = afterCrop(context, candidate, plantingDate, updated[0].planting_date).suggested
+      setDraft(current => ({ ...current, plantingDate: nextDate ?? '' }))
+      if (nextDate) assess(nextDate, updated)
+    }
   }
 
   function revise(index: number) {
+    const plantingDate = choices[index].planting_date
+    const prefix = choices.slice(0, index)
     calculation.clear(); setSaved(undefined); setSaveError(undefined)
-    setDraft(current => ({ ...current, plantingDate: choices[index].planting_date }))
-    setChoices(choices.slice(0, index))
+    setDraft(current => ({ ...current, plantingDate }))
+    setChoices(prefix)
+    if (ready && canEdit && prefix.length) assess(plantingDate, prefix)
   }
 
   async function save() {
@@ -140,7 +174,7 @@ function StrategyFlow({ field, context, advanced, ready, onSave }: {
     saveController.current = controller
     setSaving(true); setSaveError(undefined)
     try {
-      const scenario = await rotationStrategyApi.save(field.id, field.boundary_revision, choices.map(({ job_id, crop_id }) => ({ job_id, crop_id })), controller.signal)
+      const scenario = await rotationStrategyApi.save(field.id, field.boundary_revision, choices.map(decision), controller.signal)
       if (!sameScope(scenario, field)) throw new Error('Field or boundary changed. Reload the field.')
       if (!controller.signal.aborted) { setSaved(scenario); onSave() }
     } catch (failure) {
@@ -152,31 +186,39 @@ function StrategyFlow({ field, context, advanced, ready, onSave }: {
   }
 
   const result = calculation.job?.result
-  const dateHint = advanced ? 'strategy-series-date-hint' : 'strategy-date-hint'
+  const settingUp = choices.length === 0
+  const recoveryCases = Object.values(previous?.metrics.scenarios ?? {})
+  const recoveryDays = recoveryCases.flatMap(({ post_crop_recharge }) =>
+    typeof post_crop_recharge?.days_after_modeled_crop_end === 'number'
+      ? [post_crop_recharge.days_after_modeled_crop_end] : [],
+  )
+  const recoveryRange = recoveryDays.length > 0 && recoveryDays.length === recoveryCases.length
+    ? [...new Set([Math.min(...recoveryDays), Math.max(...recoveryDays)])].map(value => number(value, 0)).join('–')
+    : null
   return <section className="strategy-flow">
-    {advanced && !complete && <p role="status">{text(`Step ${choices.length + 1} of ${count}`, `Крок ${choices.length + 1} із ${count}`)}</p>}
-    {choices.length > 0 && <ol className="strategy-chosen" aria-label={text('Chosen sequence', 'Обрана послідовність')}>{choices.map((choice, index) => <li key={choice.job_id}>
-      <strong>{cropName(choice.crop_id)}</strong> · <time dateTime={choice.planting_date}>{date(choice.planting_date)}</time>
-      <button type="button" className="button" disabled={saving} onClick={() => revise(index)} aria-label={text(`Change step ${index + 1}`, `Змінити крок ${index + 1}`)}>{text('Change', 'Змінити')}</button>
+    {!complete && <p role="status">{text(`Season ${choices.length + 1} of ${count} in the rotation`, `Сезон ${choices.length + 1} із ${count} у сівозміні`)}</p>}
+    {choices.length > 0 && <ol className="strategy-chosen" aria-label={text('Crops selected for the rotation', 'Обрані культури сівозміни')}>{choices.map((choice, index) => <li key={choice.job_id}>
+      <strong>{candidateName(choice.metrics)}</strong> · <time dateTime={choice.planting_date}>{date(choice.planting_date)}</time>
+      <button type="button" className="button" disabled={saving} onClick={() => revise(index)} aria-label={text(`Change crop ${index + 1} in the rotation`, `Змінити культуру ${index + 1} у сівозміні`)}>{text('Change', 'Змінити')}</button>
     </li>)}</ol>}
-    {!complete && <form className="strategy-form" onSubmit={calculate}>
+    {!complete && settingUp && <form className="strategy-form" onSubmit={calculate}>
       <div className="strategies-context">
-        {advanced && <label>{text('Number of steps', 'Кількість кроків')}<select value={draft.count} onChange={event => {
-          const count = Number(event.target.value)
-          edit({ count, plantingDate: validPlantingDate(draft.plantingDate, context, count) ? draft.plantingDate : nextPlantingDate(context, count) })
-        }}>{Array.from({ length: context.max_steps }, (_, index) => <option key={index + 1}>{index + 1}</option>)}</select></label>}
-        {advanced && <label>{text('Priorities', 'Пріоритети')}<select value={draft.priority} onChange={e => edit({ priority: e.target.value as StrategyPriority })}>
+        <div className="strategy-input-control"><div className="context-help-row">
+          <label htmlFor="rotation-season-count">{text('Seasons in the rotation', 'Кількість сезонів у сівозміні')}</label>
+          <TermInfo term="seasons" label={text('Seasons in the rotation', 'Кількість сезонів у сівозміні')} />
+        </div><select id="rotation-season-count" value={draft.count} onChange={event => edit({ count: Number(event.target.value) })}>
+          {Array.from({ length: context.max_steps }, (_, index) => <option key={index + 1}>{index + 1}</option>)}</select></div>
+        <div className="strategy-input-control"><div className="context-help-row">
+          <label htmlFor="rotation-priority">{text('Priority', 'Пріоритет')}</label>
+          <TermInfo term={draft.priority} label={priorityName(draft.priority)} />
+        </div><select id="rotation-priority" value={draft.priority} onChange={e => edit({ priority: e.target.value as StrategyPriority })}>
           {(Object.keys(priorityMetrics) as StrategyPriority[]).map(priority => <option key={priority} value={priority}>{priorityName(priority)}</option>)}
-        </select></label>}
-        <label>{text('Sowing date', 'Дата сівби')}<input type="date" required min={bounds.min} max={bounds.max} value={draft.plantingDate}
-          aria-describedby={draft.plantingDate && !dateValid ? dateHint : undefined} onChange={e => changeDate(e.target.value)} /></label>
+        </select></div>
+        <SowingDateField id="rotation-planting-date" context={context} value={draft.plantingDate}
+          onChange={changeDate} />
       </div>
-      {draft.plantingDate && !dateValid && <p id={dateHint} role="status">
-        {text(`Choose months ${context.min_month}–${context.max_month} between ${date(bounds.min)} and ${date(bounds.max)}.`,
-          `Оберіть місяці ${context.min_month}–${context.max_month} у межах ${date(bounds.min)} – ${date(bounds.max)}.`)}
-      </p>}
       {draft.priority === 'revenue_after_seed' && <p>{text('Gross revenue minus seed or planting material cost, per hectare.', 'Виручка мінус вартість насіння або посадкового матеріалу, на гектар.')}</p>}
-      {advanced && <details>
+      <details>
         <summary>{text('Irrigation (optional)', 'Полив (необов’язково)')}</summary>
         <p>{text('For a better assessment, specify irrigation availability.', 'Для кращого прогнозу уточніть можливості поливу')}</p>
         <div className="strategies-context">
@@ -190,31 +232,72 @@ function StrategyFlow({ field, context, advanced, ready, onSave }: {
           </>}
         </div>
         {draft.irrigationStatus === 'available' && draft.dailyM3 && irrigationValid && context.area_ha > 0 && <p>{text('Equivalent field depth', 'Еквівалентна глибина для поля')}: {number(dailyM3 / (10 * context.area_ha), 2)} {text('mm/day', 'мм/добу')}</p>}
-      </details>}
-      <button type="submit" className="button primary" disabled={!canCalculate}>{advanced ? text('Calculate this step', 'Розрахувати цей крок') : text('Calculate', 'Розрахувати')}</button>
+      </details>
+      <button type="submit" className="button primary" disabled={!canCalculate}>{text('Assess crops for the rotation', 'Оцінити культури для сівозміни')}</button>
     </form>}
-    {calculation.busy && !calculation.error && <Loading text={text('Assessing this field…', 'Оцінюємо це поле…')} />}
+    {!complete && next && <>
+      <p>{text('Next sowing date', 'Наступна дата сівби')} · {dateValid
+        ? <time dateTime={draft.plantingDate}>{date(draft.plantingDate)}</time>
+        : text('Choose a date', 'Оберіть дату')}</p>
+      {next.suggested && next.recoveredOn ? <p>
+        {text(
+          `Suggested sowing date: ${date(next.suggested)}. The soil reaches 80% of its available water capacity by ${date(next.recoveredOn)} in all scenarios.`,
+          `Рекомендована дата сівби — ${date(next.suggested)}. В усіх сценаріях ґрунт відновлює запас води до 80% від доступної місткості до ${date(next.recoveredOn)}.`,
+        )}{' '}
+        {next.suggested !== next.dayAfterRecovery
+          ? text('The next day falls outside the modelled sowing window, so the date moves to its first day.',
+            'Наступний день поза періодом сівби, який підтримує модель, тому обрано перший день цього періоду.')
+          : text('Sowing starts the following day.', 'Сівбу пропонуємо на наступний день.')}
+        {dateValid && draft.plantingDate !== next.suggested && <> {text('You changed the date manually.', 'Ви змінили дату вручну.')}</>}
+      </p> : <p>{next.recoveredOn
+        ? text('There is no supported sowing date after the estimated recovery within this rotation’s time range.',
+          'Після оціненого відновлення в межах цієї сівозміни немає дати сівби, яку підтримує модель.')
+        : next.searchedThrough
+          ? text(`Water recovery was not confirmed in all scenarios through ${date(next.searchedThrough)}. Choose a sowing date to continue.`,
+            `До ${date(next.searchedThrough)} запас води відновився не в усіх сценаріях. Оберіть дату сівби, щоб продовжити.`)
+          : text('The model returned no water recovery date. Choose a sowing date to continue.',
+            'Модель не визначила дату відновлення запасу води. Оберіть дату сівби, щоб продовжити.')}</p>}
+      {recoveryRange && <div className="context-help-row">
+        <span>{text(`Estimated water recovery to 80% after the previous crop: ${recoveryRange} days`,
+          `Оцінене відновлення запасу води до 80% після попередньої культури — ${recoveryRange} дн.`)}</span>
+        <TermInfo term="recharge" label={text('Water recovery', 'Відновлення запасу води')} />
+      </div>}
+      <details key={choices.length} open={!next.suggested || undefined}>
+        <summary>{text('Change sowing date', 'Змінити дату сівби')}</summary>
+        <form className="strategy-form" onSubmit={calculate}>
+          <div className="strategies-context">
+            <SowingDateField id="rotation-next-planting-date" context={context} value={draft.plantingDate}
+              onChange={changeDate} previousEnd={next.previousEnd} first={firstDate} />
+          </div>
+          <button type="submit" className="button" disabled={!canCalculate}>{text('Recalculate for this date', 'Перерахувати на цю дату')}</button>
+        </form>
+      </details>
+    </>}
+    {calculation.busy && !calculation.error && <Loading text={settingUp
+      ? text('Assessing this field…', 'Оцінюємо це поле…')
+      : text('Assessing the next crop…', 'Оцінюємо варіанти наступної культури…')} />}
     {calculation.error && <ErrorBox message={calculation.error} retry={calculation.retry} />}
-    {calculation.job?.status === 'failed' && <ErrorBox message={calculation.job.error ?? text('The assessment failed. Try again.', 'Розрахунок не вдався. Спробуйте ще раз.')} />}
+    {calculation.job?.status === 'failed' && <ErrorBox message={calculation.job.error ?? text('The assessment failed. Try again.', 'Розрахунок не вдався. Спробуйте ще раз.')}
+      retry={canCalculate ? () => assess(draft.plantingDate, choices) : undefined} />}
     {result && <>
-      {result.status === 'available' && result.payload.observed_previous_crop === null && <p>
+      {settingUp && result.status === 'available' && result.payload.observed_previous_crop === null && <p>
         {text('Assessment completed with the previous crop unknown.', 'Оцінку виконано за невідомої попередньої культури.')}
       </p>}
       <StrategyResultCards result={result} priority={draft.priority} choose={choose} />
     </>}
     {complete && <section className="strategy-result">
-      <h3>{text('Completed scenario', 'Завершений сценарій')}</h3><p>{priorityName(draft.priority)} · {text('Conditional climate scenario', 'Умовний кліматичний сценарій')}</p>
-      {advanced && <IrrigationSummary irrigation={irrigation} />}
+      <h3>{text('Completed crop rotation', 'Завершена сівозміна')}</h3><p>{priorityName(draft.priority)} · {text('Conditional climate scenario', 'Умовний кліматичний сценарій')}</p>
+      <IrrigationSummary irrigation={irrigation} />
       <div className="strategy-decisions">{choices.map(choice => <div key={choice.job_id}><p><time dateTime={choice.planting_date}>{date(choice.planting_date)}</time></p>
         <StrategyCandidateCard candidate={choice.metrics} priority={draft.priority} /></div>)}</div>
-      {saved ? <p role="status">{text('Scenario saved', 'Сценарій збережено')}</p> : canEdit && <button type="button" className="button primary" disabled={saving} onClick={() => void save()}>{text('Save completed scenario', 'Зберегти завершений сценарій')}</button>}
+      {saved ? <p role="status">{text('Crop rotation saved', 'Сівозміну збережено')}</p> : canEdit && <button type="button" className="button primary" disabled={saving} onClick={() => void save()}>{text('Save crop rotation', 'Зберегти сівозміну')}</button>}
       {saveError && <ErrorBox message={saveError} retry={() => void save()} />}
     </section>}
   </section>
 }
 
 function SavedScenarioList({ field }: { field: Field }) {
-  const { text, date, cropName, priorityName } = useStrategyLabels()
+  const { text, date, candidateName, priorityName } = useStrategyLabels()
   const [page, setPage] = useState(0)
   const pageSize = 20
   const load = useCallback(async (signal: AbortSignal) => {
@@ -227,13 +310,13 @@ function SavedScenarioList({ field }: { field: Field }) {
   if (resource.error) return <ErrorBox message={resource.error} retry={resource.reload} />
   const rows = resource.data ?? []
   return <>
-    {!rows.length && <p>{text('No saved scenarios yet.', 'Збережених сценаріїв поки немає.')}</p>}
+    {!rows.length && <p>{text('No saved crop rotations yet.', 'Збережених сівозмін поки немає.')}</p>}
     <div className="strategy-saved-pages">
-      <button type="button" className="button" onClick={resource.reload}>{text('Refresh saved scenarios', 'Оновити збережені сценарії')}</button>
+      <button type="button" className="button" onClick={resource.reload}>{text('Refresh saved crop rotations', 'Оновити збережені сівозміни')}</button>
       {page > 0 && <button type="button" className="button" onClick={() => setPage(page - 1)}>{text('Previous page', 'Попередня сторінка')}</button>}
       {rows.length > pageSize && <button type="button" className="button" onClick={() => setPage(page + 1)}>{text('Next page', 'Наступна сторінка')}</button>}
     </div>
-    {rows.slice(0, pageSize).map(scenario => <details key={scenario.id}><summary>{date(scenario.created_at, true)} · {scenario.choices.map(choice => cropName(choice.crop_id)).join(' → ')}</summary>
+    {rows.slice(0, pageSize).map(scenario => <details key={scenario.id}><summary>{date(scenario.created_at, true)} · {scenario.choices.map(choice => candidateName(choice.metrics)).join(' → ')}</summary>
       <p>{priorityName(scenario.priority)}</p>
       <IrrigationSummary irrigation={scenario.irrigation} />
       <ul>{scenario.assumptions.map((assumption, index) => <li key={index}>{assumption}</li>)}</ul>

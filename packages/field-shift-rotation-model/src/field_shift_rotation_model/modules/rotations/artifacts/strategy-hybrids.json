@@ -1,0 +1,32 @@
+{
+  "maize": {
+    "crop_id": "maize_grain",
+    "base_c": 10,
+    "cap_c": 30,
+    "source": "https://www.mdpi.com/2072-4292/14/2/394",
+    "temperature_method_source": "https://www.pioneer.com/us/agronomy/maturity-pioneer-corn-products.html",
+    "thermal_basis": "published_growing_degree_days",
+    "hybrids": {
+      "maize-p1197amxt": ["Pioneer P1197AMXT", 760, 1499],
+      "maize-p0987amx": ["Pioneer P0987AMX", 726, 1443]
+    }
+  },
+  "sunflower": {
+    "crop_id": "sunflower",
+    "base_c": 4,
+    "cap_c": 30,
+    "source": "https://www.ndsu.edu/agriculture/sites/default/files/2025-12/a652-25.pdf",
+    "temperature_method_source": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M_MIN,T2M_MAX&community=AG&longitude=-99.1320&latitude=47.5090&start=20250606&end=20251015&format=JSON",
+    "temperature_sha256": "17dd8d790a264c50b13d994443a95163cc9bbf67b48e872e7cebd2a9ac0a9958",
+    "thermal_basis": "trial_dates_with_gridded_weather",
+    "trial_planting_date": "2025-06-06",
+    "note": "Heat accumulation uses the daily minimum and maximum clipped to 4–30 °C and covers the planting date through the reported milestone, both inclusive.",
+    "hybrids": {
+      "sunflower-n4h205e": ["Nuseed N4H205 E", 1187.54, 1877.23],
+      "sunflower-cp5249cl": ["CROPLAN CP5249CL", 1133.03, 1951.51],
+      "sunflower-4425cl": ["Sunrich 4425CL", 1133.03, 1969.86],
+      "sunflower-h49ho19cl": ["Dyna-Gro H49HO19 CL", 1243.25, 1975.19],
+      "sunflower-h47ho11ex": ["Dyna-Gro H47HO11 EX", 1187.54, 2036.71]
+    }
+  }
+}
