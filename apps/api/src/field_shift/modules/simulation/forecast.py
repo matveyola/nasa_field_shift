@@ -35,7 +35,10 @@ def run_water_forecast(
 ) -> WaterForecast:
     crop = crop_water_parameters(crop_name)
     if crop is None:
-        raise HistoricalInputError("Water forecasts currently support maize, soy and wheat.")
+        raise HistoricalInputError(
+            "No FAO-56 water reference is configured for this crop. "
+            "Supported crops: maize, soy, wheat, barley, sunflower, rapeseed and dry peas."
+        )
 
     latitude, longitude = field_location(geometry)
     run = fetch_ifs_root_zone(latitude, longitude, water_forecast_run_day(submitted_at))
