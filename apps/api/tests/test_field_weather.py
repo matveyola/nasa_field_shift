@@ -83,6 +83,26 @@ def test_current_period_exact_sum_zero_fill_and_internal_gap():
     assert result["missing_dates"] == [end - timedelta(days=3)]
 
 
+@pytest.mark.parametrize("length", [7, 30])
+@pytest.mark.parametrize("rain, expected", [(0, "all"), (0.9, "all"), (1, "none"), (2, "none")])
+def test_dry_days_strict_threshold_complete_periods(length, rain, expected):
+    end = date(2026, 11, 13)
+    values = {d: rain for d in days(end - timedelta(days=length - 1), end)}
+    result = rainfall_period(values, end, length)
+    assert result["dry_days"] == (length if expected == "all" else 0)
+    assert result["rain_mm"] == pytest.approx(length * rain)
+    values[end] = None
+    assert rainfall_period(values, end, length)["dry_days"] is None
+    del values[end]
+    assert rainfall_period(values, end, length)["dry_days"] is None
+
+
+def test_dry_days_count_zero_and_fractional_rain_but_not_one_mm():
+    end = date(2026, 11, 13)
+    values = dict(zip(days(end - timedelta(days=6), end), [0, 0.9, 1, 2, 0, 1, 4]))
+    assert rainfall_period(values, end, 7)["dry_days"] == 3
+
+
 def test_typical_is_median_of_complete_equal_length_periods_not_daily_mean():
     end = date(2026, 11, 13)
     current = {d: 3.0 for d in days(end - timedelta(days=29), end)}

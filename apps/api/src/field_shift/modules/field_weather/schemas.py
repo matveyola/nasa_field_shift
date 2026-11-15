@@ -60,6 +60,7 @@ class TypicalPeriod(Record):
 
 class RainPeriod(Record):
     length_days: int
+    dry_days: int | None
     start: date
     end: date
     complete: bool

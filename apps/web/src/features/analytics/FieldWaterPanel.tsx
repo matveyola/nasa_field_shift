@@ -35,14 +35,23 @@ export function FieldWaterPanel({ field, forecast, season, pending, error, reloa
     {error && <ErrorBox message={error} retry={reload} />}
     {!pending && !current && <p className="analytics-empty">{label('No current water estimate. Select a supported crop and calculate a forecast in the controls below. Weather remains available independently.', 'Немає актуальної оцінки води. Оберіть підтримувану культуру й розрахуйте прогноз у керуванні нижче. Погода доступна незалежно.')}</p>}
     {current && first && metrics && <>
+      <h3>{label('Water reserve today', 'Запас води сьогодні')}</h3>
       <p>{label('Today', 'Сьогодні')}: <time dateTime={today}>{fullDate(today)}</time> · UTC · {crop(current.crop)}</p>
       <div className="water-today-reading"><strong>{num(first.reserve_mm, mm)}</strong><span>{label('available reserve at day end', 'доступний запас на кінець дня')}</span></div>
       <div className="water-reading-line"><p>{label('Threshold', 'Поріг')}: <strong>{num(current.threshold_mm, mm)}</strong></p><p>{label('Margin above threshold', 'Запас над порогом')}: <strong>{num(first.reserve_mm - current.threshold_mm, mm)}</strong></p><p>{label('Daily change', 'Зміна за добу')}: <strong>{num(first.reserve_mm - first.opening_mm, mm)}</strong></p></div>
-      <h3>{label('Reserve over the forecast period', 'Запас протягом прогнозного періоду')}</h3><p>{fullDate(days[0].date)} — {fullDate(days.at(-1)!.date)} · UTC</p>
+      <h3>{label('Water movement during the day', 'Рух води за день')}</h3>
+      <p>{label('Opening reserve', 'Початковий запас')}: {num(first.opening_mm, mm)} · {label('Rain', 'Опади')}: {num(first.rain_mm, mm)} · {label('Irrigation', 'Полив')}: {num(first.irrigation_mm, mm)} · {label('Modeled water use', 'Розрахункове водоспоживання')}: {num(first.water_use_mm, mm)} · {label('Drainage', 'Дренаж')}: {num(first.drainage_mm, mm)} · {label('Closing reserve', 'Кінцевий запас')}: {num(first.reserve_mm, mm)}</p>
+      <h3>{label('Water reserve for the coming days', 'Запас води на найближчі дні')}</h3><p>{fullDate(days[0].date)} — {fullDate(days.at(-1)!.date)} · UTC</p>
       <svg className="water-reserve-line" viewBox="0 0 640 180" role="img" aria-label={label('Daily reserve and stress threshold; exact values in the table below', 'Щоденний запас і поріг стресу; точні значення в таблиці нижче')}>
-        <line x1="20" x2="620" y1={160 - 130 * current.threshold_mm / Math.max(1, current.capacity_mm)} y2={160 - 130 * current.threshold_mm / Math.max(1, current.capacity_mm)} stroke="#888" strokeDasharray="6 4" />
-        <polyline fill="none" stroke="currentColor" strokeWidth="3" points={days.map((d,i) => `${20+600*i/Math.max(1,days.length-1)},${160-130*d.reserve_mm/Math.max(1,current.capacity_mm)}`).join(' ')} />
-        <text x="20" y="177">{fullDate(days[0].date)}</text><text x="620" y="177" textAnchor="end">{fullDate(days.at(-1)!.date)}</text>
+        <text x="8" y="16">{mm}</text>
+        {[0, current.capacity_mm / 2, current.capacity_mm].map(value => <g key={value}>
+          <line x1="60" x2="620" y1={160 - 130 * value / Math.max(1, current.capacity_mm)} y2={160 - 130 * value / Math.max(1, current.capacity_mm)} stroke="#ddd" />
+          <text x="52" y={164 - 130 * value / Math.max(1, current.capacity_mm)} textAnchor="end">{num(value)}</text>
+        </g>)}
+        <line x1="60" x2="620" y1={160 - 130 * current.threshold_mm / Math.max(1, current.capacity_mm)} y2={160 - 130 * current.threshold_mm / Math.max(1, current.capacity_mm)} stroke="#666" strokeDasharray="6 4" />
+        <text x="620" y={Math.max(18, 154 - 130 * current.threshold_mm / Math.max(1, current.capacity_mm))} textAnchor="end">{label('Threshold', 'Поріг')}: {num(current.threshold_mm, mm)}</text>
+        <polyline fill="none" stroke="currentColor" strokeWidth="3" points={days.map((d,i) => `${60+560*i/Math.max(1,days.length-1)},${160-130*d.reserve_mm/Math.max(1,current.capacity_mm)}`).join(' ')} />
+        <text x="60" y="177">{fullDate(days[0].date)}</text><text x="620" y="177" textAnchor="end">{fullDate(days.at(-1)!.date)}</text>
       </svg>
       <dl className="water-result-lines">
         <div><dt>{label('First day below threshold', 'Перший день нижче порога')}</dt><dd>{metrics.firstBelow ? shortDate(metrics.firstBelow) : label('None in this period', 'Немає в цьому періоді')}</dd></div>
@@ -61,14 +70,14 @@ export function FieldWaterPanel({ field, forecast, season, pending, error, reloa
         {current.limitations.map(s=><p key={s}>{s}</p>)}
       </div></details>
     </>}
-    <details className="analytics-disclosure"><summary>{label('Seasonal scenario water estimates', 'Сезонні сценарні оцінки води')} · {season}</summary><div className="analytics-details-body">
-      <p>{label('Saved model executions, not validated field accuracy or drought probability. Separate plans and periods remain separate; median and range summarize available scenario runs.', 'Збережені виконання моделі, не перевірена точність для поля чи ймовірність посухи. Плани та періоди не змішуються; медіана й діапазон описують доступні сценарні виконання.')}</p>
+    <details className="analytics-disclosure"><summary>{label('Water for the season', 'Вода за сезон')} · {season}</summary><div className="analytics-details-body">
+      <p>{label('Saved model executions, not validated field accuracy or drought probability. Separate executions, plans and periods remain separate; median and range summarize scenarios within one execution.', 'Збережені виконання моделі, не перевірена точність для поля чи ймовірність посухи. Виконання, плани та періоди не змішуються; медіана й діапазон описують сценарії одного виконання.')}</p>
       {seasonal.pending && <p role="status">{label('Loading saved scenarios…','Завантаження збережених сценаріїв…')}</p>}
       {seasonal.error && <ErrorBox message={seasonal.error} retry={seasonal.reload} />}
       {!seasonal.pending && !groups.length && <p>{label('No estimate — no saved matching scenario results.', 'Немає оцінки — немає відповідних збережених результатів сценарію.')}</p>}
       {groups.map(group=><article key={group.key}><h3>{crop(group.first.crop_id)} · {group.first.plan_id}</h3><p>{fullDate(group.first.start_date)} — {fullDate(group.first.end_date)}</p>
         <dl className="water-result-lines">{([
-          ['demand_mm',label('Demand','Потреба'),mm],['use_mm',label('Actual water use','Фактичне використання води'),mm],['deficit_mm',label('Water deficit','Дефіцит води'),mm],
+          ['demand_mm',label('Demand','Потреба'),mm],['use_mm',label('Modeled water use','Розрахункове водоспоживання'),mm],['deficit_mm',label('Water deficit','Дефіцит води'),mm],
           ['drought_days',label('Drought days','Дні посухи'),label('days','днів')],['crop_days',label('Crop period','Період культури'),label('days','днів')],
           ['opening_mm',label('Opening reserve','Початковий запас'),mm],['closing_mm',label('Closing reserve','Кінцевий запас'),mm],['irrigation_mm',label('Irrigation','Полив'),mm],['drainage_mm',label('Drainage','Дренаж'),mm],
           ['waterlogging_days',label('Waterlogging days','Дні перезволоження'),label('days','днів')],['water_stress_days',label('Total water-stress days','Усього днів водного стресу'),label('days','днів')],

@@ -20,9 +20,18 @@ test('flowering stress requires the supplied confirmed interval; no guessed date
 test('missing estimates stay null and scenario medians retain failures and zero',()=>{
   assert.equal(range([null,undefined]),null)
   assert.deepEqual(range([0,10,100,null]),{median:10,min:0,max:100,count:3})
-  const row:SeasonalWaterRow={job_id:'one',scenario_id:'dry',plan_id:'a',crop_id:'Maize',start_date:'2026-04-01',end_date:'2026-09-01',data_kind:'historical',evidence_sha256:'abc',demand_mm:200,use_mm:150,deficit_mm:50,drought_days:10,crop_days:100,opening_mm:null,closing_mm:null,irrigation_mm:0,drainage_mm:null,waterlogging_days:null,water_stress_days:null}
-  const groups=seasonalGroups([row,row,{...row,scenario_id:'wet',deficit_mm:0,drought_days:0},{...row,plan_id:'b'}])
+  const row:SeasonalWaterRow={job_id:'one',scenario_id:'dry',plan_id:'a',crop_id:'Maize',start_date:'2026-04-01',end_date:'2026-09-01',data_kind:'historical',evidence_sha256:'abc',demand_mm:200,use_mm:150,deficit_mm:50,water_shortfall_pct:25,drought_days:10,crop_days:100,opening_mm:null,closing_mm:null,irrigation_mm:0,drainage_mm:null,waterlogging_days:null,water_stress_days:null}
+  const groups=seasonalGroups([row,row,{...row,scenario_id:'wet',deficit_mm:0,water_shortfall_pct:0,drought_days:0},{...row,plan_id:'b'}])
   assert.equal(groups.length,2);assert.equal(groups[0].runs.length,2)
   assert.equal(groups[0].deficitPercent?.median,12.5);assert.equal(groups[0].droughtPercent?.median,5)
   assert.equal(range(groups[0].runs.map(r=>r.water_stress_days)),null)
+})
+
+test('seasonal ensembles stay within one job and use only source deficit percentages',()=>{
+  const row: SeasonalWaterRow={job_id:'soil-a',scenario_id:'dry',plan_id:'same',crop_id:'Maize',start_date:'2026-04-01',end_date:'2026-09-01',data_kind:'historical',evidence_sha256:'a',demand_mm:200,use_mm:150,deficit_mm:50,water_shortfall_pct:null,drought_days:10,crop_days:100,opening_mm:null,closing_mm:null,irrigation_mm:0,drainage_mm:null,waterlogging_days:null,water_stress_days:null}
+  const groups=seasonalGroups([row,row,{...row,scenario_id:'wet'}, {...row,job_id:'soil-b',water_shortfall_pct:37}, {...row,job_id:'soil-b',scenario_id:'wet',water_shortfall_pct:0}])
+  assert.equal(groups.length,2)
+  assert.equal(groups[0].runs.length,2)
+  assert.equal(groups[0].deficitPercent,null) // no derived replacement for missing model evidence
+  assert.deepEqual(groups[1].deficitPercent,{median:18.5,min:0,max:37,count:2})
 })

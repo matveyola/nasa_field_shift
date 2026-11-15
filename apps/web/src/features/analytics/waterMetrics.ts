@@ -34,14 +34,14 @@ export function range(values: (number | null | undefined)[]) {
 export function seasonalGroups(rows: SeasonalWaterRow[]) {
   const groups = new Map<string, SeasonalWaterRow[]>()
   for (const row of rows) {
-    const key = JSON.stringify([row.plan_id, row.crop_id, row.start_date, row.end_date, row.data_kind])
+    const key = JSON.stringify([row.job_id, row.plan_id, row.crop_id, row.start_date, row.end_date, row.data_kind])
     // Exact job/scenario duplicates cannot gain extra weight in the displayed median.
     const group = groups.get(key) ?? []
     if (!group.some(r => r.job_id === row.job_id && r.scenario_id === row.scenario_id)) group.push(row)
     groups.set(key, group)
   }
   return [...groups.entries()].map(([key, runs]) => ({ key, first: runs[0], runs,
-    deficitPercent: range(runs.map(r => r.demand_mm != null && r.demand_mm > 0 && r.deficit_mm != null ? 100 * r.deficit_mm / r.demand_mm : null)),
+    deficitPercent: range(runs.map(r => r.water_shortfall_pct)),
     droughtPercent: range(runs.map(r => r.crop_days != null && r.crop_days > 0 && r.drought_days != null ? 100 * r.drought_days / r.crop_days : null)),
   }))
 }

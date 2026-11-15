@@ -1,4 +1,5 @@
 import { request } from './client'
+import type { HandoffSeasonalWater, HandoffSeasonalWaterRow } from './rotationHandoff'
 export type WeatherSource = { provider: string; url: string; retrieved_at: string; description: string }
 export type WeatherScope = { field_id: string; boundary_revision: number; geometry_fingerprint: string; generated_at: string; latitude: number; longitude: number; sources: WeatherSource[] }
 export type FieldWeather = WeatherScope & {
@@ -8,14 +9,10 @@ export type FieldWeather = WeatherScope & {
   requested_start: string; requested_end: string; missing_dates: string[];
   forecast_rain_mm: number | null; wettest_dates: string[]; lowest_probability_dates: string[];
 }
-export type RainPeriod = { length_days: number; start: string; end: string; complete: boolean; missing_dates: string[]; rain_mm: number | null; typical_rain_mm: number | null; difference_mm: number | null; typical_status: 'not_requested' | 'available' | 'unavailable'; typical_periods: {start: string; end: string; rain_mm: number}[] }
+export type RainPeriod = { length_days: number; dry_days: number | null; start: string; end: string; complete: boolean; missing_dates: string[]; rain_mm: number | null; typical_rain_mm: number | null; difference_mm: number | null; typical_status: 'not_requested' | 'available' | 'unavailable'; typical_periods: {start: string; end: string; rain_mm: number}[] }
 export type RainHistory = WeatherScope & { timezone: 'UTC'; requested_end: string; available_end: string | null; archive_lag_days: number | null; periods: RainPeriod[]; limitations: string[] }
-export type SeasonalWaterRow = {
-  job_id: string; scenario_id: string; plan_id: string; crop_id: string; start_date: string; end_date: string; data_kind: string; evidence_sha256: string;
-  demand_mm: number | null; use_mm: number | null; deficit_mm: number | null; drought_days: number | null; crop_days: number | null;
-  opening_mm: number | null; closing_mm: number | null; irrigation_mm: number | null; drainage_mm: number | null; waterlogging_days: number | null; water_stress_days: number | null;
-}
-export type SeasonalWater = { field_id: string; geometry_revision: number; rows: SeasonalWaterRow[] }
+export type SeasonalWaterRow = HandoffSeasonalWaterRow
+export type SeasonalWater = HandoffSeasonalWater
 const path = (id: string) => '/fields/' + encodeURIComponent(id)
 export const fieldWeatherApi = {
   forecast: (id: string, signal?: AbortSignal) => request<FieldWeather>(path(id) + '/weather-summary', { signal }),

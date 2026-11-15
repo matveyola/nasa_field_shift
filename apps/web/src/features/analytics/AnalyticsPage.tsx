@@ -23,11 +23,12 @@ import './analytics.css'
 const labels: Record<AnalyticsSection, string> = { overview: 'Overview', water: 'Water', vegetation: 'Vegetation', rotation: 'Rotations', soil: 'Soil' }
 
 export function AnalyticsPage(props: AnalyticsPageProps) {
+  const [rainPeriod, chooseRainPeriod] = useState<7 | 30>(7)
   // Scope every request, selection and job to the visible context. No old-season result flash.
-  return <AnalyticsWorkspace key={[props.field.id, props.field.boundary_revision, props.context.season, props.context.scenario].join(':')} {...props} />
+  return <AnalyticsWorkspace key={[props.field.id, props.field.boundary_revision, props.context.season, props.context.scenario].join(':')} {...props} rainPeriod={rainPeriod} chooseRainPeriod={chooseRainPeriod} />
 }
 
-function AnalyticsWorkspace(props: AnalyticsPageProps) {
+function AnalyticsWorkspace(props: AnalyticsPageProps & { rainPeriod: 7 | 30; chooseRainPeriod: (days: 7 | 30) => void }) {
   const { field, fields, context, section } = props
   const { text, number, crop, date } = useAnalyticsCopy()
   const today = new Date().toISOString().slice(0, 10)
@@ -73,7 +74,7 @@ function AnalyticsWorkspace(props: AnalyticsPageProps) {
     <div className="analytics-content" key={section}>
       {['overview', 'soil', 'rotation'].includes(section) && profile?.sources.some(source => source.kind === 'synthetic') && <p className="analytics-caution" role="status">{text('Synthetic profile — demonstration inputs, not field measurements.')}</p>}
       {section === 'overview' && <>
-        <FieldWeatherPanel field={field} />
+        <FieldWeatherPanel field={field} periodDays={props.rainPeriod} setPeriodDays={props.chooseRainPeriod} />
         <FieldWaterPanel field={field} forecast={forecast.data} season={context.season} pending={forecast.pending} error={forecast.error} reload={forecast.reload} />
         <details className="analytics-disclosure"><summary>{text('Water controls, history and scenarios')}</summary><div className="analytics-details-body"><WaterPage {...props} embedded /></div></details>
         <details className="analytics-disclosure"><summary>{text('More field evidence')}</summary><div className="analytics-details-body">
@@ -96,7 +97,7 @@ function AnalyticsWorkspace(props: AnalyticsPageProps) {
         </div></details>
       </>}
       {section === 'water' && <>
-        <FieldWeatherPanel field={field} />
+        <FieldWeatherPanel field={field} periodDays={props.rainPeriod} setPeriodDays={props.chooseRainPeriod} />
         <FieldWaterPanel field={field} forecast={forecast.data} season={context.season} pending={forecast.pending} error={forecast.error} reload={forecast.reload} />
         <details className="analytics-disclosure" open={Boolean(props.jobId || props.forecastDay)}><summary>{text('Water controls, history and scenarios')}</summary><div className="analytics-details-body">
         <p className="analytics-meta">{text('The live forecast concerns the coming days. Historical scenarios below use the selected season and assumptions.')}</p>

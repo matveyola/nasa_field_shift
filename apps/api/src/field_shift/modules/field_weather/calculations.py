@@ -61,6 +61,7 @@ def rainfall_period(values, end, length, historical=None):
         "complete": not missing,
         "missing_dates": missing,
         "rain_mm": total,
+        "dry_days": None if missing else sum(values[d] < 1 for d in dates),
         "typical_rain_mm": typical,
         "difference_mm": difference,
         "typical_periods": samples,
