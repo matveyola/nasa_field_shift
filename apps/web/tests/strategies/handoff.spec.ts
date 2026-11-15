@@ -95,7 +95,7 @@ for (const suitability of ['no_thermal_growth', 'not_assessed'] as const) test(`
   await setup(page, { result })
   await fill(page)
   await page.getByRole('button', { name: 'Calculate comparison', exact: true }).click()
-  await expect(page.getByText('No recommended plan is established by this result.', { exact: false })).toBeVisible()
+  await expect(page.getByRole('complementary', { name: 'Decision brief' }).getByText('Scenario estimates are available; no crop recommendation is established.', { exact: true })).toBeVisible()
   await expect(page.getByText('First by the selected criterion:', { exact: false })).toHaveCount(0)
   await expect(page.locator('[data-handoff-plan="plan-a"] h4')).not.toContainText('Rank')
   await expect(page.locator('[data-handoff-plan="plan-a"] .handoff-metrics').getByText('0 %', { exact: true })).toBeVisible()

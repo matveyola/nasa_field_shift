@@ -28,7 +28,7 @@ export function DecisionBrief({ result, reviewInputs, openAgent }: { result: Han
     </div>
     <div><h4>{text('What to check', 'Що перевірити')}</h4><ul>{brief.checks.map(key => <li key={key}>{checks[key][uk ? 1 : 0]}</li>)}</ul></div>
     <div><h4>{text('Next decision', 'Наступне рішення')}</h4>
-      <p>{reviewInputs ? text('Keeps your current draft; does not restore saved inputs or apply a plan.', 'Зберігає поточну чернетку; не відновлює збережені входи й не застосовує план.') : text('Discuss the current field context; this saved model output is not attached.', 'Обговоріть контекст поточного поля; цей збережений результат моделі не додається.')}</p>
+      <p>{reviewInputs ? text('Review the assumptions in your current draft for a new comparison.', 'Уточніть припущення в поточній чернетці, щоб розрахувати новий варіант.') : text('Discuss the current field’s conditions and missing information with the assistant.', 'Обговоріть стан і відсутні дані поточного поля з асистентом.')}</p>
       <div className="handoff-brief-actions">{reviewInputs ? <button type="button" className="button" onClick={reviewInputs}>{text('Review current inputs', 'Переглянути поточні дані')}</button>
         : openAgent ? <button type="button" className="button" onClick={openAgent}>{text('Discuss this field with assistant', 'Обговорити це поле з асистентом')}</button> : null}</div>
     </div>
