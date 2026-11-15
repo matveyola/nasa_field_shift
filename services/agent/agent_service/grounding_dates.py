@@ -37,7 +37,14 @@ DATE = re.compile(
     r")(?![\w/])",
     re.IGNORECASE,
 )
-_RANGE = re.compile(r"\s*(?:[–—-]|to|до)\s*", re.IGNORECASE)
+_RANGE = re.compile(
+    r"\s*(?:[–—-]|to|until|till|through|up\s+to|до|по)\s*", re.IGNORECASE
+)
+_BETWEEN = re.compile(
+    r"\b(?:between(?:\s+the)?(?:\s+dates?)?|між(?:\s+датами)?)\s*$",
+    re.IGNORECASE,
+)
+_AND = re.compile(r"\s*(?:and|та|і|й|&)\s*", re.IGNORECASE)
 
 
 @dataclass(frozen=True)
@@ -98,10 +105,14 @@ def range_year(text: str, spans: list[DateSpan], index: int) -> int | None:
     span = spans[index]
     if span.year is None and index + 1 < len(spans):
         following = spans[index + 1]
-        if _RANGE.fullmatch(text[span.end : following.start]):
+        if joins_range(text, span, following):
             return following.year
     return None
 
 
 def joins_range(text: str, left: DateSpan, right: DateSpan) -> bool:
-    return bool(_RANGE.fullmatch(text[left.end : right.start]))
+    gap = text[left.end : right.start]
+    return bool(
+        _RANGE.fullmatch(gap)
+        or (_AND.fullmatch(gap) and _BETWEEN.search(text[: left.start]))
+    )

@@ -360,8 +360,11 @@ def _ground_dates(text, masked, retrieved, unverified):
         }
         endpoints = {d for period in periods for d in period}
         value = span.resolve(endpoints, grounding_dates.range_year(masked, spans, i))
-        # A date immediately used as money/a measurement is not a date escape.
-        if _UNIT_AFTER.match(masked[span.end : span.end + 12]):
+        # A matched date prefix cannot hide a numeric fraction suffix, nor
+        # money/measurement units separated by arbitrary Unicode whitespace.
+        # Ordinary punctuation after a complete date remains valid.
+        suffix = masked[span.end :].lstrip()
+        if re.match(r"[.,]\d", suffix) or _UNIT_AFTER.match(suffix):
             value = None
         resolved.append(value)
         scoped_periods.append(periods)

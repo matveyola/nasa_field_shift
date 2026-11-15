@@ -280,3 +280,68 @@ def test_actual_llm_loop_preserves_verified_dates_and_redacts_unverified_yield()
     assert "45" not in text and "2027" not in text
     assert message["warnings"]
     assert all(f["id"] in FACTS for f in message["facts"])
+
+
+RANGE_PHRASES = [
+    "for {} until {}",
+    "from {} through {}",
+    "from {} up to {}",
+    "between {} and {}",
+    "між {} та {}",
+    "між {} і {}",
+    "від {} по {}",
+]
+
+
+@pytest.mark.parametrize("phrase", RANGE_PHRASES)
+def test_natural_language_range_must_match_the_complete_ordered_period(phrase):
+    # Independent review reproduced reversed `until` / `between ... and`
+    # ranges being accepted as two individually valid endpoint dates.
+    start, end = "November 1, 2025", "November 14, 2026"
+    assert not ground(
+        f"Rain {phrase.format(start, end)}: {{{{fact:season.rain}}}}."
+    ).violations
+    reversed_text = f"Rain {phrase.format(end, start)}: {{{{fact:season.rain}}}}."
+    assert {v.category for v in ground(reversed_text).violations} == {"ungrounded_date"}
+    assert not redact(reversed_text, ground(reversed_text).violations)
+
+
+@pytest.mark.parametrize("phrase", RANGE_PHRASES)
+def test_natural_language_range_cannot_splice_two_day_facts(phrase):
+    period = phrase.format("November 14, 2026", "November 16, 2026")
+    text = f"Weather {period}: {{{{fact:wx.2026-11-14.alert}}}} {{{{fact:wx.2026-11-16.alert}}}}."
+    assert {v.category for v in ground(text).violations} == {"ungrounded_date"}
+
+
+@pytest.mark.parametrize(
+    "amount",
+    [
+        "2026-11-14  USD",
+        "14 November 2026  t/ha",
+        "14 Nov 2026\t\tUAH",
+        "14 листопада 2026 року\u00a0\u00a0грн",
+        "2026-11-14\u202f\u202ft/ha",
+        "2026-11-14" + " " * 40 + "USD",
+        "2026-11-14.50 USD",
+        "14 November 2026.50USD",
+        "November 14, 2026,50 t/ha",
+        "14 листопада 2026 року.50 UAH",
+        "2026-11-14.50",
+        "14.11.2026,50",
+        "2026-11-14  .50 USD",
+        "14 November 2026\u202f,50 t/ha",
+    ],
+)
+def test_date_like_amount_is_rejected_including_spacing_and_fraction_suffix(amount):
+    text = f"{amount}: {{{{fact:wx.2026-11-14.alert}}}}."
+    assert "ungrounded_date" in {v.category for v in ground(text).violations}
+    assert not redact(text, ground(text).violations)
+
+
+def test_independent_dates_and_sentence_punctuation_are_not_ranges_or_fractions():
+    text = (
+        "{{fact:wx.2026-11-14.alert}} on November 14, 2026. "
+        "November 15, 2026, {{fact:wx.2026-11-15.alert}}. "
+        "November 16, 2026: {{fact:wx.2026-11-16.alert}}."
+    )
+    assert not ground(text).violations
