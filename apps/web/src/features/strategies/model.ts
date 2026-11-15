@@ -1,4 +1,5 @@
 import type { PlanningDraft } from '../../api/rotationPlanning'
+import type { StrategyFocus } from '../../shared/productContext'
 
 /** Summaries use only saved assignments, including failed searches with no decision. */
 export function nextSeasonDecisions(draft: PlanningDraft, focusedField?: string) {
@@ -13,6 +14,6 @@ export function allocationSeasonSupported(season: number) {
   return Number.isInteger(season) && season >= 2001 && season <= 2100
 }
 
-export function initialStrategyView(focus?: 'profiles' | 'economics') {
+export function initialStrategyView(focus?: StrategyFocus) {
   return focus ? 'scenarios' : 'opportunities'
 }

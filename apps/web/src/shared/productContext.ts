@@ -4,7 +4,7 @@ import type { SpectralIndex } from '../api/analytics'
 /** Product sections share field, season and scenario; URL compatibility is owned by app/routing. */
 export const analyticsSections = ['overview', 'water', 'vegetation', 'rotation', 'soil'] as const
 export type AnalyticsSection = (typeof analyticsSections)[number]
-export type StrategyFocus = 'profiles' | 'economics'
+export type StrategyFocus = 'profiles' | 'economics' | 'native'
 
 export type MapFocus = {
   season?: number

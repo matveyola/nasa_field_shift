@@ -18,6 +18,8 @@ test('legacy water links retain field, year, scenario and exact saved run in Ana
 test('legacy planning opens Strategies while old rotation diagnostics stay analytical', () => {
   const route = parseRoute('/rotations?planning=1&field=F-02&season=2028&trajectory=reference')
   assert.equal(route.page, 'strategies')
+  assert.equal(route.strategyFocus, 'native')
+  assert.equal(parseRoute(routeAddress(route)).strategyFocus, 'native')
   for (const page of pages) {
     const next = parseRoute(routeAddress({ ...route, page }))
     assert.equal(next.fieldId, 'F-02'); assert.equal(next.season, 2028)

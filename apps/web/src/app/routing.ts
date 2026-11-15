@@ -38,7 +38,7 @@ function identifier(value?: string | null): string | undefined {
 export function canonicalRoute(route: Route): Route {
   if (route.page === 'water') return { ...route, page: 'analytics', section: 'water' }
   if (route.page === 'rotations') return route.planning
-    ? { ...route, page: 'strategies', planning: undefined, section: undefined }
+    ? { ...route, page: 'strategies', planning: undefined, section: undefined, strategyFocus: 'native' }
     : { ...route, page: 'analytics', section: 'rotation' }
   return route
 }
@@ -65,6 +65,7 @@ export function parseRoute(address: string): Route {
     jobId: target.page === 'agent' || (target.page === 'analytics' && target.section === 'water')
       ? url.searchParams.get('job') || undefined : undefined,
     ...(target.section ? { section: target.section } : {}),
+    ...(target.strategyFocus ? { strategyFocus: target.strategyFocus } : {}),
   }
   if (!explicit) route.home = true
   if (setupId) route.setupId = setupId
@@ -72,7 +73,7 @@ export function parseRoute(address: string): Route {
   if (season !== undefined) route.season = season
   const trajectory = identifier(url.searchParams.get('trajectory'))
   if (trajectory) route.trajectory = trajectory
-  if (route.page === 'strategies' && ['profiles', 'economics'].includes(url.searchParams.get('setup') ?? '')) {
+  if (route.page === 'strategies' && ['profiles', 'economics', 'native'].includes(url.searchParams.get('setup') ?? '')) {
     route.strategyFocus = url.searchParams.get('setup') as StrategyFocus
   }
   if (route.page === 'fields' && hasMap) {

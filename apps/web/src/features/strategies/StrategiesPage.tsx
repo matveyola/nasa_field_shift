@@ -20,7 +20,7 @@ export function StrategiesPage({ field, fields, season, trajectory, focus, onCon
   const [draftState, setDraftState] = useState<AllocationDraftState>({ dirty: false, busy: false })
   const [calendarChoice, setCalendarChoice] = useState<PlantingOpportunity | null>(null)
   const [pendingPeriod, setPendingPeriod] = useState<{ year: number; item: PlantingOpportunity | null } | null>(null)
-  const [inputFocus, setInputFocus] = useState<'profiles' | 'economics' | undefined>(focus)
+  const [inputFocus, setInputFocus] = useState<'profiles' | 'economics' | undefined>(focus === 'native' ? undefined : focus)
   const confirmation = useRef<HTMLDialogElement>(null)
   useEffect(() => { setPendingPeriod(null); setCalendarChoice(null) }, [field.id, field.boundary_revision])
   useEffect(() => {
@@ -40,7 +40,7 @@ export function StrategiesPage({ field, fields, season, trajectory, focus, onCon
     if (draftState.dirty || year + seasonCount - 1 > 2100) setPendingPeriod({ year, item })
     else openPeriod(year, item)
   }
-  useEffect(() => { setInputFocus(focus); if (focus) setView('scenarios') }, [focus])
+  useEffect(() => { setInputFocus(focus === 'native' ? undefined : focus); if (focus) setView('scenarios') }, [focus])
   useEffect(() => { setApplied(false) }, [firstSeason, seasonCount])
   const names = Object.fromEntries(fields.map(f => [f.id, f.name]))
   return <section className="strategies-page" aria-labelledby="strategies-title">
