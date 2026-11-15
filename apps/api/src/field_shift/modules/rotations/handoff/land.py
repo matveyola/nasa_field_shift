@@ -1,4 +1,13 @@
-"""Use only current, available, nonsynthetic profile evidence for the land gate."""
+"""Require current, explicitly linked and complete land evidence.
+
+land_source_ids links the land assertion to SourceRecords; unrelated soil/weather
+records cannot supply missing land coverage. Empty legacy links remain unknown.
+Only valid, full polygon/area-weighted coverage qualifies; partial, missing or
+point-only records never imply whole-field arability. Source metadata are
+provenance assertions (including user-entered evidence), not independent source
+verification or crop suitability validation. The existing conservative synthetic,
+rejected, geometry, scope and availability vetoes remain across the snapshot.
+"""
 
 from datetime import UTC, datetime
 
@@ -22,8 +31,23 @@ def land_status(session, field, *, now=None):
     }:
         return "unknown"
     if profile.as_of > now or any(
-        s.available_at > now or s.kind == "synthetic" or s.quality == "rejected"
+        s.available_at > now
+        or s.retrieved_at > now
+        or s.kind == "synthetic"
+        or s.quality == "rejected"
         for s in profile.sources
     ):
+        return "unknown"
+    bound_land_sources = [
+        source
+        for source in profile.sources
+        if source.id in profile.land_source_ids
+        and source.kind != "synthetic"
+        and source.quality == "valid"
+        and source.coverage_fraction == 1
+        and source.spatial_method in {"polygon", "area_weighted"}
+        and source.available_at <= profile.as_of
+    ]
+    if not bound_land_sources:
         return "unknown"
     return profile.land_status

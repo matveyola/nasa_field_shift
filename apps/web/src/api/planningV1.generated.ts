@@ -35,6 +35,10 @@ export interface FieldProfileSnapshot {
   area_ha: number;
   land_status: "arable" | "non_arable" | "ocean" | "ice" | "unknown";
   /**
+   * @maxItems 200
+   */
+  land_source_ids?: string[];
+  /**
    * @maxItems 100
    */
   history: CropHistoryEntry[];

@@ -284,3 +284,26 @@ payloads and their stored values are unchanged; the wire version remains 1.0.0.
 This expands request capacity, not model applicability: source coverage, reviewed
 calendars, crop support and model resource limits still govern every evaluation.
 No four-or-more-season model support is implied.
+
+### Explicit land provenance (compatible optional extension)
+
+`FieldProfileSnapshot.land_source_ids` optionally names the existing source records
+that support `land_status`. It defaults to an empty list for legacy profiles;
+references must resolve and be unique. No source is automatically assigned from
+soil/weather/history provenance or inferred from provider/product text. Empty
+bindings are omitted when serializing so pre-extension canonical snapshot and
+profile-write request hashes stay unchanged. Nonempty bindings serialize and
+participate in those identities. The schema version remains 1.0.0 because this is
+an optional, backward-parseable addition; older consumers that reject unknown
+properties must be updated before consuming newly bound profiles.
+
+The rotation handoff gate requires at least one explicitly linked, nonsynthetic
+source with `quality=valid`, `coverage_fraction=1`, and polygon or area-weighted
+spatial coverage. Partial/missing/zero/unknown coverage and point-only evidence do
+not establish whole-field arability. Current geometry, farm scope and source
+availability checks still apply; legacy unbound land assertions remain unknown in
+that gate. Qualified non-arable/ice/ocean assertions still block submission. This
+is an evidence link and quality policy, not independent verification of source
+contents or crop suitability. In particular, `kind=user_entered` remains a
+user-reported assertion; an authenticated import does not make it an observed,
+validated field measurement. No yield/thermal/model release gate is promoted.
