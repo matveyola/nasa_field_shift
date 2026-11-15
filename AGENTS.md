@@ -27,12 +27,21 @@
 6. **Never fit a test to the implementation just to make it pass. Never delete, weaken, skip or bypass a failing test for a green result.** Find and fix the cause. Change an expectation only when the intended behavior changes or the existing expectation is demonstrably incorrect, and record the reason.
 7. Diagnose the root cause of a CI failure before rerunning unrelated checks.
 
+## Production behavior and global test scenarios
+
+- Never select predictions or recommendations by test username, field ID, fixture name or country label. Use declared scientific inputs, sourced applicability limits and generic constraints. Regional parameters need provenance and a justified domain of use.
+- Never introduce hidden production mocks, fabricated provider responses or success fallbacks to make a scenario work. An unavailable source or unsupported model must remain explicit, with a useful reason and next action.
+- Synthetic geometry, crop history, economic assumptions and reference scenarios are QA inputs, not observed field truth or empirical accuracy labels. Keep their origin visible. Test hypotheses such as rice suitability depend on actual climate, soil, calendar, land and management evidence; do not require a predetermined geographic winner.
+- A test account must use normal authentication, model readiness, ownership and application rules. This application currently has one farm per deployment: global QA needs a dedicated empty database and isolated services, rather than treating another account as another tenant. Seeding is explicit and idempotent, never automatic at application startup. Keep credentials and ownership receipts outside Git.
+- Persist assistant replies and tool results only after genuine execution. Clearly distinguish planned test prompts from completed conversations. Cover missing data, abstention, stale context, recovery, units and resource constraints as well as successful recommendations.
+- Review layouts at phone, tablet and desktop sizes using element containment and readable controls. Do not hide layout defects with page-wide overflow clipping or remove decision evidence to make a screen fit. Put deeper technical evidence behind accessible details.
+
 Keep temporary work notes outside the delivered source tree or remove them after verification.
 
 ## Development agent tree
 
 - For multi-component implementation or explicitly delegated work, use [.agents/skills/agent-tree/SKILL.md](.agents/skills/agent-tree/SKILL.md) and spawn bounded subagents when available. Small edits can stay with one implementer and appropriate checks.
-- Roles live in `.codex/agents`: `task_lead`, `implementer`, `researcher`, `verifier`, `test_runner`, and `integrator`. The root coordinates the whole tree; task leads may delegate within its shared capacity and ownership allocation.
+- Roles live in `.codex/agents`: `task_lead`, `implementer`, `researcher`, `verifier`, `test_runner`, `integrator`, `product_ceo`, `product_cto` and `ui_ux`. The root coordinates the whole tree; task leads may delegate within its shared capacity and ownership allocation.
 - Each implementation leaf in delegated work needs independent verification and test evidence for the same frozen revision. An author cannot approve their own change. Missing mandatory checks block acceptance; later edits invalidate affected evidence.
 - Use separate worktrees for concurrent writers. Freeze a checkout during review/testing. Assign one owner to shared files such as `docs/status.md`; worktrees do not isolate databases, Redis, ports or Docker resources.
 - Respect the effective runtime slot limit. Use staged execution and agent reuse when capacity is limited; do not recursively spawn reviewers of reviewers. The workflow depth budget is three edges from the root.
@@ -45,6 +54,8 @@ Keep temporary work notes outside the delivered source tree or remove them after
 - Create each issue's branch and isolated worktree from that person's jobs branch. Reserve its checkout for integration. Never implement concurrent issues in the same working directory.
 - The user authorizes merging verified issue work into the personal jobs branch and pushing that branch to `origin`. This supersedes older issue instructions to use `main` or stop at a PR. Do not merge into `main` or deploy without a separate request.
 - Serialize integration, combined-tree checks and push using the skill's repository-wide lock. Preserve real commit metadata and never force-push shared history.
+- For the current autonomous product task, Nazar separately authorized integrating incoming PRs/branches into current `main`, running combined verification and normally pushing the accepted result. This authorization does not permit deployment, force-push or bypassing branch protection. Preserve the personal-jobs workflow for other issue work unless separately instructed.
+- After the core task is verified, inspect incoming PRs and new remote branch tips every ten minutes while the autonomous task is active. Keep poll watermarks and integration evidence outside Git. Rebase is not required: merge candidates against current main in an isolated integration worktree, resolve conflicts, verify the combined tree and serialize publication with the repository lock. Skip unfinished or blocked candidates and report concrete reasons; a new branch is not proof of readiness. Never claim a background monitor is installed unless it actually is.
 - Planning prerequisites remain: #2 first, then #3–#6 in parallel, then #7. Each prerequisite must be present in the jobs branch before dependent work begins.
 
 ## Delivery harness and commit policy
