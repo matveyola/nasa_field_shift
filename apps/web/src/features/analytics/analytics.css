@@ -122,3 +122,19 @@
   .analytics-context .control:last-child { flex: 1 1 140px; max-width: none; }
   .analytics-context select { overflow-wrap: normal; }
 }
+
+/* Keep field/year/scenario controls explicit without repeating the field name above them. */
+.analytics-heading{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px}
+.analytics-heading>div{display:contents}
+.analytics-heading h1{grid-column:1;margin:0}
+.analytics-heading p{grid-column:1/-1;grid-row:2;margin:0}
+.analytics-heading>.button{grid-column:2;grid-row:1;min-height:44px}
+.analytics-context{margin-top:14px}
+@media(max-width:700px){
+ .analytics-page{padding-top:16px}
+ .analytics-heading h1{font-size:1.6rem}
+ .analytics-heading>.button{padding:10px 12px;max-width:140px;min-width:0}
+ .analytics-heading p{font-size:.8rem}
+ .analytics-context{margin-top:12px}
+ .analytics-content{gap:16px}
+}
