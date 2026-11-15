@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.11, <3.13"
 
 [[package]]
@@ -34,6 +34,7 @@ name = "field-shift-ml"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "field-shift-science" },
     { name = "joblib" },
     { name = "numpy" },
     { name = "pydantic" },
@@ -51,6 +52,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "field-shift-science", editable = "../field-shift-science" },
     { name = "joblib", specifier = "==1.4.2" },
     { name = "numpy", specifier = "==1.26.4" },
     { name = "pydantic", specifier = "==2.14.3" },
@@ -64,6 +66,21 @@ requires-dist = [
 dev = [
     { name = "pytest", specifier = "==9.2.0" },
     { name = "ruff", specifier = "==0.17.4" },
+]
+
+[[package]]
+name = "field-shift-science"
+version = "0.1.0"
+source = { editable = "../field-shift-science" }
+dependencies = [
+    { name = "pydantic" },
+    { name = "redis" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "pydantic", specifier = ">=2.10,<3" },
+    { name = "redis", specifier = ">=5,<9" },
 ]
 
 [[package]]

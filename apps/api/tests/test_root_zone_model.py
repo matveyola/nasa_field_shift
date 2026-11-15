@@ -3,23 +3,22 @@ from unittest.mock import Mock
 from urllib.parse import parse_qs, urlsplit
 
 import pytest
-from pydantic import ValidationError
-from redis.exceptions import ConnectionError as RedisConnectionError
-
-from field_shift.modules.geo_ml import ifs
-from field_shift.modules.geo_ml.era5_land import MoistureRequestRejected
-from field_shift.modules.geo_ml.forecast_cache import ForecastCache
-from field_shift.modules.simulation.root_zone_inputs import (
+from field_shift_science.geo_ml import ifs
+from field_shift_science.geo_ml.era5_land import MoistureRequestRejected
+from field_shift_science.geo_ml.forecast_cache import ForecastCache
+from field_shift_science.simulation.root_zone_inputs import (
     fetch_ifs_root_zone,
     root_zone_storage_mm,
 )
-from field_shift.modules.simulation.root_zone_model import (
+from field_shift_science.simulation.root_zone_model import (
     RootZoneCorrection,
     get_root_zone_correction,
     reference_reserve_mm,
     root_zone_version,
 )
-from field_shift.modules.weather.historical import WeatherUnavailableError
+from field_shift_science.weather.historical import WeatherUnavailableError
+from pydantic import ValidationError
+from redis.exceptions import ConnectionError as RedisConnectionError
 
 
 def test_reference_reserve_is_bounded_by_model_capacity():

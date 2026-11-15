@@ -1,0 +1,72 @@
+.handoff-workspace { display: grid; gap: 20px; min-width: 0; }
+.handoff-workspace fieldset { min-width: 0; border: 0; margin: 0; padding: 0; }
+.handoff-workspace legend { font-weight: 650; padding: 0 0 12px; }
+.handoff-form { display: grid; gap: 20px; }
+.handoff-workspace label { display: grid; gap: 8px; font-size: .82rem; min-width: 0; }
+.handoff-workspace input:not([type=checkbox]), .handoff-workspace select { width: 100%; min-width: 0; min-height: 44px; border: 1px solid var(--line, #ddd); border-radius: 10px; padding: 10px; background: var(--card, white); color: var(--ink, #111); }
+.handoff-workspace p, .handoff-workspace li { font-size: .82rem; overflow-wrap: anywhere; }
+.handoff-period, .handoff-equipment { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr)); gap: 14px; }
+.handoff-cycles, .handoff-plans, .handoff-outcomes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 16px; }
+.handoff-workspace .handoff-plan, .handoff-workspace .handoff-cycles > fieldset, .handoff-outcome { border: 1px solid var(--line, #ddd); border-radius: 16px; padding: 18px; background: var(--card, white); min-width: 0; }
+.handoff-crop-choice { display: grid; gap: 12px; margin-bottom: 20px; }
+.handoff-crop-choice h4 { margin: 0; font-size: .85rem; }
+.handoff-workspace details > * + * { margin-top: 12px; }
+.handoff-workspace details { border-top: 1px solid var(--line, #ddd); padding-top: 8px; }
+.handoff-note { color: var(--ink-2, #555); }
+.handoff-workspace .handoff-check { display: flex; align-items: start; gap: 10px; line-height: 1.5; }
+.handoff-check input { flex-shrink: 0; width: 18px; height: 18px; }
+.handoff-irrigation { display: grid; gap: 10px; margin-bottom: 16px; }
+.handoff-calculate { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.handoff-calculate p { margin: 0; }
+.handoff-job, .handoff-ranking { padding: 16px; border-radius: 14px; background: var(--screen, #eee); }
+.handoff-job > span { margin-left: 12px; font-size: .8rem; }
+.handoff-badge { display: inline-block; font-weight: 650; border: 1px solid var(--line, #ddd); padding: 8px 12px; border-radius: 20px; }
+.handoff-outcome h4 { font-size: 1.2rem; margin: 0 0 12px; }
+.handoff-outcome dl { display: grid; gap: 8px; font-size: .8rem; }
+.handoff-outcome dt { color: var(--ink-2, #555); }
+.handoff-outcome dd { margin: 5px 0 12px; font-weight: 600; }
+.handoff-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.handoff-season { border-top: 1px solid var(--line, #ddd); padding-top: 12px; margin-top: 14px; }
+.handoff-season h5 { font-size: 1rem; margin: 0; }
+.handoff-workspace pre { font-size: .7rem; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 420px; overflow: auto; }
+.handoff-provenance { font-size: .8rem; }
+.handoff-provenance a { display: block; margin: 8px 0; overflow-wrap: anywhere; }
+.handoff-receipts { padding-left: 18px; }
+@media (max-width: 600px) { .handoff-calculate { flex-direction: column; align-items: stretch; } }
+
+.handoff-workspace, .handoff-form { grid-template-columns: minmax(0, 1fr); }
+.handoff-workspace form, .handoff-workspace details, .handoff-workspace dl > *,
+.handoff-workspace .handoff-crop-choice { min-width: 0; }
+.handoff-workspace :is(input, select, legend) { max-width: 100%; }
+.handoff-workspace legend { overflow-wrap: anywhere; }
+.handoff-workspace .handoff-check { min-height: 44px; align-items: center; }
+
+.handoff-brief { display: grid; gap: 10px; padding: 16px; border: 1px solid var(--line, #ddd); border-radius: 14px; min-width: 0; }
+.handoff-brief > div { min-width: 0; overflow-wrap: anywhere; }
+.handoff-brief h4 { margin: 0 0 6px; }
+.handoff-brief p, .handoff-brief ul { margin: 6px 0; }
+.handoff-brief-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+.handoff-brief-actions .button { max-width: 100%; white-space: normal; }
+.handoff-workspace form[tabindex]:focus-visible { outline: 2px solid var(--primary, #316847); outline-offset: 4px; }
+
+.handoff-workspace .strategies-purpose { margin-bottom: 0; }
+.handoff-workspace .strategies-purpose h2 { margin-top: 0; }
+.handoff-results > p { margin-block: 8px; }
+.handoff-brief-lead { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; }
+.handoff-brief-lead .handoff-brief-actions { margin: 0; }
+.handoff-brief-checks { padding-left: 20px; color: var(--ink-2, #555); }
+.handoff-metrics dd { font-size: 1.25rem; letter-spacing: -.02em; color: var(--ink, #111); }
+.handoff-outcome > .handoff-metrics { margin-block: 12px; }
+.handoff-outcome .handoff-secondary-metrics dd { font-size: .9rem; }
+@container strategy-workspace (max-width: 600px) {
+  .handoff-brief-lead { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Start with sowing inputs; secondary setup stays explicit and editable. */
+.handoff-workspace { gap: 12px; }
+.handoff-workspace .strategies-purpose h2 { font-size: 1.1rem; margin-bottom: 6px; }
+.handoff-workspace .handoff-entry-status { margin: 0; }
+.handoff-workspace .handoff-saved { padding-top: 0; }
+.handoff-workspace .handoff-saved > summary { padding-block: 8px; }
+.handoff-setup-value { display: block; color: var(--ink-2, #555); font-size: .8rem; font-weight: 400; margin-top: 4px; }
+.handoff-setup > .handoff-period { margin-top: 12px; }

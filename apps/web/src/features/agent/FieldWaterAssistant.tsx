@@ -1,8 +1,9 @@
-import { ArrowRightIcon, CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import { ArrowRightIcon, InformationCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { useId } from 'react'
 import type { Field, WaterForecast } from '../../api/contracts'
 import { useLocale } from '../../shared/locale'
 import { AssistantMark } from '../../shared/AssistantMark'
+import { waterReferenceDisplay } from '../water/waterReferenceDisplay'
 import type { getWaterOutlook } from '../water/waterOutlook'
 import './fieldWaterAssistant.css'
 
@@ -15,9 +16,12 @@ type Props = {
 
 export function FieldWaterAssistant({ field, forecast, outlook, openForecast }: Props) {
   const headingId = useId()
-  const { t, number, date, shortDate } = useLocale()
+  const { t, number, date, shortDate, language } = useLocale()
+  const label = (en: string, uk: string) => language === 'uk' ? uk : en
   const shortage = outlook.kind === 'shortage'
   const available = outlook.kind !== 'unavailable'
+  const applicability = available ? forecast.data?.applicability : null
+  const display = waterReferenceDisplay(applicability, shortage, language)
   const digits = shortage && number(outlook.firstShortage.reserve_mm) === number(outlook.thresholdMm) ? 4 : 1
   let unavailableMessage = t('No forecast for the upcoming days yet.')
   if (forecast.pending) unavailableMessage = t('Loading root-zone forecast…')
@@ -34,11 +38,11 @@ export function FieldWaterAssistant({ field, forecast, outlook, openForecast }: 
         <h2 id={headingId}>{t('Field assistant')}</h2>
         <span className="field-water-assistant-badge">{t('Forecast signal')}</span>
       </header>
-      <div className={`field-water-assistant-status is-${outlook.kind}`} role="status">
+      <div className={`field-water-assistant-status is-${available ? display.tone : outlook.kind}`} role="status">
         {available ? <>
-          {shortage ? <ExclamationTriangleIcon aria-hidden="true" /> : <CheckCircleIcon aria-hidden="true" />}
+          {shortage && applicability?.status !== 'review_required' ? <ExclamationTriangleIcon aria-hidden="true" /> : <InformationCircleIcon aria-hidden="true" />}
           <div>
-            <h3>{t(shortage ? 'Water shortage expected' : 'No water shortage expected')}</h3>
+            <h3>{display.summary}</h3>
             <p>{t(shortage ? 'First day below threshold' : 'Forecast period')}{' '}
               <time dateTime={shortage ? outlook.firstShortage.date : outlook.firstDay.date}>
                 {shortDate(shortage ? outlook.firstShortage.date : outlook.firstDay.date)}
@@ -49,9 +53,10 @@ export function FieldWaterAssistant({ field, forecast, outlook, openForecast }: 
           </div>
         </> : <p>{unavailableMessage}</p>}
       </div>
+      {available && <p role="note">{display.caveat} {display.limitation}</p>}
       {shortage && <dl className="field-assistant-risk-values">
         <div><dt>{shortDate(outlook.firstShortage.date)}</dt><dd>{number(outlook.firstShortage.reserve_mm, digits)} {t('mm')}</dd></div>
-        <div><dt>{t('Stress threshold')}</dt><dd>{number(outlook.thresholdMm, digits)} {t('mm')}</dd></div>
+        <div><dt>{label('Reference threshold', 'Довідковий поріг')}</dt><dd>{number(outlook.thresholdMm, digits)} {t('mm')}</dd></div>
       </dl>}
       {available && <WaterMiniChart days={outlook.days} threshold={outlook.thresholdMm} />}
       <button type="button" className="button primary field-water-assistant-action"

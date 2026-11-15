@@ -25,6 +25,15 @@ On bare Debian/Ubuntu, install `libexpat1` for Rasterio's native runtime. The Do
 
 In **Fields**, use **Edit boundary** to move, insert, or remove vertices when a field expands or changes shape. The server recalculates the mapped field area when the outline changes. Use **Edit planted area** to mark one partial footprint for the active season, or select **Entire field** to clear the partial footprint. This keeps the physical boundary and farm area independent of the season’s planted area. The demo outlines were traced manually from NAIP imagery. When a boundary changes, older analyses remain in job history and the next refresh uses the new geometry.
 
+## Scenario crop planning
+
+The multi-field planner is available under **Rotations → Scenario planning**
+(`/rotations?planning=1`). It needs current field profiles, reviewed regional
+rules/weather/parameters and the optional private CPU crop service. Missing
+inputs produce a setup state. See [runtime setup and limits](docs/planning/runtime.md)
+and [available data / validation gaps](docs/planning/data-audit.md).
+The OSPy baseline is not independently validated for farm-level profit prediction.
+
 ## Code boundaries
 
 - `apps/web/src/app` owns the shell, routes and shared field/season/scenario. Feature directories own page behavior. `apps/web/src/api` owns the HTTP client and contracts.
@@ -87,3 +96,5 @@ npm run build
 ```
 
 Run PostgreSQL and Redis integration checks with `uv run pytest -q -m integration` from `apps/api`. Set `FIELD_SHIFT_TEST_DATABASE_URL` to a PostgreSQL database where tests can create and drop their own temporary schemas. Set `FIELD_SHIFT_TEST_REDIS_URL` to a dedicated empty Redis database. CI provisions both. The release workflow builds downloadable Docker image archives on version tags or on manual dispatch. Load both archives with `docker load`, set `API_IMAGE` and `WEB_IMAGE` to the corresponding SHA-tagged images, and start Compose with `--no-build`.
+
+Python dependency boundaries and required installed-wheel verification: [packaging policy](docs/python-packaging.md).

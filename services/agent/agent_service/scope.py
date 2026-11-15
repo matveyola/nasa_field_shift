@@ -18,11 +18,11 @@ FIELD_OVERVIEW = re.compile(
 
 DEMO_LIMITS = {
     "uk": "Цей демо-режим відповідає лише за даними вибраного поля: що про нього відомо, його карти й ваші умови "
-          "для порівняння сівозмін. На інші запитання він не відповідає. З питаннями про вирощування, ціни, техніку "
-          "чи логістику допоможе режим зі штучним інтелектом.",
+    "для порівняння сівозмін. На інші запитання він не відповідає. З питаннями про вирощування, ціни, техніку "
+    "чи логістику допоможе режим зі штучним інтелектом.",
     "en": "This demo mode answers only from the selected field's data: what is known about it, its maps and your "
-          "conditions for comparing rotations. It does not answer other questions. For growing, prices, machinery or "
-          "logistics, use the AI mode.",
+    "conditions for comparing rotations. It does not answer other questions. For growing, prices, machinery or "
+    "logistics, use the AI mode.",
 }
 
 

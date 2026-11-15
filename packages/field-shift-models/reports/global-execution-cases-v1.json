@@ -1,0 +1,1079 @@
+{
+  "schema_version": "global-execution-cases-v1",
+  "promotion": false,
+  "empirical_accuracy": "not_measured",
+  "crop_catalog": [
+    "Maize",
+    "Wheat",
+    "Soy",
+    "Barley",
+    "Sunflower",
+    "Rapeseed",
+    "Peas",
+    "Rice"
+  ],
+  "locations": [
+    {
+      "location": "kyiv",
+      "representative_coordinates": [
+        50.45,
+        30.52
+      ],
+      "land_status": "arable",
+      "land_status_basis": "controlled case assumption; no farm-parcel classification",
+      "raw_source_sha256": "bcd31ae17d525d945a16975105469538775c33e27135f3cff02cd4f2532508d4",
+      "source_dates": [
+        "2023-04-01",
+        "2023-07-29"
+      ],
+      "target_dates": [
+        "2027-04-01",
+        "2027-07-29"
+      ],
+      "mean_tmin_c": 10.320833333333333,
+      "total_precipitation_mm": 327.88,
+      "derived_fao56_et0_mm": 380.2086524967253,
+      "outcomes": [
+        {
+          "id": "Maize",
+          "status": "experimental_water_only",
+          "members": [
+            {
+              "scenario_id": "NASA-2023-replay",
+              "unmet_fraction": 0.0543685077599118,
+              "deficit_mm": 18.228803185130694,
+              "stress_days": 21,
+              "irrigation_mm": 0.0,
+              "max_balance_error_mm": 5.684341886080802e-14,
+              "closing_profile_reserve_mm": 156.20663365066736,
+              "closing_snow_mm": 0.0,
+              "input_sha256": "b02ecda5e0d99f67450426d712f63f4a4e550f4a6e20d974bdef01aefea61a5b",
+              "sources": [
+                "Controlled equal-phase crop parameters; NOT calibrated local phenology",
+                "Controlled example hydraulics/CN/snow assumptions, not measured regional soil",
+                "NASA-POWER-total-precip-bcd31ae17d525d945a16975105469538775c33e27135f3cff02cd4f2532508d4"
+              ]
+            }
+          ],
+          "worst_tested_unmet_fraction": 0.0543685077599118,
+          "yield_t_ha": null,
+          "gross_margin": null,
+          "pros": [
+            "Quantified water demand and deficit on the supplied scenarios"
+          ],
+          "cons": [
+            "No locally validated yield, survival, nitrogen, flood or economic response",
+            "Calendar/root/Kc/drainage choices materially influence rankings"
+          ]
+        },
+        {
+          "id": "Wheat",
+          "status": "experimental_water_only",
+          "members": [
+            {
+              "scenario_id": "NASA-2023-replay",
+              "unmet_fraction": 0.0543685077599118,
+              "deficit_mm": 18.228803185130694,
+              "stress_days": 21,
+              "irrigation_mm": 0.0,
+              "max_balance_error_mm": 5.684341886080802e-14,
+              "closing_profile_reserve_mm": 156.20663365066736,
+              "closing_snow_mm": 0.0,
+              "input_sha256": "70e844bc114def145bb20abc8803fcad6627c0d4c77ce447d3ca3ebefa1ec370",
+              "sources": [
+                "Controlled equal-phase crop parameters; NOT calibrated local phenology",
+                "Controlled example hydraulics/CN/snow assumptions, not measured regional soil",
+                "NASA-POWER-total-precip-bcd31ae17d525d945a16975105469538775c33e27135f3cff02cd4f2532508d4"
+              ]
+            }
+          ],
+          "worst_tested_unmet_fraction": 0.0543685077599118,
+          "yield_t_ha": null,
+          "gross_margin": null,
+          "pros": [
+            "Quantified water demand and deficit on the supplied scenarios"
+          ],
+          "cons": [
+            "No locally validated yield, survival, nitrogen, flood or economic response",
+            "Calendar/root/Kc/drainage choices materially influence rankings"
+          ]
+        },
+        {
+          "id": "Soy",
+          "status": "experimental_water_only",
+          "members": [
+            {
+              "scenario_id": "NASA-2023-replay",
+              "unmet_fraction": 0.0543685077599118,
+              "deficit_mm": 18.228803185130694,
+              "stress_days": 21,
+              "irrigation_mm": 0.0,
+              "max_balance_error_mm": 5.684341886080802e-14,
+              "closing_profile_reserve_mm": 156.20663365066736,
+              "closing_snow_mm": 0.0,
+              "input_sha256": "26b22c3aadfe9499bedb4024187a39030bad2ad951d6ae12714d9d82f463c769",
+              "sources": [
+                "Controlled equal-phase crop parameters; NOT calibrated local phenology",
+                "Controlled example hydraulics/CN/snow assumptions, not measured regional soil",
+                "NASA-POWER-total-precip-bcd31ae17d525d945a16975105469538775c33e27135f3cff02cd4f2532508d4"
+              ]
+            }
+          ],
+          "worst_tested_unmet_fraction": 0.0543685077599118,
+          "yield_t_ha": null,
+          "gross_margin": null,
+          "pros": [
+            "Quantified water demand and deficit on the supplied scenarios"
+          ],
+          "cons": [
+            "No locally validated yield, survival, nitrogen, flood or economic response",
+            "Calendar/root/Kc/drainage choices materially influence rankings"
+          ]
+        },
+        {
+          "id": "Barley",
+          "status": "experimental_water_only",
+          "members": [
+            {
+              "scenario_id": "NASA-2023-replay",
+              "unmet_fraction": 0.0543685077599118,
+              "deficit_mm": 18.228803185130694,
+              "stress_days": 21,
+              "irrigation_mm": 0.0,
+              "max_balance_error_mm": 5.684341886080802e-14,
+              "closing_profile_reserve_mm": 156.20663365066736,
+              "closing_snow_mm": 0.0,
+              "input_sha256": "811346272154f9090e64944250da431387f6b303a76a794daca947ed0adeb245",
+              "sources": [
+                "Controlled equal-phase crop parameters; NOT calibrated local phenology",
+                "Controlled example hydraulics/CN/snow assumptions, not measured regional soil",
+                "NASA-POWER-total-precip-bcd31ae17d525d945a16975105469538775c33e27135f3cff02cd4f2532508d4"
+              ]
+            }
+          ],
+          "worst_tested_unmet_fraction": 0.0543685077599118,
+          "yield_t_ha": null,
+          "gross_margin": null,
+          "pros": [
+            "Quantified water demand and deficit on the supplied scenarios"
+          ],
+          "cons": [
+            "No locally validated yield, survival, nitrogen, flood or economic response",
+            "Calendar/root/Kc/drainage choices materially influence rankings"
+          ]
+        },
+        {
+          "id": "Sunflower",
+          "status": "experimental_water_only",
+          "members": [
+            {
+              "scenario_id": "NASA-2023-replay",
+              "unmet_fraction": 0.0543685077599118,
+              "deficit_mm": 18.228803185130694,
+              "stress_days": 21,
+              "irrigation_mm": 0.0,
+              "max_balance_error_mm": 5.684341886080802e-14,
+              "closing_profile_reserve_mm": 156.20663365066736,
+              "closing_snow_mm": 0.0,
+              "input_sha256": "7cc684b66cf15e01d15f51df7b0a1f7b2034f852eaefbecad020ac748ce69416",
+              "sources": [
+                "Controlled equal-phase crop parameters; NOT calibrated local phenology",
+                "Controlled example hydraulics/CN/snow assumptions, not measured regional soil",
+                "NASA-POWER-total-precip-bcd31ae17d525d945a16975105469538775c33e27135f3cff02cd4f2532508d4"
+              ]
+            }
+          ],
+          "worst_tested_unmet_fraction": 0.0543685077599118,
+          "yield_t_ha": null,
+          "gross_margin": null,
+          "pros": [
+            "Quantified water demand and deficit on the supplied scenarios"
+          ],
+          "cons": [
+            "No locally validated yield, survival, nitrogen, flood or economic response",
+            "Calendar/root/Kc/drainage choices materially influence rankings"
+          ]
+        },
+        {
+          "id": "Rapeseed",
+          "status": "experimental_water_only",
+          "members": [
+            {
+              "scenario_id": "NASA-2023-replay",
+              "unmet_fraction": 0.0543685077599118,
+              "deficit_mm": 18.228803185130694,
+              "stress_days": 21,
+              "irrigation_mm": 0.0,
+              "max_balance_error_mm": 5.684341886080802e-14,
+              "closing_profile_reserve_mm": 156.20663365066736,
+              "closing_snow_mm": 0.0,
+              "input_sha256": "1fa45c7af06a14b671196d261414f764fa0611101f547c38e4846e968bcc078f",
+              "sources": [
+                "Controlled equal-phase crop parameters; NOT calibrated local phenology",
+                "Controlled example hydraulics/CN/snow assumptions, not measured regional soil",
+                "NASA-POWER-total-precip-bcd31ae17d525d945a16975105469538775c33e27135f3cff02cd4f2532508d4"
+              ]
+            }
+          ],
+          "worst_tested_unmet_fraction": 0.0543685077599118,
+          "yield_t_ha": null,
+          "gross_margin": null,
+          "pros": [
+            "Quantified water demand and deficit on the supplied scenarios"
+          ],
+          "cons": [
+            "No locally validated yield, survival, nitrogen, flood or economic response",
+            "Calendar/root/Kc/drainage choices materially influence rankings"
+          ]
+        },
+        {
+          "id": "Peas",
+          "status": "experimental_water_only",
+          "members": [
+            {
+              "scenario_id": "NASA-2023-replay",
+              "unmet_fraction": 0.0543685077599118,
+              "deficit_mm": 18.228803185130694,
+              "stress_days": 21,
+              "irrigation_mm": 0.0,
+              "max_balance_error_mm": 5.684341886080802e-14,
+              "closing_profile_reserve_mm": 156.20663365066736,
+              "closing_snow_mm": 0.0,
+              "input_sha256": "cb6d8f93f82222083fd4d2bdfca3a4e0b2d57f0b567dc319a5737600bfa43421",
+              "sources": [
+                "Controlled equal-phase crop parameters; NOT calibrated local phenology",
+                "Controlled example hydraulics/CN/snow assumptions, not measured regional soil",
+                "NASA-POWER-total-precip-bcd31ae17d525d945a16975105469538775c33e27135f3cff02cd4f2532508d4"
+              ]
+            }
+          ],
+          "worst_tested_unmet_fraction": 0.0543685077599118,
+          "yield_t_ha": null,
+          "gross_margin": null,
+          "pros": [
+            "Quantified water demand and deficit on the supplied scenarios"
+          ],
+          "cons": [
+            "No locally validated yield, survival, nitrogen, flood or economic response",
+            "Calendar/root/Kc/drainage choices materially influence rankings"
+          ]
+        },
+        {
+          "id": "Rice",
+          "status": "unsupported",
+          "reason": "Paddy requires a separately validated surface-water model",
+          "members": [],
+          "worst_tested_unmet_fraction": null,
+          "yield_t_ha": null,
+          "gross_margin": null
+        }
+      ]
+    },
+    {
+      "location": "rio",
+      "representative_coordinates": [
+        -22.91,
+        -43.17
+      ],
+      "land_status": "arable",
+      "land_status_basis": "controlled case assumption; no farm-parcel classification",
+      "raw_source_sha256": "50ad0f3f7de2c9ccf71057f18fd264ffec375f946952243ea50ec15d416a86b5",
+      "source_dates": [
+        "2023-10-01",
+        "2024-01-28"
+      ],
+      "target_dates": [
+        "2027-10-01",
+        "2028-01-28"
+      ],
+      "mean_tmin_c": 23.0105,
+      "total_precipitation_mm": 740.63,
+      "derived_fao56_et0_mm": 507.3252323731709,
+      "outcomes": [
+        {
+          "id": "Maize",
+          "status": "experimental_water_only",
+          "members": [
+            {
+              "scenario_id": "NASA-2023-replay",
+              "unmet_fraction": 0.0,
+              "deficit_mm": 0.0,
+              "stress_days": 0,
+              "irrigation_mm": 0.0,
+              "max_balance_error_mm": 5.684341886080802e-14,
+              "closing_profile_reserve_mm": 422.5056652556466,
+              "closing_snow_mm": 0.0,
+              "input_sha256": "6fe2f84953cb985ed4916cf4d3e519a0ffdecd939c8084c96b910cab69b1ff2b",
+              "sources": [
+                "Controlled equal-phase crop parameters; NOT calibrated local phenology",
+                "Controlled example hydraulics/CN/snow assumptions, not measured regional soil",
+                "NASA-POWER-total-precip-50ad0f3f7de2c9ccf71057f18fd264ffec375f946952243ea50ec15d416a86b5"
+              ]
+            }
+          ],
+          "worst_tested_unmet_fraction": 0.0,
+          "yield_t_ha": null,
+          "gross_margin": null,
+          "pros": [
+            "Quantified water demand and deficit on the supplied scenarios"
+          ],
+          "cons": [
+            "No locally validated yield, survival, nitrogen, flood or economic response",
+            "Calendar/root/Kc/drainage choices materially influence rankings"
+          ]
+        },
+        {
+          "id": "Wheat",
+          "status": "experimental_water_only",
+          "members": [
+            {
+              "scenario_id": "NASA-2023-replay",
+              "unmet_fraction": 0.0,
+              "deficit_mm": 0.0,
+              "stress_days": 0,
+              "irrigation_mm": 0.0,
+              "max_balance_error_mm": 5.684341886080802e-14,
+              "closing_profile_reserve_mm": 422.5056652556466,
+              "closing_snow_mm": 0.0,
+              "input_sha256": "191e0401937c58abf62feb34c3b4401abca6c4b0f19bf48299c1e70d85c52bb1",
+              "sources": [
+                "Controlled equal-phase crop parameters; NOT calibrated local phenology",
+                "Controlled example hydraulics/CN/snow assumptions, not measured regional soil",
+                "NASA-POWER-total-precip-50ad0f3f7de2c9ccf71057f18fd264ffec375f946952243ea50ec15d416a86b5"
+              ]
+            }
+          ],
+          "worst_tested_unmet_fraction": 0.0,
+          "yield_t_ha": null,
+          "gross_margin": null,
+          "pros": [
+            "Quantified water demand and deficit on the supplied scenarios"
+          ],
+          "cons": [
+            "No locally validated yield, survival, nitrogen, flood or economic response",
+            "Calendar/root/Kc/drainage choices materially influence rankings"
+          ]
+        },
+        {
+          "id": "Soy",
+          "status": "experimental_water_only",
+          "members": [
+            {
+              "scenario_id": "NASA-2023-replay",
+              "unmet_fraction": 0.0,
+              "deficit_mm": 0.0,
+              "stress_days": 0,
+              "irrigation_mm": 0.0,
+              "max_balance_error_mm": 5.684341886080802e-14,
+              "closing_profile_reserve_mm": 422.5056652556466,
+              "closing_snow_mm": 0.0,
+              "input_sha256": "109edd17e6a1e178a9bea0fb473c48ebd33cc5601cc3eb12a8e482fda67744ad",
+              "sources": [
+                "Controlled equal-phase crop parameters; NOT calibrated local phenology",
+                "Controlled example hydraulics/CN/snow assumptions, not measured regional soil",
+                "NASA-POWER-total-precip-50ad0f3f7de2c9ccf71057f18fd264ffec375f946952243ea50ec15d416a86b5"
+              ]
+            }
+          ],
+          "worst_tested_unmet_fraction": 0.0,
+          "yield_t_ha": null,
+          "gross_margin": null,
+          "pros": [
+            "Quantified water demand and deficit on the supplied scenarios"
+          ],
+          "cons": [
+            "No locally validated yield, survival, nitrogen, flood or economic response",
+            "Calendar/root/Kc/drainage choices materially influence rankings"
+          ]
+        },
+        {
+          "id": "Barley",
+          "status": "experimental_water_only",
+          "members": [
+            {
+              "scenario_id": "NASA-2023-replay",
+              "unmet_fraction": 0.0,
+              "deficit_mm": 0.0,
+              "stress_days": 0,
+              "irrigation_mm": 0.0,
+              "max_balance_error_mm": 5.684341886080802e-14,
+              "closing_profile_reserve_mm": 422.5056652556466,
+              "closing_snow_mm": 0.0,
+              "input_sha256": "9ef502a5b7ceaf2879e88503d4383834921abfb6921b5536239fa63c8f45fdf3",
+              "sources": [
+                "Controlled equal-phase crop parameters; NOT calibrated local phenology",
+                "Controlled example hydraulics/CN/snow assumptions, not measured regional soil",
+                "NASA-POWER-total-precip-50ad0f3f7de2c9ccf71057f18fd264ffec375f946952243ea50ec15d416a86b5"
+              ]
+            }
+          ],
+          "worst_tested_unmet_fraction": 0.0,
+          "yield_t_ha": null,
+          "gross_margin": null,
+          "pros": [
+            "Quantified water demand and deficit on the supplied scenarios"
+          ],
+          "cons": [
+            "No locally validated yield, survival, nitrogen, flood or economic response",
+            "Calendar/root/Kc/drainage choices materially influence rankings"
+          ]
+        },
+        {
+          "id": "Sunflower",
+          "status": "experimental_water_only",
+          "members": [
+            {
+              "scenario_id": "NASA-2023-replay",
+              "unmet_fraction": 0.0,
+              "deficit_mm": 0.0,
+              "stress_days": 0,
+              "irrigation_mm": 0.0,
+              "max_balance_error_mm": 5.684341886080802e-14,
+              "closing_profile_reserve_mm": 422.5056652556466,
+              "closing_snow_mm": 0.0,
+              "input_sha256": "754d62ac7aad918a89692cb53d858bf6d218edb53335e31a93eb7a6ac81c2b98",
+              "sources": [
+                "Controlled equal-phase crop parameters; NOT calibrated local phenology",
+                "Controlled example hydraulics/CN/snow assumptions, not measured regional soil",
+                "NASA-POWER-total-precip-50ad0f3f7de2c9ccf71057f18fd264ffec375f946952243ea50ec15d416a86b5"
+              ]
+            }
+          ],
+          "worst_tested_unmet_fraction": 0.0,
+          "yield_t_ha": null,
+          "gross_margin": null,
+          "pros": [
+            "Quantified water demand and deficit on the supplied scenarios"
+          ],
+          "cons": [
+            "No locally validated yield, survival, nitrogen, flood or economic response",
+            "Calendar/root/Kc/drainage choices materially influence rankings"
+          ]
+        },
+        {
+          "id": "Rapeseed",
+          "status": "experimental_water_only",
+          "members": [
+            {
+              "scenario_id": "NASA-2023-replay",
+              "unmet_fraction": 0.0,
+              "deficit_mm": 0.0,
+              "stress_days": 0,
+              "irrigation_mm": 0.0,
+              "max_balance_error_mm": 5.684341886080802e-14,
+              "closing_profile_reserve_mm": 422.5056652556466,
+              "closing_snow_mm": 0.0,
+              "input_sha256": "844d3cb06e2900f80c5e83af78f80978373bfbbd99e647ded4d026bd31ee6004",
+              "sources": [
+                "Controlled equal-phase crop parameters; NOT calibrated local phenology",
+                "Controlled example hydraulics/CN/snow assumptions, not measured regional soil",
+                "NASA-POWER-total-precip-50ad0f3f7de2c9ccf71057f18fd264ffec375f946952243ea50ec15d416a86b5"
+              ]
+            }
+          ],
+          "worst_tested_unmet_fraction": 0.0,
+          "yield_t_ha": null,
+          "gross_margin": null,
+          "pros": [
+            "Quantified water demand and deficit on the supplied scenarios"
+          ],
+          "cons": [
+            "No locally validated yield, survival, nitrogen, flood or economic response",
+            "Calendar/root/Kc/drainage choices materially influence rankings"
+          ]
+        },
+        {
+          "id": "Peas",
+          "status": "experimental_water_only",
+          "members": [
+            {
+              "scenario_id": "NASA-2023-replay",
+              "unmet_fraction": 0.0,
+              "deficit_mm": 0.0,
+              "stress_days": 0,
+              "irrigation_mm": 0.0,
+              "max_balance_error_mm": 5.684341886080802e-14,
+              "closing_profile_reserve_mm": 422.5056652556466,
+              "closing_snow_mm": 0.0,
+              "input_sha256": "492685f784a14b98027ec310edee964b14cd02b17b35b0342a2202403a98501b",
+              "sources": [
+                "Controlled equal-phase crop parameters; NOT calibrated local phenology",
+                "Controlled example hydraulics/CN/snow assumptions, not measured regional soil",
+                "NASA-POWER-total-precip-50ad0f3f7de2c9ccf71057f18fd264ffec375f946952243ea50ec15d416a86b5"
+              ]
+            }
+          ],
+          "worst_tested_unmet_fraction": 0.0,
+          "yield_t_ha": null,
+          "gross_margin": null,
+          "pros": [
+            "Quantified water demand and deficit on the supplied scenarios"
+          ],
+          "cons": [
+            "No locally validated yield, survival, nitrogen, flood or economic response",
+            "Calendar/root/Kc/drainage choices materially influence rankings"
+          ]
+        },
+        {
+          "id": "Rice",
+          "status": "unsupported",
+          "reason": "Paddy requires a separately validated surface-water model",
+          "members": [],
+          "worst_tested_unmet_fraction": null,
+          "yield_t_ha": null,
+          "gross_margin": null
+        }
+      ]
+    },
+    {
+      "location": "singapore",
+      "representative_coordinates": [
+        1.35,
+        103.82
+      ],
+      "land_status": "arable",
+      "land_status_basis": "controlled case assumption; no farm-parcel classification",
+      "raw_source_sha256": "c16f5c3a2229555545564d4a7508b407741317d3e45da580c45ac7cb97f73bdc",
+      "source_dates": [
+        "2023-04-01",
+        "2023-07-29"
+      ],
+      "target_dates": [
+        "2027-04-01",
+        "2027-07-29"
+      ],
+      "mean_tmin_c": 26.348666666666666,
+      "total_precipitation_mm": 1144.96,
+      "derived_fao56_et0_mm": 441.19900221787344,
+      "outcomes": [
+        {
+          "id": "Maize",
+          "status": "experimental_water_only",
+          "members": [
+            {
+              "scenario_id": "NASA-2023-replay",
+              "unmet_fraction": 0.0,
+              "deficit_mm": 0.0,
+              "stress_days": 0,
+              "irrigation_mm": 0.0,
+              "max_balance_error_mm": 1.1368683772161603e-13,
+              "closing_profile_reserve_mm": 425.8348093098785,
+              "closing_snow_mm": 0.0,
+              "input_sha256": "78bdb455c574d2d43cc69f37dfa65a1f0f67d14249889de0aca59730aeccf53d",
+              "sources": [
+                "Controlled equal-phase crop parameters; NOT calibrated local phenology",
+                "Controlled example hydraulics/CN/snow assumptions, not measured regional soil",
+                "NASA-POWER-total-precip-c16f5c3a2229555545564d4a7508b407741317d3e45da580c45ac7cb97f73bdc"
+              ]
+            }
+          ],
+          "worst_tested_unmet_fraction": 0.0,
+          "yield_t_ha": null,
+          "gross_margin": null,
+          "pros": [
+            "Quantified water demand and deficit on the supplied scenarios"
+          ],
+          "cons": [
+            "No locally validated yield, survival, nitrogen, flood or economic response",
+            "Calendar/root/Kc/drainage choices materially influence rankings"
+          ]
+        },
+        {
+          "id": "Wheat",
+          "status": "experimental_water_only",
+          "members": [
+            {
+              "scenario_id": "NASA-2023-replay",
+              "unmet_fraction": 0.0,
+              "deficit_mm": 0.0,
+              "stress_days": 0,
+              "irrigation_mm": 0.0,
+              "max_balance_error_mm": 1.1368683772161603e-13,
+              "closing_profile_reserve_mm": 425.8348093098785,
+              "closing_snow_mm": 0.0,
+              "input_sha256": "eb5d26225045453e48edfe3ed7ee49ff246d9f290f7c242cc29829c98368d070",
+              "sources": [
+                "Controlled equal-phase crop parameters; NOT calibrated local phenology",
+                "Controlled example hydraulics/CN/snow assumptions, not measured regional soil",
+                "NASA-POWER-total-precip-c16f5c3a2229555545564d4a7508b407741317d3e45da580c45ac7cb97f73bdc"
+              ]
+            }
+          ],
+          "worst_tested_unmet_fraction": 0.0,
+          "yield_t_ha": null,
+          "gross_margin": null,
+          "pros": [
+            "Quantified water demand and deficit on the supplied scenarios"
+          ],
+          "cons": [
+            "No locally validated yield, survival, nitrogen, flood or economic response",
+            "Calendar/root/Kc/drainage choices materially influence rankings"
+          ]
+        },
+        {
+          "id": "Soy",
+          "status": "experimental_water_only",
+          "members": [
+            {
+              "scenario_id": "NASA-2023-replay",
+              "unmet_fraction": 0.0,
+              "deficit_mm": 0.0,
+              "stress_days": 0,
+              "irrigation_mm": 0.0,
+              "max_balance_error_mm": 1.1368683772161603e-13,
+              "closing_profile_reserve_mm": 425.8348093098785,
+              "closing_snow_mm": 0.0,
+              "input_sha256": "632f693d22b686e05e75cbe6ca2f8012842a2dfbe1c4df437d4aa201890b622e",
+              "sources": [
+                "Controlled equal-phase crop parameters; NOT calibrated local phenology",
+                "Controlled example hydraulics/CN/snow assumptions, not measured regional soil",
+                "NASA-POWER-total-precip-c16f5c3a2229555545564d4a7508b407741317d3e45da580c45ac7cb97f73bdc"
+              ]
+            }
+          ],
+          "worst_tested_unmet_fraction": 0.0,
+          "yield_t_ha": null,
+          "gross_margin": null,
+          "pros": [
+            "Quantified water demand and deficit on the supplied scenarios"
+          ],
+          "cons": [
+            "No locally validated yield, survival, nitrogen, flood or economic response",
+            "Calendar/root/Kc/drainage choices materially influence rankings"
+          ]
+        },
+        {
+          "id": "Barley",
+          "status": "experimental_water_only",
+          "members": [
+            {
+              "scenario_id": "NASA-2023-replay",
+              "unmet_fraction": 0.0,
+              "deficit_mm": 0.0,
+              "stress_days": 0,
+              "irrigation_mm": 0.0,
+              "max_balance_error_mm": 1.1368683772161603e-13,
+              "closing_profile_reserve_mm": 425.8348093098785,
+              "closing_snow_mm": 0.0,
+              "input_sha256": "2fb95b80f06a2197463a659e050d82c0050b3326246c751faf16f438ecc0c27c",
+              "sources": [
+                "Controlled equal-phase crop parameters; NOT calibrated local phenology",
+                "Controlled example hydraulics/CN/snow assumptions, not measured regional soil",
+                "NASA-POWER-total-precip-c16f5c3a2229555545564d4a7508b407741317d3e45da580c45ac7cb97f73bdc"
+              ]
+            }
+          ],
+          "worst_tested_unmet_fraction": 0.0,
+          "yield_t_ha": null,
+          "gross_margin": null,
+          "pros": [
+            "Quantified water demand and deficit on the supplied scenarios"
+          ],
+          "cons": [
+            "No locally validated yield, survival, nitrogen, flood or economic response",
+            "Calendar/root/Kc/drainage choices materially influence rankings"
+          ]
+        },
+        {
+          "id": "Sunflower",
+          "status": "experimental_water_only",
+          "members": [
+            {
+              "scenario_id": "NASA-2023-replay",
+              "unmet_fraction": 0.0,
+              "deficit_mm": 0.0,
+              "stress_days": 0,
+              "irrigation_mm": 0.0,
+              "max_balance_error_mm": 1.1368683772161603e-13,
+              "closing_profile_reserve_mm": 425.8348093098785,
+              "closing_snow_mm": 0.0,
+              "input_sha256": "f8056c0a42d85c103c2ca2d46cd960b5881310b70a8732dd33fbaed2ee7d35c2",
+              "sources": [
+                "Controlled equal-phase crop parameters; NOT calibrated local phenology",
+                "Controlled example hydraulics/CN/snow assumptions, not measured regional soil",
+                "NASA-POWER-total-precip-c16f5c3a2229555545564d4a7508b407741317d3e45da580c45ac7cb97f73bdc"
+              ]
+            }
+          ],
+          "worst_tested_unmet_fraction": 0.0,
+          "yield_t_ha": null,
+          "gross_margin": null,
+          "pros": [
+            "Quantified water demand and deficit on the supplied scenarios"
+          ],
+          "cons": [
+            "No locally validated yield, survival, nitrogen, flood or economic response",
+            "Calendar/root/Kc/drainage choices materially influence rankings"
+          ]
+        },
+        {
+          "id": "Rapeseed",
+          "status": "experimental_water_only",
+          "members": [
+            {
+              "scenario_id": "NASA-2023-replay",
+              "unmet_fraction": 0.0,
+              "deficit_mm": 0.0,
+              "stress_days": 0,
+              "irrigation_mm": 0.0,
+              "max_balance_error_mm": 1.1368683772161603e-13,
+              "closing_profile_reserve_mm": 425.8348093098785,
+              "closing_snow_mm": 0.0,
+              "input_sha256": "668fdf28774dd8a6971b1e88bb9a6d29dab8516d5f4c84c6f6f3719e351c7443",
+              "sources": [
+                "Controlled equal-phase crop parameters; NOT calibrated local phenology",
+                "Controlled example hydraulics/CN/snow assumptions, not measured regional soil",
+                "NASA-POWER-total-precip-c16f5c3a2229555545564d4a7508b407741317d3e45da580c45ac7cb97f73bdc"
+              ]
+            }
+          ],
+          "worst_tested_unmet_fraction": 0.0,
+          "yield_t_ha": null,
+          "gross_margin": null,
+          "pros": [
+            "Quantified water demand and deficit on the supplied scenarios"
+          ],
+          "cons": [
+            "No locally validated yield, survival, nitrogen, flood or economic response",
+            "Calendar/root/Kc/drainage choices materially influence rankings"
+          ]
+        },
+        {
+          "id": "Peas",
+          "status": "experimental_water_only",
+          "members": [
+            {
+              "scenario_id": "NASA-2023-replay",
+              "unmet_fraction": 0.0,
+              "deficit_mm": 0.0,
+              "stress_days": 0,
+              "irrigation_mm": 0.0,
+              "max_balance_error_mm": 1.1368683772161603e-13,
+              "closing_profile_reserve_mm": 425.8348093098785,
+              "closing_snow_mm": 0.0,
+              "input_sha256": "181f70c341a31e846134a95c7cb7197a1afdb6b697f754e0b38c624ee8567016",
+              "sources": [
+                "Controlled equal-phase crop parameters; NOT calibrated local phenology",
+                "Controlled example hydraulics/CN/snow assumptions, not measured regional soil",
+                "NASA-POWER-total-precip-c16f5c3a2229555545564d4a7508b407741317d3e45da580c45ac7cb97f73bdc"
+              ]
+            }
+          ],
+          "worst_tested_unmet_fraction": 0.0,
+          "yield_t_ha": null,
+          "gross_margin": null,
+          "pros": [
+            "Quantified water demand and deficit on the supplied scenarios"
+          ],
+          "cons": [
+            "No locally validated yield, survival, nitrogen, flood or economic response",
+            "Calendar/root/Kc/drainage choices materially influence rankings"
+          ]
+        },
+        {
+          "id": "Rice",
+          "status": "unsupported",
+          "reason": "Paddy requires a separately validated surface-water model",
+          "members": [],
+          "worst_tested_unmet_fraction": null,
+          "yield_t_ha": null,
+          "gross_margin": null
+        }
+      ]
+    },
+    {
+      "location": "sahara",
+      "representative_coordinates": [
+        23.0,
+        13.0
+      ],
+      "land_status": "unknown",
+      "land_status_basis": "controlled case assumption; no farm-parcel classification",
+      "raw_source_sha256": "0a9446d8a41dc7da5c83b08b24f976816d14e1db7095982ecf0cc4bb6ebe1cb8",
+      "source_dates": [
+        "2023-04-01",
+        "2023-07-29"
+      ],
+      "target_dates": [
+        "2027-04-01",
+        "2027-07-29"
+      ],
+      "mean_tmin_c": 20.728,
+      "total_precipitation_mm": 0.04,
+      "derived_fao56_et0_mm": 1168.879706442529,
+      "outcomes": [
+        {
+          "id": "Maize",
+          "status": "unsupported",
+          "reason": "Confirmed arable land required; ice/ocean/unknown are not crop sites",
+          "members": [],
+          "worst_tested_unmet_fraction": null,
+          "yield_t_ha": null,
+          "gross_margin": null
+        },
+        {
+          "id": "Wheat",
+          "status": "unsupported",
+          "reason": "Confirmed arable land required; ice/ocean/unknown are not crop sites",
+          "members": [],
+          "worst_tested_unmet_fraction": null,
+          "yield_t_ha": null,
+          "gross_margin": null
+        },
+        {
+          "id": "Soy",
+          "status": "unsupported",
+          "reason": "Confirmed arable land required; ice/ocean/unknown are not crop sites",
+          "members": [],
+          "worst_tested_unmet_fraction": null,
+          "yield_t_ha": null,
+          "gross_margin": null
+        },
+        {
+          "id": "Barley",
+          "status": "unsupported",
+          "reason": "Confirmed arable land required; ice/ocean/unknown are not crop sites",
+          "members": [],
+          "worst_tested_unmet_fraction": null,
+          "yield_t_ha": null,
+          "gross_margin": null
+        },
+        {
+          "id": "Sunflower",
+          "status": "unsupported",
+          "reason": "Confirmed arable land required; ice/ocean/unknown are not crop sites",
+          "members": [],
+          "worst_tested_unmet_fraction": null,
+          "yield_t_ha": null,
+          "gross_margin": null
+        },
+        {
+          "id": "Rapeseed",
+          "status": "unsupported",
+          "reason": "Confirmed arable land required; ice/ocean/unknown are not crop sites",
+          "members": [],
+          "worst_tested_unmet_fraction": null,
+          "yield_t_ha": null,
+          "gross_margin": null
+        },
+        {
+          "id": "Peas",
+          "status": "unsupported",
+          "reason": "Confirmed arable land required; ice/ocean/unknown are not crop sites",
+          "members": [],
+          "worst_tested_unmet_fraction": null,
+          "yield_t_ha": null,
+          "gross_margin": null
+        },
+        {
+          "id": "Rice",
+          "status": "unsupported",
+          "reason": "Confirmed arable land required; ice/ocean/unknown are not crop sites",
+          "members": [],
+          "worst_tested_unmet_fraction": null,
+          "yield_t_ha": null,
+          "gross_margin": null
+        }
+      ]
+    },
+    {
+      "location": "antarctica",
+      "representative_coordinates": [
+        -80.0,
+        0.0
+      ],
+      "land_status": "ice",
+      "land_status_basis": "controlled case assumption; no farm-parcel classification",
+      "raw_source_sha256": "d8dc123f1290c1255d2c1c3769e45b2b86e6b4fcb095d88b97156edfb0f55a18",
+      "source_dates": [
+        "2023-11-01",
+        "2024-02-28"
+      ],
+      "target_dates": [
+        "2027-11-01",
+        "2028-02-28"
+      ],
+      "mean_tmin_c": -29.567416666666666,
+      "total_precipitation_mm": 37.230000000000004,
+      "derived_fao56_et0_mm": 51.790791270419135,
+      "outcomes": [
+        {
+          "id": "Maize",
+          "status": "unsupported",
+          "reason": "Confirmed arable land required; ice/ocean/unknown are not crop sites",
+          "members": [],
+          "worst_tested_unmet_fraction": null,
+          "yield_t_ha": null,
+          "gross_margin": null
+        },
+        {
+          "id": "Wheat",
+          "status": "unsupported",
+          "reason": "Confirmed arable land required; ice/ocean/unknown are not crop sites",
+          "members": [],
+          "worst_tested_unmet_fraction": null,
+          "yield_t_ha": null,
+          "gross_margin": null
+        },
+        {
+          "id": "Soy",
+          "status": "unsupported",
+          "reason": "Confirmed arable land required; ice/ocean/unknown are not crop sites",
+          "members": [],
+          "worst_tested_unmet_fraction": null,
+          "yield_t_ha": null,
+          "gross_margin": null
+        },
+        {
+          "id": "Barley",
+          "status": "unsupported",
+          "reason": "Confirmed arable land required; ice/ocean/unknown are not crop sites",
+          "members": [],
+          "worst_tested_unmet_fraction": null,
+          "yield_t_ha": null,
+          "gross_margin": null
+        },
+        {
+          "id": "Sunflower",
+          "status": "unsupported",
+          "reason": "Confirmed arable land required; ice/ocean/unknown are not crop sites",
+          "members": [],
+          "worst_tested_unmet_fraction": null,
+          "yield_t_ha": null,
+          "gross_margin": null
+        },
+        {
+          "id": "Rapeseed",
+          "status": "unsupported",
+          "reason": "Confirmed arable land required; ice/ocean/unknown are not crop sites",
+          "members": [],
+          "worst_tested_unmet_fraction": null,
+          "yield_t_ha": null,
+          "gross_margin": null
+        },
+        {
+          "id": "Peas",
+          "status": "unsupported",
+          "reason": "Confirmed arable land required; ice/ocean/unknown are not crop sites",
+          "members": [],
+          "worst_tested_unmet_fraction": null,
+          "yield_t_ha": null,
+          "gross_margin": null
+        },
+        {
+          "id": "Rice",
+          "status": "unsupported",
+          "reason": "Confirmed arable land required; ice/ocean/unknown are not crop sites",
+          "members": [],
+          "worst_tested_unmet_fraction": null,
+          "yield_t_ha": null,
+          "gross_margin": null
+        }
+      ]
+    },
+    {
+      "location": "la_paz",
+      "representative_coordinates": [
+        -16.5,
+        -68.15
+      ],
+      "land_status": "unknown",
+      "land_status_basis": "controlled case assumption; no farm-parcel classification",
+      "raw_source_sha256": "82bf23f84dc2245ca248f86bb022f17bca4be4bf119a5f0a2696ea616d8a8eb6",
+      "source_dates": [
+        "2023-04-01",
+        "2023-07-29"
+      ],
+      "target_dates": [
+        "2027-04-01",
+        "2027-07-29"
+      ],
+      "mean_tmin_c": 1.2614166666666666,
+      "total_precipitation_mm": 90.8,
+      "derived_fao56_et0_mm": 339.90286852032295,
+      "outcomes": [
+        {
+          "id": "Maize",
+          "status": "unsupported",
+          "reason": "Confirmed arable land required; ice/ocean/unknown are not crop sites",
+          "members": [],
+          "worst_tested_unmet_fraction": null,
+          "yield_t_ha": null,
+          "gross_margin": null
+        },
+        {
+          "id": "Wheat",
+          "status": "unsupported",
+          "reason": "Confirmed arable land required; ice/ocean/unknown are not crop sites",
+          "members": [],
+          "worst_tested_unmet_fraction": null,
+          "yield_t_ha": null,
+          "gross_margin": null
+        },
+        {
+          "id": "Soy",
+          "status": "unsupported",
+          "reason": "Confirmed arable land required; ice/ocean/unknown are not crop sites",
+          "members": [],
+          "worst_tested_unmet_fraction": null,
+          "yield_t_ha": null,
+          "gross_margin": null
+        },
+        {
+          "id": "Barley",
+          "status": "unsupported",
+          "reason": "Confirmed arable land required; ice/ocean/unknown are not crop sites",
+          "members": [],
+          "worst_tested_unmet_fraction": null,
+          "yield_t_ha": null,
+          "gross_margin": null
+        },
+        {
+          "id": "Sunflower",
+          "status": "unsupported",
+          "reason": "Confirmed arable land required; ice/ocean/unknown are not crop sites",
+          "members": [],
+          "worst_tested_unmet_fraction": null,
+          "yield_t_ha": null,
+          "gross_margin": null
+        },
+        {
+          "id": "Rapeseed",
+          "status": "unsupported",
+          "reason": "Confirmed arable land required; ice/ocean/unknown are not crop sites",
+          "members": [],
+          "worst_tested_unmet_fraction": null,
+          "yield_t_ha": null,
+          "gross_margin": null
+        },
+        {
+          "id": "Peas",
+          "status": "unsupported",
+          "reason": "Confirmed arable land required; ice/ocean/unknown are not crop sites",
+          "members": [],
+          "worst_tested_unmet_fraction": null,
+          "yield_t_ha": null,
+          "gross_margin": null
+        },
+        {
+          "id": "Rice",
+          "status": "unsupported",
+          "reason": "Confirmed arable land required; ice/ocean/unknown are not crop sites",
+          "members": [],
+          "worst_tested_unmet_fraction": null,
+          "yield_t_ha": null,
+          "gross_margin": null
+        }
+      ]
+    }
+  ],
+  "source_set_sha256": "02edc7d74389c4c0bfe71d6975fccab35b19accfe12170edf50dbc80d3a06d53",
+  "limitations": [
+    "Actual historical weather with controlled unvalidated soil/crop assumptions",
+    "No city-coordinate point establishes cropland, field suitability or model accuracy",
+    "Sahara/high-altitude cases abstain without confirmed arable land",
+    "Antarctic ice abstains for every crop; paddy rice always unsupported",
+    "Identical crop parameters isolate climate effects and cannot rank species",
+    "2023 weather replay is one uncalibrated scenario, not a forecast of 2027 conditions"
+  ]
+}

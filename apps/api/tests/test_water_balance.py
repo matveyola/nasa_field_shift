@@ -1,13 +1,12 @@
 from datetime import date
 
 import pytest
-
-from field_shift.modules.simulation.water_balance import (
+from field_shift_science.simulation.water_balance import (
     DemoWaterModel,
     WaterInputs,
     stress_summary,
 )
-from field_shift.modules.weather.scenarios import Scenario
+from field_shift_science.weather.scenarios import Scenario
 
 
 def test_dry_maize_tracks_daily_water_and_stress() -> None:

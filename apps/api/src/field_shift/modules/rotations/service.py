@@ -1,5 +1,7 @@
 from typing import cast
 
+from field_shift_science.simulation.water_balance import WaterInputs, stress_summary
+from field_shift_science.weather.scenarios import Scenario
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -21,8 +23,6 @@ from field_shift.modules.rotations.schemas import (
     RotationRead,
 )
 from field_shift.modules.simulation.service import calculate_water_balance
-from field_shift.modules.simulation.water_balance import WaterInputs, stress_summary
-from field_shift.modules.weather.scenarios import Scenario
 
 
 def crop_for_season(field: Field, season: int, setup: SetupInputs | None) -> str | None:
@@ -49,6 +49,8 @@ def get_plan_snapshot(
             known_crop(preceding) if preceding else None,
         )
         defaults = [[item.crop for item in plan] for plan in [example.crops, *example.alternatives]]
+    elif setup and len(setup.allowed_crops or []) == 1:
+        defaults = [list(setup.allowed_crops)]
     else:
         fallbacks = [
             crop for crop in ("Maize", "Soy", "Wheat") if crop.casefold() != field.crop.casefold()

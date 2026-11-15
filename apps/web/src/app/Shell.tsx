@@ -1,7 +1,7 @@
 import { LanguageSelect, useLocale } from '../shared/locale'
 import type { MouseEvent, ReactNode } from 'react'
 import {
-  ArrowPathIcon, BeakerIcon, BuildingOffice2Icon, HomeModernIcon, MapIcon, SparklesIcon, UserIcon,
+  ArrowTrendingUpIcon, ChartBarSquareIcon, BuildingOffice2Icon, HomeModernIcon, MapIcon, SparklesIcon, UserIcon,
 } from '@heroicons/react/24/outline'
 import { pages, routeAddress, type Page, type Route } from './routing'
 import { HeaderActions } from '../shared/HeaderActions'
@@ -9,9 +9,9 @@ import { FieldMark } from '@field-shift/agent-widget'
 
 const destinations = {
   fields: { label: 'Fields', icon: MapIcon },
-  water: { label: 'Water', icon: BeakerIcon },
+  strategies: { label: 'Strategies', icon: ArrowTrendingUpIcon },
   agent: { label: 'Assistant', icon: SparklesIcon },
-  rotations: { label: 'Rotations', icon: ArrowPathIcon },
+  analytics: { label: 'Analytics', icon: ChartBarSquareIcon },
   farm: { label: 'Farm', icon: HomeModernIcon },
 }
 
@@ -58,7 +58,7 @@ export function Shell({
                 disabled={Boolean(route.setupId)}
                 onClick={openAssistant}>
                 <span className="nav-assistant-mark" aria-hidden="true"><FieldMark /></span>
-                <span>{t('Assistant')}</span>
+                <span>{t('Agent')}</span>
               </button>
             )
             const { label, icon: Icon } = destinations[page]

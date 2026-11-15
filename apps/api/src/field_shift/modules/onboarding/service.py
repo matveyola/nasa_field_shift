@@ -2,14 +2,14 @@ from datetime import UTC, datetime
 from sqlite3 import SQLITE_BUSY, SQLITE_LOCKED
 from uuid import UUID
 
+from field_shift_science.fields.geometry import area_hectares
+from field_shift_science.fields.schemas import FieldCreate
 from sqlalchemy import select, update
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
 from field_shift.errors import ConflictError, NotFoundError
 from field_shift.modules.farm.models import FARM_ID, Farm
-from field_shift.modules.fields.geometry import area_hectares
-from field_shift.modules.fields.schemas import FieldCreate
 from field_shift.modules.fields.service import create_field, field_read, require_field
 from field_shift.modules.onboarding.demo_plan import build_demo_plan
 from field_shift.modules.onboarding.models import FieldSetup
@@ -86,14 +86,16 @@ def save_setup(session: Session, setup_id: UUID, payload: SetupInputs) -> SetupR
     inputs["start_season"] = (
         payload.start_season
         or (setup.inputs.get("start_season") if setup else None)
-        or farm.season + 1
+        or min(farm.season + 1, 2100)
     )
     if setup and setup.completed_at:
         if setup.inputs != inputs:
             raise ConflictError("This setup is complete. Start another setup to add a field.")
         return _read(session, setup)
-    if not farm.season < inputs["start_season"] <= 2098:
-        raise ConflictError("Choose a planning season after the active farm season, through 2098.")
+    if not farm.season <= inputs["start_season"] <= 2100:
+        raise ConflictError(
+            "Choose a planning year in the active farm year or later, through 2100."
+        )
     if any(entry.season > farm.season for entry in payload.history or []):
         raise ConflictError("Actual crop history cannot include a future farm season.")
     now = datetime.now(UTC)
@@ -127,10 +129,10 @@ def complete_setup(session: Session, setup_id: UUID) -> SetupRead:
         or inputs.history is None
         or "irrigation" not in setup.inputs
         or inputs.priority is None
-        or len(inputs.allowed_crops or []) < 2
+        or len(inputs.allowed_crops or []) < 1
     ):
         raise ConflictError("Confirm a boundary and answer the field questions before finishing.")
-    if inputs.start_season is None or inputs.start_season <= farm.season:
+    if inputs.start_season is None or inputs.start_season < farm.season:
         raise ConflictError("The farm season changed. Update the setup before finishing.")
     latest = max(inputs.history, key=lambda entry: entry.season, default=None)
     # 'Unknown' is explicit missing information, never a fabricated real crop observation.
@@ -147,7 +149,13 @@ def complete_setup(session: Session, setup_id: UUID) -> SetupRead:
         commit=False,
     )
     setup.field_id = field.id
-    setup.demo_plan = _demo_plan(inputs).model_dump(mode="json")
+    # Existing multi-crop examples remain explicitly illustrative. Field creation
+    # does not depend on being able to produce a three-year demonstration.
+    setup.demo_plan = (
+        _demo_plan(inputs).model_dump(mode="json")
+        if len(inputs.allowed_crops) >= 2 and inputs.start_season <= 2098
+        else None
+    )
     setup.completed_at = setup.updated_at = datetime.now(UTC)
     session.commit()
     return _read(session, setup)

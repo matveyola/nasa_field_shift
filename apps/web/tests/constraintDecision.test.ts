@@ -109,4 +109,3 @@ test("the farmer's confirmation names exactly the earlier decisions shown, by th
   assert.equal(confirmed.envelope, decision.envelope) // the same decision, nothing else changed
   assert.equal(decision.replaces, undefined) // the first attempt never claims an acknowledgement
 })
-

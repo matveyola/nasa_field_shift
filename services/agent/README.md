@@ -25,7 +25,52 @@ rotation services and the document index are off in this profile. The included
 contract stub and fixtures are for local tests. The host profile is intended
 for the local, single-farm workspace.
 
-Run the service tests from `services/agent` with `uv run --locked pytest -q`.
+Install and test from `services/agent`:
+
+```sh
+uv sync --locked
+uv run --no-sync pytest -q
+```
+
+The Python distribution installs `agent_service`, `contracts`, `integration_stub`
+and the optional evaluation tools under their existing import names. Contract
+schemas, synthetic fixtures and the retrieval benchmark are bundled package data;
+tests use installed imports without `PYTHONPATH`. To build a wheel, run
+`uv build --wheel`; to exercise the deployment installation locally, run
+`uv sync --locked --no-editable`. After installation, the environment's Python can
+run `python -I -m agent_service` from any directory. Evaluation commands require
+`field-shift-agent[eval]` (or the locked development environment).
+
+Writable files are separate from installed code. Set `AGENT_DATA_DIR` to an
+absolute application-data directory. Its default is
+`$XDG_DATA_HOME/field-shift-agent` (or `~/.local/share/field-shift-agent`) on Unix
+and `%LOCALAPPDATA%/field-shift-agent` on Windows. Knowledge commands use
+`AGENT_DATA_DIR/knowledge`; evaluation reports use `AGENT_DATA_DIR/evals/reports`.
+`AGENT_RAG_INDEX_PATH` can select a separate mounted index, and the knowledge CLI
+accepts an explicit `--data-dir` for ingestion. Directories are created only when
+writing, not when importing modules or checking configuration. No documents,
+indexes, model caches, credentials or generated reports are included in the wheel.
+
+For the repository's public document cache, explicitly select it before building
+a lexical index and running corpus-dependent tests:
+
+```sh
+export AGENT_DATA_DIR="$(pwd)/data"
+uv run --no-sync python -m agent_service.knowledge build --no-embed
+uv run --no-sync pytest -q
+```
+
+The raw allowlisted documents must already be present under
+`$AGENT_DATA_DIR/knowledge/raw`; `python -m agent_service.knowledge fetch` is the
+explicit public-source download step. Optional embeddings still require their
+separate dependency group and model cache. Docker installs a non-editable wheel,
+uses `/var/lib/field-shift-agent` for writable data and runs from a directory
+without application source. It fetches public knowledge only in the build stage.
+
+Schema generation never writes into an installed package implicitly:
+`python -m contracts.export --output-dir contracts/schema` selects the repository
+output explicitly. `python -m contracts.export --check` checks bundled schemas;
+add `--output-dir contracts/schema` to check a separate generated directory.
 
 ## Reference widget
 

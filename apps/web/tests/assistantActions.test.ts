@@ -35,3 +35,9 @@ test('the browser and the API declare the same host capabilities', () => {
   assert.deepEqual(tuple('HOST_ACTIONS'), [...HOST_ACTIONS])
   assert.deepEqual(tuple('HOST_SCREENS'), [...HOST_SCREENS])
 })
+
+test('current product destinations and legacy analytical destinations remain available', () => {
+  for (const screen of ['fields', 'strategies', 'analytics', 'water', 'rotations', 'farm']) {
+    assert.deepEqual(hostStep({ type: 'app.open_screen', screen_id: screen }), { kind: 'screen', screen })
+  }
+})

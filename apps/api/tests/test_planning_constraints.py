@@ -9,6 +9,7 @@ from pathlib import Path
 from uuid import uuid4
 
 import pytest
+from agent_contract_schema import validate_agent_wire
 from alembic import command
 from alembic.config import Config
 from fastapi.testclient import TestClient
@@ -541,22 +542,7 @@ def test_the_migration_adds_the_table_and_reverts_cleanly(tmp_path: Path):
 # ---------------------------------------------------------------- the agent's own contract
 
 
-def _agent_contract():
-    """The agent's wire contract (services/agent/contracts/models.py: stdlib and pydantic only),
-    loaded from the repository like the agent's tests load the host's signing.py."""
-    import importlib.util
-
-    path = Path(__file__).resolve().parents[3] / "services/agent/contracts/models.py"
-    if not path.exists():
-        pytest.skip("the agent contract is not in this checkout")
-    spec = importlib.util.spec_from_file_location("fieldshift_agent_contract", path)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
 def test_host_decisions_and_the_built_context_satisfy_the_agents_contract(app):
-    contract = _agent_contract()
     inferred = {
         "id": "c_len",
         "type": "rotation_length_years",
@@ -567,13 +553,13 @@ def test_host_decisions_and_the_built_context_satisfy_the_agents_contract(app):
     }
     body = decision(NO_IRRIGATION, NO_SUNFLOWER, inferred)
     # What the host accepts is a contract UIActionEnvelope...
-    contract.UIActionEnvelope.model_validate_json(json.dumps(body["envelope"]))
+    validate_agent_wire("UIActionEnvelope", body["envelope"])
     with TestClient(app) as client:
         assert client.post(URL, json=body).status_code == 200
         context = client.get(CONTEXT.format("less_rain")).json()
     # ...and the context it then builds (and signs) is a contract FieldContext.
-    parsed = contract.FieldContext.model_validate_json(json.dumps(context))
-    assert [(c.type, c.status) for c in parsed.constraints] == [
+    parsed = validate_agent_wire("FieldContext", context)
+    assert [(c["type"], c["status"]) for c in parsed["constraints"]] == [
         ("excluded_crops", "confirmed"),
         ("irrigation_available", "confirmed"),
         ("rotation_length_years", "rejected"),

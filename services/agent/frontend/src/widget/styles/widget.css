@@ -495,6 +495,11 @@
 .fsa-iconbtn:active {
   transform: scale(0.95);
 }
+.fsa-header > .fsa-iconbtn {
+  /* A generous touch target also stays above 44px during the header's entry and press motion. */
+  width: 48px;
+  height: 48px;
+}
 
 /* ------------------------------------------------------------------ field strip (context bar) */
 /* The field as a white card: a pin and the name (with a "demo data" tag when it is made up); under a hairline, each

@@ -10,6 +10,7 @@ import { useLocale } from '../../shared/locale'
 import { HOST_ACTIONS, hostStep, type AssistantScreen } from './assistantActions'
 import { assistantPath, conversationKey, historicalPeriod } from './assistantRun'
 import { CONSTRAINTS_CHANGED, CONSTRAINT_ACTION, constraintDecision, constraintSummary, decideWithReview } from './constraintDecision'
+import { AssistantHistory } from './AssistantHistory'
 import { createReplacementReview } from './replacementReview'
 import { EDITABLE_CROP_IDS, editableCropOptions } from './constraintCrops'
 import { planningUkrainian } from '../rotations/planningUkrainian'
@@ -40,10 +41,11 @@ export function Assistant({ field, season, scenario, runId, open, onOpenChange, 
   const path = field ? assistantPath(field.id, season, scenario, runId) : undefined
   // The context belongs to the address it was loaded for: after a field, scenario or run change the
   // previous one is never shown or used for actions while the new one loads.
-  const contextKey = path && `${path}#${field?.boundary_revision}`
+  const contextKey = path && `${path}#${field?.boundary_revision}#${language}`
   const [loaded, setLoaded] = useState<{ key: string; context: FieldContext | null; error?: string }>()
   // Bumped after the farmer's decision is recorded: the context the API builds then carries it.
   const [reloads, setReloads] = useState(0)
+  const [historyContext, setHistoryContext] = useState<string>()
   // A decision that would change an earlier one waits for the farmer's explicit choice; nothing is saved until
   // then. Closing the assistant, another field, boundary, season, scenario or run, or unmounting answers "keep",
   // and an answered question never comes back (replacementReview.ts).
@@ -53,6 +55,7 @@ export function Assistant({ field, season, scenario, runId, open, onOpenChange, 
   useEffect(() => review.sync(contextKey, open), [contextKey, open, review]) // closing or moving on cancels
   useEffect(() => () => review.cancel(), [review]) // unmounting cancels
   const reviewing = review.shown(contextKey, open)
+  useEffect(() => setHistoryContext(undefined), [contextKey, open])
   const current = loaded?.key === contextKey ? loaded : undefined
   const context = current?.context ?? null
   const period = runId ? historicalPeriod(context) : undefined
@@ -65,7 +68,7 @@ export function Assistant({ field, season, scenario, runId, open, onOpenChange, 
     if (!path || !open) return
     const controller = new AbortController()
     request<FieldContext>(`${path}/field-context?locale=${language}`, { signal: controller.signal })
-      .then((value) => setLoaded({ key: contextKey!, context: value }))
+      .then((value) => { if (!controller.signal.aborted) setLoaded({ key: contextKey!, context: value }) })
       .catch((error: unknown) => {
         if (controller.signal.aborted) return
         // A selected run that is missing, unfinished or stale is reported, never swapped for other data.
@@ -88,6 +91,8 @@ export function Assistant({ field, season, scenario, runId, open, onOpenChange, 
     simulation: false,
     screens: [
       { screen_id: 'fields', label: t('Fields') },
+      { screen_id: 'strategies', label: t('Strategies') },
+      { screen_id: 'analytics', label: t('Analytics') },
       { screen_id: 'water', label: t('Water') },
       { screen_id: 'rotations', label: t('Rotations') },
       { screen_id: 'farm', label: t('Farm management') },
@@ -146,11 +151,15 @@ export function Assistant({ field, season, scenario, runId, open, onOpenChange, 
       onAction={onAction}
       open={open}
       onOpenChange={onOpenChange}
+      onOpenHistory={field ? () => setHistoryContext(contextKey) : undefined}
       launcher={false}
       anchor={anchor}
       // Wide screens: next to the sidebar, at the bottom, nearest the sidebar's assistant item.
       placement={{ side: 'left', offsetX: 248, offsetY: 16 }}
     />
+    {open && field && historyContext !== undefined && historyContext === contextKey && (
+      <AssistantHistory key={contextKey} fieldId={field.id} fieldName={field.name} onClose={() => setHistoryContext(undefined)} />
+    )}
     {reviewing.length > 0 && (
       <div className="assistant-notice" role="alertdialog" aria-labelledby="replace-decision-heading" aria-describedby="replace-decision-list">
         <strong id="replace-decision-heading">{t('Replace your earlier decision?')}</strong>

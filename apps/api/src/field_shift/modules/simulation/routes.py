@@ -2,15 +2,15 @@ from datetime import date
 from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Query
+from field_shift_science.fields.schemas import Season
+from field_shift_science.simulation.schemas import WaterForecast, WaterResult, WaterSource
+from field_shift_science.weather.historical import WeatherUnavailableError
+from field_shift_science.weather.scenarios import Scenario
 
 from field_shift.db import SessionDep
-from field_shift.modules.fields.schemas import Season
 from field_shift.modules.simulation.forecast import latest_water_forecast
 from field_shift.modules.simulation.historical import HistoricalInputError
-from field_shift.modules.simulation.schemas import WaterForecast, WaterResult, WaterSource
 from field_shift.modules.simulation.service import run_water_balance
-from field_shift.modules.weather.historical import WeatherUnavailableError
-from field_shift.modules.weather.scenarios import Scenario
 
 router = APIRouter(prefix="/water", tags=["water"])
 

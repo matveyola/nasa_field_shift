@@ -2,10 +2,9 @@ from datetime import date, datetime
 from typing import Annotated, Literal
 from uuid import UUID
 
+from field_shift_science.fields.schemas import Season
+from field_shift_science.weather.scenarios import Scenario
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
-
-from field_shift.modules.fields.schemas import Season
-from field_shift.modules.weather.scenarios import Scenario
 
 AgentProviderName = Literal[
     "template", "deterministic", "scripted-llm", "gemini", "anthropic", "openai"

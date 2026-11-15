@@ -57,16 +57,18 @@ describe("launcher and panel", () => {
     expect(screen.getByRole("button", { name: "Open Field Assistant" })).toHaveFocus();
   });
 
-  it("opens from the host's own button and tells the host when the farmer closes it", async () => {
+  it.each([false, true])("opens from the host's own button and reports close (reduced motion: %s)", async (reducedMotion) => {
+    mockMedia(reducedMotion ? ["(prefers-reduced-motion: reduce)"] : []);
     const onOpenChange = vi.fn();
     const { user, rerender } = setup({ launcher: false, open: false, onOpenChange });
     expect(screen.queryByRole("button", { name: "Open Field Assistant" })).toBeNull(); // the host's button only
     rerender({ launcher: false, open: true, onOpenChange });
     await screen.findByRole("dialog", { name: "Field Assistant" });
-    expect(onOpenChange).toHaveBeenLastCalledWith(true);
+    await waitFor(() => expect(onOpenChange).toHaveBeenLastCalledWith(true));
     await user.keyboard("{Escape}");
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
-    expect(onOpenChange).toHaveBeenLastCalledWith(false);
+    // DOM removal and the host's passive-effect notification are separate observations.
+    await waitFor(() => expect(onOpenChange).toHaveBeenLastCalledWith(false));
   });
 
   it("shows two pulse rings, and none under prefers-reduced-motion", () => {
@@ -148,6 +150,55 @@ describe("launcher and panel", () => {
     expect(await screen.findByText(/Привіт! Я допоможу розібратися з вашим полем/)).toBeInTheDocument();
     expect(screen.getByRole("textbox", { name: "Повідомлення помічнику" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Що відомо про моє поле?" })).toBeInTheDocument();
+  });
+});
+
+describe("optional host saved conversations", () => {
+  it("is absent by default and leaves the current draft intact when the host opens history", async () => {
+    const onOpenHistory = vi.fn();
+    const { user, rerender } = setup();
+    await user.click(screen.getByRole("button", { name: "Open Field Assistant" }));
+    expect(screen.queryByRole("button", { name: "Saved conversations" })).toBeNull();
+    const draft = screen.getByRole("textbox", { name: "Message to the assistant" });
+    await user.type(draft, "My unsent field question");
+    rerender({ onOpenHistory });
+    const history = screen.getByRole("button", { name: "Saved conversations" });
+    history.focus();
+    await user.keyboard("{Enter}");
+    expect(onOpenHistory).toHaveBeenCalledTimes(1);
+    expect(draft).toHaveValue("My unsent field question");
+    expect(screen.getByRole("dialog", { name: "Field Assistant" })).toBeInTheDocument();
+  });
+
+  it("keeps a completed current answer when opening the host’s saved history", async () => {
+    const onOpenHistory = vi.fn();
+    const { user } = setup({ onOpenHistory });
+    await openAndAsk(user);
+    const answer = await screen.findByText(/адаптивна сівозміна має нижчий ризик/);
+    await user.click(screen.getByRole("button", { name: "Saved conversations" }));
+    expect(onOpenHistory).toHaveBeenCalledOnce();
+    expect(answer).toBeInTheDocument();
+  });
+
+  it("does not open the host's history while a turn is running", async () => {
+    const stream = manualStream();
+    const onOpenHistory = vi.fn();
+    const { user } = setup({ fetch: stream.fetch, onOpenHistory });
+    await openAndAsk(user);
+    const history = screen.getByRole("button", { name: "Saved conversations" });
+    expect(history).toBeDisabled();
+    await user.click(history);
+    expect(onOpenHistory).not.toHaveBeenCalled();
+    await user.click(screen.getByRole("button", { name: "Stop" }));
+    await waitFor(() => expect(history).toBeEnabled());
+  });
+
+  it("localizes the optional history button without changing the host's thread", async () => {
+    const onOpenHistory = vi.fn();
+    const { user } = setup({ locale: "uk", onOpenHistory });
+    await user.click(screen.getByRole("button", { name: "Відкрити: Польовий помічник" }));
+    await user.click(screen.getByRole("button", { name: "Збережені розмови" }));
+    expect(onOpenHistory).toHaveBeenCalledOnce();
   });
 });
 

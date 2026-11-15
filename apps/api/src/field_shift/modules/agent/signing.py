@@ -1,7 +1,7 @@
 """The host side of the agent trust boundary: what the API vouches for when it signs a turn.
 
-Standard library only, so the agent's tests can load this exact file and check it against the
-agent's verifier (services/agent/tests/test_host_signing.py).
+Standard library only. API and agent tests verify the same frozen wire/signature vectors
+using their own installed signer/verifier; neither imports a sibling service's source.
 
 The signature (HMAC over the exact body) says: this body came from the Field Shift API, for this
 field and boundary revision, on behalf of this caller. It does not make browser-supplied parts true:
@@ -23,7 +23,7 @@ ASSISTANT_KEYS = ("request_id", "session_id", "locale", "message", "history", "c
 # What the app's assistant host executes: keep in step with
 # apps/web/src/features/assistant/Assistant.tsx (its capabilities and onAction).
 HOST_ACTIONS = ("map.set_layers", "map.focus_field", "chart.focus", "app.open_screen")
-HOST_SCREENS = ("fields", "water", "rotations", "farm")
+HOST_SCREENS = ("fields", "strategies", "analytics", "water", "rotations", "farm")
 # The shared workspace of local (single-farm, no sign-in) mode: every request is the same caller.
 LOCAL_PRINCIPAL = "field-shift-local-farm"
 ATTESTATION_TTL_S = 120

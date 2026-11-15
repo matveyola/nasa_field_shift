@@ -13,13 +13,7 @@ from pathlib import Path
 from statistics import median
 
 import numpy as np
-from sklearn import __version__ as sklearn_version
-from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.linear_model import Ridge
-from sklearn.model_selection import GroupKFold
-from sklearn.preprocessing import StandardScaler
-
-from field_shift.modules.geo_ml.moisture_model import (
+from field_shift_science.geo_ml.moisture_model import (
     ARTIFACT_NAME,
     SOIL_ATTRIBUTES,
     V2_ARTIFACT_SCHEMA,
@@ -30,7 +24,13 @@ from field_shift.modules.geo_ml.moisture_model import (
     soil_moisture_features,
     station_distance_km,
 )
-from field_shift.modules.geo_ml.ssurgo import SoilProfile
+from field_shift_science.geo_ml.ssurgo import SoilProfile
+from sklearn import __version__ as sklearn_version
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.linear_model import Ridge
+from sklearn.model_selection import GroupKFold
+from sklearn.preprocessing import StandardScaler
+
 from field_shift_ml.resources import evaluation_resource
 from field_shift_ml.train_moisture import (
     Sample,
@@ -45,7 +45,7 @@ from field_shift_ml.train_moisture import (
     write_atomically,
 )
 
-V1_PATH = files("field_shift.modules.geo_ml").joinpath(ARTIFACT_NAME)
+V1_PATH = files("field_shift_science.geo_ml").joinpath(ARTIFACT_NAME)
 V1_FARM_REPORT = evaluation_resource("iowa-fields-v1.json")
 FIT_END = date(2024, 12, 31)
 EVALUATION_YEAR = 2025

@@ -8,12 +8,14 @@
 
 import argparse
 import json
-import os
 import logging
+import os
 import sys
 from pathlib import Path
 
-DEFAULT_DIR = Path("data/knowledge")
+from agent_service.paths import knowledge_directory
+
+DEFAULT_DIR = knowledge_directory()
 
 
 def main() -> int:

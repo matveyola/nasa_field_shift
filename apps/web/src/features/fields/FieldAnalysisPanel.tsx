@@ -15,6 +15,8 @@ import { useAccess } from '../access/AccessProvider'
 import './fieldAnalytics.css'
 
 type Props = {
+  sections?: ('vegetation' | 'terrain' | 'weather' | 'precision')[]
+  embedded?: boolean
   state: ReturnType<typeof useFieldAnalytics>
   field: Field
   season: number
@@ -24,11 +26,11 @@ type Props = {
   onHeterogeneity: () => void
   onSelectObservation: () => void
   onShowComparison: () => void
-  onShowIndex: () => void
+  onShowIndex: (index?: import('../../api/analytics').SpectralIndex) => void
   onTerrain: () => void
 }
 
-export function FieldAnalysisPanel({ state, field, season, onSeason, heterogeneityVisible, terrainVisible, onHeterogeneity, onSelectObservation, onShowComparison, onShowIndex, onTerrain }: Props) {
+export function FieldAnalysisPanel({ sections = ['vegetation', 'terrain', 'weather', 'precision'], embedded = false, state, field, season, onSeason, heterogeneityVisible, terrainVisible, onHeterogeneity, onSelectObservation, onShowComparison, onShowIndex, onTerrain }: Props) {
   const { t, number, date, language } = useLocale()
   const { canEdit } = useAccess()
   const { vegetation, terrain, observations, primary: selected, comparison, alternatives, selectedScene } = state
@@ -48,14 +50,11 @@ export function FieldAnalysisPanel({ state, field, season, onSeason, heterogenei
   }
 
   return <div className="field-analysis-panel">
-    <section aria-label={t('Seasonal NDVI')}>
-      <header className="field-analysis-heading">
-        <div className="field-help-row"><h3>{t('Seasonal NDVI')}</h3>
-          <ContextHelp label={t('Seasonal NDVI')}><p>{spectralHelp.ndvi[language]}</p></ContextHelp>
-        </div>
-        <label className="ndvi-season"><span className="sr-only">{t('Season')}</span><select value={season} onChange={(event) => onSeason(Number(event.target.value))}>
+    {sections.includes('vegetation') && <><section aria-label={t('Seasonal NDVI')}>
+      <header className="field-analysis-heading"><div className="field-help-row"><h3>{t('Seasonal NDVI')}</h3><ContextHelp label={t('Seasonal NDVI')}><p>{spectralHelp.ndvi[language]}</p></ContextHelp></div>
+        {!embedded && <label className="ndvi-season"><span className="sr-only">{t('Season')}</span><select value={season} onChange={(event) => onSeason(Number(event.target.value))}>
           {Array.from({ length: todayYear - 2016 }, (_, index) => todayYear - index).map((year) => <option key={year}>{year}</option>)}
-        </select></label>
+        </select></label>}
       </header>
       <p className="analysis-description">{t('How vegetation changes across the season.')}</p>
       {result?.boundary_history_assumed && <p className="analysis-footnote">{language === 'uk'
@@ -84,7 +83,7 @@ export function FieldAnalysisPanel({ state, field, season, onSeason, heterogenei
         <a className="analysis-source" href={selected.catalog_url} target="_blank" rel="noreferrer">Sentinel-2 L2A · {result?.resolution_m} {t('m')} · {t('View source scene')}</a>
         {selected.mean_msavi != null && <p className="analysis-description">{t('Mean MSAVI')} · {number(selected.mean_msavi, 2)}</p>}
         {(selected.mean_msavi != null || state.showingMsavi) && <button type="button" className="button subtle analysis-map-toggle"
-          onClick={() => { state.showMsavi(!state.showingMsavi); onShowIndex() }}>
+          onClick={() => { const index = state.showingMsavi ? 'ndvi' : 'msavi'; state.showMsavi(!state.showingMsavi); onShowIndex(index) }}>
           <MapIcon aria-hidden="true" />{t(state.showingMsavi ? 'Show NDVI on map' : 'Show MSAVI on map')}
         </button>}
         <button type="button" className="button subtle analysis-refresh" onClick={downloadObservations}>
@@ -120,9 +119,9 @@ export function FieldAnalysisPanel({ state, field, season, onSeason, heterogenei
         {result.limitations.map((limitation) => <p key={limitation}>{t(limitation)}</p>)}
       </details>}
     </section>
-    <SpectralIndexPanel observations={observations} selected={selected}
+    <details className="analytics-spectral-details" open={!embedded}><summary>{language === 'uk' ? 'Спектральні індекси' : 'Spectral indices'}</summary><SpectralIndexPanel observations={observations} selected={selected}
       onSelect={(day) => { state.selectObservation(day); onSelectObservation() }}
-      onMap={(index) => { state.showIndex(index); onShowIndex() }} />
+      onMap={(index) => { state.showIndex(index); onShowIndex(index) }} /></details>
     <section className="field-heterogeneity" aria-label={t('Within-field variation')}>
       <header className="field-analysis-heading">
         <div className="field-help-row"><h3>{t('Within-field variation')}</h3>
@@ -139,16 +138,15 @@ export function FieldAnalysisPanel({ state, field, season, onSeason, heterogenei
           <MapIcon aria-hidden="true" />{t(heterogeneityVisible ? 'Hide variation layer' : 'Show variation on map')}</button>
       </> : <p className="analysis-empty" role="status">{t(selectedScene.pending ? 'Loading selected scene…' : selected ? 'No saved map for this observation.' : 'The variation map appears after a usable satellite observation.')}</p>}
     </section>
-    <SeasonalWeatherPanel field={field} season={season} />
+    </>}
+    {sections.includes('weather') && <SeasonalWeatherPanel field={field} season={season} />}
+    {sections.includes('precision') && <>
     <NdviHistoryPanel field={field} season={season} layer={layer} fingerprint={selectedScene.data?.geometry_fingerprint ?? ''} />
     <PrecisionFieldPanel field={field} season={season} layer={layer} sceneId={selectedScene.data?.observation.scene_id}
       fingerprint={selectedScene.data?.geometry_fingerprint} />
-    <section className="field-terrain-analysis" aria-label={t('Terrain directions')}>
-      <header className="field-analysis-heading">
-        <div className="field-help-row"><h3>{t('Terrain directions')}</h3>
-          <ContextHelp label={help.terrain.title}><p>{help.terrain.description}</p></ContextHelp>
-        </div>
-      </header>
+    </>}
+    {sections.includes('terrain') && <section className="field-terrain-analysis" aria-label={t('Terrain directions')}>
+      <header className="field-analysis-heading"><div className="field-help-row"><h3>{t('Terrain directions')}</h3><ContextHelp label={help.terrain.title}><p>{help.terrain.description}</p></ContextHelp></div></header>
       <p className="analysis-description">{t('Potential downhill directions from the land surface.')}</p>
       {terrain.error && <ErrorBox message={terrain.error} retry={terrain.reload} />}
       {terrain.data?.status === 'ready' ? <>
@@ -168,6 +166,7 @@ export function FieldAnalysisPanel({ state, field, season, onSeason, heterogenei
       </>}
       <p className="analysis-footnote">{t('30 m surface model. This does not measure runoff, drainage pipes or flooding; small furrows and ditches may be unresolved.')}</p>
     </section>
+    }
     {state.error && <ErrorBox message={state.error} />}
   </div>
 }

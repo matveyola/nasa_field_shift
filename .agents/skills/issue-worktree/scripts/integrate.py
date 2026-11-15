@@ -2,11 +2,53 @@
 """Serialize verified issue integration and normal pushes to a personal jobs branch."""
 
 import argparse
-import fcntl
+import os
 import re
 import subprocess
 import sys
 from pathlib import Path
+
+# Filesystems shared from another kernel (Docker Desktop/WSL host drives). A flock taken
+# there is invisible to integrators on the host that owns the checkout.
+HOST_SHARED_FILESYSTEMS = {"9p", "drvfs", "fakeowner", "fuse.grpcfuse", "virtiofs"}
+
+
+def lock_exclusive(lock):
+    """Take the non-blocking, process-lifetime lock with the host's native API."""
+    if os.name == "nt":
+        import msvcrt
+
+        lock.seek(0)
+        try:
+            msvcrt.locking(lock.fileno(), msvcrt.LK_NBLCK, 1)
+        except OSError:
+            raise BlockingIOError from None
+    else:
+        import fcntl
+
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+
+
+def mount_filesystem(path, mountinfo):
+    """Return the filesystem type of the deepest mount containing path."""
+    best, kind = "", None
+    for line in mountinfo.splitlines():
+        fields = line.split(" - ")
+        mount_point = fields[0].split()[4].replace("\\040", " ")
+        inside = path == mount_point or path.startswith(mount_point.rstrip("/") + "/")
+        if inside and len(mount_point) > len(best):
+            best, kind = mount_point, fields[1].split()[0]
+    return kind
+
+
+def check_shell(git):
+    """Use Git Bash on Windows: a bare 'bash' may resolve to WSL in System32."""
+    if os.name != "nt":
+        return "bash"
+    bash = Path(git("--exec-path", capture=True)).parents[2] / "bin" / "bash.exe"
+    if not bash.is_file():
+        raise RuntimeError(f"Git Bash not found at {bash}")
+    return str(bash)
 
 
 def main():
@@ -42,9 +84,19 @@ def main():
     common = Path(
         git("rev-parse", "--path-format=absolute", "--git-common-dir", capture=True)
     )
+    if Path("/proc/self/mountinfo").exists():
+        kind = mount_filesystem(
+            str(common.resolve()), Path("/proc/self/mountinfo").read_text()
+        )
+        require(
+            kind not in HOST_SHARED_FILESYSTEMS,
+            f"Repository is on a host-shared {kind} filesystem; "
+            "run integration on the host that owns it",
+        )
+    shell = check_shell(git)
     with (common / "issue-integration.lock").open("a") as lock:
         try:
-            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            lock_exclusive(lock)
         except BlockingIOError:
             raise RuntimeError(
                 "Another agent holds the integration lock; retry later"
@@ -95,7 +147,7 @@ def main():
             require(bool(command.strip()), "Empty check command")
             print(f"Running integration check: {command}", flush=True)
             subprocess.run(
-                ["bash", "-o", "pipefail", "-c", command], cwd=root, check=True
+                [shell, "-o", "pipefail", "-c", command], cwd=root, check=True
             )
         require(
             git("diff", "--quiet", check=False) == 0,

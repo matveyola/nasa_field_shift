@@ -1,12 +1,5 @@
-from sqlalchemy import and_, select, update
-from sqlalchemy.orm import Session
-
-from field_shift.errors import ConflictError, NotFoundError
-from field_shift.modules.farm.models import FARM_ID, Farm
-from field_shift.modules.fields.geometry import area_hectares, covers_ring, same_boundary
-from field_shift.modules.fields.history import boundary_for_season, ensure_baseline, record_boundary
-from field_shift.modules.fields.models import Field, FieldPlanting
-from field_shift.modules.fields.schemas import (
+from field_shift_science.fields.geometry import area_hectares, covers_ring, same_boundary
+from field_shift_science.fields.schemas import (
     FieldBoundaryUpdate,
     FieldCreate,
     FieldPlantingRead,
@@ -14,6 +7,14 @@ from field_shift.modules.fields.schemas import (
     FieldRead,
     Polygon,
 )
+from sqlalchemy import and_, select, update
+from sqlalchemy.orm import Session
+
+from field_shift.demo_fields_naip import DEMO_FIELDS_NAIP_2026
+from field_shift.errors import ConflictError, NotFoundError
+from field_shift.modules.farm.models import FARM_ID, Farm
+from field_shift.modules.fields.history import boundary_for_season, ensure_baseline, record_boundary
+from field_shift.modules.fields.models import Field, FieldPlanting
 from field_shift.modules.onboarding.profiles import completed_setup_inputs
 
 
@@ -30,10 +31,17 @@ def field_read(
     planting: FieldPlanting | None = None,
     irrigation_available: bool | None = None,
 ) -> FieldRead:
+    # Only the exact untouched seed identity is an example. New user registrations
+    # and edited boundaries never inherit the label merely from their name.
+    example = field.boundary_revision == 0 and any(
+        field.id == seed_id and field.geometry == {"type": "Polygon", "coordinates": [ring]}
+        for seed_id, _name, _crop, _area, ring in DEMO_FIELDS_NAIP_2026
+    )
     return FieldRead.model_validate(field).model_copy(
         update={
             "planting": FieldPlantingRead.model_validate(planting) if planting else None,
             "irrigation_available": irrigation_available,
+            "boundary_origin": "example" if example else "registered",
         }
     )
 

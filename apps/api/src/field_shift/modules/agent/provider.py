@@ -4,6 +4,9 @@ from math import isfinite
 from typing import Literal, Protocol
 from uuid import UUID
 
+from field_shift_science.fields.schemas import FieldRead
+from field_shift_science.simulation.schemas import WaterForecast, WaterResult
+
 from field_shift.modules.agent.schemas import (
     AgentAction,
     AgentCitation,
@@ -12,9 +15,7 @@ from field_shift.modules.agent.schemas import (
 )
 from field_shift.modules.agent.signing import LOCAL_PRINCIPAL
 from field_shift.modules.farm.schemas import ScoutingEvidence
-from field_shift.modules.fields.schemas import FieldRead
 from field_shift.modules.imagery.vegetation_schemas import VegetationSeason
-from field_shift.modules.simulation.schemas import WaterForecast, WaterResult
 
 
 @dataclass(frozen=True, slots=True)

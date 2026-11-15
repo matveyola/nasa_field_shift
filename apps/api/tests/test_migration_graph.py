@@ -89,14 +89,14 @@ MERGES = {
         "0011_field_onboarding",
         "0011_planning_constraints",
     ),  # team main + agent
-    "0015_merge_agent_planning": (
-        "0011_planning_constraints",
+    "0015_merge_onboarding": (
         "0014_planning_inputs",
-    ),  # nazar-jobs + agent
-    "0016_merge_field_shift": (
+        "0011_field_onboarding",
+    ),  # published planning + onboarding
+    "0016_merge_agent_planning": (
+        "0015_merge_onboarding",
         "0012_merge_agent_constraints",
-        "0015_merge_agent_planning",
-    ),  # both lines (#7)
+    ),  # preserve both published histories
 }
 # A line ships whole or not at all: part of one would leave a database half migrated.
 LINES = (

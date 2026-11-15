@@ -1,7 +1,7 @@
 """The API's constraint context against the agent's own contract (Task 05E, 2026-11-14).
 
-The agent package is not importable here, so its wire models are loaded from the repository by
-path (as in test_planning_constraints), never re-typed. The expected shapes live in one fixture
+The API validates the exported JSON Schema without importing the private agent package.
+The expected shapes live in one fixture
 shared with the agent's tests (services/agent/tests/fixtures/host_constraints.json): the API must
 produce exactly those, and the agent's tests check its contract and behaviour on them. CI runs
 this file when that fixture or the agent contract changes.
@@ -9,18 +9,17 @@ this file when that fixture or the agent contract changes.
 
 # ruff: noqa: F811  (the `app` fixture comes from test_assistant_selected_run)
 
-import importlib.util
 import json
 from pathlib import Path
 
 import pytest
+from agent_contract_schema import validate_agent_wire
 from fastapi.testclient import TestClient
 from test_assistant_selected_run import _open_stream, _widget_turn, app  # noqa: F401
 from test_planning_constraints import CONTEXT, URL, decision
 
 ROOT = Path(__file__).resolve().parents[3]
 FIXTURE = ROOT / "services/agent/tests/fixtures/host_constraints.json"
-AGENT_CONTRACT = ROOT / "services/agent/contracts/models.py"
 
 
 # Fail, never skip: CI checks out the whole repository, so a missing file is a broken link.
@@ -29,17 +28,8 @@ def host_fixture() -> dict:
     return json.loads(FIXTURE.read_text(encoding="utf-8"))
 
 
-def agent_contract():
-    """The agent's wire models (stdlib and pydantic only), loaded by path from the repository."""
-    assert AGENT_CONTRACT.exists(), f"missing agent contract: {AGENT_CONTRACT}"
-    spec = importlib.util.spec_from_file_location("fieldshift_agent_contract_05e", AGENT_CONTRACT)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
 def test_the_api_signs_exactly_the_shared_host_constraints(app, monkeypatch):
-    contract, host = agent_contract(), host_fixture()
+    host = host_fixture()
     opened = _open_stream(app, monkeypatch)
     with TestClient(app) as client:
         assert client.post(URL, json=decision(*host["decided"])).status_code == 200
@@ -48,13 +38,11 @@ def test_the_api_signs_exactly_the_shared_host_constraints(app, monkeypatch):
             "/api/agent/assistant/F-03/2026/baseline/v1/agent/stream", json=_widget_turn()
         )
     assert context["constraints"] == host["signed"]
-    # The agent's own strict models, not a mirror of them.
-    contract.FieldContext.model_validate_json(json.dumps(context))
+    # The published schema; installed agent tests additionally check strict semantic validators.
+    validate_agent_wire("FieldContext", context)
     [request] = opened
-    signed = contract.AgentRequest.model_validate_json(request.data)  # what the agent parses
-    assert [
-        c.model_dump(mode="json", exclude_none=True) for c in signed.field_context.constraints
-    ] == host["signed"]
+    signed = validate_agent_wire("AgentRequest", json.loads(request.data))  # what the agent parses
+    assert signed["field_context"]["constraints"] == host["signed"]
     body = request.data.decode()
     for words in host["farmer_words"]:
         assert words not in body
@@ -77,7 +65,6 @@ CONFIRMED = [
 @pytest.mark.parametrize(("ctype", "value"), CONFIRMED, ids=[c for c, _ in CONFIRMED])
 @pytest.mark.parametrize("source", ["farmer_text", "agent_inferred"])
 def test_every_kind_of_decision_reaches_the_agent_in_its_contract(app, ctype, value, source):
-    contract = agent_contract()
     decided = {"id": "c_1", "type": ctype, "value": value, "status": "confirmed", "source": source}
     decided |= (
         {"evidence": "the farmer's words"} if source == "farmer_text" else {"confidence": 0.7}
@@ -85,9 +72,9 @@ def test_every_kind_of_decision_reaches_the_agent_in_its_contract(app, ctype, va
     with TestClient(app) as client:
         assert client.post(URL, json=decision(decided)).status_code == 200
         context = client.get(CONTEXT.format("baseline")).json()
-    parsed = contract.FieldContext.model_validate_json(json.dumps(context))
-    [constraint] = parsed.constraints
-    assert (constraint.id, constraint.type, constraint.value, constraint.status) == (
+    parsed = validate_agent_wire("FieldContext", context)
+    [constraint] = parsed["constraints"]
+    assert (constraint["id"], constraint["type"], constraint["value"], constraint["status"]) == (
         f"pc_{ctype}",
         ctype,
         value,
@@ -95,7 +82,7 @@ def test_every_kind_of_decision_reaches_the_agent_in_its_contract(app, ctype, va
     )
     if source == "agent_inferred":
         # An approved inference stays one.
-        assert (constraint.source, constraint.confidence) == ("agent_inferred", 0.7)
+        assert (constraint["source"], constraint.get("confidence")) == ("agent_inferred", 0.7)
     else:
         # The farmer's quote stays in the farm record, out of the signed context.
-        assert (constraint.source, constraint.evidence) == ("farmer_ui", None)
+        assert (constraint["source"], constraint.get("evidence")) == ("farmer_ui", None)

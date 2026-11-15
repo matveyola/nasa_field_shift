@@ -91,3 +91,12 @@ test('the run period shown to the farmer comes from the server-built historical 
   assert.equal(historicalPeriod(null), undefined)
   assert.equal(historicalPeriod({ available_charts: runContext.available_charts, timeseries_index: [] }), undefined)
 })
+
+test('Analytics water preserves only the explicitly selected historical run', () => {
+  const analytics = { ...water, page: 'analytics', section: 'water' }
+  assert.equal(currentAssistantRun(selected, analytics), RUN)
+  assert.equal(currentAssistantRun(selected, { ...analytics, jobId: undefined }), undefined)
+  assert.equal(currentAssistantRun(selected, { ...analytics, jobId: 'different' }), undefined)
+  assert.equal(currentAssistantRun(selected, { ...analytics, season: 2028 }), undefined)
+  assert.equal(currentAssistantRun(selected, { ...analytics, section: 'vegetation', jobId: undefined }), RUN)
+})

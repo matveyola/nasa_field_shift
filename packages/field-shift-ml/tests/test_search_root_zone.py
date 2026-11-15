@@ -4,8 +4,8 @@ from urllib.error import HTTPError
 
 import numpy as np
 import pytest
+from field_shift_science.simulation.root_zone_inputs import RootZoneRun, RootZoneWeatherDay
 
-from field_shift.modules.simulation.root_zone_inputs import RootZoneRun, RootZoneWeatherDay
 from field_shift_ml.fetch_root_zone_observations import RootZoneSite
 from field_shift_ml.root_zone_features import FEATURES, sample_features
 from field_shift_ml.root_zone_history import LOOKBACK, archive_station, history_features

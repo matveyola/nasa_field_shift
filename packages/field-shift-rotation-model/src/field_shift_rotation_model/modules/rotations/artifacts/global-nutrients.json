@@ -1,0 +1,226 @@
+{
+  "schema_version": 1,
+  "scope": "global",
+  "source_url": "https://files-faostat.fao.org/production/ESB/ESB_e.pdf#page=7",
+  "source_table": "FAOSTAT Cropland Nutrient Balance, December 2025 release, Table 4, PDF page 7",
+  "metadata_url": "https://doi.org/10.5061/dryad.n2z34tn0x",
+  "crop_production_url": "https://www.fao.org/faostat/en/#data/QCL",
+  "yield_basis": "faostat_harvested_product",
+  "yield_basis_note": "Metric tonne of crop harvested in the FAOSTAT Crops and livestock products reporting basis. Table 4 does not give crop-specific moisture percentages. A dry-matter yield basis requires separate conversion before use.",
+  "source_precision_note": "Table 4 publishes whole kilograms of elemental nutrient per tonne of harvested product. Additional decimal places in the oxide equivalents represent only the unit conversion.",
+  "use_note": "Harvested-product nutrient removal only. Wheat types share one FAOSTAT Wheat coefficient. Local crop concentrations, residues and soil nutrient status can differ.",
+  "oxide_conversion_factors": {
+    "p_to_p2o5": 2.2913349,
+    "k_to_k2o": 1.20459969
+  },
+  "crops": {
+    "wheat_winter_frozen": {
+      "p2o5_kg_per_t": 9.16534,
+      "k2o_kg_per_t": 6.022998,
+      "yield_basis": "faostat_harvested_product",
+      "source_url": "https://files-faostat.fao.org/production/ESB/ESB_e.pdf#page=7",
+      "source_table": "FAOSTAT Cropland Nutrient Balance, December 2025 release, Table 4, PDF page 7",
+      "source_row": "Wheat",
+      "source_scope": "global_faostat_reference",
+      "raw": {
+        "item_code": 15,
+        "item": "Wheat",
+        "n_kg_per_t": 21,
+        "p_kg_per_t": 4,
+        "k_kg_per_t": 5
+      }
+    },
+    "wheat_winter_nonfrozen": {
+      "p2o5_kg_per_t": 9.16534,
+      "k2o_kg_per_t": 6.022998,
+      "yield_basis": "faostat_harvested_product",
+      "source_url": "https://files-faostat.fao.org/production/ESB/ESB_e.pdf#page=7",
+      "source_table": "FAOSTAT Cropland Nutrient Balance, December 2025 release, Table 4, PDF page 7",
+      "source_row": "Wheat",
+      "source_scope": "global_faostat_reference",
+      "raw": {
+        "item_code": 15,
+        "item": "Wheat",
+        "n_kg_per_t": 21,
+        "p_kg_per_t": 4,
+        "k_kg_per_t": 5
+      }
+    },
+    "wheat_spring": {
+      "p2o5_kg_per_t": 9.16534,
+      "k2o_kg_per_t": 6.022998,
+      "yield_basis": "faostat_harvested_product",
+      "source_url": "https://files-faostat.fao.org/production/ESB/ESB_e.pdf#page=7",
+      "source_table": "FAOSTAT Cropland Nutrient Balance, December 2025 release, Table 4, PDF page 7",
+      "source_row": "Wheat",
+      "source_scope": "global_faostat_reference",
+      "raw": {
+        "item_code": 15,
+        "item": "Wheat",
+        "n_kg_per_t": 21,
+        "p_kg_per_t": 4,
+        "k_kg_per_t": 5
+      }
+    },
+    "barley": {
+      "p2o5_kg_per_t": 6.874005,
+      "k2o_kg_per_t": 7.227598,
+      "yield_basis": "faostat_harvested_product",
+      "source_url": "https://files-faostat.fao.org/production/ESB/ESB_e.pdf#page=7",
+      "source_table": "FAOSTAT Cropland Nutrient Balance, December 2025 release, Table 4, PDF page 7",
+      "source_row": "Barley",
+      "source_scope": "global_faostat_reference",
+      "raw": {
+        "item_code": 44,
+        "item": "Barley",
+        "n_kg_per_t": 18,
+        "p_kg_per_t": 3,
+        "k_kg_per_t": 6
+      }
+    },
+    "maize_grain": {
+      "p2o5_kg_per_t": 6.874005,
+      "k2o_kg_per_t": 4.818399,
+      "yield_basis": "faostat_harvested_product",
+      "source_url": "https://files-faostat.fao.org/production/ESB/ESB_e.pdf#page=7",
+      "source_table": "FAOSTAT Cropland Nutrient Balance, December 2025 release, Table 4, PDF page 7",
+      "source_row": "Maize",
+      "source_scope": "global_faostat_reference",
+      "raw": {
+        "item_code": 56,
+        "item": "Maize",
+        "n_kg_per_t": 12,
+        "p_kg_per_t": 3,
+        "k_kg_per_t": 4
+      }
+    },
+    "sunflower": {
+      "p2o5_kg_per_t": 9.16534,
+      "k2o_kg_per_t": 8.432198,
+      "yield_basis": "faostat_harvested_product",
+      "source_url": "https://files-faostat.fao.org/production/ESB/ESB_e.pdf#page=7",
+      "source_table": "FAOSTAT Cropland Nutrient Balance, December 2025 release, Table 4, PDF page 7",
+      "source_row": "Sunflower seed",
+      "source_scope": "global_faostat_reference",
+      "raw": {
+        "item_code": 267,
+        "item": "Sunflower seed",
+        "n_kg_per_t": 26,
+        "p_kg_per_t": 4,
+        "k_kg_per_t": 7
+      }
+    },
+    "soybeans": {
+      "p2o5_kg_per_t": 13.748009,
+      "k2o_kg_per_t": 20.478195,
+      "yield_basis": "faostat_harvested_product",
+      "source_url": "https://files-faostat.fao.org/production/ESB/ESB_e.pdf#page=7",
+      "source_table": "FAOSTAT Cropland Nutrient Balance, December 2025 release, Table 4, PDF page 7",
+      "source_row": "Soybeans",
+      "source_scope": "global_faostat_reference",
+      "raw": {
+        "item_code": 236,
+        "item": "Soybeans",
+        "n_kg_per_t": 56,
+        "p_kg_per_t": 6,
+        "k_kg_per_t": 17
+      }
+    },
+    "rapeseed_canola": {
+      "p2o5_kg_per_t": 16.039344,
+      "k2o_kg_per_t": 8.432198,
+      "yield_basis": "faostat_harvested_product",
+      "source_url": "https://files-faostat.fao.org/production/ESB/ESB_e.pdf#page=7",
+      "source_table": "FAOSTAT Cropland Nutrient Balance, December 2025 release, Table 4, PDF page 7",
+      "source_row": "Rapeseed",
+      "source_scope": "global_faostat_reference",
+      "raw": {
+        "item_code": 270,
+        "item": "Rapeseed",
+        "n_kg_per_t": 32,
+        "p_kg_per_t": 7,
+        "k_kg_per_t": 7
+      }
+    },
+    "peas_dry": {
+      "p2o5_kg_per_t": 20.622014,
+      "k2o_kg_per_t": 12.045997,
+      "yield_basis": "faostat_harvested_product",
+      "source_url": "https://files-faostat.fao.org/production/ESB/ESB_e.pdf#page=7",
+      "source_table": "FAOSTAT Cropland Nutrient Balance, December 2025 release, Table 4, PDF page 7",
+      "source_row": "Peas, dry",
+      "source_scope": "global_faostat_reference",
+      "raw": {
+        "item_code": 187,
+        "item": "Peas, dry",
+        "n_kg_per_t": 39,
+        "p_kg_per_t": 9,
+        "k_kg_per_t": 10
+      }
+    },
+    "sugar_beet": {
+      "p2o5_kg_per_t": 2.291335,
+      "k2o_kg_per_t": 4.818399,
+      "yield_basis": "faostat_harvested_product",
+      "source_url": "https://files-faostat.fao.org/production/ESB/ESB_e.pdf#page=7",
+      "source_table": "FAOSTAT Cropland Nutrient Balance, December 2025 release, Table 4, PDF page 7",
+      "source_row": "Sugar beet",
+      "source_scope": "global_faostat_reference",
+      "raw": {
+        "item_code": 157,
+        "item": "Sugar beet",
+        "n_kg_per_t": 2,
+        "p_kg_per_t": 1,
+        "k_kg_per_t": 4
+      }
+    },
+    "potato": {
+      "p2o5_kg_per_t": 2.291335,
+      "k2o_kg_per_t": 7.227598,
+      "yield_basis": "faostat_harvested_product",
+      "source_url": "https://files-faostat.fao.org/production/ESB/ESB_e.pdf#page=7",
+      "source_table": "FAOSTAT Cropland Nutrient Balance, December 2025 release, Table 4, PDF page 7",
+      "source_row": "Potatoes",
+      "source_scope": "global_faostat_reference",
+      "raw": {
+        "item_code": 116,
+        "item": "Potatoes",
+        "n_kg_per_t": 3,
+        "p_kg_per_t": 1,
+        "k_kg_per_t": 6
+      }
+    },
+    "oats": {
+      "p2o5_kg_per_t": 9.16534,
+      "k2o_kg_per_t": 6.022998,
+      "yield_basis": "faostat_harvested_product",
+      "source_url": "https://files-faostat.fao.org/production/ESB/ESB_e.pdf#page=7",
+      "source_table": "FAOSTAT Cropland Nutrient Balance, December 2025 release, Table 4, PDF page 7",
+      "source_row": "Oats",
+      "source_scope": "global_faostat_reference",
+      "raw": {
+        "item_code": 75,
+        "item": "Oats",
+        "n_kg_per_t": 22,
+        "p_kg_per_t": 4,
+        "k_kg_per_t": 5
+      }
+    },
+    "millet": {
+      "p2o5_kg_per_t": 9.16534,
+      "k2o_kg_per_t": 7.227598,
+      "yield_basis": "faostat_harvested_product",
+      "source_url": "https://files-faostat.fao.org/production/ESB/ESB_e.pdf#page=7",
+      "source_table": "FAOSTAT Cropland Nutrient Balance, December 2025 release, Table 4, PDF page 7",
+      "source_row": "Millet",
+      "source_scope": "global_faostat_reference",
+      "raw": {
+        "item_code": 79,
+        "item": "Millet",
+        "n_kg_per_t": 23,
+        "p_kg_per_t": 4,
+        "k_kg_per_t": 6
+      }
+    }
+  }
+}

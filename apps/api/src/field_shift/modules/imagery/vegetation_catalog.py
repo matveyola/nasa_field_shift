@@ -9,7 +9,8 @@ from urllib.error import URLError
 from urllib.parse import urlencode, urlsplit
 from urllib.request import Request, urlopen
 
-from field_shift.modules.fields.schemas import Polygon
+from field_shift_science.fields.schemas import Polygon
+
 from field_shift.modules.imagery.sentinel import ASSET_HOSTS, CATALOG, COLLECTION, _covers_field
 
 MAX_CATALOG_BYTES = 4 * 1024 * 1024

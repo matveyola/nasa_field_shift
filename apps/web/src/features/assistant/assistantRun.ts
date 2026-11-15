@@ -7,13 +7,13 @@ import type { Job, WaterResult } from '../../api/contracts'
 /** The farmer's selection, with the field context it was made in. */
 export type AssistantRun = { id: string; fieldId: string; season: number; scenario: string }
 
-type Shown = { fieldId?: string; season?: number; scenario: string; page: string; jobId?: string }
+type Shown = { fieldId?: string; season?: number; scenario: string; page: string; section?: string; jobId?: string }
 
 /** The selected run while it still matches what the app shows; otherwise none (it is stale, never replaced). */
 export function currentAssistantRun(run: AssistantRun | undefined, shown: Shown): string | undefined {
   if (!run || run.fieldId !== shown.fieldId || run.season !== shown.season || run.scenario !== shown.scenario) return undefined
   // On the Water page another selected run (or none) replaces this one.
-  if (shown.page === 'water' && shown.jobId !== run.id) return undefined
+  if ((shown.page === 'water' || (shown.page === 'analytics' && shown.section === 'water')) && shown.jobId !== run.id) return undefined
   return run.id
 }
 

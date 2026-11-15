@@ -1,11 +1,11 @@
 from uuid import uuid4
 
 import pytest
+from field_shift_science.fields.schemas import FieldBoundaryUpdate, FieldPlantingUpdate, Polygon
 
 from field_shift.db import build_session_factory
 from field_shift.models import metadata
 from field_shift.modules.farm.service import get_farm
-from field_shift.modules.fields.schemas import FieldBoundaryUpdate, FieldPlantingUpdate, Polygon
 from field_shift.modules.fields.service import list_fields, update_boundary, update_planting
 from field_shift.modules.onboarding.schemas import SetupInputs
 from field_shift.modules.onboarding.service import complete_setup, save_setup

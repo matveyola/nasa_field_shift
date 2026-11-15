@@ -73,7 +73,7 @@ scenarios, constraints, UI actions).
    uv run --env-file .env python -m evals.run --provider gemini --smoke
    ```
 
-   It writes `evals/reports/gemini-latest.md` / `.json` with the real model id, tools called, pass/fail, latency
+   It writes `AGENT_DATA_DIR/evals/reports/gemini-latest.md` / `.json` with the real model id, tools called, pass/fail, latency
    and the provider's input, output and thinking token counts per case, plus an estimated cost.
 
 **Token usage and cost.** Every model call logs one `llm round` line and every turn one `turn usage` line with
@@ -481,7 +481,7 @@ Violations go through the M2 repair round and then sentence removal, as for numb
 uv run python -m evals.run
 ```
 
-The suite runs 109 cases (`evals/cases.py`, `evals/knowledge_cases.py`, `evals/integration_cases.py`) through the real service, agent loop, tools and grounding, with the scripted provider playing well-behaved and adversarial models. It checks outcomes (events, final message, what the model was sent), plus contract invariants on every event against the **exported JSON Schema**. It writes `evals/reports/scripted-latest.md` and `.json` with pass/fail by category and failure categories. Categories: tool selection, constraint extraction, data reliability, security, provider behaviour, knowledge, integration. Integration cases use the real adapters (fixture, and HTTP against the contract stub with injected faults) and add invariants: message facts must come from the context or the turn's verified evidence, result references must point at a verified result, and simulation facts from a test service must be labelled fixture.
+The suite runs 109 cases (`evals/cases.py`, `evals/knowledge_cases.py`, `evals/integration_cases.py`) through the real service, agent loop, tools and grounding, with the scripted provider playing well-behaved and adversarial models. It checks outcomes (events, final message, what the model was sent), plus contract invariants on every event against the **exported JSON Schema**. It writes `AGENT_DATA_DIR/evals/reports/scripted-latest.md` and `.json` with pass/fail by category and failure categories. Categories: tool selection, constraint extraction, data reliability, security, provider behaviour, knowledge, integration. Integration cases use the real adapters (fixture, and HTTP against the contract stub with injected faults) and add invariants: message facts must come from the context or the turn's verified evidence, result references must point at a verified result, and simulation facts from a test service must be labelled fixture.
 
 Scripted results validate orchestration and safeguards, **not** a real model's judgement. Live model quality needs the live run:
 

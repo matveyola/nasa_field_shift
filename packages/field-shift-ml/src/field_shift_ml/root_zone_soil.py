@@ -8,7 +8,8 @@ from math import isfinite, log1p
 from pathlib import Path
 from urllib.request import Request, urlopen
 
-from field_shift.modules.geo_ml.ssurgo import SDA_ENDPOINT
+from field_shift_science.geo_ml.ssurgo import SDA_ENDPOINT
+
 from field_shift_ml.fetch_observations import write_atomic
 from field_shift_ml.fetch_root_zone_observations import RootZoneSite
 from field_shift_ml.train_moisture import write_atomically

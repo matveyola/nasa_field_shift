@@ -5,16 +5,16 @@ from math import fsum, isfinite
 from typing import Literal
 from urllib.parse import urlsplit
 
+from field_shift_science.fields.geometry import area_hectares
+from field_shift_science.fields.schemas import FieldRead
+from field_shift_science.geo_ml.schemas import GeoResult
+from field_shift_science.simulation.schemas import WaterDay, WaterForecast, WaterResult, WaterSource
+from field_shift_science.weather.scenarios import Scenario
 from shapely.geometry import Polygon as ShapelyPolygon
 
 from field_shift.modules.farm.schemas import ScoutingEvidence
-from field_shift.modules.fields.geometry import area_hectares
-from field_shift.modules.fields.schemas import FieldRead
-from field_shift.modules.geo_ml.schemas import GeoResult
 from field_shift.modules.imagery.vegetation_schemas import METHOD_VERSION, VegetationSeason
-from field_shift.modules.simulation.schemas import WaterDay, WaterForecast, WaterResult, WaterSource
 from field_shift.modules.terrain.schemas import TerrainResult
-from field_shift.modules.weather.scenarios import Scenario
 
 NDVI_LAYER = "l_ndvi_variability"
 VEGETATION_CHART = "c_vegetation"
@@ -167,11 +167,22 @@ def _add_forecast(context: dict, forecast: WaterForecast, season: int, now: date
     )
     if not _valid_water_days(days, forecast.threshold_mm) or days[0].date != today:
         return
+    if forecast.applicability is None:
+        applicability = "Applicability unknown: no stored shallow-soil diagnostic. "
+    elif forecast.applicability.status == "review_required":
+        applicability = "review_required: shallow 0–7 cm daily-mean soil forecast <=0 °C. "
+    else:
+        applicability = "not_assessed: shallow 0–7 cm daily-mean soil forecast >0 °C. "
+    # Put domain limits before provider text: _provenance bounds the wire method to 300 chars.
+    method = (
+        applicability + "Freezing/thawing/dormancy not modeled; root-zone ice, liquid water and "
+        "crop suitability unassessed. Reference loam, fixed roots, zero irrigation. "
+        f"{forecast.provider} forecast, "
+        f"initialized {forecast.initialized_at.astimezone(UTC):%Y-%m-%d %H:%M UTC}."
+    )
     provenance = _provenance(
         _source("Field Shift", "FAO-56", forecast.physical_model_version, forecast.source_url),
-        f"Physical root-zone water balance driven by {forecast.provider} forecast, "
-        f"initialized {forecast.initialized_at.astimezone(UTC):%Y-%m-%d %H:%M UTC}. "
-        "Uses reference loam, fixed roots and zero irrigation. The source link is weather input.",
+        method,
         days[0].date,
         days[-1].date,
         forecast.generated_at,

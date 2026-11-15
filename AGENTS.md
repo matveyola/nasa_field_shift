@@ -3,13 +3,19 @@
 ## Project boundaries
 
 - The Python backend is a modular monolith in `apps/api`. Keep application rules in their owning domain and HTTP endpoints thin.
-- The React application lives in `apps/web`. Maintain distinct Fields, Water, Agent, Rotations and Farm routes. Share selected field, season and scenario across routes.
+- The React application lives in `apps/web`. Use five user-facing destinations: Fields, Strategies, Agent, Analytics and Farm. Keep Water and rotation diagnostics inside Analytics, preserve legacy URLs through contextual routing, and keep the existing assistant as the central action. Share selected field, season and scenario across destinations.
 - Web `src/features` owns user-facing behavior. Backend `modules` own application rules and their APIs. Keep shared UI and transport code in the web app's existing `shared` and `api` directories.
 - Keep agent and model adapters replaceable. Identify mock data as such. Surface soil moisture and root-zone water reserve have separate units and data contracts.
 - The API agent module owns chat, field context and evidence. The optional model inference process lives in `services/agent` with its own dependency lock and private API.
-- Offline model training and evaluation live in `packages/field-shift-ml` with a separate dependency lock. Workers load versioned artifacts from their owning API modules under the existing release gates.
+- Offline model training and evaluation live in `packages/field-shift-ml` with a separate dependency lock. Workers load versioned artifacts from their owning domain modules in `field-shift-science` under the existing release gates.
 - PostgreSQL owns job state, attempts and results. Redis delivers job identifiers. Submit work durably before publishing, acknowledge after execution, and fence writes to the current attempt.
 - When adding a worker task, document its execution bound, retry policy, idempotency and recovery behavior. Use separate queues for simulation and geospatial ML.
+
+## Python package boundaries
+
+- Follow [docs/python-packaging.md](docs/python-packaging.md) for all Python work. Shared planning contracts live in `packages/field-shift-contracts`; shared scientific calculations and immutable artifacts live in `packages/field-shift-science`. API modules retain HTTP, persistence and application orchestration.
+- Declare and install cross-project dependencies. Never inject `PYTHONPATH`, `sys.path`, sibling source directories or pytest `pythonpath`, including in tests and Docker. Use installed entry points and packaged resources; keep mutable data outside installed code.
+- Packaging, dependency, entry-point or resource changes require `python3 infra/check_python_packaging.py`, clean installed-wheel checks via `infra/verify_python_wheels.py`, and affected integration tests. Preserve separate locks and verify the production non-editable installation from outside the checkout.
 
 ## Testing and CI policy
 
@@ -20,13 +26,28 @@
 5. Escalate verification for authentication, security, database schemas and migrations, public contracts, and critical data pipelines.
 6. **Never fit a test to the implementation just to make it pass. Never delete, weaken, skip or bypass a failing test for a green result.** Find and fix the cause. Change an expectation only when the intended behavior changes or the existing expectation is demonstrably incorrect, and record the reason.
 7. Diagnose the root cause of a CI failure before rerunning unrelated checks.
+8. Serialize Docker/Compose lifecycle operations, including network cleanup, with host Chromium E2E runs using localhost, unless they have real network isolation. Different worktrees and ports do not isolate host network-change events. Inspect `ERR_NETWORK_CHANGED` traces, retain the interrupted attempt and repeat only affected checks after correcting the execution environment.
+9. Add a new web browser harness to the existing serial desktop/mobile CI configuration list, with an isolated port and explicit fixture provenance. A manually passing gallery is not evidence that CI runs it.
+
+## Production behavior and global test scenarios
+
+- Never select predictions or recommendations by test username, field ID, fixture name or country label. Use declared scientific inputs, sourced applicability limits and generic constraints. Regional parameters need provenance and a justified domain of use.
+- Never introduce hidden production mocks, fabricated provider responses or success fallbacks to make a scenario work. An unavailable source or unsupported model must remain explicit, with a useful reason and next action.
+- Synthetic geometry, crop history, economic assumptions and reference scenarios are QA inputs, not observed field truth or empirical accuracy labels. Keep their origin visible. Test hypotheses such as rice suitability depend on actual climate, soil, calendar, land and management evidence; do not require a predetermined geographic winner.
+- A test account must use normal authentication, model readiness, ownership and application rules. This application currently has one farm per deployment: global QA needs a dedicated empty database and isolated services, rather than treating another account as another tenant. Seeding is explicit and idempotent, never automatic at application startup. Keep credentials and ownership receipts outside Git.
+- Persist assistant replies and tool results only after genuine execution. Clearly distinguish planned test prompts from completed conversations. Cover missing data, abstention, stale context, recovery, units and resource constraints as well as successful recommendations.
+- Propagate model applicability limits through every reachable summary, legacy view and assistant evidence path. A coherent water balance does not establish liquid water availability, crop growth or sowing suitability. Preserve source depth and units; a shallow temperature cannot prove the state of the whole root zone.
+- QA drivers use ordinary authentication, rate limits and retry budgets. Back off after throttling, preserve failed attempts and provider retrieval times, and never disable gates for the test account. A later live-provider response may be a different forecast vintage; compare exact values only against the same captured input.
+- Review layouts at phone, tablet and desktop sizes using element containment and readable controls. Do not hide layout defects with page-wide overflow clipping or remove decision evidence to make a screen fit. Put deeper technical evidence behind accessible details.
+- Lead dense planning and analytics views with the supported conclusion, a clear action and a few dated metrics. Keep critical applicability, missing-input and abstention states visible; disclose complete arithmetic, assumptions, sources and scenario detail on demand. Preserve keyboard access and drafts when compacting navigation.
+- Preserve colored crop artwork and apply grayscale through the shared presentation style. Resolve actual catalog identifiers and supported display aliases; keep unknown crops generic. An icon identifies a crop, never model support, calibrated accuracy or suitability.
 
 Keep temporary work notes outside the delivered source tree or remove them after verification.
 
 ## Development agent tree
 
 - For multi-component implementation or explicitly delegated work, use [.agents/skills/agent-tree/SKILL.md](.agents/skills/agent-tree/SKILL.md) and spawn bounded subagents when available. Small edits can stay with one implementer and appropriate checks.
-- Roles live in `.codex/agents`: `task_lead`, `implementer`, `researcher`, `verifier`, `test_runner`, and `integrator`. The root coordinates the whole tree; task leads may delegate within its shared capacity and ownership allocation.
+- Roles live in `.codex/agents`: `task_lead`, `implementer`, `researcher`, `verifier`, `test_runner`, `integrator`, `product_ceo`, `product_cto` and `ui_ux`. The root coordinates the whole tree; task leads may delegate within its shared capacity and ownership allocation.
 - Each implementation leaf in delegated work needs independent verification and test evidence for the same frozen revision. An author cannot approve their own change. Missing mandatory checks block acceptance; later edits invalidate affected evidence.
 - Use separate worktrees for concurrent writers. Freeze a checkout during review/testing. Assign one owner to shared files such as `docs/status.md`; worktrees do not isolate databases, Redis, ports or Docker resources.
 - Respect the effective runtime slot limit. Use staged execution and agent reuse when capacity is limited; do not recursively spawn reviewers of reviewers. The workflow depth budget is three edges from the root.
@@ -39,6 +60,8 @@ Keep temporary work notes outside the delivered source tree or remove them after
 - Create each issue's branch and isolated worktree from that person's jobs branch. Reserve its checkout for integration. Never implement concurrent issues in the same working directory.
 - The user authorizes merging verified issue work into the personal jobs branch and pushing that branch to `origin`. This supersedes older issue instructions to use `main` or stop at a PR. Do not merge into `main` or deploy without a separate request.
 - Serialize integration, combined-tree checks and push using the skill's repository-wide lock. Preserve real commit metadata and never force-push shared history.
+- For the current autonomous product task, Nazar separately authorized integrating incoming PRs/branches into current `main`, running combined verification and normally pushing the accepted result. This authorization does not permit deployment, force-push or bypassing branch protection. Preserve the personal-jobs workflow for other issue work unless separately instructed.
+- After the core task is verified, inspect incoming PRs and new remote branch tips every ten minutes while the autonomous task is active. Keep poll watermarks and integration evidence outside Git. Rebase is not required: merge candidates against current main in an isolated integration worktree, resolve conflicts, verify the combined tree and serialize publication with the repository lock. Skip unfinished or blocked candidates and report concrete reasons; a new branch is not proof of readiness. Never claim a background monitor is installed unless it actually is.
 - Planning prerequisites remain: #2 first, then #3–#6 in parallel, then #7. Each prerequisite must be present in the jobs branch before dependent work begins.
 
 ## Delivery harness and commit policy
@@ -52,3 +75,13 @@ Keep temporary work notes outside the delivered source tree or remove them after
 - Keep each checkpoint reviewable and reversible. Use `git revert` for shared history; do not rewrite published history or use destructive resets. Database rollback requires a tested restore to a fresh database, not merely a code revert.
 - Do not publish, deploy or push without explicit authorization. Do not commit secrets, environments, dependency caches or generated runtime data.
 - Update `docs/status.md` when readiness, verification or material limitations change. Keep it a concise status report rather than a transcript of individual file edits. Never claim an unrun check passed.
+
+## Model evidence and public data
+
+- Follow [global evaluation and applicability](docs/planning/global-model-results.md). Record crop, region, management, target, unit/depth, lead and model/data/parameter identities separately; execution support is not empirical validation.
+- Use open data with recorded provider, source version, checksums and constituent reuse terms. Keep raw data, mutable features and fit caches outside source; do not turn an archive-wide license into permission for restricted contributors.
+- Separate forecasts issued at decision time, retrospective reconstructions, historical analogue scenarios and synthetic tests. Check observation completion and source/label availability against the decision cutoff; disclose revised historical vintages and assumed publication lags.
+- Freeze protocols before fitting and freeze validation-selected parameters before opening new test errors. Fit transforms on training rows only; retain chronological and disjoint geographic groups, valid zero labels, missing-data counts, negative skill and abstentions. Public labels and local timestamps do not prove an externally sealed holdout.
+- Compare models on identical targets, leads, eligible rows and aggregation. Never infer local yield/profit accuracy from weather scores, coarse administrative correlations, physical mass balance or passing geography tests. Report actual metrics, uncertainty limits and failed gates.
+- Keep protocol, prepared data/metadata, frozen selections, predictions and reports at distinct paths. Reject canonical or inode aliases and existing output destinations before writing; never overwrite raw inputs or provenance artifacts.
+- Keep offline experiment winners outside serving until independent validation and the owning release gates permit promotion. Missing crop/system/soil/calendar support stays explicit; never substitute an unrelated crop or invent a calibrated global fallback.

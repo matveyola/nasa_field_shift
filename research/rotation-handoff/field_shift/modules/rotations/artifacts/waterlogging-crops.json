@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "source_model": "AquaCrop-OSPy",
+  "source_commit": "256cac4c2cebd261818debd612c26f2eab561865",
+  "source_commit_date": "2024-05-31",
+  "source_license": "Apache-2.0",
+  "sources": {
+    "crop_parameters_url": "https://github.com/aquacropos/aquacrop/blob/256cac4c2cebd261818debd612c26f2eab561865/aquacrop/entities/crops/crop_params.py",
+    "lag_default_url": "https://github.com/aquacropos/aquacrop/blob/256cac4c2cebd261818debd612c26f2eab561865/aquacrop/entities/crop.py#L54-L57",
+    "equation_url": "https://github.com/aquacropos/aquacrop/blob/256cac4c2cebd261818debd612c26f2eab561865/aquacrop/solution/aeration_stress.py#L50-L68",
+    "reference_manual_url": "https://ees.kuleuven.be/en/aquacrop/resources/reference-manual/chapter2aquacropv73.pdf",
+    "license_url": "https://github.com/aquacropos/aquacrop/blob/256cac4c2cebd261818debd612c26f2eab561865/LICENSE"
+  },
+  "profiles": {
+    "wheat_winter_frozen": {
+      "aquacrop_profile": "WheatGDD",
+      "aeration_threshold_below_saturation_vol_pct": 5,
+      "lag_days": 3
+    },
+    "wheat_winter_nonfrozen": {
+      "aquacrop_profile": "WheatGDD",
+      "aeration_threshold_below_saturation_vol_pct": 5,
+      "lag_days": 3
+    },
+    "wheat_spring": {
+      "aquacrop_profile": "WheatGDD",
+      "aeration_threshold_below_saturation_vol_pct": 5,
+      "lag_days": 3
+    },
+    "barley": {
+      "aquacrop_profile": "BarleyGDD",
+      "aeration_threshold_below_saturation_vol_pct": 15,
+      "lag_days": 3
+    },
+    "maize_grain": {
+      "aquacrop_profile": "MaizeGDD",
+      "aeration_threshold_below_saturation_vol_pct": 5,
+      "lag_days": 3
+    },
+    "sunflower": {
+      "aquacrop_profile": "SunflowerGDD",
+      "aeration_threshold_below_saturation_vol_pct": 5,
+      "lag_days": 3
+    },
+    "soybeans": {
+      "aquacrop_profile": "SoybeanGDD",
+      "aeration_threshold_below_saturation_vol_pct": 5,
+      "lag_days": 3
+    },
+    "sugar_beet": {
+      "aquacrop_profile": "SugarBeetGDD",
+      "aeration_threshold_below_saturation_vol_pct": 5,
+      "lag_days": 3
+    },
+    "potato": {
+      "aquacrop_profile": "PotatoGDD",
+      "aeration_threshold_below_saturation_vol_pct": 5,
+      "lag_days": 3
+    }
+  },
+  "unsupported_profile_ids": ["rapeseed_canola", "peas_dry", "oats", "millet"],
+  "notes": [
+    "Each supported row uses its published species-level Aer parameter and the global LagAer default. The three wheat profiles share the generic WheatGDD aeration parameter.",
+    "Aer is an absolute volume percentage point difference below saturation. The threshold in m3/m3 is theta_sat minus Aer / 100.",
+    "Parameters describe a root-zone aeration stress factor on transpiration, with no stage-specific response or field-calibrated yield-loss percentage."
+  ]
+}

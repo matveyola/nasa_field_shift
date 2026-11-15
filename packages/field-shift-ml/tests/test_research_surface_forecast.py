@@ -5,12 +5,12 @@ from hashlib import sha256
 
 import numpy as np
 import pytest
+from field_shift_science.geo_ml.ifs import IFSForecastDay, IFSForecastRun
+from field_shift_science.geo_ml.moisture_model import station_distance_km
+from field_shift_science.geo_ml.ssurgo import SoilProfile
+from field_shift_science.simulation.root_zone_inputs import root_zone_run_url
 from threadpoolctl import threadpool_limits
 
-from field_shift.modules.geo_ml.ifs import IFSForecastDay, IFSForecastRun
-from field_shift.modules.geo_ml.moisture_model import station_distance_km
-from field_shift.modules.geo_ml.ssurgo import SoilProfile
-from field_shift.modules.simulation.root_zone_inputs import root_zone_run_url
 from field_shift_ml.research_surface_forecast import (
     BUFFER_KM,
     FEATURE_NAMES,

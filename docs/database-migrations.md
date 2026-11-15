@@ -13,8 +13,8 @@ revisions.
 | Merge revision | Joins | Where |
 |---|---|---|
 | `0012_merge_agent_constraints` | `0011_field_onboarding`, `0011_planning_constraints` | team `main` with the agent |
-| `0015_merge_agent_planning` | `0011_planning_constraints`, `0014_planning_inputs` | `nazar-jobs` with the agent |
-| `0016_merge_field_shift` | `0012_merge_agent_constraints`, `0015_merge_agent_planning` | `main` and `nazar-jobs` combined (#7) |
+| `0015_merge_onboarding` | `0014_planning_inputs`, `0011_field_onboarding` | published planning and onboarding |
+| `0016_merge_agent_planning` | `0015_merge_onboarding`, `0012_merge_agent_constraints` | combined planning, onboarding and agent constraints |
 
 Each merge revision changes no table. Every line only creates its own tables, so applying them in any order gives the
 same schema.

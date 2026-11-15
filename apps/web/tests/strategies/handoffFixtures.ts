@@ -1,0 +1,24 @@
+/** Synthetic UI outcomes; real source catalog bytes are used only in this test fixture. */
+import { readFileSync } from 'node:fs'
+import type { HandoffCatalog, HandoffJob, HandoffResult } from '../../src/api/rotationHandoff'
+import { newDraft } from '../../src/features/strategies/handoff/model.ts'
+const profiles = JSON.parse(readFileSync(new URL('../../../../research/rotation-handoff/field_shift/modules/rotations/artifacts/forecast-crops.json', import.meta.url), 'utf8')) as Array<{ id: string; name: string; calendars: Array<{ id: string; stage_lengths: number[]; reference_planting_months: string; reference_region: string | null }> }>
+export function catalogFixture(): HandoffCatalog {
+  return Object.assign({ status: 'available' as const, engine_version: 'synthetic-ui-engine-v1', source_commit: 'test-source-commit', empirical_status: 'not_validated' as const, operations: ['forecast' as const], crops: profiles.map(profile => ({ id: profile.id, name: profile.name, climate_supported: false, allocation_crop_id: null, profile })), request_schemas: { forecast: { $defs: { FarmerSettings: { properties: { priorities: { items: { enum: ['water_stress', 'water_deficit', 'water_saving', 'yield', 'revenue', 'soil_cover'] } } } } } } }, limitations: ['Synthetic interaction catalog; not an accuracy result.'], reasons: [] }, { equipment: [{ id: 'row_planter', name: 'Просапна сівалка', purpose: 'Synthetic metadata' }, { id: 'grain_combine', name: 'Зернозбиральний комбайн', purpose: 'Synthetic metadata' }], cultivar_references: [] })
+}
+export function filledDraft() {
+  const catalog = catalogFixture(), draft = newDraft()
+  draft.cycles[0].planting = '2027-05-01'
+  draft.plans.forEach((plan, i) => { const crop = catalog.crops.find(row => row.id === (i ? 'sunflower' : 'maize_grain'))!; plan.crops[0].cropId = crop.id; plan.crops[0].calendarId = crop.profile.calendars![0].id })
+  return draft
+}
+export function resultFixture(rankingUsable = true): HandoffResult {
+  return Object.assign({ operation: 'forecast' as const, status: 'available' as const, data_kind: 'hybrid_scenario' as const, empirical_status: 'not_validated' as const, engine_version: 'synthetic-ui-engine-v1', source_commit: 'test-source-commit', input_sha256: 'a'.repeat(64), evidence_sha256: 'b'.repeat(64), acquired_at: '2026-11-15T00:00:00Z', source_receipts: [{ source_url: 'https://example.org/synthetic-weather', sha256: 'c'.repeat(64), bytes: 123, available_at: '2026-11-14T00:00:00Z', kind: 'acquired_public_input' as const }], limitations: ['Synthetic interaction result. Never measured field accuracy.'], reasons: [], payload: {
+    as_of: '2026-11-15', soil_source_url: 'https://example.org/synthetic-soil', weather: { interpretation: 'conditional_historical_scenarios', historical_source_url: 'https://example.org/synthetic-history' },
+    plans: ['plan-a', 'plan-b'].map((id, i) => ({ id, minimum_pct: 0, median_pct: i ? 12 : 0, maximum_pct: i ? 24 : 5, median_water_stress_days_pct: null, scheduled_net_irrigation_mm: 0, required_equipment: ['row_planter', 'grain_combine'], equipment_requirements_source: 'catalog_baseline', economics: { marketable_yield_t_ha: null, gross_revenue_per_ha: null, gross_revenue_currency: null, gross_margin_per_ha: null, currency: null, inputs: [null], input_origins: ['unavailable'] }, members: [{ historical_anchor_date: '2020-05-01', seasons: [{ crop_id: i ? 'sunflower' : 'maize_grain', planting_date: '2027-05-01', through_date: '2027-08-20', calendar_id: 'test-calendar', stage_lengths: [20, 30, 40, 22], opening_reserve_mm: 50, ending_reserve_mm: 15, demand_mm: 120, modeled_use_mm: 100, opening_source: 'synthetic_historical_analogue', opening_historical_date: '2020-05-01', weather_segments: [{ source: 'historical_analog', dates: { start: '2027-05-01', end: '2027-08-20' }, historical_dates: { start: '2020-05-01', end: '2020-08-20' } }] }] }] })),
+    decision: { priorities_used: ['water_deficit'], priorities_missing: [], decisions: ['plan-a', 'plan-b'].map((id, i) => ({ id, feasibility: 'feasible', rank: i + 1, blockers: [], unknowns: [], values: { water_deficit: i ? 12 : 0, revenue: null }, gross_revenue_currency: null })) },
+  } }, { ranking_usable: rankingUsable, suitability_status: rankingUsable ? 'arable_land_only' as const : 'no_thermal_growth' as const, diagnostics: rankingUsable ? [] : [{ code: 'no_thermal_growth', severity: 'blocking' as const, message: 'Synthetic cold cycle: zero demand does not establish a viable crop.', crop_id: 'maize_grain', start_date: '2027-05-01', end_date: '2027-08-20', details: {} }] })
+}
+export function jobFixture(field = 'north', status: HandoffJob['status'] = 'succeeded', result = resultFixture()): HandoffJob {
+  return { job_id: 'saved-model-job', field_id: field, geometry_revision: 1, status, attempts: status === 'queued' ? 0 : 1, result: status === 'succeeded' ? result : null, error: status === 'failed' ? 'Synthetic provider failure' : null }
+}

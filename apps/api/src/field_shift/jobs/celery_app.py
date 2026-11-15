@@ -16,7 +16,8 @@ app.conf.update(
     task_queues=tuple(
         Queue(kind.value, Exchange(kind.value, type="direct"), routing_key=kind.value)
         for kind in JobKind
-    ),
+    )
+    + (Queue("planning", Exchange("planning", type="direct"), routing_key="planning"),),
     task_default_queue=JobKind.SIMULATION.value,
     task_create_missing_queues=False,
     task_serializer="json",
@@ -49,3 +50,10 @@ def _worker_factory() -> sessionmaker[Session]:
 def run_job(job_id: str) -> None:
     # A normal return follows a committed database change or identifies a duplicate.
     process_job(_worker_factory(), job_id, lease_seconds=settings.lease_seconds)
+
+
+@app.task(name="field_shift.planning.run", time_limit=330)
+def planning_job(run_id: str) -> None:
+    from field_shift.jobs.planning import process_planning
+
+    process_planning(_worker_factory(), run_id)

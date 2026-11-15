@@ -59,6 +59,8 @@ export interface FieldShiftAssistantProps {
   open?: boolean;
   /** Called whenever the panel opens or closes, by the host or by the farmer (close button, Escape). */
   onOpenChange?: (open: boolean) => void;
+  /** Open the host’s read-only saved conversations. Does not replace this widget’s thread. */
+  onOpenHistory?: () => void;
   /** Show the round launcher. Default true; false when the host's own button opens the assistant. */
   launcher?: boolean;
   /** The host's button that opens the assistant: the panel unfolds from it and folds back into it. */
@@ -199,6 +201,7 @@ export function FieldShiftAssistant(props: FieldShiftAssistantProps) {
             citation={citation}
             onCloseCitation={closeCitation}
             onClose={close}
+            onOpenHistory={props.onOpenHistory}
             anchor={props.anchor}
           />
         )}

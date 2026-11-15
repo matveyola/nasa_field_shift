@@ -12,17 +12,17 @@ from pathlib import Path
 from urllib.parse import urlencode
 
 import numpy as np
-
-from field_shift.modules.geo_ml.moisture_features import (
+from field_shift_science.geo_ml.moisture_features import (
     FEATURE_NAMES,
     moisture_feature_url,
     parse_moisture_features,
 )
-from field_shift.modules.geo_ml.ssurgo import SoilProfile
-from field_shift.modules.weather.historical import (
+from field_shift_science.geo_ml.ssurgo import SoilProfile
+from field_shift_science.weather.historical import (
     OPEN_METEO_ARCHIVE,
     OPEN_METEO_CUSTOMER_ARCHIVE,
 )
+
 from field_shift_ml.train_moisture import Station, download_features, write_atomically
 
 ERA5_COLUMNS = {

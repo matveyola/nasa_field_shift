@@ -3,6 +3,8 @@ from uuid import UUID
 
 from fastapi import APIRouter, Body, Query, Request
 from fastapi.responses import JSONResponse, StreamingResponse
+from field_shift_science.fields.schemas import Season
+from field_shift_science.weather.scenarios import Scenario
 from sqlalchemy.orm import Session
 
 from field_shift.db import SessionDep
@@ -16,9 +18,7 @@ from field_shift.modules.agent.schemas import (
     ConversationRead,
 )
 from field_shift.modules.agent.signing import LOCAL_PRINCIPAL, agent_principal
-from field_shift.modules.fields.schemas import Season
 from field_shift.modules.fields.service import require_field
-from field_shift.modules.weather.scenarios import Scenario
 
 router = APIRouter(prefix="/agent", tags=["agent"])
 

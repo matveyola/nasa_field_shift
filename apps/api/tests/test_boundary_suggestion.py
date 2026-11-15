@@ -8,12 +8,12 @@ import numpy as np
 import pytest
 import rasterio
 from fastapi.testclient import TestClient
+from field_shift_science.fields.geometry import area_hectares, contains_point
 from rasterio.io import MemoryFile
 from rasterio.warp import transform
 
 from field_shift.api import create_app
 from field_shift.modules.fields import boundary_suggestion as suggestion
-from field_shift.modules.fields.geometry import area_hectares, contains_point
 from field_shift.modules.imagery.sentinel import SatelliteImage
 
 URL = "/api/fields/boundary-suggestion"

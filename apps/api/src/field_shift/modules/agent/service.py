@@ -2,6 +2,9 @@ from datetime import UTC, datetime
 from typing import Literal
 from uuid import UUID, uuid4
 
+from field_shift_science.fields.schemas import FieldRead
+from field_shift_science.simulation.schemas import WaterResult, WaterSource
+from field_shift_science.weather.scenarios import Scenario
 from pydantic import ValidationError
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -21,14 +24,11 @@ from field_shift.modules.agent.schemas import (
 )
 from field_shift.modules.agent.signing import LOCAL_PRINCIPAL
 from field_shift.modules.farm.service import recent_scouting
-from field_shift.modules.fields.schemas import FieldRead
 from field_shift.modules.fields.service import require_field
 from field_shift.modules.geo_ml.service import latest_surface_moisture
 from field_shift.modules.imagery.vegetation import vegetation_footprint, vegetation_season
 from field_shift.modules.simulation.forecast import latest_water_forecast
-from field_shift.modules.simulation.schemas import WaterResult, WaterSource
 from field_shift.modules.terrain.service import latest_terrain
-from field_shift.modules.weather.scenarios import Scenario
 
 
 def _get_conversation(

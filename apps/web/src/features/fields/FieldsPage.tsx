@@ -3,6 +3,7 @@ import { lazy, Suspense, useCallback, useEffect, useId, useMemo, useRef, useStat
 import { AdjustmentsHorizontalIcon, ArrowPathIcon, ChartBarIcon, ChevronRightIcon, MapIcon, PencilSquareIcon, PlusIcon, ViewfinderCircleIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { api, ApiError } from '../../api/client'
 import type { Field, MoistureLayer, MoistureSource, Position } from '../../api/contracts'
+import type { AnalyticsSection, MapFocus } from '../../shared/productContext'
 import { JobStatus } from '../../shared/JobStatus'
 import { ErrorBox, PageHeading } from '../../shared/ui'
 import { errorText } from '../../shared/useResource'
@@ -19,6 +20,7 @@ import { useSatelliteLayer } from './satellite'
 import { useBoundarySuggestion } from './useBoundarySuggestion'
 import { useMoistureOverlay, type MoistureOverlay } from './useMoistureOverlay'
 import { useFieldAnalytics } from './useFieldAnalytics'
+import { MapObservationControls } from './MapObservationControls'
 import { ndviBands } from './vegetationInsights'
 import { spectralCell, spectralColor, spectralDefinitions } from './spectralIndices'
 import { BoundaryHistoryPanel } from './BoundaryHistoryPanel'
@@ -29,7 +31,7 @@ import './map.css'
 import './fieldWorkspace.css'
 
 const FieldMap = lazy(() => import('./FieldMap'))
-const FieldAnalysisPanel = lazy(() => import('./FieldAnalysisPanel').then((module) => ({ default: module.FieldAnalysisPanel })))
+
 const moistureSources = {
   historical: 'Historical soil moisture', ml: 'Modelled soil moisture', demo: 'Demo soil moisture',
 } satisfies Record<MoistureSource, string>
@@ -41,6 +43,11 @@ type Props = {
   initialDrawing?: boolean
   initialAnalysis?: boolean
   showNdviLayer?: boolean
+  showTerrainLayer?: boolean
+  mapFocus?: MapFocus
+  openStrategies?: () => void
+  openAnalytics?: (section?: AnalyticsSection) => void
+  openAgent?: () => void
   chooseField: (id: string) => void
   onCreate: (field: Field) => void
   onUpdate: (field: Field) => void
@@ -50,7 +57,8 @@ type Props = {
   setupLabel?: string
 }
 
-export function FieldsPage({ fields, selected, season, initialDrawing = false, initialAnalysis, showNdviLayer, chooseField, onCreate, onUpdate, reloadFields, openForecast, onSetup, setupLabel }: Props) {
+export function FieldsPage({ fields, selected, season, initialDrawing = false, initialAnalysis, showNdviLayer, showTerrainLayer, mapFocus, openStrategies, openAnalytics, openAgent, chooseField, onCreate, onUpdate, reloadFields, openForecast, onSetup, setupLabel }: Props) {
+
   const { t, number, date, shortDate } = useLocale()
   const { canEdit } = useAccess()
   const [preparedContours, setPreparedContours] = useState<PreparedContour[]>([])
@@ -59,11 +67,15 @@ export function FieldsPage({ fields, selected, season, initialDrawing = false, i
   const [activeLayers, setActiveLayers] = useState<ReadonlySet<MapLayer>>(() => {
     const layers = new Set<MapLayer>(['forecast', 'historical', 'boundaries', 'planting'])
     if (showNdviLayer) layers.add('heterogeneity')
+    if (showTerrainLayer) layers.add('terrain')
     return layers
   })
   useEffect(() => {
     if (showNdviLayer) setActiveLayers((layers) => layers.has('heterogeneity') ? layers : new Set([...layers, 'heterogeneity']))
   }, [showNdviLayer])
+  useEffect(() => {
+    if (showTerrainLayer) setActiveLayers(layers => layers.has('terrain') ? layers : new Set([...layers, 'terrain']))
+  }, [showTerrainLayer])
   const [drawing, setDrawing] = useState(initialDrawing && canEdit)
   const [points, setPoints] = useState<Position[]>([])
   const [draft, setDraft] = useState<FieldGeometryDraft>()
@@ -107,8 +119,8 @@ export function FieldsPage({ fields, selected, season, initialDrawing = false, i
   const drawingMap = drawing || Boolean(edit)
   const inspecting = !drawingMap && !search
   const assistantField = inspecting ? selected : undefined
-  const [analysisSeason, setAnalysisSeason] = useState(Math.min(season, new Date().getUTCFullYear()))
-  const analytics = useFieldAnalytics(assistantField, analysisSeason)
+  const analysisSeason = season
+  const analytics = useFieldAnalytics(assistantField, analysisSeason, true, mapFocus)
   const sceneLayer = analytics.activeScene.data?.heterogeneity
   const comparingNdvi = Boolean(analytics.comparison && !analytics.spectralIndex)
   const vegetationIndex = analytics.spectralIndex ?? (comparingNdvi ? 'ndvi' : 'relative')
@@ -258,7 +270,7 @@ export function FieldsPage({ fields, selected, season, initialDrawing = false, i
 
   return (
     <div className="page-body fields-page">
-      <PageHeading title="Fields" season={season} />
+      <PageHeading title="Fields" season={season} dataLabel={null} />
       <div className="fields-content">
         {onSetup && <div className="field-setup-banner">
           <button type="button" className="button primary" onClick={onSetup}>
@@ -267,14 +279,10 @@ export function FieldsPage({ fields, selected, season, initialDrawing = false, i
         </div>}
         <div className={'fields-layout' + (assistantField ? '' : ' is-editing')}>
           {assistantField && <FieldContextPanel field={assistantField}
+            season={season} openStrategies={openStrategies} openAnalytics={openAnalytics} openAgent={openAgent}
             initialAnalysis={initialAnalysis} mapFirst={showNdviLayer} vegetation={analytics.vegetation.data}
-            analysis={(inspectMap) => <Suspense fallback={<p role="status">{t('Loading field analysis…')}</p>}>
-              <FieldAnalysisPanel state={analytics} field={assistantField} season={analysisSeason} onSeason={setAnalysisSeason}
-              heterogeneityVisible={activeLayers.has('heterogeneity')} terrainVisible={activeLayers.has('terrain')}
-              onSelectObservation={revealNdviLayer} onShowComparison={() => { analytics.showComparison(true); revealNdviLayer(); inspectMap() }}
-              onShowIndex={() => { revealNdviLayer(); inspectMap() }}
-              onHeterogeneity={() => { toggleLayer('heterogeneity'); inspectMap() }} onTerrain={() => { toggleLayer('terrain'); inspectMap() }} />
-            </Suspense>}
+            analysis={() => <MapObservationControls state={analytics} reveal={revealNdviLayer}
+              openAnalytics={openAnalytics ? () => openAnalytics('vegetation') : undefined} />}
             canSwitch={fields.length > 1} onStep={stepField} openForecast={openForecast} surfaceForecastOpen={showSurfaceForecast}
             onSheetPosition={onSheetPosition}
             surface={currentSurface && forecastState.forecast ? { value: currentSurface.ifs_value, date: currentSurface.date, provider: forecastState.forecast.provider } : undefined}>

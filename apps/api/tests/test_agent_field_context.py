@@ -2,20 +2,26 @@ import json
 from datetime import timedelta
 
 import pytest
+from field_shift_science.fields.schemas import FieldRead
+from field_shift_science.geo_ml.schemas import GeoResult, MoistureSource
+from field_shift_science.simulation.schemas import HistoricalProvenance, WaterResult
+from field_shift_science.weather.scenarios import Scenario
 from sqlalchemy import func, select
-from test_agent_evidence import NOW, TODAY, database, forecast, vegetation  # noqa: F401
+from test_agent_evidence import (
+    NOW,
+    TODAY,
+    database,  # noqa: F401
+    forecast,
+    vegetation,
+)
 
 from field_shift.jobs import repository
 from field_shift.jobs.models import Job, JobKind, JobStatus
 from field_shift.modules.agent import service
 from field_shift.modules.agent.field_context import build_field_context
-from field_shift.modules.fields.schemas import FieldRead
 from field_shift.modules.fields.service import require_field
-from field_shift.modules.geo_ml.schemas import GeoResult, MoistureSource
-from field_shift.modules.simulation.schemas import HistoricalProvenance, WaterResult
 from field_shift.modules.terrain.schemas import TerrainResult
 from field_shift.modules.terrain.service import MODEL_VERSION as TERRAIN_MODEL
-from field_shift.modules.weather.scenarios import Scenario
 
 
 @pytest.fixture

@@ -14,9 +14,7 @@ from xml.etree import ElementTree
 from zipfile import ZipFile
 
 import numpy as np
-from sklearn.linear_model import Ridge
-
-from field_shift.modules.rotations.yield_model import (
+from field_shift_science.rotations.yield_model import (
     FEATURES,
     SOURCE_URL,
     Predecessor,
@@ -25,6 +23,8 @@ from field_shift.modules.rotations.yield_model import (
     effect_features,
     site_distance,
 )
+from sklearn.linear_model import Ridge
+
 from field_shift_ml.train_moisture import evaluate_predictions, write_atomically
 
 WORKBOOK_URL = "https://ndownloader.figshare.com/files/44334239"

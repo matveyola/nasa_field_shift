@@ -41,6 +41,7 @@ export interface FieldShiftAssistantProps {
   planningCrops?: readonly { id: string; label: string }[]
   open?: boolean
   onOpenChange?: (open: boolean) => void
+  onOpenHistory?: () => void
   launcher?: boolean
   anchor?: Element | null
   placement?: { side?: 'right' | 'left'; offsetX?: number; offsetY?: number; zIndex?: number }

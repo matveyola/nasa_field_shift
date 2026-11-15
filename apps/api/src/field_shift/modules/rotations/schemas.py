@@ -1,8 +1,7 @@
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import BaseModel
-
-from field_shift.modules.fields.schemas import CropName, Season
+from field_shift_science.fields.schemas import CropName, Season
+from pydantic import BaseModel, Field, model_validator
 
 PlanId = Literal["plan-a", "plan-b"]
 
@@ -39,7 +38,13 @@ class MainPlanUpdate(BaseModel):
 class PlanUpdate(BaseModel):
     field_id: str
     season: Season
-    crops: tuple[CropName, CropName, CropName]
+    crops: Annotated[list[CropName], Field(min_length=1, max_length=6)]
+
+    @model_validator(mode="after")
+    def horizon(self):
+        if self.season + len(self.crops) > 2100:
+            raise ValueError("The last crop season must be no later than 2100.")
+        return self
 
 
 class RotationYieldYear(BaseModel):

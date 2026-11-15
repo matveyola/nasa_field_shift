@@ -1,6 +1,7 @@
 from pathlib import Path
 from uuid import UUID
 
+import pytest
 from alembic import command
 from alembic.config import Config
 from sqlalchemy import inspect
@@ -36,5 +37,26 @@ def test_onboarding_migration_preserves_fields_and_can_be_reversed(tmp_path: Pat
         assert "field_setups" not in inspect(engine).get_table_names()
         with Session(engine) as session:
             assert session.get(Field, "F-01").name == "West Field"
+    finally:
+        engine.dispose()
+
+
+@pytest.mark.parametrize("published_head", ["0011_field_onboarding", "0014_planning_inputs"])
+def test_merge_preserves_both_published_migration_histories(tmp_path, published_head):
+    api = Path(__file__).resolve().parents[1]
+    config = Config(str(api / "alembic.ini"))
+    url = f"sqlite:///{tmp_path / 'both-histories.sqlite'}"
+    config.attributes["database_url"] = url
+    command.upgrade(config, published_head)
+    engine = build_engine(url)
+    try:
+        with Session(engine) as session:
+            seed_demo(session)
+        command.upgrade(config, "head")
+        tables = set(inspect(engine).get_table_names())
+        assert {"field_setups", "planning_input_bundles", "farm_rotation_drafts"} <= tables
+        with Session(engine) as session:
+            assert session.get(Field, "F-01").name == "West Field"
+        command.upgrade(config, "head")
     finally:
         engine.dispose()

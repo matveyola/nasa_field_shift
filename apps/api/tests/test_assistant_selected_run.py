@@ -13,6 +13,8 @@ from uuid import UUID, uuid4
 
 import pytest
 from fastapi.testclient import TestClient
+from field_shift_science.simulation.schemas import WaterSource
+from field_shift_science.weather.scenarios import Scenario
 from test_agent_evidence import NOW, FrozenDatetime, forecast, vegetation
 from test_agent_field_context import historical_run
 from test_remote_agent import API_KEY, SIGNING_KEY, _decode, _Stream
@@ -26,8 +28,6 @@ from field_shift.models import metadata
 from field_shift.modules.agent import service
 from field_shift.modules.farm.models import Farm
 from field_shift.modules.fields.models import Field
-from field_shift.modules.simulation.schemas import WaterSource
-from field_shift.modules.weather.scenarios import Scenario
 from field_shift.seed import seed_demo
 
 BASE = "/api/agent/assistant/F-03/2026"

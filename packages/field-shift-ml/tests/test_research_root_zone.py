@@ -1,9 +1,9 @@
 from datetime import date, datetime
 
 import pytest
+from field_shift_science.simulation.root_zone_inputs import RootZoneRun, RootZoneWeatherDay
+from field_shift_science.simulation.root_zone_model import CAPACITY_MM
 
-from field_shift.modules.simulation.root_zone_inputs import RootZoneRun, RootZoneWeatherDay
-from field_shift.modules.simulation.root_zone_model import CAPACITY_MM
 from field_shift_ml.fetch_root_zone_observations import RootZoneSite
 from field_shift_ml.research_root_zone import (
     ALTERNATIVES,

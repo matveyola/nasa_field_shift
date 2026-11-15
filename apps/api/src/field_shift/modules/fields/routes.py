@@ -1,18 +1,18 @@
 from datetime import date
 
 from fastapi import APIRouter, status
-
-from field_shift.db import SessionDep
-from field_shift.modules.fields import service
-from field_shift.modules.fields.schemas import (
+from field_shift_science.fields.schemas import (
     FieldBoundaryUpdate,
     FieldCreate,
     FieldPlantingUpdate,
     FieldRead,
     Season,
 )
+from field_shift_science.geo_ml.schemas import GeoResult, MoistureForecast, SurfaceSource
+
+from field_shift.db import SessionDep
+from field_shift.modules.fields import service
 from field_shift.modules.geo_ml.forecast import latest_moisture_forecast
-from field_shift.modules.geo_ml.schemas import GeoResult, MoistureForecast, SurfaceSource
 from field_shift.modules.geo_ml.service import latest_surface_moisture
 
 router = APIRouter(prefix="/fields", tags=["fields"])

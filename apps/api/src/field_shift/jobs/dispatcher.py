@@ -66,9 +66,12 @@ def main() -> None:
     while True:
         try:
             cycle = run_once(factory, publish_celery, settings=settings)
+            from field_shift.jobs.planning import dispatch, publish
+
+            dispatch(factory, publish)
             if cycle.recovered:
                 logger.info("Recovered %s expired job leases", cycle.recovered)
-        except SQLAlchemyError:
+        except (SQLAlchemyError, ConnectionError, OSError):
             logger.exception("Dispatcher database cycle failed; retrying")
         sleep(settings.poll_seconds)
 

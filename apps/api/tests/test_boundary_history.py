@@ -2,6 +2,7 @@ from datetime import UTC, datetime
 
 import pytest
 from fastapi.testclient import TestClient
+from field_shift_science.fields.schemas import Polygon
 from sqlalchemy import select
 
 from field_shift.api import create_app
@@ -9,7 +10,6 @@ from field_shift.db import build_session_factory
 from field_shift.models import metadata
 from field_shift.modules.fields.history import boundary_for_season
 from field_shift.modules.fields.models import Field, FieldBoundaryVersion, PreparedContour
-from field_shift.modules.fields.schemas import Polygon
 from field_shift.seed import seed_demo
 
 

@@ -71,7 +71,7 @@ field context and recent chat history.
 - The agent can explain saved FAO-56 root-zone forecasts, historical water runs
   explicitly linked to the conversation, and sampled Sentinel-2 NDVI. Units, dates,
   source and calculated versus observed provenance accompany the supplied facts.
-- A saved historical run reaches the assistant only when the farmer selects it on Water and
+- A saved historical run reaches the assistant only when the farmer selects it in Analytics → Water and
   clicks «Ask agent about this run». The widget's base URL then ends in
   `/assistant/{field}/{season}/{scenario}/runs/{run_id}` (a path segment, because the widget
   appends `/health/ready` and `/v1/agent/stream`). The API loads the run, checks the field is
@@ -83,7 +83,8 @@ field context and recent chat history.
 - Map and chart chips point to the same selected field. The API allows only supported
   navigation actions from the signed context. The UI checks the boundary revision
   before opening a chip. Existing conversations are preserved by migration `0005`.
-- Rotation simulations remain available in the Rotations tab. The agent's
+- Rotation diagnostics remain available in Analytics; Strategies owns allocation and
+  the separately gated native and handoff model flows. The agent's
   proposed simulation contract and external geo connector are disabled in this
   profile. The agent cannot start a comparison, and it cannot save a constraint.
 - Planning constraints the agent proposes (for example "no irrigation", "exclude
@@ -123,15 +124,33 @@ field context and recent chat history.
   builds and signs, so a browser's context or history cannot mark a constraint confirmed.
   That context carries structured values only (source `farmer_ui`, or `agent_inferred`
   with its confidence): the farmer's quoted words and the free-text machinery note stay
-  in the farm record, like scouting notes. The Rotations page lists the decisions, with
+  in the farm record, like scouting notes. Analytics rotation diagnostics list the decisions, with
   those words, for review and withdrawal.
   No rotation comparison or simulation uses them yet. The browser offers
   `compare.set_constraints` to the widget only; the signed agent capabilities
   (`signing.py` `HOST_ACTIONS`) are unchanged.
-- The profile uses the existing single-farm local deployment. The process limits
-  the remote adapter to two simultaneous turns and ten per minute. Before exposing
-  the app to multiple farms, add farmer authentication and field authorization in
-  the host API. The internal request signature identifies the host, not a farmer.
+- The profile uses the existing single-farm-per-deployment architecture, with local
+  shared-workspace or authenticated team access. The host signature binds a team turn
+  to the server-authenticated farm/member; the browser cannot choose that principal.
+  Local mode uses an explicit shared-workspace principal. Authentication does not
+  make the deployment a multi-farm tenant service. The remote adapter retains its
+  concurrency and rate bounds.
+- Fields, Strategies, Agent, Analytics and Farm remain the five destinations.
+  Legacy `water` and `rotations` host actions open the corresponding Analytics views;
+  current `strategies` and `analytics` action IDs are also signed and validated.
+  Selected year/scenario and boundary/run context stay explicit. Another context
+  invalidates earlier action references; an aborted response cannot replace current context.
+- The widget conversation is still in-memory and restarts across a browser reload.
+  The legacy chat endpoint persists genuinely executed replies in its existing DB
+  conversation tables, but this integration does not add a widget history drawer or
+  persist richer stream/tool transcripts. Do not seed fake conversations to hide that limit.
+- API tests validate cross-service payloads against exported JSON schemas. Agent tests
+  retain their installed strict Pydantic checks. Both installed services verify the same
+  deterministic test-only signed-body/token vectors independently; no sibling source
+  files or import paths are injected. The API JSON-schema dependency is development-only.
+- Migration `0016_merge_agent_planning` joins the published `0015_merge_onboarding`
+  and `0012_merge_agent_constraints` heads without changing either history. Upgrade and
+  restore verification must run against disposable PostgreSQL before publication.
 
 See [runtime reference notes](../services/agent/REFERENCE.md) for the agent engine and
 [field analytics](field-analytics.md) for how the underlying observations are made.
@@ -158,7 +177,6 @@ These are in-app notifications, not background browser push notifications.
 Reading a signal records a bounded, farm/season-scoped identifier in this browser's
 local storage. It is not synchronized between devices. Changed boundaries or
 new observation dates create new identifiers. Opening the assistant preserves the
-field and signal type, clears historical run context and prepares an editable
-question without sending it. Direct analysis links open that field's water forecast
+selected field/year/scenario and clears historical run context without sending a question. Direct analysis links open that field's water forecast
 at the first stress day or its NDVI layer. The inbox is a keyboard-accessible desktop
 dialog and a mobile bottom sheet.

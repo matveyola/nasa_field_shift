@@ -2,9 +2,9 @@ from datetime import UTC, date, datetime
 from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Query
+from field_shift_science.fields.schemas import Polygon
 
 from field_shift.db import SessionDep
-from field_shift.modules.fields.schemas import Polygon
 from field_shift.modules.fields.service import require_field
 from field_shift.modules.imagery.sentinel import (
     EARLIEST_SCENE,

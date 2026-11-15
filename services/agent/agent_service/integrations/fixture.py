@@ -8,7 +8,6 @@ services. They are NOT a geo pipeline or a crop model and must never be configur
 
 import uuid
 from datetime import UTC, datetime, timedelta
-from pathlib import Path
 from typing import Literal
 
 from contracts.integration import (
@@ -27,10 +26,10 @@ from contracts.integration import (
     SimulationCapabilities,
 )
 from contracts.models import FieldContext, FieldProfile, RotationComparison
+from contracts.resources import FIXTURES, field_context_fixtures
 
 from .ports import IntegrationFailure
 
-FIXTURES = Path(__file__).parents[2] / "contracts" / "fixtures"
 RESULT_TTL_S = 3600
 # The only field with a fixture comparison, and the only scenario it covers.
 COMPARISON_FIELDS = {"demo-poltava-01": "rotation_comparison.poltava.json"}
@@ -40,7 +39,7 @@ FixtureMode = Literal["fixture", "stub"]
 
 def _contexts() -> dict[str, FieldContext]:
     out = {}
-    for path in sorted(FIXTURES.glob("field_context.*.json")):
+    for path in field_context_fixtures():
         ctx = FieldContext.model_validate_json(path.read_text(encoding="utf-8"))
         out[ctx.field_id] = ctx
     return out

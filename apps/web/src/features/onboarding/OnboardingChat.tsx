@@ -52,13 +52,13 @@ export function OnboardingChat({ fieldName, season, answers, onAnswersChange, on
   const questions: Record<Step, string> = uk
     ? {
         history: historyQuestion(previousSeason),
-        allowed_crops: 'Які культури ви можете вирощувати на цьому полі? Оберіть принаймні дві.',
+        allowed_crops: 'Які культури ви можете вирощувати на цьому полі? Оберіть принаймні одну.',
         irrigation: 'Чи можете ви поливати це поле?',
         priority: 'Що найважливіше для вас у наступних сезонах?',
       }
     : {
         history: historyQuestion(previousSeason),
-        allowed_crops: 'Which crops can you grow in this field? Choose at least two.',
+        allowed_crops: 'Which crops can you grow in this field? Choose at least one.',
         irrigation: 'Can you irrigate this field?',
         priority: 'What matters most to you over the next seasons?',
       }
@@ -248,7 +248,7 @@ export function OnboardingChat({ fieldName, season, answers, onAnswersChange, on
           </button>
         )}
         {active === 'allowed_crops' && (
-          <button className="button primary" type="button" disabled={busy || currentSelection.length < 2}
+          <button className="button primary" type="button" disabled={busy || currentSelection.length < 1}
             onClick={() => applyAnswer({ allowed_crops: currentSelection })}>
             {uk ? 'Підтвердити культури' : 'Confirm crops'}<ArrowRightIcon aria-hidden="true" />
           </button>
