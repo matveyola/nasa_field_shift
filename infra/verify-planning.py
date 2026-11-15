@@ -352,7 +352,7 @@ def main():
             )
             assert sql(counts_query, "planning_restore") == original_counts
             heads = compose("exec", "-T", "api", "alembic", "heads", capture=True)
-            assert heads.count("(head)") == 1 and "0014_planning_inputs" in heads
+            assert heads.count("(head)") == 1 and "0015_merge_onboarding" in heads
             script = """import os, subprocess
 from field_shift.config import get_settings
 from sqlalchemy.engine import make_url
@@ -377,7 +377,7 @@ subprocess.run(["alembic", "downgrade", "0010_precision_plans"], check=True)
             )
             assert (
                 sql("select version_num from alembic_version", "planning_restore")
-                == "0014_planning_inputs"
+                == "0015_merge_onboarding"
             )
             check(
                 "single migration head; archive restored to fresh DB; "

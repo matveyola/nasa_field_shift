@@ -136,7 +136,7 @@ export function App() {
     if (parseRoute(location.href).setupId !== route.setupId) return
     addCreatedField(created); setSetupInProgress(pendingSetup())
     setLastField(created.id); rememberSelectedField(created.id)
-    closeSetup({ page: 'strategies', fieldId: created.id, scenario, season: Math.max(season, farm?.season ?? season) })
+    closeSetup({ page: 'strategies', fieldId: created.id, scenario, season: (farm?.season ?? season) + 1 })
     setStrategiesVisited(true)
   }
   function goHome() {
@@ -155,7 +155,7 @@ export function App() {
   if (workspace.pending) content = <Loading text={t('Loading workspace…')} />
   else if (workspace.error) content = <ErrorBox message={workspace.error} retry={workspace.reload} />
   else if (farm) {
-    if (route.setupId && canEdit) content = <Suspense fallback={<Loading />}><FieldOnboarding key={route.setupId} id={route.setupId} fields={fields} season={season}
+    if (route.setupId && canEdit) content = <Suspense fallback={<Loading />}><FieldOnboarding key={route.setupId} id={route.setupId} fields={fields} season={farm.season}
       onCancel={() => closeSetup({ page: 'fields', fieldId: field?.id, season, scenario })} onComplete={finishSetup} /></Suspense>
     else if (missingField) content = <Empty><p>{t('The linked field is no longer available.')}</p><button className="button" type="button" onClick={() => go('fields')}>{t('Open Fields')}</button></Empty>
     else if (route.page === 'fields' || route.page === 'agent') content = (
