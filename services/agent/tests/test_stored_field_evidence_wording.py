@@ -125,3 +125,15 @@ def test_the_widget_names_the_new_facts_as_the_agent_does():
             plain.NAMES["en"][key],
             plain.NAMES["uk"][key],
         ], key
+
+
+@pytest.mark.parametrize("lang", ["en", "uk"])
+def test_no_fact_name_reads_as_an_observation(lang):
+    """Stored facts are computed (ml_estimate, deterministic_calc or simulation output), and
+    overview and evidence lines start with their plain name. "share of the observed area" made
+    the grounding check flag such a line as estimate_as_observation and redact it. Found in the
+    2026-11-15 acceptance run: the low-NDVI share vanished from scripted answers."""
+    from agent_service.grounding import _OBSERVED
+
+    flagged = {k: v for k, v in plain.NAMES[lang].items() if _OBSERVED.search(v)}
+    assert flagged == {}

@@ -53,7 +53,9 @@ _I = re.IGNORECASE
 
 NO_IRRIGATION = re.compile(
     r"(?:немає|нема|відсутн\w*)\s+поливу|поливу\s+(?:немає|нема)|без\s+поливу|не\s+(?:маю|маємо|має|мають)\s+полив\w*"
-    r"|no\s+irrigation|without\s+irrigation|not\s+irrigated|(?:don't|do\s+not)\s+(?:have\s+)?irrigat\w*",
+    r"|не\s+(?:можу|можемо|може|можуть)\s+полива\w*|богар\w*"
+    r"|no\s+irrigation|without\s+irrigation|not\s+irrigated|(?:don't|do\s+not)\s+(?:have\s+)?irrigat\w*"
+    r"|(?:can't|can’t|cannot|can\s+not)\s+irrigat\w*|rain-?fed|dryland",
     _I,
 )
 HAS_IRRIGATION = re.compile(
