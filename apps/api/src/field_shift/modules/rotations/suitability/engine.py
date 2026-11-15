@@ -5,6 +5,7 @@ import itertools
 
 from field_shift_contracts.planning_v1 import CandidateSequence, SuitabilityAssessment
 from field_shift_contracts.planning_v1.field import CropAssignment
+from field_shift_science.fields.land import qualified_land_sources
 
 from .evidence import reason
 from .rules import dates_in
@@ -38,11 +39,9 @@ class SuitabilityEngine:
                 )
             )
 
-        land_sources = [
-            s
-            for s in profile.sources
-            if s.quality == "valid" and s.coverage_fraction == 1 and s.available_at <= profile.as_of
-        ]
+        land_sources = qualified_land_sources(
+            profile, as_of=as_of or profile.as_of, allow_synthetic=self.allow_synthetic
+        )
         if profile.land_status in {"ice", "ocean", "non_arable"} and land_sources:
             checked.append("land")
             add(
@@ -54,6 +53,8 @@ class SuitabilityEngine:
         elif profile.land_status != "arable" or not land_sources:
             unchecked.append("land")
             add("insufficient_data", "land_unknown", "Missing complete valid land coverage")
+        else:
+            checked.append("land")
         if not rule:
             add(
                 "out_of_domain" if rules else "unsupported",

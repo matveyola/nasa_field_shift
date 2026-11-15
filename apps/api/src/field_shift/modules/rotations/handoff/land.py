@@ -11,6 +11,8 @@ rejected, geometry, scope and availability vetoes remain across the snapshot.
 
 from datetime import UTC, datetime
 
+from field_shift_science.fields.land import qualified_land_sources
+
 from field_shift.modules.fields.planning_profile.service import ProfileError, ProfileRepository
 
 
@@ -38,16 +40,7 @@ def land_status(session, field, *, now=None):
         for s in profile.sources
     ):
         return "unknown"
-    bound_land_sources = [
-        source
-        for source in profile.sources
-        if source.id in profile.land_source_ids
-        and source.kind != "synthetic"
-        and source.quality == "valid"
-        and source.coverage_fraction == 1
-        and source.spatial_method in {"polygon", "area_weighted"}
-        and source.available_at <= profile.as_of
-    ]
+    bound_land_sources = qualified_land_sources(profile, as_of=now)
     if not bound_land_sources:
         return "unknown"
     return profile.land_status

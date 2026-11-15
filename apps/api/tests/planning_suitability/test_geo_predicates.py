@@ -3,6 +3,7 @@
 import json
 from datetime import date
 
+import pytest
 from field_shift_contracts.planning_v1 import FarmPlanningRequest, WeatherScenarioSet
 from field_shift_contracts.planning_v1.common import CropRef
 from field_shift_contracts.planning_v1.field import CropAssignment
@@ -360,3 +361,94 @@ def test_three_season_candidates_carry_choices_into_return_rules(profile, exampl
     assert repeat.assessments[1].status == "ineligible"
     assert repeat.assessments[2].status == "ineligible"
     assert all(s.assignments[0].commitment_id == "wheat-committed" for s in sequences)
+
+
+@pytest.mark.parametrize(
+    "defect", ["unlinked", "partial", "zero", "point", "synthetic_without_permission"]
+)
+def test_land_requires_explicit_qualified_links(profile, examples, fixtures, defect):
+    p = prepared(profile).model_copy(deep=True)
+    records = fixtures["records"][next(k for k in fixtures["records"] if "G03" in k)]
+    records = [{**d, "soil_frozen": False} for d in records]
+    reviewed = rule().model_copy(update={"review_status": "reviewed"})
+    if defect == "unlinked":
+        p.land_source_ids = []
+    else:
+        land = next(s for s in p.sources if s.id in p.land_source_ids)
+        if defect == "partial":
+            land.quality = "partial"
+        elif defect == "zero":
+            land.coverage_fraction = 0
+        elif defect == "point":
+            land.spatial_method = "representative_point"
+    assessor = engine(reviewed, allow_synthetic=defect != "synthetic_without_permission")
+    result = assessor.evaluate(p, reviewed.crop, 2027, weather_for(examples, p, records))
+    assert result.status == "insufficient_data"
+    assert "land" in result.unchecked_rule_ids
+    assert "land_unknown" in {r.code for r in result.reasons}
+
+
+def test_unrelated_weather_metadata_persisted_through_real_repository_cannot_qualify_land(
+    profile,
+    examples,
+    fixtures,
+):
+    from field_shift_contracts.planning_v1 import ProfileWriteRequest
+
+    from field_shift.db import build_session_factory
+    from field_shift.models import metadata
+    from field_shift.modules.farm.models import Farm
+    from field_shift.modules.fields.models import Field
+    from field_shift.modules.fields.planning_profile.service import ProfileRepository
+
+    p = prepared(profile).model_dump(mode="json")
+    p.update(farm_id="1", field_id="F-01", land_source_ids=[])
+    # Adversarial submitted metadata claims a valid reference, but only for
+    # temperature. This is not relabelled positive synthetic land evidence.
+    p["sources"] = p["sources"][:1]
+    p["sources"][0].update(product="temperature-only-unrelated-to-land", kind="reference")
+    factory = build_session_factory("sqlite://")
+    metadata.create_all(factory.kw["bind"])
+    try:
+        with factory.begin() as session:
+            session.add(
+                Farm(
+                    id=1,
+                    name="Unit negative source proof",
+                    season=2026,
+                    next_field_number=2,
+                    irrigation_available=False,
+                    priority="water",
+                )
+            )
+            session.flush()
+            session.add(
+                Field(
+                    id="F-01",
+                    farm_id=1,
+                    name="Unit negative profile",
+                    crop="Unknown",
+                    season=2026,
+                    area_ha=p["area_ha"],
+                    boundary_revision=p["geometry_revision"],
+                    geometry={k: p["geometry"][k] for k in ("type", "coordinates")},
+                )
+            )
+        with factory() as session:
+            ProfileRepository(session).write(
+                "1",
+                "F-01",
+                ProfileWriteRequest.model_validate_json(
+                    json.dumps({"request_id": "proof", "expected_revision": None, "profile": p})
+                ),
+            )
+            saved = ProfileRepository(session).latest("1", "F-01")
+        records = fixtures["records"][next(k for k in fixtures["records"] if "G03" in k)]
+        records = [{**d, "soil_frozen": False} for d in records]
+        reviewed = rule().model_copy(update={"review_status": "reviewed"})
+        result = engine(reviewed, allow_synthetic=False).evaluate(
+            saved, reviewed.crop, 2027, weather_for(examples, saved, records)
+        )
+        assert result.status == "insufficient_data" and "land" in result.unchecked_rule_ids
+    finally:
+        factory.kw["bind"].dispose()
