@@ -26,6 +26,7 @@
 5. Escalate verification for authentication, security, database schemas and migrations, public contracts, and critical data pipelines.
 6. **Never fit a test to the implementation just to make it pass. Never delete, weaken, skip or bypass a failing test for a green result.** Find and fix the cause. Change an expectation only when the intended behavior changes or the existing expectation is demonstrably incorrect, and record the reason.
 7. Diagnose the root cause of a CI failure before rerunning unrelated checks.
+8. Serialize Docker/Compose lifecycle operations, including network cleanup, with host Chromium E2E runs using localhost, unless they have real network isolation. Different worktrees and ports do not isolate host network-change events. Inspect `ERR_NETWORK_CHANGED` traces, retain the interrupted attempt and repeat only affected checks after correcting the execution environment.
 
 ## Production behavior and global test scenarios
 
