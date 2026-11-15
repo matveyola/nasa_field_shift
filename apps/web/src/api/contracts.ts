@@ -281,3 +281,33 @@ export type Conversation = FieldContext & { id: string; title: string; updated_a
 export type ConversationDetail = Conversation & {
   messages: ConversationMessage[]
 }
+
+/** A farmer's recorded decision about a planning condition the assistant proposed (agent contract › Constraint).
+ *  Built by the API from its own record for one field, season and boundary; proposals are never recorded. */
+export type PlanningConstraint = {
+  id: string
+  type: 'irrigation_available' | 'fertilizer_budget' | 'erosion_protection' | 'rotation_length_years'
+    | 'excluded_crops' | 'preferred_crops' | 'previous_crop' | 'organic_only' | 'machinery_limit' | 'market_preference'
+  value: boolean | number | string | string[]
+  status: 'confirmed' | 'rejected'
+  source: 'farmer_text' | 'farmer_voice' | 'farmer_ui' | 'agent_inferred'
+  evidence?: string
+  confidence?: number
+  /** Opaque and new with every write: a replacement or a removal names the exact decision the farmer saw, even
+   *  if one of the same kind was removed and decided again meanwhile. */
+  token: string
+}
+
+/** A proposed value that would change an earlier decision: not saved until the farmer confirms the replacement. */
+export type ConstraintReplacement = {
+  current: PlanningConstraint
+  proposed: Omit<PlanningConstraint, 'token'> & { status: 'confirmed' | 'rejected' }
+}
+
+/** The farmer's decision: the widget's compare.set_constraints envelope, plus each earlier decision (type and
+ *  token) the farmer saw and chose to replace. */
+export type ConstraintDecision = {
+  field_id: string
+  envelope: unknown
+  replaces?: { type: PlanningConstraint['type']; token: string }[]
+}

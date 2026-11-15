@@ -9,9 +9,10 @@ claims ("the soil is dry"), and paraphrased claims outside the patterns below ar
 """
 
 import re
+import unicodedata
 from dataclasses import dataclass, field
 
-from contracts.models import Fact, Provenance, Quantity
+from contracts.models import CALC_FACT_PREFIX, Fact, Provenance, Quantity
 
 from . import plain, scenarios
 
@@ -27,11 +28,13 @@ LABELS = {
            "estimate": "оцінка", "estimate_unchecked": "неперевірена оцінка", "calc": "розрахунок",
            "reference": "довідкове значення", "farmer": "з ваших слів",
            "simulation": "розрахунок сівозміни, варіант «{scenario}»",
+           "arithmetic": "розрахунок з ваших чисел",
            "unverified": "не підтверджено сервісом даних"},
     "en": {"demo": "demo", "cached": "saved earlier", "unavailable": "no data",
            "estimate": "estimate", "estimate_unchecked": "unchecked estimate", "calc": "calculated",
            "reference": "reference value", "farmer": "from you",
            "simulation": "rotation calculation, case “{scenario}”",
+           "arithmetic": "calculated from your figures",
            "unverified": "not confirmed by the data service"},
 }
 _SCENARIO_IN_METHOD = re.compile(r"scenario=([a-z0-9_]+)")
@@ -42,8 +45,18 @@ def format_number(value: float, lang: str) -> str:
     return text.replace(".", ",") if lang == "uk" else text
 
 
+MONEY_UNITS = frozenset({"UAH", "USD", "UAH/ha", "USD/ha"})
+
+
+def format_money(value: float, lang: str) -> str:
+    """Grouped thousands and kopecks/cents only when there are any: "7 500", "22 500,50" (uk); "7,500", "22,500.50"."""
+    text = f"{value:,.2f}".removesuffix(".00")
+    return text.replace(",", "\u00a0").replace(".", ",") if lang == "uk" else text  # no-break space, as Intl uk-UA
+
+
 def format_quantity(q: Quantity, lang: str) -> str:
-    text = format_number(q.value, lang) + plain.unit(q.unit, lang, q.value)
+    number = format_money(q.value, lang) if q.unit in MONEY_UNITS else format_number(q.value, lang)
+    text = number + plain.unit(q.unit, lang, q.value)
     u = q.uncertainty
     if u and u.kind in ("range", "ci95") and u.low is not None and u.high is not None:
         text += f" ({format_number(u.low, lang)}–{format_number(u.high, lang)})"
@@ -80,6 +93,11 @@ def origin_note(p: Provenance, lang: str, mark_demo: bool = True) -> str:
     return ", ".join(parts)
 
 
+def is_farmer_arithmetic(f: Fact) -> bool:
+    """An input or result of calculate_farm_budget: the farmer's own figures, never field data or live data."""
+    return f.domain == "farm" and f.id.startswith(CALC_FACT_PREFIX)  # a FieldContext cannot carry such ids
+
+
 def is_simulation_output(f: Fact) -> bool:
     """A score from a compare_rotations result (see integrations.normalize.check_comparison)."""
     return f.domain == "rotation" and f.id.startswith("sim.")
@@ -91,6 +109,8 @@ def render_fact(f: Fact, lang: str, unverified: bool = False, mark_demo: bool = 
         return f"{LABELS[lang]['unavailable']}" + (f" ({name})" if name else "")
     value = format_quantity(f.quantity, lang) if f.quantity is not None else (f.category or "")
     note = origin_note(f.provenance, lang, mark_demo)
+    if is_farmer_arithmetic(f) and f.provenance.kind == "deterministic_calc":
+        note = LABELS[lang]["arithmetic"]
     if is_simulation_output(f):
         m = _SCENARIO_IN_METHOD.search(f.provenance.method or "")
         # display name only; the id stays in provenance.method and every contract (unknown id → shown as is)
@@ -135,7 +155,9 @@ _YEAR = re.compile(r"(?:19|20)\d{2}")
 # Units after a number turn it into a measurement claim, whatever its size.
 _UNIT_AFTER = re.compile(
     r"\s?(?:%|‰|°|℃|mm\b|мм\b|cm\b|см\b|km\b|км\b|m\b|м\b|m[²³23]|м[²³23]|ha\b|га\b|kg\b|кг\b|t\b|т\b|ц\b"
-    r"|g/kg|г/кг|mg|мг|cmol|MJ|W/m|t/ha|т/га|ц/га|kg/ha|кг/га|mm/d|K\b|percent|відсот|процент)",
+    r"|g/kg|г/кг|mg|мг|cmol|MJ|W/m|t/ha|т/га|ц/га|kg/ha|кг/га|mm/d|K\b|percent|відсот|процент"
+    # money and its scale words: a price or cost is a claim whatever its size
+    r"|грн|гривн|гривень|₴|UAH\b|USD\b|\$|долар|dollars?\b|тис\.|тисяч|млн|thousand|million)",
     re.IGNORECASE,
 )
 _PH_BEFORE = re.compile(r"\bpH\W{0,3}$", re.IGNORECASE)
@@ -159,6 +181,17 @@ _CLAIMS: dict[str, re.Pattern[str]] = {
     "unsupported_recommendation": re.compile(
         r"(?:оптимальн|найкращ|найвигідніш)\w*\s+(?:\w+\s+){0,2}сівозмін|сівозмін\w*\s+(?:\w+\s+){0,2}(?:оптимальн|найкращ)"
         r"|\b(?:optimal|best|ideal)\s+(?:\w+\s+){0,2}rotation",
+        re.IGNORECASE,
+    ),
+    # No connected simulation service applies the farmer's confirmed conditions (tools.compare_rotations): a result
+    # must never be said to reflect them. The negated forms ("не враховує ваших умов") are what the agent should say.
+    "constraints_applied_claim": re.compile(
+        r"(?<!не )(?<!не\s)\bвраховує\w*\s+(?:\w+\s+){0,2}(?:ваш\w*|фермер\w*)\s+(?:\w+\s+){0,2}(?:умов|обмежен|вимог)\w*"
+        r"|(?<!без )\bз\s+урахуванням\s+(?:\w+\s+){0,1}ваш\w*\s+(?:\w+\s+){0,2}(?:умов|обмежен|вимог)\w*"
+        r"|(?<!not )(?<!n't )\b(?:takes?|took|taking)\s+(?:\w+\s+){0,2}into\s+account\s+your\s+(?:\w+\s+){0,2}"
+        r"(?:conditions|constraints|restrictions|rules)"
+        r"|(?<!not )(?<!n't )\b(?:reflects?|follows?|respects?)\s+your\s+(?:\w+\s+){0,2}"
+        r"(?:conditions|constraints|restrictions|rules)",
         re.IGNORECASE,
     ),
     # estimate_as_observation is checked per sentence in check(): it needs the cited facts' provenance.
@@ -217,6 +250,14 @@ def _number_is_claim(text: str, m: re.Match[str], farmer_numbers: set[str]) -> b
     if has_unit or "." in raw or "," in raw:
         return True                            # a measurement or a precise value
     return int(raw) > 10                       # small integers: counts, list items, "3 years"
+
+
+def visible_text(text: str) -> str:
+    """The model's text without invisible format characters (Unicode Cf: zero-width spaces and joiners, bidi
+    controls, soft hyphens). "2<ZWSP>5<ZWSP>0" reads as 250 on screen but slipped past the number checks as three
+    small digits. Letters, apostrophes (ʼ ’) and no-break spaces are not Cf and stay; source passages are never
+    touched (only the model-written draft goes through here)."""
+    return "".join(ch for ch in text if unicodedata.category(ch) != "Cf")
 
 
 def check(text: str, *, retrieved: dict[str, Fact], known_ids: set[str], farmer_text: str,

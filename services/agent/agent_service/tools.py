@@ -26,12 +26,13 @@ from contracts.models import (
     simulation_scenarios,
 )
 
-from . import scenarios
+from . import budget, constraint_evidence, scenarios
 from .citations import uk_locator
 from .grounding import FACT_TOKEN, label_problem, product_name
 from .integrations.normalize import check_comparison, check_profile, idempotency_key
 from .integrations.ports import IntegrationFailure
 from .llm.provider import ToolCall, ToolResult, ToolSpec
+from .plain import CROPS
 from .service import ui_action_problem
 
 log = logging.getLogger("agent_service.tools")
@@ -101,6 +102,11 @@ class TurnState:
     geo_note: dict[str, Any] | None = None                      # what the geo service said this turn (loaded once)
     conflicting_fact_ids: set[str] = field(default_factory=set)
     sim_calls: int = 0
+    calculations: int = 0                    # calculate_farm_budget results this turn (ids calc.<n>.*)
+    # rotation_id -> confirmed farmer conditions a compared rotation breaks (see constraint_conflicts)
+    constraint_conflicts: dict[str, list[dict[str, Any]]] = field(default_factory=dict)
+    conflicting_rotation_facts: set[str] = field(default_factory=set)  # score fact ids of those rotations
+    replaced_confirmed: set[str] = field(default_factory=set)  # constraint types whose confirmed value a proposal would replace
     # Trust boundary (M6A). Context facts are client assertions unless a configured data service returned
     # the same fact this turn (verified) or an authenticated host is configured to attest the context.
     context_attested: bool = False           # the host signed this request's body, field and revision (M6B)
@@ -132,9 +138,11 @@ class TurnState:
     def sub_request_id(self, suffix: str) -> str:
         return f"{self.request.request_id[:100]}.{suffix}"
 
-    def farmer_texts(self) -> list[str]:
-        texts = [self.request.message.text or ""]
-        return texts + [h.text for h in self.request.history if h.role == "user"]
+    def farmer_message(self) -> str:
+        """What the farmer says in this turn: the only text that may be quoted as their words or echo their numbers.
+        History is client-supplied (the host signs what the browser sent, not what the farmer said), so it stays
+        context for the model and never becomes evidence or a grounding exemption."""
+        return self.request.message.text or ""
 
 
 class _Args(BaseModel):
@@ -259,9 +267,14 @@ class ConstraintsArgs(_Args):
     constraints: Annotated[list[ConstraintProposal], Field(min_length=1, max_length=10)]
 
 
+_NOT_CURRENT = ("Evidence must be copied exactly from the farmer's current message. For something said in earlier turns, "
+                "ask the farmer, or propose it with basis \"inferred\", no evidence and a confidence, for them to confirm.")
+
+
 async def propose_constraints(args: ConstraintsArgs, state: TurnState) -> tuple[dict[str, Any], list[str]]:
-    farmer_texts = state.farmer_texts()
+    farmer_text = state.farmer_message()
     existing = {c.type: c for c in state.ctx.constraints if c.status != "rejected"}
+    known_crops = constraint_evidence.crop_catalogue([s.crop_id for s in state.ctx.crop_history])
     accepted, rejected, unchanged = [], [], []
     batch_types: dict[str, Any] = {}
 
@@ -288,11 +301,11 @@ async def propose_constraints(args: ConstraintsArgs, state: TurnState) -> tuple[
             if not evidence:
                 reject("missing_evidence", "An explicit constraint needs the exact words the farmer used.")
                 continue
-            if not any(evidence in t for t in farmer_texts):
-                reject("evidence_not_found", "Evidence must be copied exactly from the farmer's message.")
+            if evidence not in farmer_text:
+                reject("evidence_not_found", _NOT_CURRENT)
                 continue
-        elif evidence and not any(evidence in t for t in farmer_texts):
-            reject("evidence_not_found", "Evidence, when given, must be copied exactly from the farmer's message.")
+        elif evidence and evidence not in farmer_text:
+            reject("evidence_not_found", _NOT_CURRENT)
             continue
         candidate = {
             "id": f"k_{p.type}", "type": p.type, "value": p.value, "status": "proposed",
@@ -306,8 +319,31 @@ async def propose_constraints(args: ConstraintsArgs, state: TurnState) -> tuple[
         except ValidationError:
             reject("invalid_value", f"Value for {p.type} must be: {VALUE_HINTS[p.type]}.")
             continue
-        batch_types[p.type] = p.value
+        # Do the farmer's words carry this meaning (negation, hedges, named crops, the number, a wish vs a rule)?
+        if found := constraint_evidence.problem(p.type, constraint.value, evidence, farmer_text,
+                                                explicit=p.basis == "explicit", known_crops=known_crops):
+            if found[0] == "conflict":  # the message says both: nothing of this type is proposed in this turn
+                state.conflicted_types.add(p.type)
+                state.constraints.pop(p.type, None)
+                accepted[:] = [a for a in accepted if a["type"] != p.type]
+            reject(*found)
+            continue
+        if p.type in ("excluded_crops", "preferred_crops"):
+            other = "preferred_crops" if p.type == "excluded_crops" else "excluded_crops"
+            theirs = set(batch_types.get(other) or ()) | set(state.constraints[other].value if other in state.constraints else ())
+            if both := sorted(set(constraint.value) & theirs):
+                # The same crop wanted and ruled out: keep neither, so the farmer is asked.
+                state.conflicted_types.update({p.type, other})
+                state.constraints.pop(other, None)
+                accepted[:] = [a for a in accepted if a["type"] != other]
+                reject("conflict", f"{', '.join(both)} is both preferred and excluded; ask the farmer which holds.")
+                continue
         prior = existing.get(p.type)
+        if prior is not None and prior.status == "confirmed" and prior.value != constraint.value and p.basis != "explicit":
+            reject("confirmed_by_farmer", f"The farmer confirmed {p.type} = {prior.value}. An inference never replaces "
+                   "it: ask whether it has changed.")
+            continue
+        batch_types[p.type] = p.value
         if prior is not None and prior.value == constraint.value:
             unchanged.append({"type": p.type, "existing_id": prior.id})
             continue
@@ -315,11 +351,17 @@ async def propose_constraints(args: ConstraintsArgs, state: TurnState) -> tuple[
         entry = {"id": constraint.id, "type": p.type, "value": constraint.value, "basis": p.basis}
         if prior is not None:
             entry["supersedes"] = {"id": prior.id, "value": prior.value, "status": prior.status}
+            if prior.status == "confirmed":
+                entry["replaces_confirmed"] = True
+                state.replaced_confirmed.add(p.type)
         accepted.append(entry)
 
     result = {
         "accepted": accepted, "rejected": rejected, "already_in_context": unchanged,
-        "note": "These are proposals only. Nothing is saved until the farmer confirms them in the app.",
+        "note": "These are proposals only. Nothing is saved until the farmer confirms them in the app. For an entry "
+                "with replaces_confirmed, say plainly that it would replace a condition the farmer confirmed earlier "
+                "and changes nothing until they confirm. For a rejection, quote more of the farmer's words, propose it "
+                "as inferred, or ask; never guess the other way.",
     }
     return result, [a["id"] for a in accepted]
 
@@ -791,10 +833,15 @@ async def compare_rotations(args: CompareArgs, state: TurnState) -> tuple[dict[s
     rotations = []
     for r in sorted(response.comparison.rotations, key=lambda r: r.rank):
         refs = checked.score_refs.get(r.rotation_id, {})
+        conflicts = constraint_conflicts(r, confirmed)
+        if conflicts:
+            state.constraint_conflicts[r.rotation_id] = conflicts
+            state.conflicting_rotation_facts.update(refs.values())
         rotations.append({
             "rotation_id": r.rotation_id, "rank": r.rank,
             "sequence": [{"year": s.year_index, "season": s.season, "crop": s.crop_id} for s in r.sequence],
             "scores": {metric: _score_view(checked.facts[fid]) for metric, fid in refs.items()},
+            "farmer_constraint_conflicts": conflicts,
         })
     statuses = {f.provenance.data_status for f in checked.facts.values()}
     result = {
@@ -803,16 +850,108 @@ async def compare_rotations(args: CompareArgs, state: TurnState) -> tuple[dict[s
         "engine": f"{response.engine.name} {response.engine.version}",
         "computed_at": response.computed_at.isoformat() if response.computed_at else None,
         "expires_at": response.expires_at.isoformat(),
-        "constraints_used": [c.id for c in confirmed],
+        # Sent, never "used": no connected service shows it applied the farmer's conditions. Marsden says it ignores
+        # them, and RotationComparison.constraint_weights_applied is no proof either: the fixture and stub copy a
+        # static M0 value whatever was sent, and Marsden leaves it empty. So it is not passed on, and the answer must
+        # not say the results reflect the conditions.
+        "constraints_sent": [c.id for c in confirmed],
+        "constraints_note": "The service received the farmer's confirmed conditions but does not report applying "
+                            "them: never say these results take them into account. farmer_constraint_conflicts lists "
+                            "where a returned rotation does not match one.",
         "rotations": rotations,
         "warnings": checked.warnings + [w.detail or w.code for w in response.warnings],
         "note": ("Simulation outputs: computed by the service, never observed yields or measurements. Cite each value "
                  "only with its cite_as token. data_status 'fixture' / service_mode 'stub' or 'fixture' means synthetic "
                  "test values: say so plainly. rank is the service's ordering for this scenario, not a recommendation; "
-                 "never call a rotation optimal or best. To show the comparison, propose panel.open with "
-                 "panel='comparison' and ref_id=result_id."),
+                 "never call a rotation optimal or best. A rotation with farmer_constraint_conflicts does not match a "
+                 "condition the farmer confirmed (an advisory check of the returned rotations, not something the service "
+                 "optimised for): say so whenever you mention it and never present it as fitting their plan. "
+                 "To show the comparison, propose panel.open with panel='comparison' and ref_id=result_id."),
     }
     return result, [response.result_id, *checked.facts]
+
+
+def constraint_conflicts(rotation: Any, confirmed: list[Constraint]) -> list[dict[str, Any]]:
+    """Where a returned rotation does not match a condition the farmer confirmed: an advisory check of the service's
+    output, not a sign that the service optimised for the conditions (it is not known to apply them). Only what the
+    rotation itself shows is checked: its crops, and its length in years (distinct year indices, so several crops or
+    a cover crop in one year count once). The contract does not say whether rotation_length_years is an exact length
+    or a maximum, so any difference is reported, as a difference. Rejected and proposed conditions never count."""
+    crops = [s.crop_id for s in rotation.sequence]
+    years = len({s.year_index for s in rotation.sequence})
+    found = []
+    for c in confirmed:
+        if c.type == "excluded_crops" and (hit := sorted(set(crops) & set(c.value))):
+            found.append({"constraint_id": c.id, "type": c.type, "crops": hit})
+        elif c.type == "rotation_length_years" and years != c.value:
+            found.append({"constraint_id": c.id, "type": c.type, "years": years, "confirmed_years": c.value})
+    return found
+
+
+# ------------------------------------------------------------------ calculate_farm_budget
+
+MAX_CALCULATIONS_PER_TURN = 5
+_BUDGET_LABELS = {"per_hectare": "fact.budget_per_hectare", "total_for_area": "fact.budget_total_for_area",
+                  "difference": "fact.budget_difference"}
+_INPUT_LABELS = {"UAH": "fact.farmer_amount", "USD": "fact.farmer_amount", "UAH/ha": "fact.farmer_amount_per_hectare",
+                 "USD/ha": "fact.farmer_amount_per_hectare", "ha": "fact.farmer_area"}
+
+
+class BudgetOperandArgs(_Args):
+    quote: Annotated[str, Field(min_length=1, max_length=120)]
+    unit: budget.OperandUnit
+
+
+class BudgetArgs(_Args):
+    operation: budget.Operation
+    amount: BudgetOperandArgs
+    other: BudgetOperandArgs
+
+
+async def calculate_farm_budget(args: BudgetArgs, state: TurnState) -> tuple[dict[str, Any], list[str]]:
+    """Exact arithmetic on two figures the farmer wrote in this message. The model supplies quotes, never numbers."""
+    if state.calculations >= MAX_CALCULATIONS_PER_TURN:
+        raise ToolRejected("limit", "Calculation limit for this answer reached; use the results you have.")
+    message = state.farmer_message()
+    try:
+        amount = budget.read_operand(args.amount.quote, args.amount.unit, message)
+        other = budget.read_operand(args.other.quote, args.other.unit, message)
+        result = budget.calculate(args.operation, amount, other)
+    except budget.BudgetRefused as e:
+        raise ToolRejected(e.category, str(e)) from None
+    state.calculations += 1
+    n, now = state.calculations, datetime.now(UTC)
+    inputs = []
+    for role, operand in (("amount", amount), ("other", other)):
+        inputs.append(Fact.model_validate_json(json.dumps({
+            "id": f"calc.{n}.{role}", "domain": "farm", "label_key": _INPUT_LABELS[operand.unit],
+            "quantity": {"value": float(operand.value), "unit": operand.unit},
+            "provenance": {"kind": "farmer_input", "data_status": "live",
+                           "method": f"The farmer's own words in this message: \"{operand.quote}\""[:300],
+                           "retrieved_at": now.isoformat()},
+        }, ensure_ascii=False)))
+    output = Fact.model_validate_json(json.dumps({
+        "id": f"calc.{n}.result", "domain": "farm", "label_key": _BUDGET_LABELS[args.operation],
+        "quantity": {"value": float(result.value), "unit": result.unit},
+        "provenance": {"kind": "deterministic_calc", "data_status": "live",
+                       "method": (f"Arithmetic on the farmer's own figures from this message: {result.expression} "
+                                  "(exact decimals, rounded half up to 0.01). Not a prediction, a market price or a "
+                                  "verified expense.")[:300],
+                       "inputs": [f.id for f in inputs], "retrieved_at": now.isoformat()},
+    }, ensure_ascii=False))
+    by_id = {f.id: f for f in (*inputs, output)}
+    state.external_facts.update(by_id)  # computed by this server from the farmer's current words
+    state.retrieved.update(by_id)
+    return {
+        "operation": args.operation,
+        "result": {"ref": output.id, "cite_as": f"{{{{fact:{output.id}}}}}", "value": output.quantity.value,
+                   "unit": output.quantity.unit},
+        "inputs": [{"ref": f.id, "cite_as": f"{{{{fact:{f.id}}}}}", "value": f.quantity.value, "unit": f.quantity.unit,
+                    "farmer_words": o.quote} for f, o in zip(inputs, (amount, other), strict=True)],
+        "note": "Cite the result and any input only with their cite_as tokens; never write these numbers yourself. Say "
+                "it is simple arithmetic on the farmer's own figures, not a forecast, a price or a checked expense, and "
+                "name what each figure is in the farmer's words.",
+    }, list(by_id)
 
 
 # ------------------------------------------------------------------ search_knowledge
@@ -921,11 +1060,15 @@ CONSTRAINTS_SPEC = ToolSpec(
     name="propose_constraints",
     description=(
         "Turn the farmer's stated conditions into structured constraint proposals shown as removable pills. "
-        "basis='explicit' only for something the farmer actually said: evidence must be the exact words copied from "
-        "their message. basis='inferred' for your own inference: give a confidence 0-1 (evidence optional, empty "
-        "string if none). Mind negation ('є полив' vs 'немає поливу'). If statements contradict each other, do not "
-        "guess: ask. Value types: " + "; ".join(f"{k}: {v}" for k, v in VALUE_HINTS.items()) + ". "
-        "Nothing is saved: the farmer confirms in the app."
+        "basis='explicit' only for something the farmer clearly said in THIS message: evidence is their exact words, "
+        "whole words, long enough to carry the meaning with its negation or condition ('немає поливу', not 'поливу'; "
+        "'на це поле воду не подаватиму', not 'Полив є'). Earlier messages are never evidence. basis='inferred' for "
+        "your own reading or anything the farmer hedged ('мабуть', 'probably', 'краще не'): give a confidence 0-1 "
+        "(evidence optional, empty string if none). excluded_crops only for a refusal ('не буду сіяти', 'cannot "
+        "grow'); a wish to avoid a crop is inferred. Crops only from: " + ", ".join(sorted(CROPS["en"])) + " and only "
+        "ones the farmer named. If statements contradict each other, do not guess: ask. A proposal never replaces a "
+        "confirmed condition silently: say so when it would. Value types: "
+        + "; ".join(f"{k}: {v}" for k, v in VALUE_HINTS.items()) + ". Nothing is saved: the farmer confirms in the app."
     ),
     input_schema=_obj({"constraints": {"type": "array", "items": _obj({
         "type": {"type": "string", "enum": list(_CONSTRAINT_TYPES)},
@@ -1032,12 +1175,38 @@ COMPARE_SPEC = ToolSpec(
         "can (water risk; some services also soil cover days, nitrogen input, yield risk or harvest lost to water "
         "shortage): a score it does not return was not computed, so never fill it in. Results come back as cite_as "
         "tokens with a result_id; each score's method says what exactly was computed. Only "
-        "the farmer's confirmed constraints are sent. rotation_ids: empty = the service picks candidates. Use it only "
+        "the farmer's confirmed constraints are sent, and no connected service reports applying them. rotation_ids: "
+        "empty = the service picks candidates. Use it only "
         "when the farmer asks to compare rotations or scenarios; never present its outputs as observed yields."
     ),
     input_schema=_obj({
         "scenario": {"type": "string", "enum": list(_SCENARIOS)},
         "rotation_ids": _STR_LIST,
+    }),
+)
+
+
+_BUDGET_OPERAND = _obj({
+    "quote": {"type": "string", "description": "The farmer's exact words from their current message holding ONE number "
+                                               "and its unit, e.g. \"300 000 грн\", \"40 га\", \"5 500 грн/га\", \"$98,000\"."},
+    "unit": {"type": "string", "enum": ["UAH", "USD", "UAH/ha", "USD/ha", "ha"]},
+})
+
+BUDGET_SPEC = ToolSpec(
+    name="calculate_farm_budget",
+    description=(
+        "Exact arithmetic on two figures the farmer wrote in THIS message. operation: 'per_hectare' = a total amount "
+        "(UAH or USD) divided by an area in ha; 'total_for_area' = an amount per hectare (UAH/ha or USD/ha) times an "
+        "area in ha; 'difference' = amount minus other, both in the same unit (e.g. revenue minus expenses, or two "
+        "costs compared). Give quotes, never numbers: the server reads each number and unit from the farmer's words "
+        "and refuses figures from earlier messages, the app's field data or your own estimates. Use an area only when "
+        "the farmer tied it to the amount; never the field's area from the app. Currencies are never converted. Cite "
+        "the returned cite_as tokens."
+    ),
+    input_schema=_obj({
+        "operation": {"type": "string", "enum": ["per_hectare", "total_for_area", "difference"]},
+        "amount": _BUDGET_OPERAND,
+        "other": _BUDGET_OPERAND,
     }),
 )
 
@@ -1084,6 +1253,7 @@ def default_registry(knowledge_timeout_s: float = 20.0, with_knowledge: bool = T
         Tool(CONSTRAINTS_SPEC, ConstraintsArgs, propose_constraints),
         Tool(ACTIONS_SPEC, ActionsArgs, propose_ui_actions),
         Tool(BLOCKS_SPEC, BlocksArgs, present_blocks),
+        Tool(BUDGET_SPEC, BudgetArgs, calculate_farm_budget),  # pure server-side arithmetic: no service, no I/O
     ]
     if with_knowledge:
         tools.append(Tool(SEARCH_SPEC, SearchArgs, search_knowledge, timeout_s=knowledge_timeout_s))
@@ -1119,6 +1289,8 @@ def _arg_summary(name: str, args: _Args) -> dict[str, Any]:
         return {"start_date": args.start_date, "crop": args.crop}
     if isinstance(args, BlocksArgs):  # labels are model wording: types only
         return {"blocks": [b.get("type") if isinstance(b, dict) else None for b in args.blocks]}
+    if isinstance(args, BudgetArgs):  # quotes are farmer wording: operation and units only
+        return {"operation": args.operation, "units": [args.amount.unit, args.other.unit]}
     if isinstance(args, SearchArgs):  # the query is farmer-derived text: length only
         return {"topic": args.topic, "content": args.content, "max_results": args.max_results,
                 "query_chars": len(args.query)}
@@ -1129,7 +1301,10 @@ def _arg_summary(name: str, args: _Args) -> dict[str, Any]:
 # something this turn cannot do (a wrong date, too many rotations, a scenario the farmer did not ask about or the
 # service does not offer) and the answer says so in words. The farmer's step list shows them as done, not "error".
 # Real failures (a service down or too slow, a result too large) still show as errors.
-EXPLAINED_REFUSALS = frozenset({"invalid_arguments", "limit", "scenario_not_requested", "unsupported_scenario"})
+EXPLAINED_REFUSALS = frozenset({"invalid_arguments", "limit", "scenario_not_requested", "unsupported_scenario",
+                                # calculate_farm_budget: the farmer's figures cannot be used as written; the answer asks
+                                "ambiguous_number", "missing_unit", "unit_mismatch", "currency_mismatch",
+                                "unsupported_currency", "unsupported_unit", "zero_area", "too_large", "invalid_value"})
 
 
 def _call_key(call: ToolCall) -> str:

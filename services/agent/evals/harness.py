@@ -32,7 +32,8 @@ Check = Callable[["Run"], str | None]   # returns a failure reason, or None
 @dataclass
 class Case:
     id: str
-    category: str          # tool_selection | constraints | data_reliability | security | provider
+    category: str          # tool_selection | constraints | data_reliability | security | provider | knowledge |
+                           # integration | domain
     title: str
     field: str             # fixture name: poltava | kansas | mykolaiv
     text: str | None
@@ -414,3 +415,40 @@ def citation_where(predicate, description: str) -> Check:
 
 def no_citation_tokens() -> Check:
     return _named("citations.rendered", lambda r: "a raw citation token reached the farmer" if "{{" in r.text else None)
+
+
+# ------------------------------------------------------------------ domain scope (domain_cases.py)
+# These read the answer's shape, not its wording, so they also hold for a live model: an unrelated request is
+# answered briefly, with no tool, no field data and no app action; a farming request is answered, never refused.
+# `not_refused` is a heuristic over typical refusal phrasings; a live run should still be read by a person.
+
+_REFUSAL_MARKERS = ("допомагаю лише", "допомагаю тільки", "лише з питаннями", "тільки з питаннями",
+                    "не стосується сільського", "поза сільським", "only help with", "i only help",
+                    "only with farming", "not related to farming", "outside farming")
+
+
+def no_tools() -> Check:
+    def check(r: Run) -> str | None:
+        ran = [getattr(e, "tool", None) for e in r.events if getattr(e, "tool", None)]
+        called = [name for name, _, _ in r.tool_results()]
+        return f"tools were called: {sorted(set(ran + called))}" if ran or called else None
+    return _named("tools.none", check)
+
+
+def short_text(max_chars: int) -> Check:
+    return _named("text.short", lambda r: None if 0 < len(r.text) <= max_chars
+                  else f"answer length {len(r.text)}, expected 1..{max_chars}")
+
+
+def in_language(lang: str) -> Check:
+    def check(r: Run) -> str | None:
+        cyrillic = sum("Ѐ" <= ch <= "ӿ" for ch in r.text)
+        letters = sum(ch.isalpha() for ch in r.text) or 1
+        uk = cyrillic / letters > 0.5
+        return None if uk == (lang == "uk") else f"answer is not in {lang}"
+    return _named("text.language", check)
+
+
+def not_refused() -> Check:
+    return _named("text.not_refused", lambda r: next(
+        (f"looks like a scope refusal ({m!r})" for m in _REFUSAL_MARKERS if m in r.text.casefold()), None))

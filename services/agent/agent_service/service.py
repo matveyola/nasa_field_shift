@@ -175,13 +175,14 @@ class AgentService:
                 raise AgentContractError(f"fact {fact.id!r} is not from the field context or a verified tool result")
         results = {r.result_id: r for r in evidence.comparisons}
 
-        # Farmer-sourced constraints must quote text the farmer actually wrote.
-        farmer_text = [request.message.text or ""] + [h.text for h in request.history if h.role == "user"]
+        # Farmer-sourced constraints must quote what the farmer wrote in this turn. History is client-supplied (the
+        # host signs what the browser sent), so it is never accepted as the farmer's words.
+        farmer_text = request.message.text or ""
         proposed = list(message.constraints_proposed)
         for envelope in message.ui_actions:
             proposed += getattr(envelope.action, "constraints", [])
         for c in proposed:
-            if c.source == "farmer_text" and not any(c.evidence and c.evidence in t for t in farmer_text):
+            if c.source == "farmer_text" and not (c.evidence and c.evidence in farmer_text):
                 raise AgentContractError(f"constraint {c.id!r} evidence is not in the farmer's text")
 
         actions = []

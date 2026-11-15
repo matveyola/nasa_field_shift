@@ -48,9 +48,12 @@ UtcDatetime = Annotated[AwareDatetime, AfterValidator(_require_utc)]
 
 # UCUM codes. ponytail: an allowlist, not a UCUM parser. Add a code here when a
 # new unit is needed; "Cel.d" (degree-days) is a common extension.
+# Money (UCUM has none): ISO 4217 codes, alone or per hectare; only the two currencies the farm-budget calculator
+# accepts, never converted into each other (added 2026-11-14).
 Unit = Literal[
     "1", "%", "[pH]", "mm", "mm/d", "m3/m3", "Cel", "Cel.d", "d", "m", "cm",
     "ha", "deg", "kg/ha", "t/ha", "g/kg", "cmol/kg", "MJ/m2/d", "m/s",
+    "UAH", "USD", "UAH/ha", "USD/ha",
 ]
 
 
@@ -158,6 +161,7 @@ class Provenance(Model):
 
 
 Domain = Literal["soil", "water", "climate", "vegetation", "terrain", "farm", "rotation"]
+CALC_FACT_PREFIX = "calc."  # facts of the agent's calculate_farm_budget tool; never in a FieldContext
 
 
 class Fact(Model):
@@ -398,6 +402,9 @@ class FieldContext(Model):
     @model_validator(mode="after")
     def _references(self):
         _require_unique("fact", [f.id for f in self.facts])
+        # "calc." ids are the agent's own farm-budget arithmetic of one turn: a context fact must not pose as one.
+        if reserved := sorted(f.id for f in self.facts if f.id.startswith(CALC_FACT_PREFIX)):
+            raise ValueError(f"fact ids starting with '{CALC_FACT_PREFIX}' are reserved for the agent: {reserved}")
         _require_unique("metric", [t.metric_id for t in self.timeseries_index])
         _require_unique("layer", [layer.layer_id for layer in self.available_layers])
         _require_unique("chart", [c.chart_id for c in self.available_charts])
@@ -750,6 +757,7 @@ class ErrorEnvelope(Model):
 ToolName = Literal[
     "get_field_facts", "get_timeseries", "compare_rotations", "search_knowledge",
     "propose_constraints", "propose_ui_actions", "present_blocks", "get_weather_forecast", "get_season_weather", "check_sowing_soil", "analyze_soil_photo",
+    "calculate_farm_budget",
 ]
 
 

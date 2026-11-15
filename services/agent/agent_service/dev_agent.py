@@ -39,7 +39,7 @@ from contracts.models import (
 
 from .agent import AgentOutput
 from .attestation import UNTRUSTED, RequestTrust
-from . import plain
+from . import constraint_evidence, plain, scope
 from .grounding import format_quantity as _quantity
 from .grounding import paragraph_chunks as _chunks
 from .prompts import response_language as _language
@@ -52,7 +52,7 @@ _I = re.IGNORECASE
 # --------------------------------------------------------------- intent rules
 
 NO_IRRIGATION = re.compile(
-    r"(?:немає|нема|відсутн\w*)\s+поливу|поливу\s+(?:немає|нема)|без\s+поливу"
+    r"(?:немає|нема|відсутн\w*)\s+поливу|поливу\s+(?:немає|нема)|без\s+поливу|не\s+(?:маю|маємо|має|мають)\s+полив\w*"
     r"|no\s+irrigation|without\s+irrigation|not\s+irrigated|(?:don't|do\s+not)\s+(?:have\s+)?irrigat\w*",
     _I,
 )
@@ -123,6 +123,7 @@ TEXT = {
         "cached": "збережено раніше",
         "unverified": "**дані від застосунку, сервіс даних їх не підтвердив**",
         "satellite_product": "{product}",
+        "weather_data": "{product}",
         "ml_estimate": "комп’ютерна оцінка, не прямий вимір",
         "ml_short": "оцінка, не вимір",
         "ml_unvalidated": "точність ще не перевірена",
@@ -163,6 +164,7 @@ TEXT = {
         "cached": "saved earlier",
         "unverified": "**from the app, not confirmed by the data service**",
         "satellite_product": "{product}",
+        "weather_data": "{product}",
         "ml_estimate": "computer estimate, not a direct measurement",
         "ml_short": "estimate, not a measurement",
         "ml_unvalidated": "accuracy not checked yet",
@@ -191,7 +193,7 @@ def _origin(p: Provenance, lang: str) -> str:
         parts.append(t["ml_validated"].format(n=v.n) if v else t["ml_unvalidated"])
     elif p.kind == "deterministic_calc":
         parts = [t["deterministic_calc"]]
-    elif p.kind in ("satellite_product", "reference"):
+    elif p.kind in ("satellite_product", "reference", "weather_data"):
         parts = [t[p.kind].format(product=product)]
     else:
         parts = [t.get(p.kind, p.kind)]
@@ -258,6 +260,7 @@ class Reply:
 
 
 def _extract_constraints(text: str) -> list[Constraint]:
+    """The farmer's explicit statements, kept only when their words carry the meaning (constraint_evidence)."""
     found: list[Constraint] = []
     if m := NO_IRRIGATION.search(text) or HAS_IRRIGATION.search(text):
         found.append(IrrigationConstraint(
@@ -270,7 +273,9 @@ def _extract_constraints(text: str) -> list[Constraint]:
             value="minimize_n" if m.re is REDUCE_NITROGEN else "low",
             status="proposed", source="farmer_text", evidence=m.group(0),
         ))
-    return found
+    crops = constraint_evidence.crop_catalogue()
+    return [c for c in found if not constraint_evidence.problem(c.type, c.value, c.evidence or "", text, explicit=True,
+                                                                known_crops=crops)]
 
 
 def _constraints(reply: Reply, ctx: FieldContext, text: str) -> None:
@@ -388,7 +393,12 @@ def compose(request: AgentRequest, context_attested: bool = False) -> Reply:
     if topics and not wants_map:
         _topic_facts(reply, ctx, topics)
     if len(reply.paragraphs) == before and text:
-        _summary(reply, ctx)
+        # No rule matched. A question about the field gets its summary; anything else gets what this demo can do
+        # (it cannot tell a farming question from an unrelated one, so it never calls anything off-topic).
+        if scope.asks_about_the_field(text):
+            _summary(reply, ctx)
+        else:
+            reply.paragraphs.append(scope.DEMO_LIMITS[reply.lang])
 
     if any(f.provenance.data_status == "fixture" for f in reply.facts.values()):
         reply.warn("fixture_data", "Values relayed from the field context are synthetic fixtures.")

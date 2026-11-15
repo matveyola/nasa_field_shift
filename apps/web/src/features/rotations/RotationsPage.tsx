@@ -10,6 +10,7 @@ import { cropInput, useLocale } from '../../shared/locale'
 import { useJob, useStartJob } from '../../shared/jobs'
 import { JobStatus } from '../../shared/JobStatus'
 import { Empty, ErrorBox, Loading, PageHeading, ScenarioSelect } from '../../shared/ui'
+import { PlanningPreferences } from '../assistant/PlanningPreferences'
 import { errorText, useResource } from '../../shared/useResource'
 import { RotationYieldPanel } from './RotationYieldPanel'
 import { RotationComparison } from './RotationComparison'
@@ -135,6 +136,7 @@ export function RotationsPage({ field, fields, context: { field_id, season, scen
         {fieldSetup.data?.demo_plan && <OnboardingPlan setup={fieldSetup.data} />}
         {!fieldSetup.pending && <RotationTools fold={Boolean(fieldSetup.data?.demo_plan)}>
         <FarmRotationPlanner fieldId={field_id} season={season} onApplied={rotations.reload} />
+        <PlanningPreferences key={field_id + ':' + season + ':' + field.boundary_revision} fieldId={field_id} season={season} boundaryRevision={field.boundary_revision} />
         {create.error && <ErrorBox message={create.error} />}
         {jobId && <JobStatus job={current.job} error={current.error} />}
         {rotations.pending && <Loading text={t('Loading rotation plans…')} />}

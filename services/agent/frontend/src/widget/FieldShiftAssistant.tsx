@@ -1,5 +1,6 @@
 import { type CSSProperties, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import type { CropOption } from "./actions/editing";
 import type { HostCapabilities } from "./actions/policy";
 import type { Citation, FieldContext } from "./contracts";
 import { dictionaries, fmt, type Locale } from "./i18n/strings";
@@ -20,6 +21,8 @@ export const WIDGET_VERSION = "fieldshift-widget/0.4.0";
  * `{ "--fsa-accent": "#3fb08a", "--fsa-on-accent": "#03140d" }`.
  */
 export type ThemeOverrides = Partial<Record<`--fsa-${string}`, string>>;
+
+const NO_CROPS: readonly CropOption[] = [];
 
 export interface FieldShiftAssistantProps {
   /** How to reach the agent service. Use a same-origin path behind your backend; never embed a server secret. */
@@ -42,6 +45,12 @@ export interface FieldShiftAssistantProps {
   theme?: ThemeOverrides;
   /** Hosts allowed in "View original source" links (https only). Default: FAO. */
   trustedSourceHosts?: readonly string[];
+  /**
+   * The crops this host app plans with (contract crop ids and their names in the current locale). Farmers can edit a
+   * crop in a proposed condition only to one of these; without a list, crop proposals can be confirmed or rejected
+   * as proposed but not edited. Other condition types can always be edited.
+   */
+  planningCrops?: readonly CropOption[];
   /** Show FieldContext.revision in the context bar (debugging). */
   showRevision?: boolean;
   /** Where to mount; default document.body, so map containers with transforms cannot clip it. */
@@ -161,10 +170,11 @@ export function FieldShiftAssistant(props: FieldShiftAssistantProps) {
       ctx: fieldContext,
       caps: capabilities,
       trustedSourceHosts: props.trustedSourceHosts ?? DEFAULT_TRUSTED_SOURCE_HOSTS,
+      crops: props.planningCrops ?? NO_CROPS,
       assistant,
       openCitation,
     }),
-    [d, locale, name, fieldContext, capabilities, props.trustedSourceHosts, assistant, openCitation],
+    [d, locale, name, fieldContext, capabilities, props.trustedSourceHosts, props.planningCrops, assistant, openCitation],
   );
 
   const side = placement?.side ?? "right";

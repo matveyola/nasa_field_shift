@@ -20,7 +20,9 @@ async def test_eval_case(case):
 def test_case_ids_unique_and_categories_covered():
     ids = [c.id for c in CASES]
     assert len(ids) == len(set(ids))
-    assert {c.category for c in CASES} == {"tool_selection", "constraints", "data_reliability", "security", "provider", "knowledge", "integration"}
+    # "domain" (Task 03, 2026-11-14): farming scope, unrelated requests, follow-ups (evals/domain_cases.py).
+    assert {c.category for c in CASES} == {"tool_selection", "constraints", "data_reliability", "security", "provider",
+                                           "knowledge", "integration", "domain"}
     live = [c.id for c in CASES if c.live]
     assert {"ts_general_question", "ts_constraints_uk", "ts_map_layer", "dr_missing_fact"} <= set(live)
 

@@ -3,6 +3,7 @@ import { lazy, Suspense, useCallback, useEffect, useState } from 'react'
 import { api } from '../api/client'
 import { scenarioOrDefault, type Field, type Scenario } from '../api/contracts'
 import { Assistant } from '../features/assistant/Assistant'
+import { currentAssistantRun, type AssistantRun } from '../features/assistant/assistantRun'
 import { FarmPage } from '../features/farm/FarmPage'
 import { FieldsPage } from '../features/fields/FieldsPage'
 import { RotationsPage } from '../features/rotations/RotationsPage'
@@ -42,6 +43,13 @@ export function App() {
   const home: Route = { page: pages[0], home: true, fieldId: field?.id, scenario: selectedScenario }
   // «Польовий помічник» opens over any page; an /agent address (old links, bookmarks) opens it over Fields.
   const [assistantOpen, setAssistantOpen] = useState(() => route.page === 'agent')
+  // The saved run the farmer asked the assistant about (Water → «Ask agent»). It ends when the field,
+  // season, scenario or Water's selected run changes; the assistant never picks a run on its own.
+  const [assistantRun, setAssistantRun] = useState<AssistantRun>()
+  const assistantRunId = currentAssistantRun(assistantRun, {
+    fieldId: missingField ? undefined : field?.id, season: farm?.season, scenario, page: route.page, jobId: route.jobId,
+  })
+  if (assistantRun && !assistantRunId) setAssistantRun(undefined)
   useEffect(() => {
     if (!requestedField) return
     setLastField(requestedField.id)
@@ -85,6 +93,8 @@ export function App() {
   function go(page: Page, options?: { fieldId?: string; jobId?: string | null; scenario?: Scenario; addField?: boolean; forecastDay?: string; analysis?: boolean; layer?: Route['layer']; signal?: Route['signal'] }) {
     if (page === 'agent') { // the assistant opens over the current page, for the field asked about
       if (options?.fieldId && options.fieldId !== field?.id) setAddress({ page: route.page, fieldId: options.fieldId, scenario })
+      const runField = options?.fieldId ?? field?.id
+      setAssistantRun(options?.jobId && runField && farm ? { id: options.jobId, fieldId: runField, season: farm.season, scenario } : undefined)
       setAssistantOpen(true)
       return
     }
@@ -240,8 +250,9 @@ export function App() {
       : go('fields', { fieldId: item.fieldId, analysis: true, layer: 'ndvi_variability' })}>
     <Shell route={route} homeAddress={routeAddress(home)} farmName={farm?.name} navigate={go}
       navigateHome={goHome} assistantOpen={assistantOpen} openAssistant={() => setAssistantOpen(true)}>{content}</Shell>
-    {farm && !route.setupId && <Assistant field={missingField ? undefined : field} season={farm.season} scenario={scenario}
+    {farm && !route.setupId && <Assistant field={missingField ? undefined : field} season={farm.season} scenario={scenario} runId={assistantRunId}
       open={assistantOpen} onOpenChange={changeAssistantOpen}
+      openRun={(jobId) => go('water', { jobId })} clearRun={() => setAssistantRun(undefined)}
       openScreen={(screen) => go(screen)}
       openVegetation={(ndvi) => go('fields', { analysis: true, layer: ndvi ? 'ndvi_variability' : undefined })}
       openForecast={(day) => { if (field) openFieldForecast(field.id, day) }} />}

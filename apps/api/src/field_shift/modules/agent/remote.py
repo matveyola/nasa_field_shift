@@ -1,17 +1,13 @@
 """Signed, bounded transport for the private Field Shift agent runtime."""
 
-import base64
-import hashlib
-import hmac
 import json
 import re
-import secrets
 from collections import deque
 from collections.abc import Iterator
 from datetime import UTC, datetime
 from http.client import HTTPException as HttpTransportError
 from threading import Lock
-from time import monotonic, time
+from time import monotonic
 from typing import Annotated, Literal, cast
 from urllib.error import HTTPError
 from urllib.parse import urlsplit
@@ -28,6 +24,7 @@ from field_shift.modules.agent.schemas import (
     AgentProviderName,
     AgentStatus,
 )
+from field_shift.modules.agent.signing import LOCAL_PRINCIPAL, assistant_body, attestation
 
 MAX_REQUEST_BYTES = 256 * 1024
 MAX_REPLY_BYTES = 1024 * 1024
@@ -52,35 +49,9 @@ class RemoteAgentError(Exception):
         super().__init__(message)
 
 
-# The widget's AgentRequest keys the API forwards.
-# The field context is always rebuilt on the server.
-ASSISTANT_KEYS = ("request_id", "session_id", "locale", "message", "history", "client")
-
-
 class _NoRedirect(HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         return None
-
-
-def _b64(data: bytes) -> str:
-    return base64.urlsafe_b64encode(data).rstrip(b"=").decode("ascii")
-
-
-def _attestation(key: bytes, *, field_id: str, revision: int, body: bytes) -> str:
-    issued = int(time())
-    payload = {
-        "v": 1,
-        "principal": "field-shift-local-farm",
-        "field_id": field_id,
-        "field_context_revision": revision,
-        "body_sha256": hashlib.sha256(body).hexdigest(),
-        "iat": issued,
-        "exp": issued + 120,
-        "jti": secrets.token_urlsafe(12),
-    }
-    encoded = _b64(json.dumps(payload, separators=(",", ":"), sort_keys=True).encode())
-    signature = hmac.digest(key, f"v1.{encoded}".encode(), "sha256")
-    return f"v1.{encoded}.{_b64(signature)}"
 
 
 ShortText = Annotated[str, StringConstraints(min_length=1, max_length=500)]
@@ -322,13 +293,15 @@ class RemoteAgentProvider:
             },
         }
 
-    def stream(self, payload: dict, field_context: dict) -> Iterator[bytes]:
-        """One widget turn: the server-built field context replaces the browser's, the body is
-        signed, and the agent's SSE frames pass back unchanged (the widget checks every frame)."""
+    def stream(
+        self, payload: dict, field_context: dict, principal: str = LOCAL_PRINCIPAL
+    ) -> Iterator[bytes]:
+        """One widget turn: the server-built field context replaces the browser's, capabilities
+        are limited to this host's, the body is signed for the authenticated caller, and the
+        agent's SSE frames pass back unchanged (the widget checks every frame)."""
         if not self._configured:
             raise RemoteAgentError(503, "The assistant is not configured.")
-        body = {key: payload[key] for key in ASSISTANT_KEYS if key in payload}
-        body["field_context"] = field_context
+        body = assistant_body(payload, field_context)
         session_id = body.get("session_id")
         if not isinstance(session_id, str) or not session_id:
             raise RemoteAgentError(422, "The request has no session.")
@@ -346,8 +319,9 @@ class RemoteAgentProvider:
                 "Authorization": f"Bearer {self._api_key}",
                 "Content-Type": "application/json",
                 "Accept": "text/event-stream",
-                "X-FieldShift-Context-Attestation": _attestation(
+                "X-FieldShift-Context-Attestation": attestation(
                     self._signing_key,
+                    principal=principal,
                     field_id=field_context["field_id"],
                     revision=field_context["revision"],
                     body=encoded,
@@ -465,8 +439,9 @@ class RemoteAgentProvider:
             raise RemoteAgentError(
                 413, "The selected field context is too large for the assistant."
             )
-        signature = _attestation(
+        signature = attestation(
             self._signing_key,
+            principal=context.principal,
             field_id=context.field.id,
             revision=field_context["revision"],
             body=body,

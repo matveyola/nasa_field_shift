@@ -393,3 +393,15 @@ CASES += KNOWLEDGE_CASES
 from .integration_cases import INTEGRATION_CASES  # noqa: E402
 
 CASES += INTEGRATION_CASES
+
+from .domain_cases import DOMAIN_CASES  # noqa: E402
+
+CASES += DOMAIN_CASES
+
+from .constraint_cases import CONSTRAINT_CASES  # noqa: E402  (Task 05C, 2026-11-14)
+
+CASES += CONSTRAINT_CASES
+
+from .strategy_cases import STRATEGY_CASES  # noqa: E402  (Task 06A-1, 2026-11-15)
+
+CASES += STRATEGY_CASES

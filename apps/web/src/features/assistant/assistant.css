@@ -1,0 +1,29 @@
+/* A selected saved run the API refused (missing, unfinished, stale): shown above the assistant (z 1000). */
+.assistant-run-error {
+  position: fixed; z-index: 1001; top: 16px; left: 50%; transform: translateX(-50%);
+  width: min(560px, calc(100vw - 32px)); display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 12px 16px; border-radius: 12px; background: var(--danger-soft); color: var(--danger);
+  box-shadow: var(--shadow-float);
+}
+.assistant-run-error > span { flex: 1 1 240px; min-width: 0; overflow-wrap: anywhere; }
+/* A decision that would replace an earlier planning decision: shown, and confirmed or cancelled, before saving. */
+.assistant-notice {
+  position: fixed; z-index: 1001; top: 16px; left: 50%; transform: translateX(-50%);
+  width: min(560px, calc(100vw - 32px)); display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 12px 16px; border-radius: 12px; background: var(--card); color: var(--ink);
+  box-shadow: var(--shadow-float);
+}
+.assistant-notice > strong { flex-basis: 100%; }
+.assistant-notice > ul { flex-basis: 100%; margin: 0; padding-left: 18px; overflow-wrap: anywhere; }
+.assistant-notice-actions { flex-basis: 100%; display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+
+/* The farmer's decisions about assistant-proposed planning conditions (Rotations page). */
+.planning-preferences-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.planning-preferences-list li {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  padding: 10px 0; border-top: 1px solid var(--line, rgba(0, 0, 0, .08));
+}
+.planning-preferences-list li > div { min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.planning-preferences-list p { flex-basis: 100%; margin: 0; color: var(--ink-2); font-size: .88rem; overflow-wrap: anywhere; }
+/* A rejected condition reads as a decision not to plan with it: struck through, unlike a confirmed one. */
+.planning-preference--rejected strong { text-decoration: line-through; text-decoration-color: var(--ink-2); }
