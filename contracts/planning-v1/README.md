@@ -135,7 +135,7 @@ and dated equipment capacity are explicit constraints. Conflicting valid inputs
 are accepted as a request and must produce an infeasibility explanation, not be
 silently relaxed or altered by an agent.
 
-Structural bounds: 1–30 fields, one or three planning seasons, 1–64 weather
+Structural bounds: 1–30 fields, one to three planning seasons, 1–64 weather
 trajectories, up to 2192 daily records per trace, 1–3 alternatives. Solver limits
 are 1–1,000,000 nodes, 1–300 seconds, at most 1000 candidates per field. These are
 contract ceilings, not performance promises. C/#7 must enforce stricter measured
@@ -276,3 +276,34 @@ an authorization or scientific validation boundary.
 Do not change schemas or cases merely to pass a lane's tests. An agreed change
 updates canonical definitions, generated files, examples, compatibility notes
 and version together, then publishes a new shared commit before dependent work.
+
+### Two-season request compatibility
+
+Planning-v1 now also accepts `season_count: 2`. Existing one- and three-season
+payloads and their stored values are unchanged; the wire version remains 1.0.0.
+This expands request capacity, not model applicability: source coverage, reviewed
+calendars, crop support and model resource limits still govern every evaluation.
+No four-or-more-season model support is implied.
+
+### Explicit land provenance (compatible optional extension)
+
+`FieldProfileSnapshot.land_source_ids` optionally names the existing source records
+that support `land_status`. It defaults to an empty list for legacy profiles;
+references must resolve and be unique. No source is automatically assigned from
+soil/weather/history provenance or inferred from provider/product text. Empty
+bindings are omitted when serializing so pre-extension canonical snapshot and
+profile-write request hashes stay unchanged. Nonempty bindings serialize and
+participate in those identities. The schema version remains 1.0.0 because this is
+an optional, backward-parseable addition; older consumers that reject unknown
+properties must be updated before consuming newly bound profiles.
+
+The rotation handoff gate requires at least one explicitly linked, nonsynthetic
+source with `quality=valid`, `coverage_fraction=1`, and polygon or area-weighted
+spatial coverage. Partial/missing/zero/unknown coverage and point-only evidence do
+not establish whole-field arability. Current geometry, farm scope and source
+availability checks still apply; legacy unbound land assertions remain unknown in
+that gate. Qualified non-arable/ice/ocean assertions still block submission. This
+is an evidence link and quality policy, not independent verification of source
+contents or crop suitability. In particular, `kind=user_entered` remains a
+user-reported assertion; an authenticated import does not make it an observed,
+validated field measurement. No yield/thermal/model release gate is promoted.

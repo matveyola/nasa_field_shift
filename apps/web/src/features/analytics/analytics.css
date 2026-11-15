@@ -1,0 +1,124 @@
+.analytics-page { max-width: 1320px; margin-inline: auto; padding: 28px 36px 48px; }
+.analytics-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 24px; }
+.analytics-heading > div { flex: 1 1 260px; }
+.analytics-heading > .button { flex-shrink: 0; max-width: 100%; overflow-wrap: normal; }
+.analytics-heading h1 { margin: 6px 0 12px; }
+.analytics-heading p, .analytics-meta { color: var(--ink-2); font-size: .88rem; }
+.analytics-eyebrow { color: var(--ink-2); font-size: .72rem; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; }
+.analytics-context { display: flex; gap: 12px; flex-wrap: wrap; margin: 24px 0 18px; }
+.analytics-context .control { flex: 1 1 150px; max-width: 300px; min-width: 0; }
+.analytics-context select { width: 100%; min-height: 44px; max-width: 100%; }
+.analytics-sections { display: flex; flex-wrap: nowrap; min-width: 0; max-width: 100%; overflow-x: auto; padding: 5px; gap: 4px; background: var(--sunken); border-radius: 16px; margin-bottom: 18px; scroll-padding-inline: 6px; }
+.analytics-sections button { flex: 1 0 auto; min-height: 44px; border: 0; border-radius: 13px; padding: 10px 18px; background: transparent; color: var(--ink-2); font-size: .9rem; }
+.analytics-sections button[aria-current] { background: var(--ink); color: white; box-shadow: var(--shadow-btn); }
+.analytics-content { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+.analytics-content > .button { align-self: flex-start; }
+.analytics-intro { display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 12px 32px; padding: 12px 0 8px; }
+.analytics-intro > :not(button) { grid-column: 1; }
+.analytics-intro .button { grid-column: 2; grid-row: 2 / 4; align-self: center; }
+.analytics-intro h2 { font-size: clamp(1.5rem, 3vw, 2.15rem); }
+.analytics-intro p { color: var(--ink-2); max-width: 650px; }
+.analytics-priorities { list-style: none; margin: 0; padding: 0 26px; border-radius: var(--r-card); background: var(--card); box-shadow: var(--shadow-card); }
+.analytics-priorities li { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; align-items: center; gap: 24px; padding: 25px 0; }
+.analytics-priorities li + li { border-top: 1px solid var(--line); }
+.analytics-priority-number { color: var(--ink-3); font-size: .88rem; font-variant-numeric: tabular-nums; }
+.analytics-priorities h3 { font-size: 1rem; line-height: 1.5; margin-top: 5px; }
+.analytics-evidence-index { display: grid; grid-template-columns: 1fr 2fr; gap: 12px 28px; padding: 24px 0; border-top: 1px solid var(--line-strong); }
+.analytics-evidence-index h2 { font-size: 1.05rem; }
+.analytics-evidence-index dl > div { display: flex; justify-content: space-between; gap: 24px; padding: 8px 0; }
+.analytics-evidence-index dt { color: var(--ink-2); }
+.analytics-evidence-index dd { margin: 0; text-align: right; }
+.analytics-evidence-index > .button { justify-self: start; }
+.analytics-disclosure { border: 1px solid var(--line-strong); border-radius: var(--r-card); background: var(--card); overflow: hidden; }
+.analytics-disclosure > summary { padding: 20px 24px; font-weight: 600; cursor: pointer; min-height: 48px; }
+.analytics-details-body { padding: 0 24px 24px; display: flex; flex-direction: column; gap: 18px; }
+.analytics-details-body > p { color: var(--ink-2); }
+.analytics-source-list { padding: 0; list-style: none; }
+.analytics-source-list li { padding: 20px 0; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
+.analytics-source-list small { color: var(--ink-2); }
+.analytics-facts { display: flex; flex-wrap: wrap; gap: 20px 36px; margin: 16px 0; }
+.analytics-facts dt { color: var(--ink-2); font-size: .78rem; }
+.analytics-facts dd { margin: 5px 0 0; font-size: 1rem; font-variant-numeric: tabular-nums; }
+.analytics-empty, .analytics-caution { background: var(--sunken); border-radius: var(--r-md); padding: 16px 20px; color: var(--ink-2); line-height: 1.6; }
+.analytics-vegetation-lead { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 32px; align-items: center; }
+.analytics-vegetation-lead h2 { margin: 8px 0 14px; }
+.analytics-vegetation-lead p { margin-bottom: 14px; max-width: 760px; }
+.analytics-ndvi-figure { display: flex; flex-direction: column; padding: 24px 32px; border-left: 1px solid var(--line-strong); }
+.analytics-ndvi-figure strong { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 500; letter-spacing: -.05em; line-height: 1.2; }
+.analytics-ndvi-figure span { font-size: .75rem; color: var(--ink-2); }
+.analytics-content > .field-analysis-panel { width: 100%; padding: 24px; background: white; border-radius: var(--r-card); }
+.analytics-content .field-analysis-panel > section { max-width: none; }
+.analytics-content .field-analysis-panel .field-analysis-heading { margin-top: 0; }
+.analytics-spectral-details > summary { padding-block: 15px; cursor: pointer; font-weight: 600; }
+.analytics-history { padding: 28px; background: white; border-radius: var(--r-card); }
+.analytics-history > p { margin-top: 14px; color: var(--ink-2); }
+.analytics-history-timeline { list-style: none; padding: 0; margin: 26px 0 0; }
+.analytics-history-timeline li { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 24px; padding-bottom: 26px; }
+.analytics-history-timeline li > div { border-left: 2px solid var(--line-strong); padding-left: 24px; }
+.analytics-history-year { font-size: 1.2rem; font-variant-numeric: tabular-nums; }
+.analytics-history-timeline p, .analytics-history-timeline small { color: var(--ink-2); }
+.analytics-history-timeline details { font-size: .8rem; margin-top: 8px; overflow-wrap: anywhere; }
+.analytics-soil-profile h2 { margin-bottom: 14px; }
+.analytics-soil-profile > p { margin-bottom: 12px; max-width: 800px; }
+.analytics-horizons { margin-top: 28px; display: flex; flex-direction: column; gap: 12px; }
+.analytics-horizon { display: grid; grid-template-columns: 110px minmax(0, 1fr); border-radius: var(--r-card); background: white; overflow: hidden; }
+.analytics-depth { background: var(--sunken-2); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px; font-variant-numeric: tabular-nums; }
+.analytics-depth strong { font-size: 1.3rem; }
+.analytics-depth span { color: var(--ink-2); font-size: .8rem; }
+.analytics-horizon > div:last-child { padding: 24px; }
+.analytics-horizon header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.analytics-horizon details { padding-top: 8px; }
+.analytics-horizon summary { cursor: pointer; }
+.analytics-terrain-lead { display: flex; align-items: center; gap: 24px; border-top: 1px solid var(--line-strong); padding-top: 28px; }
+.analytics-terrain-lead > div { flex: 1; }
+.analytics-terrain-lead p { margin-top: 12px; color: var(--ink-2); }
+.analytics-water .water-workspace-controls { justify-content: flex-start; }
+.analytics-water .water-view-toggle { margin: 0; }
+.analytics-rotations .rotations-workspace { margin: 0; padding: 0; box-shadow: none; }
+.analytics-rotations .rotation-plan-options { grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); }
+.analytics-page :is(.water-workspace, .water-view-content, .rotations-workspace, .field-analysis-panel, .rotation-yield-section) { min-width: 0; max-width: 100%; }
+.analytics-page .water-simulation-form { box-shadow: none; background: var(--sunken); }
+@media (max-width: 700px) {
+  .analytics-page { padding: 22px 16px 32px; }
+  .analytics-heading { align-items: start; gap: 12px; }
+  .analytics-heading > .button { max-width: 145px; font-size: .8rem; }
+  .analytics-context { gap: 10px; }
+  .analytics-context .control { flex-basis: 120px; }
+  .analytics-context .control:first-child { flex-basis: 100%; max-width: none; }
+  .analytics-sections button { padding: 10px 16px; font-size: .88rem; }
+  .analytics-context { margin-block: 16px 12px; }
+  .analytics-intro { display: flex; flex-direction: column; align-items: start; }
+  .analytics-intro .button { align-self: flex-start; }
+  .analytics-priorities { padding: 0 18px; }
+  .analytics-priorities li { grid-template-columns: 24px minmax(0, 1fr); gap: 10px 14px; padding-block: 20px; }
+  .analytics-priorities li > .button { grid-column: 2; justify-self: start; padding-left: 0; }
+  .analytics-evidence-index { display: flex; flex-direction: column; }
+  .analytics-evidence-index dl > div { flex-direction: column; gap: 4px; }
+  .analytics-evidence-index dd { text-align: left; }
+  .analytics-vegetation-lead { display: flex; flex-direction: column; align-items: stretch; gap: 16px; }
+  .analytics-ndvi-figure { padding: 8px 0; border: 0; flex-direction: row; gap: 18px; align-items: center; }
+  .analytics-history, .analytics-content > .field-analysis-panel { padding: 20px 16px; }
+  .analytics-history-timeline li { grid-template-columns: 52px minmax(0, 1fr); gap: 14px; }
+  .analytics-history-timeline li > div { padding-left: 16px; }
+  .analytics-disclosure > summary { padding: 18px 16px; }
+  .analytics-details-body { padding: 0 16px 20px; }
+  .analytics-horizon { grid-template-columns: 70px minmax(0, 1fr); }
+  .analytics-depth { padding: 10px; }
+  .analytics-depth strong { font-size: 1rem; }
+  .analytics-horizon > div:last-child { padding: 18px 14px; }
+  .analytics-terrain-lead { flex-direction: column; align-items: start; }
+}
+
+/* Containment belongs to the evidence component, including long field/source names. */
+.analytics-page { min-width: 0; overflow-wrap: anywhere; }
+.analytics-heading > div { min-width: 0; }
+.analytics-sections button { white-space: nowrap; }
+.analytics-sections button:focus-visible { outline: 2px solid var(--ink); outline-offset: -3px; }
+@media (max-width: 700px) {
+  /* Keep the selected year and scenario legible rather than squeezing their
+     values beside two inline labels inside half-width pills. */
+  .analytics-context .control:not(:first-child) { flex-direction: column; align-items: stretch; gap: 2px; }
+  .analytics-context .control:nth-child(2) { flex: 0 0 110px; }
+  .analytics-context .control:last-child { flex: 1 1 140px; max-width: none; }
+  .analytics-context select { overflow-wrap: normal; }
+}

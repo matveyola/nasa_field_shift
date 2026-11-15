@@ -19,6 +19,17 @@ def synthetic_inputs(crop="Maize", years=1, dry=False):
         .read_text()
     )
     p, c, w = (copy.deepcopy(example[k]) for k in ("field_profile", "candidate", "weather"))
+    land = copy.deepcopy(p["sources"][0])
+    land.update(
+        id="synthetic-land",
+        product="controlled synthetic land assumption",
+        kind="synthetic",
+        spatial_method="polygon",
+        coverage_fraction=1.0,
+        quality="valid",
+    )
+    p["sources"].append(land)
+    p["land_source_ids"] = [land["id"]]
     instant = "2027-04-01T00:00:00Z"
     p["as_of"] = instant
     p["soil"][0].update(bottom_cm=240.0, salinity_ds_m=0.0, quality="valid")

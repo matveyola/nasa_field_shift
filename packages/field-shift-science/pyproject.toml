@@ -12,6 +12,7 @@ dependencies = ["pydantic>=2.10,<3", "redis>=5,<9"]
 where = ["src"]
 
 [tool.setuptools.package-data]
+"field_shift_science.crops" = ["assets/referencecropcalendar*"]
 "field_shift_science.geo_ml" = ["artifacts/*.json"]
 "field_shift_science.simulation" = ["artifacts/*.json"]
 "field_shift_science.rotations" = ["artifacts/*.json"]

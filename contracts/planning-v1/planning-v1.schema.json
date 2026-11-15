@@ -963,6 +963,7 @@
         "season_count": {
           "enum": [
             1,
+            2,
             3
           ],
           "type": "integer"
@@ -1173,6 +1174,14 @@
             "unknown"
           ],
           "type": "string"
+        },
+        "land_source_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "maxItems": 200,
+          "type": "array"
         },
         "history": {
           "items": {

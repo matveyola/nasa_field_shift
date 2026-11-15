@@ -19,14 +19,29 @@ assert.ok(contract(JSON.parse(JSON.stringify(example))), JSON.stringify(contract
 assert.ok(cases(read('cases.v1.json')), JSON.stringify(cases.errors));
 assert.ok(empirical(read('empirical-sites.v1.json')), JSON.stringify(empirical.errors));
 
+for (const season_count of [1, 2, 3]) {
+  const bounded = structuredClone(example);
+  bounded.request.season_count = season_count;
+  assert.ok(contract(bounded), JSON.stringify(contract.errors));
+}
+
+const linkedLand = structuredClone(example);
+linkedLand.field_profile.land_source_ids = [linkedLand.field_profile.sources[0].id];
+assert.ok(contract(linkedLand), JSON.stringify(contract.errors));
+linkedLand.field_profile.land_source_ids = [];
+assert.ok(contract(linkedLand), JSON.stringify(contract.errors));
 // These structural mistakes must fail in a browser/Node consumer too.
 for (const mutate of [
   (v) => { v.field_profile.area_ha = '0.79'; },
+  (v) => { v.field_profile.land_source_ids = [42]; },
+  (v) => { v.field_profile.land_source_ids = null; },
+  (v) => { v.field_profile.land_source_ids = Array(201).fill('source'); },
   (v) => { v.field_profile.geometry.coordinates[0][0][1] = 91; },
   (v) => { v.weather.scenarios[0].traces[0].days[0].liquid_rain_mm = -1; },
   (v) => { v.observation.available_at = 'not-a-date'; },
   (v) => { v.apply_request.confirmed_by_human = false; },
   (v) => { v.request.extra_unreviewed_constraint = true; },
+  (v) => { v.request.season_count = 4; },
   (v) => { v.evaluation.model.artifact_sha256 = 'not-a-checksum'; },
 ]) {
   const invalid = structuredClone(example);
@@ -35,5 +50,5 @@ for (const mutate of [
 }
 assert.equal(example.weather.scenarios[0].traces[0].days[0].liquid_rain_mm, 0);
 assert.equal(example.evaluation.seasons[0].yield_t_ha.value, null);
-console.log('Planning-v1: JSON roundtrip, 24 case shapes, empirical manifest and 7 invalid payloads checked.');
+console.log('Planning-v1: JSON roundtrip, 24 case shapes, empirical manifest three accepted horizons and 11 invalid payloads checked.');
 console.log('Cross-field semantic checks run in Python; no model accuracy is asserted.');

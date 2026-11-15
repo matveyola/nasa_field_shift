@@ -4,10 +4,11 @@ The JSON Schema is generated with `python -m contracts.export`, and the
 TypeScript types with `npm run gen:ts`. Field semantics: CONTRACTS.md.
 """
 
+import itertools
 import re
 from collections import Counter
 from datetime import date, datetime, timedelta
-from typing import Annotated, Any, Literal, TypeAliasType, Union
+from typing import Annotated, Any, Literal
 
 from pydantic import (
     AfterValidator,
@@ -48,9 +49,32 @@ UtcDatetime = Annotated[AwareDatetime, AfterValidator(_require_utc)]
 
 # UCUM codes. ponytail: an allowlist, not a UCUM parser. Add a code here when a
 # new unit is needed; "Cel.d" (degree-days) is a common extension.
+# Money (UCUM has none): ISO 4217 codes, alone or per hectare; only the two currencies the farm-budget calculator
+# accepts, never converted into each other (added 2026-11-14).
 Unit = Literal[
-    "1", "%", "[pH]", "mm", "mm/d", "m3/m3", "Cel", "Cel.d", "d", "m", "cm",
-    "ha", "deg", "kg/ha", "t/ha", "g/kg", "cmol/kg", "MJ/m2/d", "m/s",
+    "1",
+    "%",
+    "[pH]",
+    "mm",
+    "mm/d",
+    "m3/m3",
+    "Cel",
+    "Cel.d",
+    "d",
+    "m",
+    "cm",
+    "ha",
+    "deg",
+    "kg/ha",
+    "t/ha",
+    "g/kg",
+    "cmol/kg",
+    "MJ/m2/d",
+    "m/s",
+    "UAH",
+    "USD",
+    "UAH/ha",
+    "USD/ha",
 ]
 
 
@@ -93,21 +117,21 @@ class Quantity(Model):
 # ---------------------------------------------------------------- provenance
 
 ProvenanceKind = Literal[
-    "satellite_product",   # published EO / reanalysis product, as distributed
-    "ml_estimate",         # output of a Field Shift ML model
+    "satellite_product",  # published EO / reanalysis product, as distributed
+    "ml_estimate",  # output of a Field Shift ML model
     "deterministic_calc",  # formula applied to other values (e.g. FAO-56)
-    "reference",           # value taken from a document or table
-    "farmer_input",        # stated, clicked or photographed by the farmer
-    "llm_explanation",     # prose from the language model; never a number source
-    "weather_data",        # a weather forecast or weather archive (reanalysis) as distributed by its provider (added 2026-11-10)
+    "reference",  # value taken from a document or table
+    "farmer_input",  # stated, clicked or photographed by the farmer
+    "llm_explanation",  # prose from the language model; never a number source
+    "weather_data",  # a weather forecast or weather archive (reanalysis) as distributed by its provider (added 2026-11-10)
 ]
 DataStatus = Literal["live", "cached", "fixture", "unavailable"]
 
 
 class Source(Model):
-    provider: ShortText    # "NASA NSIDC DAAC", "ISRIC", "FAO"
+    provider: ShortText  # "NASA NSIDC DAAC", "ISRIC", "FAO"
     product_id: ShortText  # "SPL4SMGP", "GPM_3IMERGDF", "FAO-56"
-    version: ShortText     # "008"; "unverified" when not yet confirmed
+    version: ShortText  # "008"; "unverified" when not yet confirmed
     level: ShortText | None = None
     doi: ShortText | None = None
     url: HttpUrl | None = None
@@ -148,7 +172,10 @@ class Provenance(Model):
 
     @model_validator(mode="after")
     def _kind_requirements(self):
-        if self.kind in ("satellite_product", "reference", "weather_data") and self.source is None:
+        if (
+            self.kind in ("satellite_product", "reference", "weather_data")
+            and self.source is None
+        ):
             raise ValueError(f"provenance kind '{self.kind}' requires source")
         if self.kind == "ml_estimate" and self.model is None:
             raise ValueError("provenance kind 'ml_estimate' requires model")
@@ -157,7 +184,12 @@ class Provenance(Model):
         return self
 
 
-Domain = Literal["soil", "water", "climate", "vegetation", "terrain", "farm", "rotation"]
+Domain = Literal[
+    "soil", "water", "climate", "vegetation", "terrain", "farm", "rotation"
+]
+CALC_FACT_PREFIX = (
+    "calc."  # facts of the agent's calculate_farm_budget tool; never in a FieldContext
+)
 
 
 class Fact(Model):
@@ -166,7 +198,9 @@ class Fact(Model):
     label_key: I18nKey
     quantity: Quantity | None = None
     category: ShortText | None = None  # categorical value, e.g. hydrologic group "C"
-    depth_cm: tuple[Annotated[int, Field(ge=0)], Annotated[int, Field(gt=0)]] | None = None
+    depth_cm: tuple[Annotated[int, Field(ge=0)], Annotated[int, Field(gt=0)]] | None = (
+        None
+    )
     provenance: Provenance
 
     @model_validator(mode="after")
@@ -203,25 +237,36 @@ class Point(Model):
 
 class Polygon(Model):
     type: Literal["Polygon"]
-    coordinates: Annotated[list[Annotated[list[LonLat], Field(min_length=4)]], Field(min_length=1)]
+    coordinates: Annotated[
+        list[Annotated[list[LonLat], Field(min_length=4)]], Field(min_length=1)
+    ]
 
     @model_validator(mode="after")
     def _closed(self):
         for ring in self.coordinates:
             if ring[0] != ring[-1]:
-                raise ValueError("polygon rings must be closed (first == last position)")
+                raise ValueError(
+                    "polygon rings must be closed (first == last position)"
+                )
         return self
 
 
-Geometry = Annotated[Union[Point, Polygon], Field(discriminator="type")]
+Geometry = Annotated[Point | Polygon, Field(discriminator="type")]
 
 
 # ---------------------------------------------------------------- farmer constraints
 
 ConstraintType = Literal[
-    "irrigation_available", "fertilizer_budget", "erosion_protection",
-    "rotation_length_years", "excluded_crops", "preferred_crops", "previous_crop",
-    "organic_only", "machinery_limit", "market_preference",
+    "irrigation_available",
+    "fertilizer_budget",
+    "erosion_protection",
+    "rotation_length_years",
+    "excluded_crops",
+    "preferred_crops",
+    "previous_crop",
+    "organic_only",
+    "machinery_limit",
+    "market_preference",
 ]
 
 
@@ -229,13 +274,17 @@ class _ConstraintBase(Model):
     id: Id
     status: Literal["proposed", "confirmed", "rejected"]
     source: Literal["farmer_text", "farmer_voice", "farmer_ui", "agent_inferred"]
-    evidence: Annotated[str, StringConstraints(min_length=1, max_length=500)] | None = None
+    evidence: Annotated[str, StringConstraints(min_length=1, max_length=500)] | None = (
+        None
+    )
     confidence: Annotated[FiniteFloat, Field(ge=0, le=1)] | None = None
 
     @model_validator(mode="after")
     def _traceable(self):
         if self.source in ("farmer_text", "farmer_voice") and self.evidence is None:
-            raise ValueError("a constraint from farmer text/voice needs the evidence span")
+            raise ValueError(
+                "a constraint from farmer text/voice needs the evidence span"
+            )
         if self.source == "agent_inferred" and self.confidence is None:
             raise ValueError("an agent-inferred constraint needs confidence")
         return self
@@ -294,25 +343,33 @@ class MarketPreferenceConstraint(_ConstraintBase):
     value: CropList
 
 
-Constraint = TypeAliasType(
-    "Constraint",
-    Annotated[
-        Union[
-            IrrigationConstraint, FertilizerBudgetConstraint, ErosionProtectionConstraint,
-            RotationLengthConstraint, ExcludedCropsConstraint, PreferredCropsConstraint,
-            PreviousCropConstraint, OrganicOnlyConstraint, MachineryLimitConstraint,
-            MarketPreferenceConstraint,
-        ],
-        Field(discriminator="type"),
-    ],
-)
+type Constraint = Annotated[
+    IrrigationConstraint
+    | FertilizerBudgetConstraint
+    | ErosionProtectionConstraint
+    | RotationLengthConstraint
+    | ExcludedCropsConstraint
+    | PreferredCropsConstraint
+    | PreviousCropConstraint
+    | OrganicOnlyConstraint
+    | MachineryLimitConstraint
+    | MarketPreferenceConstraint,
+    Field(discriminator="type"),
+]
 
 # Owned by member 2. driest/hottest_recent_year: the driest / hottest season of the service's recent archive for
 # that field, replayed as it was (the Marsden service, 2026-11-12); not "drought 2024" nor "+2.5 °C".
-ScenarioId = Literal["typical", "drought_2024", "heat_plus_2_5c", "driest_recent_year", "hottest_recent_year"]
+ScenarioId = Literal[
+    "typical",
+    "drought_2024",
+    "heat_plus_2_5c",
+    "driest_recent_year",
+    "hottest_recent_year",
+]
 
 
 # ---------------------------------------------------------------- field context
+
 
 class Region(Model):
     country_iso2: Annotated[str, StringConstraints(pattern=r"^[A-Z]{2}$")]
@@ -340,7 +397,9 @@ class ChartInfo(Model):
 
 
 class CropSeason(Model):
-    season: Annotated[str, StringConstraints(pattern=r"^\d{4}(-\d{4})?$")]  # "2025" or "2024-2025"
+    season: Annotated[
+        str, StringConstraints(pattern=r"^\d{4}(-\d{4})?$")
+    ]  # "2025" or "2024-2025"
     crop_id: CropId
     source: Literal["farmer_input", "inferred"]
 
@@ -357,7 +416,9 @@ class UIState(Model):
     chart_focus: ChartFocus | None = None
     selected_rotation_ids: list[Id] = []
     scenario: ScenarioId = "typical"
-    screen_id: Id | None = None  # the app screen on display (AppScreen.screen_id), when the host has screens
+    screen_id: Id | None = (
+        None  # the app screen on display (AppScreen.screen_id), when the host has screens
+    )
 
 
 class FieldProfile(Model):
@@ -381,7 +442,9 @@ class FieldContext(Model):
 
     schema_version: Literal["0.1"]
     field_id: Id
-    revision: Annotated[int, Field(ge=0)]  # bump on every change; stale UI actions are dropped
+    revision: Annotated[
+        int, Field(ge=0)
+    ]  # bump on every change; stale UI actions are dropped
     geometry: Geometry
     centroid: LonLat
     area_ha: Annotated[FiniteFloat, Field(gt=0)] | None = None
@@ -398,6 +461,13 @@ class FieldContext(Model):
     @model_validator(mode="after")
     def _references(self):
         _require_unique("fact", [f.id for f in self.facts])
+        # "calc." ids are the agent's own farm-budget arithmetic of one turn: a context fact must not pose as one.
+        if reserved := sorted(
+            f.id for f in self.facts if f.id.startswith(CALC_FACT_PREFIX)
+        ):
+            raise ValueError(
+                f"fact ids starting with '{CALC_FACT_PREFIX}' are reserved for the agent: {reserved}"
+            )
         _require_unique("metric", [t.metric_id for t in self.timeseries_index])
         _require_unique("layer", [layer.layer_id for layer in self.available_layers])
         _require_unique("chart", [c.chart_id for c in self.available_charts])
@@ -406,19 +476,28 @@ class FieldContext(Model):
         metrics = {t.metric_id for t in self.timeseries_index}
         charts = {c.chart_id: set(c.metric_ids) for c in self.available_charts}
         if unknown := set(self.ui_state.active_layer_ids) - layers:
-            raise ValueError(f"ui_state references unknown layer ids: {sorted(unknown)}")
+            raise ValueError(
+                f"ui_state references unknown layer ids: {sorted(unknown)}"
+            )
         for chart in self.available_charts:
             if unknown := set(chart.metric_ids) - metrics:
-                raise ValueError(f"chart '{chart.chart_id}' references unknown metric ids: {sorted(unknown)}")
+                raise ValueError(
+                    f"chart '{chart.chart_id}' references unknown metric ids: {sorted(unknown)}"
+                )
         if focus := self.ui_state.chart_focus:
             if focus.chart_id not in charts:
-                raise ValueError(f"chart_focus references unknown chart id '{focus.chart_id}'")
+                raise ValueError(
+                    f"chart_focus references unknown chart id '{focus.chart_id}'"
+                )
             if unknown := set(focus.metric_ids) - charts[focus.chart_id]:
-                raise ValueError(f"chart_focus references unknown metric ids: {sorted(unknown)}")
+                raise ValueError(
+                    f"chart_focus references unknown metric ids: {sorted(unknown)}"
+                )
         return self
 
 
 # ---------------------------------------------------------------- UI actions (widget -> host)
+
 
 class SetLayersAction(Model):
     type: Literal["map.set_layers"]
@@ -464,37 +543,50 @@ class OpenPanelAction(Model):
 
 class OpenScreenAction(Model):
     """Show one of the app's own screens (AppScreen.screen_id from the host's capabilities). View only."""
+
     type: Literal["app.open_screen"]
     screen_id: Id
 
 
-UIAction = TypeAliasType(
-    "UIAction",
-    Annotated[
-        Union[
-            SetLayersAction, FocusFieldAction, SetTimeRangeAction, FocusChartAction,
-            SetConstraintsAction, SelectRotationsAction, SetScenarioAction, OpenPanelAction, OpenScreenAction,
-        ],
-        Field(discriminator="type"),
-    ],
-)
+type UIAction = Annotated[
+    SetLayersAction
+    | FocusFieldAction
+    | SetTimeRangeAction
+    | FocusChartAction
+    | SetConstraintsAction
+    | SelectRotationsAction
+    | SetScenarioAction
+    | OpenPanelAction
+    | OpenScreenAction,
+    Field(discriminator="type"),
+]
 
 UIActionType = Literal[
-    "map.set_layers", "map.focus_field", "time.set_range", "chart.focus", "compare.set_constraints",
-    "compare.select_rotations", "scenario.set", "panel.open", "app.open_screen",
+    "map.set_layers",
+    "map.focus_field",
+    "time.set_range",
+    "chart.focus",
+    "compare.set_constraints",
+    "compare.select_rotations",
+    "scenario.set",
+    "panel.open",
+    "app.open_screen",
 ]
 
 
 class UIActionEnvelope(Model):
     id: Id
     field_context_revision: Annotated[int, Field(ge=0)]
-    trigger: Literal["auto", "chip"]  # auto = host applies now; chip = rendered as a button
-    label: ShortText                  # localized chip text
+    trigger: Literal[
+        "auto", "chip"
+    ]  # auto = host applies now; chip = rendered as a button
+    label: ShortText  # localized chip text
     reason: ShortText | None = None
     action: UIAction
 
 
 # ---------------------------------------------------------------- citations
+
 
 class Locator(Model):
     chapter: ShortText | None = None
@@ -505,7 +597,9 @@ class Locator(Model):
     @model_validator(mode="after")
     def _not_empty(self):
         if not any((self.chapter, self.section, self.table, self.page)):
-            raise ValueError("locator needs at least one of chapter, section, table, page")
+            raise ValueError(
+                "locator needs at least one of chapter, section, table, page"
+            )
         return self
 
 
@@ -525,6 +619,7 @@ class Citation(Model):
 
 
 # ---------------------------------------------------------------- agent request / response
+
 
 class Attachment(Model):
     attachment_id: Id
@@ -549,13 +644,17 @@ class HistoryTurn(Model):
 
 class AppScreen(Model):
     """A screen of the host app the assistant may open or point to. Host-declared UI data, not permission."""
+
     screen_id: Id
-    label: ShortText                    # the screen's name as the farmer sees it
-    how_to_open: ShortText | None = None  # plain words for finding it by hand, e.g. "Menu → Fields"
+    label: ShortText  # the screen's name as the farmer sees it
+    how_to_open: ShortText | None = (
+        None  # plain words for finding it by hand, e.g. "Menu → Fields"
+    )
 
 
 class ClientCapabilities(Model):
     """What the host app can show or do right now (HostCapabilities of the widget). Unknown when absent."""
+
     actions: Annotated[list[UIActionType], Field(max_length=20)] = []
     screens: Annotated[list[AppScreen], Field(max_length=30)] = []
 
@@ -567,7 +666,9 @@ class ClientCapabilities(Model):
 
 class ClientInfo(Model):
     widget_version: ShortText
-    capabilities: ClientCapabilities | None = None  # added 2026-11-10; absent = unknown (older widgets)
+    capabilities: ClientCapabilities | None = (
+        None  # added 2026-11-10; absent = unknown (older widgets)
+    )
 
 
 class AgentRequest(Model):
@@ -594,8 +695,10 @@ class ClarifyingQuestionBlock(Model):
 # Presentation blocks (v0.2, additive). They never carry a number of their own: every value is a reference to a
 # fact in AgentMessage.facts, which the client renders with its unit and origin. Labels are plain words.
 
+
 class MetricsBlock(Model):
     """A row of value cards: several values of this field at a glance."""
+
     type: Literal["metrics"]
     title: ShortText | None = None
     fact_ids: Annotated[list[Id], Field(min_length=1, max_length=6)]
@@ -606,11 +709,14 @@ class MetricsBlock(Model):
 
 class TableRow(Model):
     label: ShortText
-    fact_ids: Annotated[list[Id | None], Field(min_length=1, max_length=5)]  # one per column; None = no value
+    fact_ids: Annotated[
+        list[Id | None], Field(min_length=1, max_length=5)
+    ]  # one per column; None = no value
 
 
 class TableBlock(Model):
     """Options side by side (rows) on the same measures (columns)."""
+
     type: Literal["table"]
     title: ShortText | None = None
     columns: Annotated[list[ShortText], Field(min_length=1, max_length=5)]
@@ -633,6 +739,7 @@ class ChartBar(Model):
 
 class BarChartBlock(Model):
     """One measure compared across options; all bars share one unit."""
+
     type: Literal["bar_chart"]
     title: ShortText
     bars: Annotated[list[ChartBar], Field(min_length=2, max_length=8)]
@@ -643,6 +750,7 @@ class BarChartBlock(Model):
 
 class CalloutBlock(Model):
     """A short notice set apart from the text (a caution, or something to know)."""
+
     type: Literal["callout"]
     tone: Literal["info", "warning"]
     text: ShortText
@@ -652,11 +760,15 @@ class CalloutBlock(Model):
     scenario: ScenarioId | None = None
 
 
-MessageBlock = TypeAliasType(
-    "MessageBlock",
-    Annotated[Union[TextBlock, ClarifyingQuestionBlock, MetricsBlock, TableBlock, BarChartBlock, CalloutBlock],
-              Field(discriminator="type")],
-)
+type MessageBlock = Annotated[
+    TextBlock
+    | ClarifyingQuestionBlock
+    | MetricsBlock
+    | TableBlock
+    | BarChartBlock
+    | CalloutBlock,
+    Field(discriminator="type"),
+]
 
 
 def block_fact_ids(block: Any) -> list[str]:
@@ -675,12 +787,19 @@ _SCENARIO_IN_METHOD = re.compile(r"scenario=([a-z0-9_]+)")
 
 def simulation_scenarios(facts: list["Fact"]) -> set[str]:
     """Scenarios of the simulation outputs among `facts` (compare_rotations scores record theirs in the method)."""
-    return {m.group(1) for f in facts
-            if f.domain == "rotation" and f.id.startswith("sim.") and (m := _SCENARIO_IN_METHOD.search(f.provenance.method or ""))}
+    return {
+        m.group(1)
+        for f in facts
+        if f.domain == "rotation"
+        and f.id.startswith("sim.")
+        and (m := _SCENARIO_IN_METHOD.search(f.provenance.method or ""))
+    }
 
 
 class AgentWarning(Model):
-    code: Literal["ungrounded_number", "source_unavailable", "fixture_data", "low_confidence"]
+    code: Literal[
+        "ungrounded_number", "source_unavailable", "fixture_data", "low_confidence"
+    ]
     detail: ShortText | None = None
 
 
@@ -695,7 +814,7 @@ class AgentMessage(Model):
     turn_id: Id
     locale: Locale
     blocks: Annotated[list[MessageBlock], Field(min_length=1)]
-    facts: list[Fact] = []          # every number shown in blocks is one of these
+    facts: list[Fact] = []  # every number shown in blocks is one of these
     citations: list[Citation] = []
     constraints_proposed: list[Constraint] = []
     ui_actions: list[UIActionEnvelope] = []
@@ -711,25 +830,43 @@ class AgentMessage(Model):
         for block in self.blocks:
             missing = [fid for fid in block_fact_ids(block) if fid not in facts]
             if missing:
-                raise ValueError(f"block '{block.type}' shows facts not in the message: {missing}")
+                raise ValueError(
+                    f"block '{block.type}' shows facts not in the message: {missing}"
+                )
             if hasattr(block, "scenario"):
-                shown = simulation_scenarios([facts[fid] for fid in block_fact_ids(block)])
+                shown = simulation_scenarios(
+                    [facts[fid] for fid in block_fact_ids(block)]
+                )
                 if len(shown) > 1 or block.scenario != next(iter(shown), None):
-                    raise ValueError(f"block '{block.type}' must name the one scenario of its simulation values")
+                    raise ValueError(
+                        f"block '{block.type}' must name the one scenario of its simulation values"
+                    )
             if isinstance(block, BarChartBlock):
                 quantities = [facts[b.fact_id].quantity for b in block.bars]
-                if any(q is None for q in quantities) or len({q.unit for q in quantities}) != 1:
-                    raise ValueError("bar chart bars need numeric facts with one shared unit")
+                if (
+                    any(q is None for q in quantities)
+                    or len({q.unit for q in quantities}) != 1
+                ):
+                    raise ValueError(
+                        "bar chart bars need numeric facts with one shared unit"
+                    )
         if any(f.provenance.data_status == "fixture" for f in self.facts) and not any(
             w.code == "fixture_data" for w in self.warnings
         ):
-            raise ValueError("a message that shows fixture facts must carry a 'fixture_data' warning")
+            raise ValueError(
+                "a message that shows fixture facts must carry a 'fixture_data' warning"
+            )
         return self
 
 
 ErrorCode = Literal[
-    "invalid_request", "rate_limited", "upstream_timeout", "upstream_unavailable",
-    "llm_error", "payload_too_large", "internal",
+    "invalid_request",
+    "rate_limited",
+    "upstream_timeout",
+    "upstream_unavailable",
+    "llm_error",
+    "payload_too_large",
+    "internal",
 ]
 
 
@@ -748,8 +885,18 @@ class ErrorEnvelope(Model):
 
 
 ToolName = Literal[
-    "get_field_facts", "get_timeseries", "compare_rotations", "search_knowledge",
-    "propose_constraints", "propose_ui_actions", "present_blocks", "get_weather_forecast", "get_season_weather", "check_sowing_soil", "analyze_soil_photo",
+    "get_field_facts",
+    "get_timeseries",
+    "compare_rotations",
+    "search_knowledge",
+    "propose_constraints",
+    "propose_ui_actions",
+    "present_blocks",
+    "get_weather_forecast",
+    "get_season_weather",
+    "check_sowing_soil",
+    "analyze_soil_photo",
+    "calculate_farm_budget",
 ]
 
 
@@ -785,17 +932,19 @@ class ErrorEvent(ErrorBody):
     event: Literal["error"]
 
 
-AgentEvent = TypeAliasType(
-    "AgentEvent",
-    Annotated[
-        Union[TurnStartedEvent, TextDeltaEvent, ToolStartedEvent, ToolFinishedEvent,
-              TurnCompletedEvent, ErrorEvent],
-        Field(discriminator="event"),
-    ],
-)
+type AgentEvent = Annotated[
+    TurnStartedEvent
+    | TextDeltaEvent
+    | ToolStartedEvent
+    | ToolFinishedEvent
+    | TurnCompletedEvent
+    | ErrorEvent,
+    Field(discriminator="event"),
+]
 
 
 # ---------------------------------------------------------------- geo + simulation services
+
 
 class TimeseriesQuery(Model):
     """Agent -> geo service (member 1)."""
@@ -816,7 +965,7 @@ class Timeseries(Model):
     @model_validator(mode="after")
     def _sorted(self):
         days = [p[0] for p in self.points]
-        if any(a >= b for a, b in zip(days, days[1:])):
+        if any(a >= b for a, b in itertools.pairwise(days)):
             raise ValueError("timeseries points must be strictly increasing in date")
         return self
 
@@ -828,7 +977,7 @@ class CompareRotationsRequest(Model):
     field_context_revision: Annotated[int, Field(ge=0)]
     constraints: list[Constraint] = []  # the service ignores status == "rejected"
     scenario: ScenarioId
-    rotation_ids: list[Id] = []         # empty = let the service choose candidates
+    rotation_ids: list[Id] = []  # empty = let the service choose candidates
 
 
 class Score(Quantity):
@@ -837,17 +986,24 @@ class Score(Quantity):
     @model_validator(mode="after")
     def _computed(self):
         if self.provenance.kind not in ("deterministic_calc", "ml_estimate"):
-            raise ValueError("rotation scores must be deterministic_calc or ml_estimate")
+            raise ValueError(
+                "rotation scores must be deterministic_calc or ml_estimate"
+            )
         return self
 
 
 class RotationScores(Model):
     """A service sends only what it computes: an absent score is "not computed", never zero."""
-    water_risk: Score                       # share of water need or of days short of water: the method says which
+
+    water_risk: (
+        Score  # share of water need or of days short of water: the method says which
+    )
     soil_cover_days: Score | None = None
     n_input: Score | None = None
-    yield_risk: Score | None = None         # probability of a harvest loss beyond a threshold
-    yield_loss_water: Score | None = None   # size of the harvest loss caused by water shortage (not a probability)
+    yield_risk: Score | None = None  # probability of a harvest loss beyond a threshold
+    yield_loss_water: Score | None = (
+        None  # size of the harvest loss caused by water shortage (not a probability)
+    )
 
 
 class RotationStep(Model):
@@ -868,7 +1024,9 @@ class RotationComparison(Model):
     scenario: ScenarioId
     rotations: Annotated[list[RotationOption], Field(min_length=1)]
     facts: list[Fact] = []
-    constraint_weights_applied: dict[ConstraintType, FiniteFloat] = {}  # from the deterministic mapping
+    constraint_weights_applied: dict[
+        ConstraintType, FiniteFloat
+    ] = {}  # from the deterministic mapping
 
     @model_validator(mode="after")
     def _consistency(self):
@@ -879,5 +1037,7 @@ class RotationComparison(Model):
         known = {f.id for f in self.facts}
         for r in self.rotations:
             if unknown := set(r.reason_fact_ids) - known:
-                raise ValueError(f"rotation '{r.rotation_id}' cites unknown fact ids: {sorted(unknown)}")
+                raise ValueError(
+                    f"rotation '{r.rotation_id}' cites unknown fact ids: {sorted(unknown)}"
+                )
         return self

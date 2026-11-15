@@ -1,15 +1,18 @@
-import { ArrowPathIcon, CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import { ArrowPathIcon, InformationCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '../../api/client'
+import { ContextHelp } from '../../shared/ContextHelp'
 import { useLocale } from '../../shared/locale'
 import { useJob, useStartJob } from '../../shared/jobs'
 import { JobStatus } from '../../shared/JobStatus'
 import { Empty, ErrorBox, Loading } from '../../shared/ui'
 import { useResource } from '../../shared/useResource'
 import { selectWaterForecast } from './waterForecast'
+import { waterReferenceDisplay } from './waterReferenceDisplay'
 import { getCurrentWaterOutlook } from './waterOutlook'
 import { WaterForecastChart } from './WaterForecastChart'
 import { WaterBudgetPanel } from './WaterBudgetPanel'
+import { waterHelp } from './waterHelp'
 
 const refreshIntervalMs = 5 * 60 * 1000
 
@@ -18,7 +21,8 @@ export function WaterForecastPanel({ fieldId, boundaryRevision, forecastDay }: {
   boundaryRevision: number
   forecastDay?: string
 }) {
-  const { t, number, crop, date, shortDate } = useLocale()
+  const { t, number, crop, date, shortDate, language } = useLocale()
+  const initialHelp = waterHelp[language].initialReserve
   const heading = useRef<HTMLHeadingElement>(null)
   const load = useCallback((signal: AbortSignal) => api.waterForecast(fieldId, signal), [fieldId, boundaryRevision])
   const saved = useResource(load, refreshIntervalMs)
@@ -29,6 +33,7 @@ export function WaterForecastPanel({ fieldId, boundaryRevision, forecastDay }: {
   const forecast = selectWaterForecast(fieldId, (job?.boundary_revision ?? 0) === boundaryRevision ? job : undefined, saved.data)
   const today = new Date().toISOString().slice(0, 10)
   const outlook = getCurrentWaterOutlook(forecast, fieldId, today)
+  const display = waterReferenceDisplay(forecast?.applicability, outlook.kind === 'shortage', language)
   const days = outlook.kind === 'unavailable' ? [] : outlook.days
   const hasModelEstimate = forecast === saved.data && forecast?.method === 'ml'
     && days.some(({ root_zone_estimate_mm }) => root_zone_estimate_mm != null)
@@ -67,17 +72,16 @@ export function WaterForecastPanel({ fieldId, boundaryRevision, forecastDay }: {
       </div>
       {forecast && outlook.kind !== 'unavailable' && (
         <>
-          <div className="water-outlook" data-status={outlook.kind}>
+          <div className="water-outlook" data-status={display.tone}>
             <div className="water-outlook-status">
-              {outlook.kind === 'shortage' ? <ExclamationTriangleIcon aria-hidden="true" /> : <CheckCircleIcon aria-hidden="true" />}
+              {display.tone === 'shortage' ? <ExclamationTriangleIcon aria-hidden="true" /> : <InformationCircleIcon aria-hidden="true" />}
               <div>
-                <strong>{outlook.kind === 'shortage'
-                  ? <>{t('Water shortage risk from')}{' '}<time dateTime={outlook.firstShortage.date}>{shortDate(outlook.firstShortage.date)}</time></>
-                  : t('No water shortage expected')}</strong>
-                <p>{t('Stress threshold')} — {number(outlook.thresholdMm)} {t('mm')}</p>
+                <strong>{display.summary}{outlook.kind === 'shortage' && <> · <time dateTime={outlook.firstShortage.date}>{shortDate(outlook.firstShortage.date)}</time></>}</strong>
+                <p>{language === 'uk' ? 'Довідковий поріг' : 'Reference threshold'} — {number(outlook.thresholdMm)} {t('mm')}</p>
               </div>
             </div>
           </div>
+          <p role="note">{display.caveat} {display.limitation}</p>
           {forecast.days.some(({ date }) => date < today) && (
             <p className="analysis-day-source" role="status">{t('Showing the remaining days from an earlier run.')}</p>
           )}
@@ -85,7 +89,8 @@ export function WaterForecastPanel({ fieldId, boundaryRevision, forecastDay }: {
             <p className="analysis-day-source" role="status">{t('The linked day is no longer in the current forecast.')}</p>
           )}
           <WaterForecastChart key={forecastDay} initialDate={forecastDay ?? (outlook.kind === 'shortage' ? outlook.firstShortage.date : undefined)}
-            threshold={outlook.thresholdMm} days={days} showModelEstimate={hasModelEstimate} />
+            threshold={outlook.thresholdMm} days={days} showModelEstimate={hasModelEstimate}
+            rootDepthMetres={forecast.root_depth_m} provider={forecast.provider} />
           <footer className="water-forecast-footer">
             <p className="water-source-summary">{sourceSummary}</p>
             <details className="analysis-details water-source-details">
@@ -97,7 +102,9 @@ export function WaterForecastPanel({ fieldId, boundaryRevision, forecastDay }: {
                 {hasModelEstimate && <p>{t('Validated ML estimate')} · {forecast.model_version}</p>}
                 <dl className="data-strip analysis-source-grid">
                   <div><dt>{t('Root depth')}</dt><dd>{number(forecast.root_depth_m, 2)} {t('m')}</dd></div>
-                  <div><dt>{t('Initial reserve')}</dt><dd>{number(forecast.initial_reserve_mm)} {t('mm')}</dd></div>
+                  <div><dt>{t('Initial reserve')}{' '}
+                    <ContextHelp label={initialHelp.title}><p>{initialHelp.description}</p></ContextHelp>
+                  </dt><dd>{number(forecast.initial_reserve_mm)} {t('mm')}</dd></div>
                   <div><dt>{t('Soil capacity')}</dt><dd>{number(forecast.capacity_mm)} {t('mm')}</dd></div>
                   <div><dt>{t('Stress threshold')}</dt><dd>{number(forecast.threshold_mm)} {t('mm')}</dd></div>
                 </dl>

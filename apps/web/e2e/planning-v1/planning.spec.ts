@@ -1,4 +1,4 @@
-import { test, expect } from '../../../../services/agent/frontend/node_modules/@playwright/test/index.mjs'
+import { test, expect } from '@playwright/test'
 import { cases, expectedStatus } from '../../tests/planning/fixtures'
 
 const base = '/e2e/planning-v1/index.html'

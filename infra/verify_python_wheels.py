@@ -21,6 +21,7 @@ PROJECTS = {
     "field-shift-api": "apps/api",
     "field-shift-ml": "packages/field-shift-ml",
     "field-shift-models": "packages/field-shift-models",
+    "field-shift-rotation-model": "packages/field-shift-rotation-model",
     "field-shift-crop-runtime": "services/crop-model",
     "field-shift-agent": "services/agent",
 }
@@ -35,12 +36,18 @@ MODULES = {
     ],
     "field-shift-crop-runtime": ["crop_runtime.server", "field_shift_models.provider"],
     "field-shift-agent": ["agent_service.api", "contracts", "integration_stub"],
+    "field-shift-rotation-model": [
+        "field_shift_rotation_model.runtime",
+        "field_shift_rotation_model.server",
+    ],
 }
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
+    parser.add_argument(
+        "--root", type=Path, default=Path(__file__).resolve().parents[1]
+    )
     parser.add_argument("--python", default="3.12")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
@@ -64,7 +71,9 @@ def main():
 
     def run(argv, cwd, capture=False):
         with (output / "commands.log").open("a") as log:
-            log.write(json.dumps({"cwd": str(cwd), "argv": list(map(str, argv))}) + "\n")
+            log.write(
+                json.dumps({"cwd": str(cwd), "argv": list(map(str, argv))}) + "\n"
+            )
             log.flush()
             result = subprocess.run(
                 list(map(str, argv)),
@@ -103,11 +112,18 @@ def main():
                             continue
                         if member in owned:
                             raise RuntimeError(f"Wheel ownership collision: {member}")
-                        if member.endswith((".env", ".sqlite")) or "__pycache__" in member:
-                            raise RuntimeError(f"Runtime/private data in wheel: {member}")
+                        if (
+                            member.endswith((".env", ".sqlite"))
+                            or "__pycache__" in member
+                        ):
+                            raise RuntimeError(
+                                f"Runtime/private data in wheel: {member}"
+                            )
                         owned[member] = name
             assert set(built) == set(PROJECTS)
-            report["checks"].append("seven wheels built; no overlapping files or runtime data")
+            report["checks"].append(
+                f"{len(PROJECTS)} wheels built; no overlapping files or runtime data"
+            )
             for name, project in PROJECTS.items():
                 print("Checking installed wheel:", name, flush=True)
                 lock_project = (
@@ -228,6 +244,28 @@ assert result['result']['evaluation']['seasons'][0]['status'] == 'available'
                         True,
                     )
                     assert installed.startswith("2."), installed
+                if name == "field-shift-rotation-model":
+                    run(
+                        [
+                            python,
+                            "-I",
+                            "-c",
+                            """
+import json
+from importlib.resources import files
+from field_shift_rotation_model import runtime
+receipt = json.loads(files('field_shift_rotation_model').joinpath('upstream-receipt.json').read_text())
+catalog = runtime.catalog()
+assert catalog['source_commit'] == receipt['upstream_commit']
+assert catalog['engine_version'] == runtime.installed_identity()
+assert len(catalog['crops']) == 13
+assert catalog['empirical_status'] == 'not_validated'
+assert 'forecast' in catalog['operations']
+assert files('field_shift_rotation_model').joinpath('examples/sutherland-2026-28/README.md').read_text()
+""",
+                        ],
+                        scratch,
+                    )
                 if name == "field-shift-ml":
                     run([environment / "bin/field-shift-ml", "--help"], scratch)
                     run(
@@ -249,6 +287,7 @@ assert numpy.__version__ == '1.26.4'
                     "field-shift-models",
                     "field-shift-crop-runtime",
                     "field-shift-ml",
+                    "field-shift-rotation-model",
                 ):
                     run(
                         [

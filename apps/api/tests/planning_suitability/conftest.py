@@ -14,7 +14,19 @@ def profile():
     document = json.loads(
         (ROOT / "contracts/planning-v1/examples/planning-contracts.json").read_text()
     )
-    return FieldProfileSnapshot.model_validate_json(json.dumps(document["field_profile"]))
+    profile = document["field_profile"]
+    land = dict(
+        profile["sources"][0],
+        id="synthetic-land",
+        product="controlled synthetic land assumption",
+        kind="synthetic",
+        spatial_method="polygon",
+        coverage_fraction=1.0,
+        quality="valid",
+    )
+    profile["sources"].append(land)
+    profile["land_source_ids"] = [land["id"]]
+    return FieldProfileSnapshot.model_validate_json(json.dumps(profile))
 
 
 @pytest.fixture

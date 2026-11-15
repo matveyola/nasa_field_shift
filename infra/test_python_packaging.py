@@ -12,10 +12,17 @@ from check_python_packaging import validate
 
 PROJECTS = {
     "apps/api": ("field-shift-api", "field_shift"),
-    "packages/field-shift-contracts": ("field-shift-contracts", "field_shift_contracts"),
+    "packages/field-shift-contracts": (
+        "field-shift-contracts",
+        "field_shift_contracts",
+    ),
     "packages/field-shift-science": ("field-shift-science", "field_shift_science"),
     "packages/field-shift-ml": ("field-shift-ml", "field_shift_ml"),
     "packages/field-shift-models": ("field-shift-models", "field_shift_models"),
+    "packages/field-shift-rotation-model": (
+        "field-shift-rotation-model",
+        "field_shift_rotation_model",
+    ),
     "services/crop-model": ("field-shift-crop-model", "crop_runtime"),
     "services/agent": ("field-shift-agent", "agent_service"),
 }
@@ -53,7 +60,8 @@ class PythonPackagingTests(unittest.TestCase):
         self.write(
             "apps/api/pyproject.toml",
             self.manifest(
-                "field-shift-api", '["field-shift-contracts>=1", "field_shift_science[geo]>=1"]'
+                "field-shift-api",
+                '["field-shift-contracts>=1", "field_shift_science[geo]>=1"]',
             ),
         )
         self.write(
@@ -73,7 +81,9 @@ def calculate():
             with self.subTest(project=relative):
                 path = self.root / relative / "pyproject.toml"
                 path.write_text(f'[project]\nname = "{name}"\n')
-                self.assertViolation(f"{relative}/pyproject.toml: explicit build-backend")
+                self.assertViolation(
+                    f"{relative}/pyproject.toml: explicit build-backend"
+                )
                 path.write_text(self.manifest(name))
 
     def test_missing_and_invalid_manifests_fail(self):
@@ -121,7 +131,8 @@ except ImportError:
         self.write(
             "apps/api/pyproject.toml",
             self.manifest(
-                "field-shift-api", extra='[dependency-groups]\ndev = ["field-shift-science"]\n'
+                "field-shift-api",
+                extra='[dependency-groups]\ndev = ["field-shift-science"]\n',
             ),
         )
         self.write("apps/api/src/field_shift/main.py", "import field_shift_science\n")
@@ -134,7 +145,9 @@ except ImportError:
         )
         self.write("services/agent/evals/evaluate.py", "import agent_service\n")
         self.assertEqual(validate(self.root), [])
-        self.write("services/agent/agent_service/main.py", "import field_shift_contracts\n")
+        self.write(
+            "services/agent/agent_service/main.py", "import field_shift_contracts\n"
+        )
         self.assertViolation("requires dependency field-shift-contracts")
 
     def test_dynamic_dependency_file_is_resolved_relative_to_project(self):
@@ -146,10 +159,12 @@ except ImportError:
             ),
         )
         self.write(
-            "packages/field-shift-ml/requirements.txt", "# Runtime\nfield-shift-science>=1\n"
+            "packages/field-shift-ml/requirements.txt",
+            "# Runtime\nfield-shift-science>=1\n",
         )
         self.write(
-            "packages/field-shift-ml/src/field_shift_ml/main.py", "import field_shift_science\n"
+            "packages/field-shift-ml/src/field_shift_ml/main.py",
+            "import field_shift_science\n",
         )
         self.assertEqual(validate(self.root), [])
 
@@ -157,14 +172,17 @@ except ImportError:
         self.write(
             "apps/api/pyproject.toml",
             self.manifest(
-                "field-shift-api", extra='[tool.pytest.ini_options]\npythonpath = ["src"]\n'
+                "field-shift-api",
+                extra='[tool.pytest.ini_options]\npythonpath = ["src"]\n',
             ),
         )
         self.assertViolation("pytest pythonpath is forbidden")
         self.write("apps/api/pyproject.toml", self.manifest("field-shift-api"))
         for name, section in [("pytest.ini", "pytest"), ("setup.cfg", "tool:pytest")]:
             with self.subTest(name=name):
-                path = self.write(f"apps/api/{name}", f"[{section}]\npythonpath = src\n")
+                path = self.write(
+                    f"apps/api/{name}", f"[{section}]\npythonpath = src\n"
+                )
                 self.assertViolation(f"apps/api/{name}: pytest pythonpath")
                 path.unlink()
 
@@ -233,12 +251,16 @@ def clean(monkeypatch):
 
     def test_documentation_tests_caches_and_tool_imports_are_not_dependencies(self):
         for directory in [".venv", "node_modules", "dist"]:
-            self.write(f"apps/api/{directory}/example.py", "import sys\nsys.path.append('src')")
+            self.write(
+                f"apps/api/{directory}/example.py", "import sys\nsys.path.append('src')"
+            )
         self.write("apps/api/tests/test_example.py", "import field_shift_ml")
         self.write("apps/api/src/field_shift/tests/helpers.py", "import field_shift_ml")
         self.write("docs/setup.md", "PYTHONPATH=src pytest")
         self.write("apps/api/src/tools/example.py", "import field_shift_ml")
-        self.write("apps/api/package.json", '{"description":"PYTHONPATH=src","scripts":{}}')
+        self.write(
+            "apps/api/package.json", '{"description":"PYTHONPATH=src","scripts":{}}'
+        )
         self.assertEqual(validate(self.root), [])
 
     def test_conftest_and_test_helpers_cannot_mutate_import_paths(self):
@@ -259,7 +281,9 @@ def clean(monkeypatch):
                 path.unlink()
 
     def test_only_guard_negative_fixture_file_is_exempt(self):
-        self.write("infra/test_python_packaging.py", "example = 'PYTHONPATH=src pytest'")
+        self.write(
+            "infra/test_python_packaging.py", "example = 'PYTHONPATH=src pytest'"
+        )
         self.write(
             "apps/api/tests/conftest.py",
             """
@@ -269,7 +293,10 @@ def clean(monkeypatch):
 """,
         )
         self.assertEqual(validate(self.root), [])
-        self.write("apps/api/tests/test_python_packaging.py", "import sys\nsys.path.append('src')")
+        self.write(
+            "apps/api/tests/test_python_packaging.py",
+            "import sys\nsys.path.append('src')",
+        )
         self.assertViolation("apps/api/tests/test_python_packaging.py")
 
     def test_syntax_errors_are_failures_instead_of_silently_skipped(self):
@@ -280,6 +307,7 @@ def clean(monkeypatch):
         script = Path(__file__).with_name("check_python_packaging.py")
         result = subprocess.run(
             [sys.executable, str(script), "--root", str(self.root)],
+            check=False,
             cwd="/",
             capture_output=True,
             text=True,
@@ -289,6 +317,7 @@ def clean(monkeypatch):
         self.write("apps/api/src/field_shift/bad.py", "import field_shift_ml")
         result = subprocess.run(
             [sys.executable, str(script), "--root", str(self.root)],
+            check=False,
             cwd="/",
             capture_output=True,
             text=True,

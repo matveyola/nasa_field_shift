@@ -57,16 +57,18 @@ describe("launcher and panel", () => {
     expect(screen.getByRole("button", { name: "Open Field Assistant" })).toHaveFocus();
   });
 
-  it("opens from the host's own button and tells the host when the farmer closes it", async () => {
+  it.each([false, true])("opens from the host's own button and reports close (reduced motion: %s)", async (reducedMotion) => {
+    mockMedia(reducedMotion ? ["(prefers-reduced-motion: reduce)"] : []);
     const onOpenChange = vi.fn();
     const { user, rerender } = setup({ launcher: false, open: false, onOpenChange });
     expect(screen.queryByRole("button", { name: "Open Field Assistant" })).toBeNull(); // the host's button only
     rerender({ launcher: false, open: true, onOpenChange });
     await screen.findByRole("dialog", { name: "Field Assistant" });
-    expect(onOpenChange).toHaveBeenLastCalledWith(true);
+    await waitFor(() => expect(onOpenChange).toHaveBeenLastCalledWith(true));
     await user.keyboard("{Escape}");
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
-    expect(onOpenChange).toHaveBeenLastCalledWith(false);
+    // DOM removal and the host's passive-effect notification are separate observations.
+    await waitFor(() => expect(onOpenChange).toHaveBeenLastCalledWith(false));
   });
 
   it("shows two pulse rings, and none under prefers-reduced-motion", () => {
@@ -148,6 +150,55 @@ describe("launcher and panel", () => {
     expect(await screen.findByText(/Привіт! Я допоможу розібратися з вашим полем/)).toBeInTheDocument();
     expect(screen.getByRole("textbox", { name: "Повідомлення помічнику" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Що відомо про моє поле?" })).toBeInTheDocument();
+  });
+});
+
+describe("optional host saved conversations", () => {
+  it("is absent by default and leaves the current draft intact when the host opens history", async () => {
+    const onOpenHistory = vi.fn();
+    const { user, rerender } = setup();
+    await user.click(screen.getByRole("button", { name: "Open Field Assistant" }));
+    expect(screen.queryByRole("button", { name: "Saved conversations" })).toBeNull();
+    const draft = screen.getByRole("textbox", { name: "Message to the assistant" });
+    await user.type(draft, "My unsent field question");
+    rerender({ onOpenHistory });
+    const history = screen.getByRole("button", { name: "Saved conversations" });
+    history.focus();
+    await user.keyboard("{Enter}");
+    expect(onOpenHistory).toHaveBeenCalledTimes(1);
+    expect(draft).toHaveValue("My unsent field question");
+    expect(screen.getByRole("dialog", { name: "Field Assistant" })).toBeInTheDocument();
+  });
+
+  it("keeps a completed current answer when opening the host’s saved history", async () => {
+    const onOpenHistory = vi.fn();
+    const { user } = setup({ onOpenHistory });
+    await openAndAsk(user);
+    const answer = await screen.findByText(/адаптивна сівозміна має нижчий ризик/);
+    await user.click(screen.getByRole("button", { name: "Saved conversations" }));
+    expect(onOpenHistory).toHaveBeenCalledOnce();
+    expect(answer).toBeInTheDocument();
+  });
+
+  it("does not open the host's history while a turn is running", async () => {
+    const stream = manualStream();
+    const onOpenHistory = vi.fn();
+    const { user } = setup({ fetch: stream.fetch, onOpenHistory });
+    await openAndAsk(user);
+    const history = screen.getByRole("button", { name: "Saved conversations" });
+    expect(history).toBeDisabled();
+    await user.click(history);
+    expect(onOpenHistory).not.toHaveBeenCalled();
+    await user.click(screen.getByRole("button", { name: "Stop" }));
+    await waitFor(() => expect(history).toBeEnabled());
+  });
+
+  it("localizes the optional history button without changing the host's thread", async () => {
+    const onOpenHistory = vi.fn();
+    const { user } = setup({ locale: "uk", onOpenHistory });
+    await user.click(screen.getByRole("button", { name: "Відкрити: Польовий помічник" }));
+    await user.click(screen.getByRole("button", { name: "Збережені розмови" }));
+    expect(onOpenHistory).toHaveBeenCalledOnce();
   });
 });
 
@@ -243,12 +294,321 @@ describe("conversation with the agent service", () => {
     expect(screen.getByRole("button", { name: "Confirm condition: Minimise nitrogen fertiliser" })).toBeInTheDocument();
   });
 
-  it("dismissing a proposal changes nothing in the host", async () => {
+  it("hiding a proposal changes nothing in the host and says so", async () => {
+    // "Dismiss" is now "Hide": it only hides the proposal here, unlike "Reject", which is saved (Task 05D-1).
     const { user, onAction } = setup();
     await openAndAsk(user);
-    await user.click(await screen.findByRole("button", { name: "Dismiss condition: No irrigation" }));
+    const hide = await screen.findByRole("button", { name: "Hide without saving: No irrigation" });
+    expect(hide).toHaveAttribute("title", "Only hides it in this conversation. Nothing is saved.");
+    await user.click(hide);
     expect(onAction).not.toHaveBeenCalled();
-    expect(screen.getByText("Dismissed")).toBeInTheDocument();
+    expect(screen.getByText("Hidden here · not saved")).toBeInTheDocument();
+  });
+
+  describe("rejecting a proposal", () => {
+    async function reject(over: Parameters<typeof setup>[0] = {}) {
+      const ctx = setup(over);
+      await openAndAsk(ctx.user, "No irrigation, and I want to cut fertiliser costs.");
+      await ctx.user.click(await screen.findByRole("button", { name: "Reject and save: No irrigation" }));
+      const item = () => screen.getByText("No irrigation").closest("li")!;
+      return { ...ctx, item };
+    }
+
+    it("sends the farmer's rejection to the host and shows it as a saved decision", async () => {
+      const { onAction, rerender, props, item } = await reject();
+      expect(onAction).toHaveBeenCalledTimes(1);
+      const req = onAction.mock.calls[0]![0]!;
+      expect(req.origin).toBe("farmer_click");
+      expect(req.envelope).toMatchObject({ id: "reject.k_irrigation", trigger: "chip", field_context_revision: 3 });
+      expect(req.envelope.action).toMatchObject({
+        type: "compare.set_constraints",
+        constraints: [{ id: "k_irrigation", type: "irrigation_available", value: false, status: "rejected" }],
+      });
+      // Saved only once the host's context holds the rejection: until then it is still being saved.
+      expect(within(item()).getByText("Saving…")).toBeInTheDocument();
+      const rejected = req.envelope.action.type === "compare.set_constraints" ? req.envelope.action.constraints : [];
+      rerender({ fieldContext: { ...props.fieldContext!, constraints: rejected } });
+      expect(within(item()).getByText("Rejected by you · saved")).toBeInTheDocument();
+      expect(within(item()).queryByRole("button")).toBeNull();
+      expect(within(item()).queryByRole("status")).toBeNull(); // a decision, not an error note
+      expect(within(item()).queryByText("Confirmed")).toBeNull();
+      // The other proposal is untouched.
+      expect(screen.getByRole("button", { name: "Confirm condition: Minimise nitrogen fertiliser" })).toBeInTheDocument();
+    });
+
+    it("reports a host failure as not saved, never as a rejection", async () => {
+      const { item } = await reject({ onAction: () => ({ status: "rejected", reason: "failed" }) });
+      expect(await within(item()).findByText("Not saved: The app could not apply this action.")).toBeInTheDocument();
+      expect(within(item()).queryByText("Rejected by you · saved")).toBeNull();
+    });
+
+    it("reports a thrown host error as a failure", async () => {
+      const { item } = await reject({ onAction: () => { throw new Error("offline"); } });
+      expect(await within(item()).findByText("Not saved: The app could not apply this action.")).toBeInTheDocument();
+    });
+
+    it("reports a stale field view, without saving", async () => {
+      const { item } = await reject({ onAction: () => ({ status: "rejected", reason: "stale_context" }) });
+      expect(await within(item()).findByText(/the field view changed since this answer/)).toBeInTheDocument();
+      expect(within(item()).queryByText("Rejected by you · saved")).toBeNull();
+    });
+
+    it("reopens the choice when the farmer keeps an earlier decision", async () => {
+      const { item } = await reject({ onAction: () => ({ status: "rejected", reason: "cancelled" }) });
+      await waitFor(() => expect(within(item()).getByRole("button", { name: "Reject and save: No irrigation" })).toBeInTheDocument());
+      expect(within(item()).getByText("Proposed")).toBeInTheDocument();
+      expect(within(item()).queryByRole("status")).toBeNull(); // no failure message for the farmer's own choice
+    });
+
+    it("waits for the host while the farmer reviews a replacement", async () => {
+      let answer!: (result: { status: "applied" }) => void;
+      const { item } = await reject({ onAction: () => new Promise((resolve) => { answer = resolve; }) });
+      expect(within(item()).getByText("Saving…")).toBeInTheDocument();
+      await act(async () => answer({ status: "applied" }));
+      // Applied, but shown as rejected only once the host's context holds it.
+      expect(within(item()).getByText("Saving…")).toBeInTheDocument();
+    });
+
+    it("shows a rejection the host already holds as decided earlier, with nothing to click", async () => {
+      // Task 05D-2: a decision the host held before this answer reads "earlier", so it is never taken for one just saved.
+      const held = { ...poltava().constraints![0]!, id: "pc_irrigation_available", status: "rejected" as const };
+      const { user } = setup({ fieldContext: { ...clean(poltava()), constraints: [{ ...held, type: "irrigation_available", value: false }] } });
+      await openAndAsk(user, "No irrigation, and I want to cut fertiliser costs.");
+      const item = (await screen.findByText("No irrigation")).closest("li")!;
+      expect(within(item).getByText("Already rejected earlier · nothing new saved")).toBeInTheDocument();
+      expect(within(item).queryByRole("button")).toBeNull();
+    });
+
+    it("an agent's action never rejects a condition for the farmer", async () => {
+      const auto: AgentMessage = {
+        ...fixtureMessage,
+        ui_actions: [{
+          id: "a_reject", field_context_revision: 3, trigger: "auto", label: "Reject irrigation",
+          action: { type: "compare.set_constraints", constraints: [{ ...fixtureMessage.constraints_proposed![0]!, status: "rejected" }] },
+        }],
+      };
+      const { user, onAction } = setup({ fetch: fakeServer(sse(turn(auto))).fetch });
+      await openAndAsk(user, "No irrigation, and I want to cut fertiliser costs.");
+      await screen.findByText("No irrigation");
+      expect(onAction).not.toHaveBeenCalled();
+      expect(screen.queryByText("Rejected by you · saved")).toBeNull();
+    });
+  });
+
+  describe("editing a proposal before deciding", () => {
+    // The host's crops whose identity the agent shares (apps/web constraintCrops.ts).
+    const planningCrops = [
+      { id: "maize", label: "Maize" },
+      { id: "soybean", label: "Soy" },
+      { id: "sunflower", label: "Sunflower" },
+    ];
+    const proposing = (constraints: unknown[]): AgentMessage => ({
+      ...fixtureMessage,
+      ui_actions: [],
+      constraints_proposed: constraints as AgentMessage["constraints_proposed"],
+    });
+    const rotation = { id: "k_len", type: "rotation_length_years", value: 4, status: "proposed", source: "agent_inferred", confidence: 0.6 };
+    const noCrops = { id: "k_crops", type: "excluded_crops", value: ["sunflower"], status: "proposed", source: "farmer_text", evidence: "no sunflower" };
+    const unshared = { id: "k_crops", type: "excluded_crops", value: ["winter_wheat", "sunflower"], status: "proposed", source: "farmer_text", evidence: "no winter wheat or sunflower" };
+
+    async function ask(over: Parameters<typeof setup>[0] = {}) {
+      const ctx = setup(over);
+      await openAndAsk(ctx.user, "No irrigation, and I want to cut fertiliser costs.");
+      return ctx;
+    }
+    const item = (text: string | RegExp) => screen.getByText(text).closest("li")!;
+
+    it("edits a value, saves nothing until Confirm, and then sends the farmer's own choice", async () => {
+      const { user, onAction, rerender, props } = await ask();
+      const edit = await screen.findByRole("button", { name: "Edit before deciding: No irrigation" });
+      await user.click(edit);
+      const editor = screen.getByRole("group", { name: "Change the condition" });
+      expect(within(editor).getByText("Nothing is saved until you confirm or reject it.")).toBeInTheDocument();
+      expect(within(editor).getByRole("radio", { name: "Irrigation available" })).toHaveFocus();
+      await user.click(within(editor).getByRole("radio", { name: "Irrigation available" }));
+      await user.click(screen.getByRole("button", { name: "Use this value" }));
+      expect(onAction).not.toHaveBeenCalled(); // editing never saves
+
+      const chip = item("Irrigation available");
+      expect(within(chip).getByText("Edited by you · not saved yet")).toBeInTheDocument();
+      expect(within(chip).getByText(/Your choice in the app\. The assistant proposed: No irrigation/)).toBeInTheDocument();
+      expect(within(chip).queryByText(/From your words/)).toBeNull(); // the farmer did not say this
+      expect(screen.getByRole("button", { name: "Edit before deciding: Irrigation available" })).toHaveFocus();
+
+      await user.click(within(chip).getByRole("button", { name: "Confirm condition: Irrigation available" }));
+      expect(onAction).toHaveBeenCalledTimes(1);
+      const req = onAction.mock.calls[0]![0]!;
+      expect(req.origin).toBe("farmer_click");
+      const sent = req.envelope.action.type === "compare.set_constraints" ? req.envelope.action.constraints : [];
+      expect(sent).toEqual([{ id: "k_irrigation", type: "irrigation_available", value: true, status: "confirmed", source: "farmer_ui" }]);
+      expect(within(chip).getByText("Saving…")).toBeInTheDocument();
+      // The host holds it (and its revision moved on, which discards undecided edits): the sent value is matched.
+      rerender({ fieldContext: { ...props.fieldContext!, revision: 4, constraints: sent } });
+      expect(within(item("Irrigation available")).getByText("Confirmed")).toBeInTheDocument();
+      expect(screen.queryByText("No irrigation")).toBeNull();
+    });
+
+    it("cancelling the editor (button or Escape) changes nothing", async () => {
+      const { user, onAction } = await ask();
+      await user.click(await screen.findByRole("button", { name: "Edit before deciding: No irrigation" }));
+      await user.click(screen.getByRole("radio", { name: "Irrigation available" }));
+      await user.click(screen.getByRole("button", { name: "Cancel" }));
+      expect(screen.queryByRole("group", { name: "Change the condition" })).toBeNull();
+      expect(within(item("No irrigation")).getByText("Proposed")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Edit before deciding: No irrigation" })).toHaveFocus();
+
+      await user.click(screen.getByRole("button", { name: "Edit before deciding: No irrigation" }));
+      await user.click(screen.getByRole("radio", { name: "Irrigation available" }));
+      await user.keyboard("{Escape}");
+      expect(screen.queryByRole("group", { name: "Change the condition" })).toBeNull();
+      expect(screen.getByRole("dialog", { name: "Field Assistant" })).toBeInTheDocument(); // the assistant stays open
+      expect(within(item("No irrigation")).getByText("Proposed")).toBeInTheDocument();
+      expect(onAction).not.toHaveBeenCalled();
+    });
+
+    it("refuses an invalid value with an accessible error, and sends nothing", async () => {
+      const { user, onAction } = await ask({ fetch: fakeServer(sse(turn(proposing([rotation])))).fetch });
+      await user.click(await screen.findByRole("button", { name: "Edit before deciding: Rotation of 4 years" }));
+      const years = screen.getByRole("spinbutton", { name: "Rotation length in years (2–6)" });
+      await user.clear(years);
+      await user.type(years, "9");
+      await user.click(screen.getByRole("button", { name: "Use this value" }));
+      expect(screen.getByRole("alert")).toHaveTextContent("Choose a whole number of years from 2 to 6.");
+      expect(years).toHaveAttribute("aria-invalid", "true");
+      expect(years).toHaveAccessibleDescription("Choose a whole number of years from 2 to 6.");
+      expect(onAction).not.toHaveBeenCalled();
+      await user.clear(years);
+      await user.type(years, "5");
+      await user.click(screen.getByRole("button", { name: "Use this value" }));
+      // An inference the farmer changed is the farmer's choice, no longer the assistant's guess.
+      expect(within(item("Rotation of 5 years")).getByText(/Your choice in the app/)).toBeInTheDocument();
+      expect(within(item("Rotation of 5 years")).queryByText("Inferred by the assistant")).toBeNull();
+    });
+
+    it("edits crops only among those the app and the assistant share, and rejects the edit", async () => {
+      const { user, onAction } = await ask({ fetch: fakeServer(sse(turn(proposing([noCrops])))).fetch, planningCrops });
+      await user.click(await screen.findByRole("button", { name: "Edit before deciding: Exclude: Sunflower" }));
+      expect(screen.getByText("Only crops that this app's planning and the assistant name the same way can be chosen here.")).toBeInTheDocument();
+      expect(screen.getAllByRole("checkbox").map((box) => box.closest("label")!.textContent)).toEqual(["Maize", "Soy", "Sunflower"]);
+      expect(screen.getByRole("checkbox", { name: "Sunflower" })).toBeChecked();
+      await user.click(screen.getByRole("checkbox", { name: "Maize" }));
+      await user.click(screen.getByRole("button", { name: "Use this value" }));
+      await user.click(screen.getByRole("button", { name: "Reject and save: Exclude: Sunflower, Maize" }));
+      const sent = onAction.mock.calls[0]![0]!.envelope.action;
+      expect(sent).toEqual({
+        type: "compare.set_constraints",
+        constraints: [{ id: "k_crops", type: "excluded_crops", value: ["sunflower", "maize"], status: "rejected", source: "farmer_ui" }],
+      });
+    });
+
+    it("a proposal naming a crop the app and the assistant do not share cannot be edited, only decided as proposed", async () => {
+      const { user, onAction } = await ask({ fetch: fakeServer(sse(turn(proposing([unshared])))).fetch, planningCrops });
+      await screen.findByText("Exclude: winter wheat, Sunflower");
+      const chip = item("Exclude: winter wheat, Sunflower");
+      expect(within(chip).queryByRole("button", { name: /^Edit before deciding/ })).toBeNull();
+      expect(within(chip).getByText(
+        "Can't be edited here: winter wheat has no single name shared by this app's planning list and the assistant. You can still confirm, reject or hide it as proposed.",
+      )).toBeInTheDocument();
+      expect(within(chip).getByRole("button", { name: "Hide without saving: Exclude: winter wheat, Sunflower" })).toBeInTheDocument();
+      expect(within(chip).getByRole("button", { name: "Reject and save: Exclude: winter wheat, Sunflower" })).toBeInTheDocument();
+      // Confirmed as proposed: winter wheat is kept exactly, with the farmer's own words.
+      await user.click(within(chip).getByRole("button", { name: "Confirm condition: Exclude: winter wheat, Sunflower" }));
+      expect(onAction.mock.calls[0]![0]!.envelope.action).toEqual({
+        type: "compare.set_constraints",
+        constraints: [{ ...unshared, status: "confirmed" }],
+      });
+    });
+
+    it("a previous crop the app and the assistant do not share cannot be edited either", async () => {
+      const previous = { id: "k_prev", type: "previous_crop", value: "winter_wheat", status: "proposed", source: "agent_inferred", confidence: 0.7 };
+      await ask({ fetch: fakeServer(sse(turn(proposing([previous])))).fetch, planningCrops });
+      expect(await screen.findByRole("button", { name: "Confirm condition: Previous crop: winter wheat" })).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: /^Edit before deciding/ })).toBeNull();
+      expect(screen.getByText(/^Can't be edited here: winter wheat/)).toBeInTheDocument();
+    });
+
+    it("needs at least one crop", async () => {
+      const { user, onAction } = await ask({ fetch: fakeServer(sse(turn(proposing([noCrops])))).fetch, planningCrops });
+      await user.click(await screen.findByRole("button", { name: "Edit before deciding: Exclude: Sunflower" }));
+      await user.click(screen.getByRole("checkbox", { name: "Sunflower" }));
+      await user.click(screen.getByRole("button", { name: "Use this value" }));
+      expect(screen.getByRole("alert")).toHaveTextContent("Choose at least one crop.");
+      expect(screen.getByRole("group", { name: "Crops" })).toHaveAttribute("aria-invalid", "true");
+      expect(onAction).not.toHaveBeenCalled();
+    });
+
+    it("without the app's crop list, a crop proposal can be decided but not edited", async () => {
+      await ask({ fetch: fakeServer(sse(turn(proposing([noCrops])))).fetch });
+      expect(await screen.findByRole("button", { name: /^Confirm condition: Exclude/ })).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: /^Edit before deciding: Exclude/ })).toBeNull();
+    });
+
+    it("going back to the proposal restores it, words and all", async () => {
+      const { user } = await ask();
+      await user.click(await screen.findByRole("button", { name: "Edit before deciding: No irrigation" }));
+      await user.click(screen.getByRole("radio", { name: "Irrigation available" }));
+      await user.click(screen.getByRole("button", { name: "Use this value" }));
+      await user.click(screen.getByRole("button", { name: "Back to the assistant's proposal: No irrigation" }));
+      expect(within(item("No irrigation")).getByText("Proposed")).toBeInTheDocument();
+      expect(within(item("No irrigation")).getByText(/From your words/)).toBeInTheDocument();
+    });
+
+    it("another field view discards an open editor and an undecided edit", async () => {
+      const { user, rerender, props, onAction } = await ask();
+      await user.click(await screen.findByRole("button", { name: "Edit before deciding: No irrigation" }));
+      await user.click(screen.getByRole("radio", { name: "Irrigation available" }));
+      await user.click(screen.getByRole("button", { name: "Use this value" }));
+      await user.click(screen.getByRole("button", { name: "Edit before deciding: Minimise nitrogen fertiliser" }));
+      rerender({ fieldContext: { ...props.fieldContext!, revision: 9 } }); // e.g. the boundary changed
+      expect(screen.queryByRole("group", { name: "Change the condition" })).toBeNull();
+      expect(screen.getByText("No irrigation")).toBeInTheDocument();
+      expect(screen.queryByText("Irrigation available")).toBeNull();
+      expect(onAction).not.toHaveBeenCalled();
+    });
+
+    it("an edit to a decision the host already holds says it was saved earlier, not that it was just saved", async () => {
+      const held = { id: "pc_irrigation_available", type: "irrigation_available", value: true, status: "confirmed", source: "farmer_ui" } as const;
+      const { user, onAction } = await ask({ fieldContext: { ...clean(poltava()), constraints: [held] } });
+      await user.click(await screen.findByRole("button", { name: "Edit before deciding: No irrigation" }));
+      await user.click(screen.getByRole("radio", { name: "Irrigation available" }));
+      await user.click(screen.getByRole("button", { name: "Use this value" }));
+      const chip = item("Irrigation available");
+      expect(within(chip).getByText("Already confirmed earlier · nothing new saved")).toBeInTheDocument();
+      expect(within(chip).queryByText("Confirmed")).toBeNull();
+      expect(within(chip).queryByText("Saving…")).toBeNull();
+      expect(onAction).not.toHaveBeenCalled(); // nothing was submitted
+      // The farmer can go back to the assistant's proposal and decide that instead.
+      await user.click(within(chip).getByRole("button", { name: "Back to the assistant's proposal: No irrigation" }));
+      expect(within(item("No irrigation")).getByText("Proposed")).toBeInTheDocument();
+    });
+
+    it("a decision made here is shown as made here, even when the host held it already", async () => {
+      const { user, onAction, rerender, props } = await ask();
+      await user.click(await screen.findByRole("button", { name: "Confirm condition: No irrigation" }));
+      const sent = onAction.mock.calls[0]![0]!.envelope.action;
+      rerender({ fieldContext: { ...props.fieldContext!, constraints: sent.type === "compare.set_constraints" ? sent.constraints : [] } });
+      expect(within(item("No irrigation")).getByText("Confirmed")).toBeInTheDocument();
+      expect(within(item("No irrigation")).queryByText(/earlier/)).toBeNull();
+    });
+
+    it("keeps the edit when the farmer keeps an earlier decision instead, or the host fails", async () => {
+      for (const reason of ["cancelled", "failed"] as const) {
+        const { user, unmount } = await ask({ onAction: () => ({ status: "rejected", reason }) });
+        await user.click(await screen.findByRole("button", { name: "Edit before deciding: No irrigation" }));
+        await user.click(screen.getByRole("radio", { name: "Irrigation available" }));
+        await user.click(screen.getByRole("button", { name: "Use this value" }));
+        await user.click(screen.getByRole("button", { name: "Confirm condition: Irrigation available" }));
+        const chip = item("Irrigation available");
+        if (reason === "cancelled") {
+          // Nothing changed: the edited choice is offered again, without a failure message.
+          await waitFor(() => expect(within(chip).getByText("Edited by you · not saved yet")).toBeInTheDocument());
+          expect(within(chip).queryByRole("status")).toBeNull();
+        } else {
+          expect(await within(chip).findByText("Not saved: The app could not apply this action.")).toBeInTheDocument();
+        }
+        unmount();
+      }
+    });
   });
 
   it("applies a map chip through the host, and refuses it once the field view has changed", async () => {

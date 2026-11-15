@@ -1,0 +1,26 @@
+{
+  "_about": "The host-to-agent constraint contract (Task 05E). `decided` is what the farmer's app sends the API (POST /api/agent/constraints/{field}/{season}); `signed` is exactly what the API then puts in the agent's signed FieldContext. apps/api/tests/test_agent_host_contract.py checks the real API produces `signed` from `decided`; services/agent/tests/test_host_constraint_contract.py checks the agent's contract and behaviour on `signed`. `farmer_words` must never reach the signed context.",
+  "decided": [
+    {"id": "c_irrigation", "type": "irrigation_available", "value": false, "status": "confirmed",
+     "source": "farmer_text", "evidence": "I don't have irrigation"},
+    {"id": "c_excluded", "type": "excluded_crops", "value": ["sunflower"], "status": "confirmed",
+     "source": "farmer_text", "evidence": "exclude sunflower"},
+    {"id": "c_organic", "type": "organic_only", "value": true, "status": "rejected",
+     "source": "farmer_text", "evidence": "organic only please"},
+    {"id": "c_length", "type": "rotation_length_years", "value": 4, "status": "confirmed",
+     "source": "agent_inferred", "confidence": 0.6},
+    {"id": "c_machinery", "type": "machinery_limit", "value": "Only a 6 m seeder", "status": "confirmed",
+     "source": "farmer_text", "evidence": "we only have a 6 m seeder"}
+  ],
+  "signed": [
+    {"id": "pc_excluded_crops", "type": "excluded_crops", "value": ["sunflower"], "status": "confirmed",
+     "source": "farmer_ui"},
+    {"id": "pc_irrigation_available", "type": "irrigation_available", "value": false, "status": "confirmed",
+     "source": "farmer_ui"},
+    {"id": "pc_organic_only", "type": "organic_only", "value": true, "status": "rejected", "source": "farmer_ui"},
+    {"id": "pc_rotation_length_years", "type": "rotation_length_years", "value": 4, "status": "confirmed",
+     "source": "agent_inferred", "confidence": 0.6}
+  ],
+  "farmer_words": ["I don't have irrigation", "exclude sunflower", "organic only please", "we only have a 6 m seeder",
+                   "Only a 6 m seeder", "seeder"]
+}

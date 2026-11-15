@@ -9,7 +9,12 @@ from field_shift_science.simulation.root_zone_inputs import (
     root_zone_storage_mm,
 )
 from field_shift_science.simulation.root_zone_model import active_root_zone_correction
-from field_shift_science.simulation.schemas import WaterForecast, WaterForecastDay
+from field_shift_science.simulation.schemas import (
+    ShallowSoilTemperature,
+    WaterForecast,
+    WaterForecastApplicability,
+    WaterForecastDay,
+)
 from field_shift_science.simulation.water_balance import (
     FAO56_BUCKET_VERSION,
     REFERENCE_FIELD_CAPACITY,
@@ -35,7 +40,10 @@ def run_water_forecast(
 ) -> WaterForecast:
     crop = crop_water_parameters(crop_name)
     if crop is None:
-        raise HistoricalInputError("Water forecasts currently support maize, soy and wheat.")
+        raise HistoricalInputError(
+            "No FAO-56 water reference is configured for this crop. "
+            "Supported crops: maize, soy, wheat, barley, sunflower, rapeseed and dry peas."
+        )
 
     latitude, longitude = field_location(geometry)
     run = fetch_ifs_root_zone(latitude, longitude, water_forecast_run_day(submitted_at))
@@ -100,7 +108,22 @@ def run_water_forecast(
             "The opening reserve uses forecast soil layers from the initialization day.",
             "The bucket uses reference loam, fixed rooting depth and a midseason crop coefficient.",
             "The forecast assumes zero irrigation, snowmelt and runoff and uses grid data.",
+            "Freezing, thawing and crop dormancy are not modeled. The reference bucket does not "
+            "establish liquid plant-available water, root-zone frozen fraction "
+            "or crop suitability.",
         ],
+        applicability=WaterForecastApplicability(
+            status=(
+                "review_required"
+                if any(day.soil_temperature_c <= 0 for day in run.days)
+                else "not_assessed"
+            ),
+            initialized_at=datetime.combine(run.initialized_on, time(), UTC),
+            soil_temperature=[
+                ShallowSoilTemperature(date=day.date, mean_c=day.soil_temperature_c)
+                for day in run.days
+            ],
+        ),
         days=days,
     )
 
@@ -125,6 +148,13 @@ def latest_water_forecast(session: Session, field_id: str) -> WaterForecast | No
     if data is None:
         return None
     result = WaterForecast.model_validate(data)
+    # Crop edits do not change boundary_revision. Keep the old run archived,
+    # but never present its crop-specific balance as the current field state.
+    if (
+        crop_water_parameters(field.crop) is None
+        or field.crop.strip().casefold() != result.crop.strip().casefold()
+    ):
+        return None
     if result.model_version is not None:
         correction = active_root_zone_correction()
         if correction is None or correction.version != result.model_version:

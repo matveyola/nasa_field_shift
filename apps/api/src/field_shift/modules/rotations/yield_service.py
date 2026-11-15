@@ -12,12 +12,13 @@ from sqlalchemy.orm import Session
 
 from field_shift.modules.fields.history import boundary_for_season
 from field_shift.modules.fields.service import require_field
+from field_shift.modules.onboarding.profiles import completed_setup_inputs
 from field_shift.modules.rotations.schemas import (
     RotationYieldPlan,
     RotationYieldRead,
     RotationYieldYear,
 )
-from field_shift.modules.rotations.service import get_plan_snapshot
+from field_shift.modules.rotations.service import crop_for_season, get_plan_snapshot
 
 logger = logging.getLogger(__name__)
 
@@ -39,11 +40,13 @@ def get_yield_comparison(session: Session, field_id: str, season: int) -> Rotati
     enabled = model is not None and (
         model.promoted or getenv("ROTATION_YIELD_ENABLE_EXPERIMENTAL", "0") == "1"
     )
+    setup = completed_setup_inputs(session, (field_id,)).get(field_id)
+    first_preceding_crop = crop_for_season(field, season, setup)
     plans = []
     for plan in schedules:
         estimates = []
         sequence = tuple(item.crop for item in plan.crops)
-        preceding_crop = field.crop if field.season == season else None
+        preceding_crop = first_preceding_crop
         for item in plan.crops:
             estimate = (
                 model.estimate(

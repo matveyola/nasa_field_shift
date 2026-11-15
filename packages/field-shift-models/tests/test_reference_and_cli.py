@@ -104,3 +104,25 @@ def test_packaging_and_chronology_preserve_frozen_baseline_numerics(previous, cu
             assert {k: v for k, v in a.items() if k not in identity} == {
                 k: v for k, v in b.items() if k not in identity
             }
+
+
+def test_explicit_land_evidence_changes_identity_without_changing_baseline_numbers():
+    import json
+
+    reports = Path(__file__).resolve().parents[1] / "reports"
+    before = json.loads((reports / "cpu-v5.json").read_text())
+    after = json.loads((reports / "cpu-v6.json").read_text())
+    assert before["accuracy_metrics"] is after["accuracy_metrics"] is None
+    assert before["promotion"] == after["promotion"] == "baseline_only"
+    for key, old in before["runs"].items():
+        new = after["runs"][key]
+        # New explicit synthetic land evidence is an actual input change, not a
+        # rewritten old fingerprint. Numerical weather/soil/crop inputs are equal.
+        assert old["input_sha256"] != new["input_sha256"]
+        for a, b in zip(
+            old["ospy"]["result"]["seasons"], new["ospy"]["result"]["seasons"], strict=True
+        ):
+            identities = {"opening_state_id", "closing_state_id"}
+            assert {k: v for k, v in a.items() if k not in identities} == {
+                k: v for k, v in b.items() if k not in identities
+            }

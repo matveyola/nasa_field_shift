@@ -1,21 +1,29 @@
-import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
-import { ArrowPathIcon, ArrowRightIcon, CheckCircleIcon, PencilSquareIcon } from '@heroicons/react/24/outline'
+import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
+import { ArrowPathIcon, ArrowRightIcon, CheckCircleIcon, PencilSquareIcon, PlusIcon } from '@heroicons/react/24/outline'
 import { api } from '../../api/client'
 import type { Field, FieldContext, HistoricalRotationComparison, Job, Rotations, Scenario } from '../../api/contracts'
+import { onboardingApi } from '../../api/onboarding'
+import { ContextHelp } from '../../shared/ContextHelp'
 import { CropIcon } from '../../shared/CropIcon'
 import { FieldWorkspaceBar } from '../../shared/FieldWorkspaceBar'
 import { cropInput, useLocale } from '../../shared/locale'
 import { useJob, useStartJob } from '../../shared/jobs'
 import { JobStatus } from '../../shared/JobStatus'
 import { Empty, ErrorBox, Loading, PageHeading, ScenarioSelect } from '../../shared/ui'
+import { PlanningPreferences } from '../assistant/PlanningPreferences'
 import { errorText, useResource } from '../../shared/useResource'
 import { RotationYieldPanel } from './RotationYieldPanel'
 import { RotationComparison } from './RotationComparison'
 import { FarmRotationPlanner } from './FarmRotationPlanner'
 import { useAccess } from '../access/AccessProvider'
+import { OnboardingPlan } from '../onboarding/OnboardingPlan'
+import { waterHelp } from '../water/waterHelp'
+import { rotationHelp } from './rotationHelp'
 import './rotations.css'
 
 type Props = {
+  embedded?: boolean
+  openStrategies?: () => void
   field: Field
   fields: Field[]
   context: FieldContext
@@ -24,13 +32,19 @@ type Props = {
   openWater: () => void
   chooseField: (id: string) => void
   openFields: () => void
+  onAddField?: () => void
 }
 
-export function RotationsPage({ field, fields, context: { field_id, season, scenario }, irrigationAvailable, chooseScenario, openWater, chooseField, openFields }: Props) {
-  const { t, crop, date } = useLocale()
+export function RotationsPage({ embedded = false, openStrategies, field, fields, context: { field_id, season, scenario }, irrigationAvailable, chooseScenario, openWater, chooseField, openFields, onAddField }: Props) {
+  const { t, crop, date, language } = useLocale()
+  const scenarioHelp = rotationHelp[language].scenario
+  const { stressDays, irrigation } = waterHelp[language]
   const { canEdit } = useAccess()
-  const load = useCallback((signal: AbortSignal) => api.rotations({ field_id, season, scenario }, signal), [field_id, season, scenario])
+  const scope = JSON.stringify([field_id, season, scenario, field.boundary_revision])
+  const load = useCallback(async (signal: AbortSignal) => ({ scope, data: await api.rotations({ field_id, season, scenario }, signal) }), [field_id, season, scenario, scope])
   const rotations = useResource(load)
+  const loadSetup = useCallback((signal: AbortSignal) => onboardingApi.field(field_id, signal), [field_id])
+  const fieldSetup = useResource(loadSetup)
   const [selectedId, setSelectedId] = useState<string>()
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -43,7 +57,7 @@ export function RotationsPage({ field, fields, context: { field_id, season, scen
   const jobs = useResource(loadJobs)
   const current = useJob(jobId)
   const create = useStartJob()
-  const data = rotations.data
+  const data = rotations.data?.scope === scope ? rotations.data.data : undefined
   const context = { field_id, season, scenario }
   const comparison = (job?: Job) => (job?.boundary_revision ?? 0) === field.boundary_revision
     ? matchComparison(job, context, data) : undefined
@@ -103,16 +117,27 @@ export function RotationsPage({ field, fields, context: { field_id, season, scen
   }
 
   return (
-    <div className="page-body rotations-page">
-      <PageHeading title="Rotations" season={season} dataLabel={result ? 'Historical reanalysis' : 'Demo data'} />
-      <FieldWorkspaceBar field={field} fields={fields} chooseField={chooseField} openFields={openFields} disabled={saving}>
+    <div className={embedded ? "rotations-page analytics-rotations" : "page-body rotations-page"}>
+      {!embedded && <><PageHeading title="Rotations" season={season} dataLabel={result ? 'Historical reanalysis' : 'Demo data'} />
+      <FieldWorkspaceBar field={field} fields={fields} chooseField={chooseField} openFields={openFields} disabled={saving} directSelection>
+        {onAddField && <button className="button" type="button" disabled={saving} onClick={onAddField}><PlusIcon aria-hidden="true" />{t('Add field')}</button>}
         <fieldset className="rotation-context-options" disabled={saving}>
-          <ScenarioSelect value={scenario} onChange={chooseScenario} />
-          <span className="rotation-irrigation">{irrigationAvailable ? t('No irrigation applied') : t('No irrigation')}</span>
+          <div className="context-help-row">
+            <ScenarioSelect value={scenario} onChange={chooseScenario} />
+            <ContextHelp label={scenarioHelp.title}><p>{scenarioHelp.description}</p></ContextHelp>
+          </div>
+          <div className="context-help-row">
+            <span className="rotation-irrigation">{irrigationAvailable ? t('Irrigation available') : t('No irrigation')}</span>
+            <ContextHelp label={irrigation.title}><p>{irrigation.description}</p></ContextHelp>
+          </div>
         </fieldset>
-      </FieldWorkspaceBar>
+      </FieldWorkspaceBar></>}
       <div className="rotations-workspace">
-        <FarmRotationPlanner season={season} onApplied={rotations.reload} />
+        {fieldSetup.error && <ErrorBox message={fieldSetup.error} retry={fieldSetup.reload} />}
+        {fieldSetup.data?.demo_plan && <details><summary>{language === 'uk' ? 'Приклад із налаштування поля' : 'Field setup example'}</summary><OnboardingPlan setup={fieldSetup.data} /></details>}
+        {!fieldSetup.pending && <RotationTools fold={!embedded && Boolean(fieldSetup.data?.demo_plan)}>
+        {!embedded && <FarmRotationPlanner fieldId={field_id} season={season} onApplied={rotations.reload} />}
+        <PlanningPreferences key={field_id + ":" + season + ":" + field.boundary_revision} fieldId={field_id} season={season} boundaryRevision={field.boundary_revision} />
         {create.error && <ErrorBox message={create.error} />}
         {jobId && <JobStatus job={current.job} error={current.error} />}
         {rotations.pending && <Loading text={t('Loading rotation plans…')} />}
@@ -120,10 +145,11 @@ export function RotationsPage({ field, fields, context: { field_id, season, scen
         {error && <ErrorBox message={error} />}
         {notice && <p ref={saveNotice} tabIndex={-1} className="job-status rotation-save-notice" role="status"><CheckCircleIcon aria-hidden="true" />{t(notice)}</p>}
         {data && !data.plans.length && <Empty>{t('No rotation plans are available for this field.')}</Empty>}
+        {embedded && data?.demo && <p className="analytics-caution">{language === 'uk' ? 'Довідкові послідовності. Демонстраційні дні стресу не є вимірами цього поля; запустіть історичне порівняння.' : 'Reference sequences. Demo stress days are not measurements of this field; run a historical comparison.'}</p>}
         {data && data.plans.length > 0 && (
           <>
             <section className="rotation-planning" aria-labelledby="rotation-planning-heading">
-              <div className="section-heading"><div><h2 id="rotation-planning-heading">{t('Choose a crop sequence')}</h2>
+              <div className="section-heading"><div><h2 id="rotation-planning-heading">{embedded ? (language === 'uk' ? 'Збережені послідовності культур' : 'Saved crop sequences') : t('Choose a crop sequence')}</h2>
                 <p>{t('Compare crop sequences for')} {field.name}.</p></div>
                 <span className="rotation-period">{years[0]}–{years[years.length - 1]}</span>
               </div>
@@ -150,7 +176,7 @@ export function RotationsPage({ field, fields, context: { field_id, season, scen
                   </button>
                 ))}
               </div>
-              {selected && <div className="rotation-plan-actions">
+              {!embedded && selected && <div className="rotation-plan-actions">
                 <p><span>{t('Selected plan')}</span><strong>{t(selected.name)}</strong></p>
                 <button ref={editButton} className="button" type="button" disabled={saving || !canEdit} onClick={() => setEditing(!editing)}
                   aria-expanded={editing} aria-controls="rotation-plan-editor">
@@ -161,7 +187,7 @@ export function RotationsPage({ field, fields, context: { field_id, season, scen
                   <CheckCircleIcon aria-hidden="true" />{saving ? t('Saving…') : t(selected.id === data.main_plan_id ? 'Main plan' : 'Set as main plan')}
                 </button>
               </div>}
-              {editing && selected && (
+              {!embedded && editing && selected && (
                 <form id="rotation-plan-editor" className="form-grid rotation-plan-editor" key={selected.id} onSubmit={(event) => void editPlan(event)}>
                   {selected.crops.map(({ year, crop: cropName }) => (
                     <label key={year}><span>{t('Crop')} · {year}</span><input name={'crop-' + year}
@@ -177,7 +203,10 @@ export function RotationsPage({ field, fields, context: { field_id, season, scen
             </section>
             <section className="rotation-water-comparison" aria-labelledby="rotation-water-heading">
               <div className="section-heading">
-                <div><h2 id="rotation-water-heading">{t('Water stress · Year 1')}</h2><p>{t('Fewer stress days means less water pressure on the crop.')}</p></div>
+                <div><div className="context-help-row">
+                  <h2 id="rotation-water-heading">{t('Water stress · Year 1')}</h2>
+                  <ContextHelp label={stressDays.title}><p>{stressDays.description}</p></ContextHelp>
+                </div><p>{t('Fewer stress days means less water pressure on the crop.')}</p></div>
                 <button className="button" type="button" disabled={!canEdit || !data || saving || create.submitting || active}
                   onClick={() => void runHistoricalComparison()}>
                   <ArrowPathIcon className={active ? 'spin' : undefined} aria-hidden="true" />
@@ -191,25 +220,36 @@ export function RotationsPage({ field, fields, context: { field_id, season, scen
                     + ' – ' + date(result.plans[0].provenance.end_date) + ' · ' + t('Crop year') + ' ' + result.evaluated_year
                   : t('Demo comparison. Run the historical comparison to use ERA5 weather.')}</p>
               </div>
-              <RotationComparison groups={measures.map(({ label, property }) => ({
+              {(result || !embedded) && <RotationComparison groups={measures.map(({ label, property }) => ({
                 label: t(label), unit: t('d'),
                 values: data.plans.map((plan) => ({
                   label: t(plan.name),
                   value: (result ? result.plans.find(({ id }) => id === plan.id)?.[property] : plan[property]) ?? null,
                 })),
-              }))} />
+              }))} />}
             </section>
             <RotationYieldPanel
               key={JSON.stringify([field_id, season, data.plans.map(({ id, crops }) => [id, crops])])}
               fieldId={field_id} season={season} plans={data.plans} />
             <div className="rotation-footer">
+              {embedded && openStrategies && <button type="button" className="button primary" onClick={openStrategies}>{language === 'uk' ? 'Майбутні рішення у Стратегіях' : 'Future choices in Strategies'}<ArrowRightIcon aria-hidden="true" /></button>}
               <button type="button" className="button" disabled={saving} onClick={openWater}>{t('Open water balance')}<ArrowRightIcon aria-hidden="true" /></button>
             </div>
           </>
         )}
+        </RotationTools>}
       </div>
     </div>
   )
+}
+
+function RotationTools({ fold, children }: { fold: boolean; children: ReactNode }) {
+  const { language } = useLocale()
+  if (!fold) return <>{children}</>
+  return <details className="advanced-rotation-tools">
+    <summary>{language === 'uk' ? 'Інші інструменти планування' : 'Other planning tools'}</summary>
+    {children}
+  </details>
 }
 
 function matchComparison(job: Job | undefined, context: FieldContext, plans: Rotations | undefined): HistoricalRotationComparison | undefined {

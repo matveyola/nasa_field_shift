@@ -53,7 +53,10 @@ def main():
     }
     docker = ["docker"]
     if subprocess.run(
-        docker + ["info"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        docker + ["info"],
+        check=False,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
     ).returncode:
         docker = ["sg", "docker", "-c"]
 
@@ -63,6 +66,7 @@ def main():
         with (report_dir / "commands.log").open("ab") as log:
             result = subprocess.run(
                 parts,
+                check=False,
                 cwd=ROOT,
                 input=input,
                 env=env,
@@ -75,7 +79,13 @@ def main():
 
     # Require a fresh project; even a previous failed verifier is not silently overwritten.
     present = command(
-        ["docker", "ps", "-aq", "--filter", "label=com.docker.compose.project=" + project],
+        [
+            "docker",
+            "ps",
+            "-aq",
+            "--filter",
+            "label=com.docker.compose.project=" + project,
+        ],
         capture=True,
     )
     if present.strip():
@@ -122,6 +132,10 @@ def main():
                     "services": {
                         "postgres": {"ports": [f"127.0.0.1:{pg_port}:5432"]},
                         "redis": {"ports": [f"127.0.0.1:{redis_port}:6379"]},
+                        # The planning acceptance uses supplied field geometry.
+                        # Boundary inference has its own real-image smoke test;
+                        # do not download weights in this deterministic gate.
+                        "boundary-model": {"profiles": ["verify-boundary-inference"]},
                     }
                 }
             )
@@ -337,7 +351,15 @@ def main():
                 "-f",
                 "/tmp/planning-acceptance.dump",
             )
-            compose("exec", "-T", "postgres", "createdb", "-U", "field_shift", "planning_restore")
+            compose(
+                "exec",
+                "-T",
+                "postgres",
+                "createdb",
+                "-U",
+                "field_shift",
+                "planning_restore",
+            )
             compose(
                 "exec",
                 "-T",
@@ -352,7 +374,7 @@ def main():
             )
             assert sql(counts_query, "planning_restore") == original_counts
             heads = compose("exec", "-T", "api", "alembic", "heads", capture=True)
-            assert heads.count("(head)") == 1 and "0014_planning_inputs" in heads
+            assert heads.count("(head)") == 1 and "0016_merge_agent_planning" in heads
             script = """import os, subprocess
 from field_shift.config import get_settings
 from sqlalchemy.engine import make_url
@@ -377,7 +399,7 @@ subprocess.run(["alembic", "downgrade", "0010_precision_plans"], check=True)
             )
             assert (
                 sql("select version_num from alembic_version", "planning_restore")
-                == "0014_planning_inputs"
+                == "0016_merge_agent_planning"
             )
             check(
                 "single migration head; archive restored to fresh DB; "
@@ -392,6 +414,7 @@ subprocess.run(["alembic", "downgrade", "0010_precision_plans"], check=True)
                 ISSUE3_DATABASE_URL=f"postgresql+psycopg://field_shift:{password}@127.0.0.1:{pg_port}/planning_profiles",
                 ISSUE5_POSTGRES_ADMIN_URL=f"postgresql://field_shift:{password}@127.0.0.1:{pg_port}/planning_test",
                 FIELD_SHIFT_TEST_REDIS_URL=f"redis://127.0.0.1:{redis_port}/15",
+                FIELD_SHIFT_HANDOFF_TEST_DATABASE_URL=f"postgresql+psycopg://field_shift:{password}@127.0.0.1:{pg_port}/planning_test",
             )
             command(
                 [
@@ -406,6 +429,17 @@ subprocess.run(["alembic", "downgrade", "0010_precision_plans"], check=True)
                 env=test_env,
             )
             check("all impacted PostgreSQL/Redis integration and concurrency tests")
+            command(
+                [
+                    str(ROOT / "apps/api/.venv/bin/python"),
+                    "-m",
+                    "pytest",
+                    "-q",
+                    "apps/api/tests/test_rotation_handoff.py",
+                ],
+                env=test_env,
+            )
+            check("handoff owner, snapshot and final-attempt fences on PostgreSQL")
             compose("stop", "crop-model")
             unavailable = api("/planning-workspace")
             assert unavailable["status"] == "unavailable" and unavailable["request"] is None
@@ -422,7 +456,13 @@ subprocess.run(["alembic", "downgrade", "0010_precision_plans"], check=True)
             (report_dir / "report.json").write_text(json.dumps(report, indent=2) + "\n")
             if started:
                 compose(
-                    "logs", "--no-color", "--tail", "100", "worker-planning", "crop-model", "api"
+                    "logs",
+                    "--no-color",
+                    "--tail",
+                    "100",
+                    "worker-planning",
+                    "crop-model",
+                    "api",
                 )
                 compose("down", "--volumes", "--remove-orphans")
             os.environ.update(original)

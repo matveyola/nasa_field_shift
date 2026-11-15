@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { analyticsApi, type VegetationObservation, type VegetationResult } from '../../api/analytics'
 import type { Field } from '../../api/contracts'
+import type { MapFocus } from '../../shared/productContext'
 import { errorText, useResource } from '../../shared/useResource'
 import { useJob } from '../../shared/jobs'
 import { usableObservations } from './vegetationInsights'
@@ -29,7 +30,7 @@ function useVegetationScene(result: VegetationResult | undefined, observation: V
     pending: Boolean(requestKey && current === undefined && !resource.error) }
 }
 
-export function useFieldAnalytics(field: Field | undefined, season: number, includeMap = true) {
+export function useFieldAnalytics(field: Field | undefined, season: number, includeMap = true, initialFocus?: MapFocus) {
   const fieldId = field?.id
   const revision = field?.boundary_revision
   const footprint = JSON.stringify(field?.planting?.geometry ?? field?.geometry)
@@ -42,15 +43,19 @@ export function useFieldAnalytics(field: Field | undefined, season: number, incl
   const current = vegetation.data && vegetation.data.field_id === fieldId && vegetation.data.boundary_revision === revision
     && vegetation.data.season === season && vegetation.data.requestFootprint === footprint ? vegetation.data : undefined
   const observations = useMemo(() => usableObservations(current), [current])
-  const scope = JSON.stringify([fieldId, season, revision, footprint])
+  const scope = JSON.stringify([fieldId, season, revision, footprint, initialFocus])
   const [selection, setSelection] = useState<{ scope: string; primaryDate?: string; comparisonDate?: string; showComparison?: boolean; index?: import('../../api/analytics').SpectralIndex }>()
-  const scoped = selection?.scope === scope ? selection : undefined
-  const primary = observations.find((point) => point.date === scoped?.primaryDate) ?? observations.at(-1)
+  const scoped = selection?.scope === scope ? selection : initialFocus ? {
+    scope, primaryDate: initialFocus.observationDate, comparisonDate: initialFocus.comparisonDate,
+    showComparison: initialFocus.comparison, index: initialFocus.index,
+  } : undefined
+  // An explicit deep-linked observation must never silently select another date.
+  const primary = scoped?.primaryDate ? observations.find((point) => point.date === scoped.primaryDate) : observations.at(-1)
   const alternatives = observations.filter((point) => point.date !== primary?.date)
   const comparison = alternatives.find((point) => point.date === scoped?.comparisonDate)
   const selectedScene = useVegetationScene(current, includeMap ? primary : undefined)
   const comparisonScene = useVegetationScene(current, includeMap ? comparison : undefined)
-  const showingComparison = Boolean(comparison && scoped?.showComparison)
+  const showingComparison = Boolean(scoped?.showComparison)
   const spectralIndex = scoped?.index
   const showingMsavi = spectralIndex === 'msavi'
 

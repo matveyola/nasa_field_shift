@@ -19,7 +19,7 @@ Field Shift об’єднує карту полів, стан рослиннос
 | Фонові завдання | Стан у PostgreSQL, доставка через Redis | Lease, retries, ідемпотентність, fencing |
 | Асистент | Контекст поля, докази, підписані запити, inference | Контракти, attestation, grounding, SSE |
 | Схема БД | Послідовність Alembic revisions і початкові дані | Міграції, seed, backup/restore |
-| Web | Оболонка, карта, Water, Rotations, Farm, widget | Unit, TypeScript, build, browser E2E |
+| Web | Поля, Стратегії, центральний Агент, Аналітика, Господарство; сумісні старі адреси | Unit, TypeScript, build, browser E2E |
 | ML | Окремі офлайн-процеси навчання й оцінювання | Відтворювані протоколи та заморожені оцінки |
 | Експлуатація | Compose, образи, резервні копії, CI | Config, container builds, інтеграційні suites |
 

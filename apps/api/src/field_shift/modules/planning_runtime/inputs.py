@@ -5,6 +5,7 @@ from uuid import uuid4
 
 from field_shift_contracts.planning_v1 import FarmPlanningRequest
 from field_shift_contracts.planning_v1.common import Contract
+from field_shift_science.fields.land import LAND_ELIGIBILITY_POLICY_VERSION
 from pydantic import Field as PydanticField
 from pydantic import model_validator
 from sqlalchemy import select
@@ -161,6 +162,7 @@ class TrustedResolver:
         if request.weather.stale_after <= datetime.now(UTC):
             raise PlanningFailure("stale", "Weather issue expired; acquire a new issue")
         return request, {
+            "eligibility_policy": LAND_ELIGIBILITY_POLICY_VERSION,
             "profiles": {f.field_id: f.snapshot_id for f in request.fields},
             "geometry": {f.field_id: f.geometry_revision for f in request.fields},
             "weather": digest(expected),

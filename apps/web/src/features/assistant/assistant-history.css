@@ -1,0 +1,21 @@
+.assistant-history { width: min(760px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); padding: 0; border: 1px solid #dce2d9; border-radius: 16px; color: #22332c; background: #fff; box-shadow: 0 16px 72px #142e2833; overflow: hidden; }
+.assistant-history::backdrop { background: #142e2870; }
+.assistant-history-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 16px; border-bottom: 1px solid #dce2d9; }
+.assistant-history-heading > div { min-width: 0; }
+.assistant-history-heading h2 { margin: 0; font-size: 1.2rem; }
+.assistant-history-heading p { margin: 4px 0 0; }
+.assistant-history-heading button { flex: none; font-size: 24px; }
+.assistant-history-body { padding: 0 16px 16px; overflow-y: auto; max-height: calc(100dvh - 144px); }
+.assistant-history :is(p, strong, span, h2, h3, a) { overflow-wrap: anywhere; }
+.assistant-history button, .assistant-history a { min-height: 44px; min-width: 44px; }
+.assistant-history a { display: inline-flex; align-items: center; }
+.assistant-history button:focus-visible, .assistant-history a:focus-visible { outline: 3px solid #3d805b; outline-offset: 2px; }
+.assistant-history-help { color: #56655c; font-size: .88rem; }
+.assistant-history-list, .assistant-history-messages { list-style: none; padding: 0; display: grid; gap: 12px; }
+.assistant-history-list button { display: grid; gap: 6px; width: 100%; text-align: start; border: 1px solid #dce2d9; background: #f6f8f4; border-radius: 10px; padding: 12px; color: inherit; font: inherit; cursor: pointer; }
+.assistant-history-list button span { font-size: .85rem; }
+.assistant-history-message { border: 1px solid #dce2d9; border-radius: 10px; padding: 12px; min-width: 0; }
+.assistant-history-message--user { background: #f6f8f4; }
+.assistant-history-message-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: .85rem; }
+.assistant-history-text { white-space: pre-wrap; }
+@media (max-width: 480px) { .assistant-history-heading, .assistant-history-body { padding-inline: 12px; } .assistant-history-message { padding: 10px; } }

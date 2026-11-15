@@ -3,7 +3,7 @@
 from datetime import date
 from typing import Annotated, Literal
 
-from pydantic import Field, model_validator
+from pydantic import Field, model_serializer, model_validator
 
 from .common import (
     Capability,
@@ -204,6 +204,7 @@ class FieldProfileSnapshot(Versioned):
     geometry: FieldGeometry
     area_ha: Annotated[Finite, Field(gt=0, le=100000)]
     land_status: Literal["arable", "non_arable", "ocean", "ice", "unknown"]
+    land_source_ids: Annotated[list[Id], Field(max_length=200)] = Field(default_factory=list)
     history: Annotated[list[CropHistoryEntry], Field(max_length=100)]
     history_complete_since: Season | None
     current_crop: CropRef | None
@@ -214,6 +215,15 @@ class FieldProfileSnapshot(Versioned):
     hazards: Annotated[list[HazardEvidence], Field(max_length=50)]
     sources: Annotated[list[SourceRecord], Field(max_length=200)]
     missing_data: Annotated[list[Reason], Field(max_length=50)]
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_land_serialization(self, handler):
+        data = handler(self)
+        # Empty and absent bindings both mean unassessed. Keep pre-extension
+        # canonical snapshot/request bytes stable; explicit links are hashed.
+        if not self.land_source_ids:
+            data.pop("land_source_ids", None)
+        return data
 
     @model_validator(mode="after")
     def provenance(self):
@@ -227,6 +237,9 @@ class FieldProfileSnapshot(Versioned):
         if any(a.bottom_cm > b.top_cm for a, b in zip(ordered, ordered[1:])):
             raise ValueError("soil horizons overlap")
         source_ids = {s.id for s in self.sources}
+        unique(self.land_source_ids, "land source")
+        if not set(self.land_source_ids) <= source_ids:
+            raise ValueError("unresolved land source reference")
         records = [
             *self.history,
             *self.soil,

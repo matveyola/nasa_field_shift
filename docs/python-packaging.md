@@ -11,6 +11,7 @@ not change which application code or immutable resources they load.
 | `field-shift-models` | `field_shift_models` | Crop engines, bounded evaluation and offline experiments |
 | `field-shift-ml` | `field_shift_ml` | Offline acquisition, training and evaluation workflows |
 | `field-shift-crop-runtime` | `crop_runtime` | Private authenticated model process |
+| `field-shift-rotation-model` | `field_shift_rotation_model` | Installed experimental rotation engine, bounded private HTTP and immutable reference resources |
 | `field-shift-agent` | `agent_service`, `contracts`, `integration_stub`, `evals` | Private assistant, its own contracts and evaluation tools |
 
 The agent's existing `contracts` namespace and planning's `field_shift_contracts`
@@ -51,7 +52,7 @@ A path in a build resolver is an explicit package source, not an import-path ove
 ## Required verification
 
 Run `python3 infra/check_python_packaging.py` (also included in tooling/fast checks).
-It checks seven build backends, ordinary first-party imports and path overrides.
+It checks eight build backends, ordinary first-party imports and path overrides.
 Its limitations are explicit: dynamic imports and runtime behavior need execution.
 
 After changing package boundaries, dependency metadata, package data, entry points
@@ -61,7 +62,7 @@ or Docker installation, run:
 python3 infra/verify_python_wheels.py --output /tmp/field-shift-wheel-check
 ```
 
-This builds all seven wheels, checks ownership collisions, installs resolved
+This builds all eight wheels, checks ownership collisions, installs resolved
 runtime dependencies into separate temporary environments constrained by consumer
 locks, runs `uv pip check`, then imports and reads resources from an unrelated
 working directory with `python -I`. It executes a real bounded crop evaluation,

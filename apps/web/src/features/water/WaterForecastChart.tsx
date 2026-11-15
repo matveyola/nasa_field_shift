@@ -1,18 +1,25 @@
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 import { useEffect, useId, useRef, useState } from 'react'
 import type { WaterForecast } from '../../api/contracts'
+import { ContextHelp } from '../../shared/ContextHelp'
 import { axisRange, chartColors } from '../../shared/DataCharts'
 import { useLocale } from '../../shared/locale'
+import { waterHelp, waterHelpMetadata } from './waterHelp'
 
 type Props = {
   days: WaterForecast['days']
   threshold: number
   initialDate?: string
   showModelEstimate: boolean
+  rootDepthMetres: number
+  provider: string
 }
 
-export function WaterForecastChart({ days, threshold, initialDate, showModelEstimate }: Props) {
+export function WaterForecastChart({ days, threshold, initialDate, showModelEstimate, rootDepthMetres, provider }: Props) {
   const { language, t, number, date, shortDate } = useLocale()
+  const help = waterHelp[language].rootZoneReserve
+  const depth = Number.isFinite(rootDepthMetres) && rootDepthMetres > 0
+    ? number(rootDepthMetres, 2) + ' ' + t('m') : undefined
   const [selectedDate, setSelectedDate] = useState(initialDate)
   const [width, setWidth] = useState(640)
   const container = useRef<HTMLDivElement>(null)
@@ -63,6 +70,9 @@ export function WaterForecastChart({ days, threshold, initialDate, showModelEsti
     <div className="water-forecast-chart" ref={container}>
       <figure className="water-trend-figure">
         <figcaption><strong>{t('Reserve')}</strong><span>, {t('mm')}</span>
+          <ContextHelp label={help.title}><p>{help.description}</p>
+            <p>{waterHelpMetadata(language, { depth, source: provider })}</p>
+          </ContextHelp>
           {showModelEstimate && <span className="water-model-key"><i />{t('ML estimate')}</span>}
         </figcaption>
         <svg viewBox={`0 0 ${width} ${height}`} height={height} role="img"

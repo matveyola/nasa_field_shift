@@ -53,6 +53,24 @@ def build_plan(root: Path, mode: str = "fast", build: bool = False) -> list[Chec
     add("agent contract TypeScript", "services/agent", "npm", "run", "check:ts")
     add("Python package boundaries", ".", sys.executable, "infra/check_python_packaging.py")
     for operation in ("check", "format"):
+        add(
+            f"development tooling {operation}",
+            "apps/api",
+            "uv",
+            "run",
+            "--no-sync",
+            "ruff",
+            operation,
+            *(("--check",) if operation == "format" else ()),
+            "--config",
+            "pyproject.toml",
+            "../../infra/check_agent_tree.py",
+            "../../infra/test_agent_tree.py",
+            "../../infra/test_ci_paths.py",
+            "../../infra/verify.py",
+            "../../infra/test_verify.py",
+        )
+    for operation in ("check", "format"):
         args = ("--check",) if operation == "format" else ()
         add(
             f"shared Python packages {operation}",
@@ -123,6 +141,7 @@ def build_plan(root: Path, mode: str = "fast", build: bool = False) -> list[Chec
         ("API", "apps/api"),
         ("ML", "packages/field-shift-ml"),
         ("models", "packages/field-shift-models"),
+        ("rotation model", "packages/field-shift-rotation-model"),
     )
     for name, directory in python_packages:
         add(f"{name} lint", directory, "uv", "run", "--no-sync", "ruff", "check", ".")

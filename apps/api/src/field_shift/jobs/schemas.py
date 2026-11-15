@@ -150,7 +150,7 @@ class JobResponse(BaseModel):
 
     id: str
     kind: JobKind
-    analysis: Analysis | None
+    analysis: Analysis | Literal["rotation_handoff"] | None
     field_id: str
     boundary_revision: int
     status: JobStatus

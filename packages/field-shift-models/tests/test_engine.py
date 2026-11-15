@@ -336,3 +336,34 @@ def test_missing_native_profiles_stay_unsupported(crop):
     result = AquaCropProvider({p.snapshot_id: hydraulics}).evaluate(p, candidate, weather)
     assert result.seasons[0].status == "unsupported"
     assert result.seasons[0].yield_t_ha.value is None
+
+
+@pytest.mark.parametrize("defect", ["unlinked", "partial", "zero", "point", "future_retrieval"])
+def test_direct_provider_rejects_unproven_land_before_numeric_execution(monkeypatch, defect):
+    from datetime import timedelta
+
+    from field_shift_models import provider as module
+
+    p, c, w, h = synthetic_inputs()
+    if defect == "unlinked":
+        p = p.model_copy(update={"land_source_ids": []})
+    else:
+        source = next(s for s in p.sources if s.id in p.land_source_ids)
+        if defect == "partial":
+            source.quality = "partial"
+        elif defect == "zero":
+            source.coverage_fraction = 0
+        elif defect == "point":
+            source.spatial_method = "representative_point"
+        else:
+            source.retrieved_at = w.as_of + timedelta(days=1)
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("unqualified land must not execute the numerical model")
+
+    monkeypatch.setattr(module, "run_engine", forbidden)
+    result = AquaCropProvider({p.snapshot_id: h}).evaluate(p, c, w)
+    assert all(
+        s.status == "insufficient_data" and s.yield_t_ha.value is None for s in result.seasons
+    )
+    assert any(r.code in {"land_evidence", "source_quality"} for r in result.reasons)

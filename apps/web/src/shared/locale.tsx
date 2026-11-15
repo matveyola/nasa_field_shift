@@ -9,6 +9,7 @@ const UpdateLocale = createContext<(language: Language) => void>(() => {})
 
 const cropInputs = new Map([
   ['кукурудза', 'Maize'], ['соя', 'Soy'], ['пшениця', 'Wheat'], ['яра пшениця', 'Spring wheat'],
+  ['ячмінь', 'Barley'], ['соняшник', 'Sunflower'], ['ріпак', 'Rapeseed'], ['горох', 'Peas'],
 ])
 
 export function cropInput(value: string) {

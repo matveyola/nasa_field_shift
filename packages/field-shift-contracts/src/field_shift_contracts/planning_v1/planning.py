@@ -121,7 +121,7 @@ class FarmPlanningRequest(Versioned):
     farm_id: Id
     as_of: Utc
     start_season: Season
-    season_count: Literal[1, 3]
+    season_count: Literal[1, 2, 3]
     fields: Annotated[list[FieldProfileSnapshot], Field(min_length=1, max_length=30)]
     weather: WeatherScenarioSet
     enabled_crops: Annotated[list[CropRef], Field(min_length=1, max_length=30)]

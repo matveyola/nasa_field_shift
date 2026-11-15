@@ -10,6 +10,8 @@ from field_shift.modules.farm.models import FARM_ID, Farm
 from field_shift.modules.farm.service import require_farm
 from field_shift.modules.fields.models import Field
 from field_shift.modules.fields.service import require_field
+from field_shift.modules.onboarding.profiles import completed_setup_inputs
+from field_shift.modules.onboarding.schemas import SetupInputs
 from field_shift.modules.rotations.models import FarmRotationDraft, RotationPreference
 from field_shift.modules.rotations.planner import optimize
 from field_shift.modules.rotations.planning_catalog import CROP_FAMILIES, known_crop
@@ -23,13 +25,16 @@ from field_shift.modules.rotations.planning_schemas import (
 )
 
 
-def _field_context(field: Field, start_season: int) -> PlanningField:
-    crop = known_crop(field.crop)
-    history = (
-        [CropDecision(field_id=field.id, season=field.season, crop=crop)]
-        if (crop is not None and start_season - 8 <= field.season < start_season)
-        else []
-    )
+def _field_context(field: Field, start_season: int, setup: SetupInputs | None) -> PlanningField:
+    setup_history = setup.history if setup and setup.history else []
+    history = {
+        entry.season: entry.crop
+        for entry in setup_history
+        if entry.crop is not None and start_season - 8 <= entry.season < start_season
+    }
+    current_crop = known_crop(field.crop)
+    if current_crop is not None and start_season - 8 <= field.season < start_season:
+        history[field.season] = current_crop
     return PlanningField(
         id=field.id,
         name=field.name,
@@ -37,17 +42,24 @@ def _field_context(field: Field, start_season: int) -> PlanningField:
         boundary_revision=field.boundary_revision,
         crop=field.crop,
         crop_season=field.season,
-        history=history,
+        history=[
+            CropDecision(field_id=field.id, season=season, crop=crop)
+            for season, crop in sorted(history.items())
+        ],
+        allowed_crops=setup.allowed_crops if setup else None,
+        priority=setup.priority if setup else None,
     )
 
 
-def planning_context(session: Session, start_season: int) -> PlanningContext:
+def planning_context(session: Session, start_season: int, season_count: int = 3) -> PlanningContext:
     if start_season < require_farm(session).season:
         raise ConflictError("Planning starts in the active farm season or later.")
-    fields = session.scalars(select(Field).where(Field.farm_id == FARM_ID).order_by(Field.id))
+    fields = list(session.scalars(select(Field).where(Field.farm_id == FARM_ID).order_by(Field.id)))
+    setups = completed_setup_inputs(session, (field.id for field in fields))
     return PlanningContext(
         start_season=start_season,
-        fields=[_field_context(field, start_season) for field in fields],
+        season_count=season_count,
+        fields=[_field_context(field, start_season, setups.get(field.id)) for field in fields],
         crops=[{"crop": crop, "family": family} for crop, family in CROP_FAMILIES.items()],
     )
 
@@ -58,6 +70,7 @@ def _snapshot(session: Session, payload: PlanningRequest, *, lock: bool = False)
         raise ConflictError("Planning starts in the active farm season or later.")
     fields = []
     preferences = {}
+    setups = completed_setup_inputs(session, payload.field_ids)
     for field_id in sorted(payload.field_ids):
         field = require_field(session, field_id)
         if lock:
@@ -67,7 +80,9 @@ def _snapshot(session: Session, payload: PlanningRequest, *, lock: bool = False)
                 .with_for_update()
                 .execution_options(populate_existing=True)
             ).one()
-        fields.append(_field_context(field, payload.start_season).model_dump(mode="json"))
+        # Omit unset profile values to retain compatibility with saved legacy snapshots.
+        context = _field_context(field, payload.start_season, setups.get(field_id))
+        fields.append(context.model_dump(mode="json", exclude_none=True))
         preference = session.get(
             RotationPreference, (field_id, payload.start_season - 1), populate_existing=True
         )
@@ -88,6 +103,7 @@ def _read(draft: FarmRotationDraft) -> PlanningRead:
         id=draft.id,
         name=draft.name,
         start_season=draft.start_season,
+        season_count=draft.request.get("season_count", 3),
         created_at=_timestamp(draft.created_at),
         applied_at=_timestamp(draft.applied_at) if draft.applied_at else None,
         request=draft.request,
@@ -102,7 +118,7 @@ def _timestamp(value: datetime) -> str:
 
 
 def _matching_retry(existing: FarmRotationDraft, payload: PlanningRequest) -> PlanningRead:
-    if existing.farm_id != FARM_ID or existing.request != payload.model_dump(mode="json"):
+    if existing.farm_id != FARM_ID or PlanningRequest.model_validate(existing.request) != payload:
         raise ConflictError("This request identifier is already used by a different plan.")
     return _read(existing)
 
@@ -156,6 +172,7 @@ def list_drafts(session: Session) -> list[PlanningSummary]:
             id=draft.id,
             name=draft.name,
             start_season=draft.start_season,
+            season_count=draft.request.get("season_count", 3),
             created_at=_timestamp(draft.created_at),
             applied_at=_timestamp(draft.applied_at) if draft.applied_at else None,
             status=draft.result["status"],
@@ -192,12 +209,23 @@ def apply_draft(session: Session, draft_id: str) -> PlanningRead:
     current = _snapshot(session, payload, lock=True)
     if current != draft.input_snapshot:
         raise ConflictError("Fields or crop plans changed. Generate a fresh plan before applying.")
-    by_field = {field_id: [] for field_id in payload.field_ids}
-    for row in sorted(draft.result["assignments"], key=lambda row: row["season"]):
-        by_field[row["field_id"]].append(row["crop"])
-    for field_id, crops in by_field.items():
-        if len(crops) != 3:
-            raise ConflictError("The rotation plan is incomplete and cannot be applied.")
+    years = list(range(payload.start_season, payload.start_season + payload.season_count))
+    by_field = {field_id: {} for field_id in payload.field_ids}
+    enabled = {rule.crop for rule in payload.crops}
+    for row in draft.result["assignments"]:
+        field_id, year, crop = row["field_id"], row["season"], row["crop"]
+        if (
+            field_id not in by_field
+            or year not in years
+            or year in by_field[field_id]
+            or crop not in enabled
+        ):
+            raise ConflictError("The rotation plan has invalid field/season assignments.")
+        by_field[field_id][year] = crop
+    if any(set(rows) != set(years) for rows in by_field.values()):
+        raise ConflictError("The rotation plan is incomplete and cannot be applied.")
+    for field_id, rows in by_field.items():
+        crops = [rows[year] for year in years]
         preference = session.get(RotationPreference, (field_id, payload.start_season - 1))
         if preference is None:
             preference = RotationPreference(

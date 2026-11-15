@@ -1,7 +1,8 @@
 // Real browser → API → durable worker → private CPU model; no network mocks.
 import assert from 'node:assert/strict'
 import { mkdir, writeFile } from 'node:fs/promises'
-import { chromium, expect } from '../services/agent/frontend/node_modules/@playwright/test/index.mjs'
+import { createRequire } from 'node:module'
+const { chromium, expect } = createRequire(new URL('../apps/web/package.json', import.meta.url))('@playwright/test')
 const baseURL = process.env.PLANNING_LIVE_URL
 const output = process.env.PLANNING_LIVE_OUTPUT
 if (!baseURL || !output || !process.env.PLANNING_LIVE_PASSWORD) throw new Error('Isolated acceptance environment required')
@@ -20,9 +21,9 @@ try {
   })
   assert.equal(login.status(), 200)
   await page.goto('/rotations?desktop=1&planning=1&field=F-01&season=' + new Date().getUTCFullYear())
-  await expect(page.getByRole('heading', { name: 'Crop planning', exact: true })).toBeVisible({ timeout: 20000 })
-  await expect(page.getByText('Synthetic demonstration — not measured accuracy', { exact: true })).toBeVisible()
   const controls = page.locator('.planning-workspace')
+  await expect(controls.getByRole('heading', { name: 'Scenario comparison', exact: true })).toBeVisible({ timeout: 20000 })
+  await expect(page.getByText('Synthetic demonstration — not measured accuracy', { exact: true })).toBeVisible()
   await controls.getByRole('combobox', { name: 'Field', exact: true }).selectOption('F-02')
   await controls.getByRole('combobox', { name: 'Season', exact: true }).selectOption(String(new Date().getUTCFullYear() + 1))
   await expect(page).toHaveURL(/field=F-02/)
@@ -41,7 +42,7 @@ try {
   await expect(controls.getByText('Changes from previous plan', { exact: true })).toBeVisible({ timeout: 180000 })
   await expect(controls.getByText('No assignment changes', { exact: true })).toBeVisible()
   await page.screenshot({ path: output + (mobile ? '/live-mobile.png' : '/live-desktop.png'), fullPage: true })
-  await expect(controls.getByRole('heading', { name: 'Crop planning', exact: true })).toBeVisible()
+  await expect(controls.getByRole('heading', { name: 'Scenario comparison', exact: true })).toBeVisible()
   assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'Mobile page overflow')
   await page.goto('/agent?desktop=1&field=F-02&season=2028&trajectory=reference')
   await expect(page).toHaveURL(/\/fields\?/)

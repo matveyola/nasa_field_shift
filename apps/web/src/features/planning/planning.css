@@ -39,3 +39,8 @@
   .pl-matrix th, .pl-matrix td { font-size: 12px; padding: 3px; }
   .pl-matrix button { font-size: 12px; padding: 4px; }
 }
+.pl-outcome { display: grid; gap: 7px; padding: 12px 0; }
+.pl-outcome small { color: var(--ink-2, #666); }
+.pl-outcome strong { font-size: 1.1rem; overflow-wrap: anywhere; }
+.pl-assumptions > details { margin-top: 12px; }
+.pl-subcard small { overflow-wrap: anywhere; }

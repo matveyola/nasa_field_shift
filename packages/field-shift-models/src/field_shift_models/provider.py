@@ -11,6 +11,10 @@ from field_shift_contracts.planning_v1.models import (
     SeasonEvaluation,
     SequenceEvaluation,
 )
+from field_shift_science.fields.land import (
+    LAND_ELIGIBILITY_POLICY_VERSION,
+    qualified_land_sources,
+)
 
 from .engine import NATIVE_CROP_NAMES, Parameters, RejectedInput, run_engine
 from .provenance import digest, distribution_manifest
@@ -78,6 +82,7 @@ class AquaCropProvider:
             parameter_sha256=digest(
                 {
                     "adapter": VERSION,
+                    "eligibility_policy": LAND_ELIGIBILITY_POLICY_VERSION,
                     "crops": SUPPORTED,
                     "generic_crop_parameters": {
                         c: vars(Crop(NATIVE_CROP_NAMES[c], planting_date="04/01"))
@@ -226,6 +231,20 @@ class AquaCropProvider:
             )
         if any(s.quality != "valid" for s in profile.sources + weather.sources):
             raise RejectedInput("insufficient_data", "source_quality", "Valid sources required")
+        if profile.snapshot_id not in self.hydraulics:
+            raise RejectedInput(
+                "insufficient_data", "hydraulics", "No pinned hydraulic parameters for snapshot"
+            )
+        parameters = self.hydraulics.get(profile.snapshot_id)
+        synthetic_test = bool(
+            parameters and parameters.synthetic and weather.scenario_type == "synthetic"
+        )
+        if not qualified_land_sources(profile, as_of=weather.as_of, allow_synthetic=synthetic_test):
+            raise RejectedInput(
+                "insufficient_data",
+                "land_evidence",
+                "Complete explicitly linked land evidence required",
+            )
         if profile.land_status != "arable":
             raise RejectedInput("unsupported", "land", "An evidenced arable field is required")
         if self.footprint:
@@ -263,10 +282,6 @@ class AquaCropProvider:
         if profile.hazards:
             raise RejectedInput(
                 "unsupported", "hazard", "Hazard impact needs a separately validated model"
-            )
-        if profile.snapshot_id not in self.hydraulics:
-            raise RejectedInput(
-                "insufficient_data", "hydraulics", "No pinned hydraulic parameters for snapshot"
             )
         if self.hydraulics[profile.snapshot_id].synthetic and weather.scenario_type != "synthetic":
             raise RejectedInput(

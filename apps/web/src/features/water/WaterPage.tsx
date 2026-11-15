@@ -4,6 +4,7 @@ import { AdjustmentsHorizontalIcon, ArrowPathIcon, CalendarDaysIcon, ChartBarIco
 import { api } from '../../api/client'
 import type { Field, FieldContext, JobOptions, Scenario, WaterResult } from '../../api/contracts'
 import { isWaterResult, matchingWaterResult } from '../../shared/analysis'
+import { explicitHistoricalRun } from '../assistant/assistantRun'
 import { useJob, useStartJob } from '../../shared/jobs'
 import { JobStatus } from '../../shared/JobStatus'
 import { Empty, ErrorBox, Loading, PageHeading, ScenarioSelect } from '../../shared/ui'
@@ -19,6 +20,7 @@ import './water.css'
 type WaterView = 'forecast' | 'scenarios'
 
 type Props = {
+  embedded?: boolean
   fields: Field[]
   field: Field
   context: FieldContext
@@ -55,11 +57,11 @@ export function WaterPage(props: Props) {
   }
 
   return (
-    <div className="page-body water-page">
-      <PageHeading title="Water" season={season} dataLabel={null} />
+    <div className={props.embedded ? "water-page analytics-water" : "page-body water-page"}>
+      {!props.embedded && <PageHeading title="Water" season={season} dataLabel={null} />}
       <div className="water-workspace">
         <div className="water-workspace-controls">
-          <button className="button water-back" type="button" onClick={props.openFields}>
+          {!props.embedded && <><button className="button water-back" type="button" onClick={props.openFields}>
             <ChevronLeftIcon aria-hidden="true" />{t('Back to map')}
           </button>
           <div className="water-field-switcher">
@@ -70,6 +72,7 @@ export function WaterPage(props: Props) {
               disabled={fields.length < 2} onClick={() => stepField(1)}><ChevronRightIcon aria-hidden="true" /></button>
             <span className="crop-label water-field-crop"><CropIcon crop={field.crop} />{crop(field.crop)} · {number(field.area_ha)} {t('ha')}</span>
           </div>
+          </>}
           <div className="water-view-toggle" role="group" aria-label={t('Water view')}>
             <button type="button" aria-pressed={view === 'forecast'} aria-controls="water-forecast-view"
               onClick={() => chooseView('forecast')}>
@@ -86,7 +89,7 @@ export function WaterPage(props: Props) {
             boundaryRevision={field.boundary_revision} forecastDay={forecastDay} />
         </div>
         <div id="water-scenarios-view" className="page-stack water-view-content" hidden={view !== 'scenarios'}>
-          {selection.visitedScenarios && <WaterScenarios key={field_id + ':' + field.boundary_revision} {...props} />}
+          {selection.visitedScenarios && <WaterScenarios key={field_id + ':' + field.boundary_revision + ':' + season} {...props} />}
         </div>
       </div>
     </div>
@@ -127,6 +130,8 @@ function WaterScenarios(props: Props) {
   const result = completed ?? (source === 'demo' && preview?.field_id === field_id
     && preview.season === season && preview.scenario === scenario ? preview : undefined)
   const active = Boolean(jobId && (!job ? !error : job.status !== 'succeeded' && job.status !== 'failed'))
+  // Only the run the farmer selected, never the latest one shown by default, goes to the assistant.
+  const askedRun = explicitHistoricalRun(jobId, job, completed)
   const day = result?.days.find(({ date }) => date === selectedDate) ?? result?.days.find(({ date }) => date === result.first_stress_date) ?? result?.days[0]
   const { reload: reloadRuns } = runs
 
@@ -153,6 +158,7 @@ function WaterScenarios(props: Props) {
 
   return (
     <>
+      {result && props.embedded && <section className="analytics-water-result"><h2>{t(result.demo ? 'Demo run' : 'Historical scenario')}</h2><WaterMetrics result={result} /></section>}
       <section className="panel water-simulation-form" aria-labelledby="water-simulation-heading">
         <div className="section-heading">
           <div>
@@ -172,7 +178,7 @@ function WaterScenarios(props: Props) {
           )}
         </div>
         <div className="toolbar water-simulation-inputs">
-          <ScenarioSelect value={scenario} onChange={props.chooseScenario} />
+          {!props.embedded && <ScenarioSelect value={scenario} onChange={props.chooseScenario} />}
           <label className="control"><span>{t('Data')}</span>
             <select value={source} onChange={(event) => setSource(event.target.value as typeof source)}>
               <option value="historical">{t('ERA5 historical')}</option>
@@ -219,6 +225,7 @@ function WaterScenarios(props: Props) {
           </button>
         </div>
       </section>
+      {runs.error && <ErrorBox message={runs.error} retry={runs.reload} />}
       {create.error && <ErrorBox message={create.error} />}
       {jobId && <JobStatus job={job} error={error} />}
       {archivedRun && <Empty>{t('This run used an earlier field boundary. Run the simulation again.')}</Empty>}
@@ -230,7 +237,7 @@ function WaterScenarios(props: Props) {
       {source === 'historical' && !result && !jobId && !runs.pending && (
         <Empty>{t('Run the water balance to view this field’s historical scenario.')}</Empty>
       )}
-      {result && <WaterMetrics result={result} />}
+      {result && !props.embedded && <WaterMetrics result={result} />}
       {result && day && (
         <>
           <section className="panel">
@@ -270,7 +277,9 @@ function WaterScenarios(props: Props) {
       {result && comparison && <ScenarioComparison key={jobId ?? 'preview'} context={props.context} baseline={result}
         boundaryRevision={field.boundary_revision} />}
       <div className="toolbar">
-        <button className="button" type="button" onClick={() => props.openAgent(completed ? (jobId ?? latest?.id) : undefined)}><SparklesIcon aria-hidden="true" />{t('Ask agent')}</button>
+        <button className="button" type="button" onClick={() => props.openAgent(askedRun)}>
+          <SparklesIcon aria-hidden="true" />{askedRun ? t('Ask agent about this run') : t('Ask agent')}
+        </button>
       </div>
     </>
   )

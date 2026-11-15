@@ -1,0 +1,316 @@
+{
+  "field_id": "F-03",
+  "start": "2025-07-02",
+  "end": "2025-07-17",
+  "model_source": "Ruslan: fstasks-layered-bucket-v1 with v6 delayed drainage; task3_flowering_f03_2025.json (historical replay)",
+  "scenarios": {
+    "f03-july-2025-replay": {
+      "data_kind": "historical_replay",
+      "weather_source": "NASA POWER archive; observed dates substituted for the 16-day forecast in Ruslan’s replay"
+    }
+  },
+  "plans": [
+    {
+      "id": "maize",
+      "members": {
+        "f03-july-2025-replay": [
+          {
+            "date": "2025-07-02",
+            "cover": "maize",
+            "etc_mm": 4.86,
+            "eta_mm": 4.86,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-03",
+            "cover": "maize",
+            "etc_mm": 6.3,
+            "eta_mm": 6.3,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-04",
+            "cover": "maize",
+            "etc_mm": 6.79,
+            "eta_mm": 6.79,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-05",
+            "cover": "maize",
+            "etc_mm": 3.38,
+            "eta_mm": 3.38,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-06",
+            "cover": "maize",
+            "etc_mm": 6.13,
+            "eta_mm": 6.13,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-07",
+            "cover": "maize",
+            "etc_mm": 6.21,
+            "eta_mm": 6.21,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-08",
+            "cover": "maize",
+            "etc_mm": 5.78,
+            "eta_mm": 5.78,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-09",
+            "cover": "maize",
+            "etc_mm": 6.67,
+            "eta_mm": 6.67,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-10",
+            "cover": "maize",
+            "etc_mm": 5.94,
+            "eta_mm": 5.94,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-11",
+            "cover": "maize",
+            "etc_mm": 2.77,
+            "eta_mm": 2.77,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-12",
+            "cover": "maize",
+            "etc_mm": 5.65,
+            "eta_mm": 5.65,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-13",
+            "cover": "maize",
+            "etc_mm": 5.93,
+            "eta_mm": 5.93,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-14",
+            "cover": "maize",
+            "etc_mm": 6.52,
+            "eta_mm": 6.52,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-15",
+            "cover": "maize",
+            "etc_mm": 6.82,
+            "eta_mm": 6.82,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-16",
+            "cover": "maize",
+            "etc_mm": 5.02,
+            "eta_mm": 5.02,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-17",
+            "cover": "maize",
+            "etc_mm": 4.76,
+            "eta_mm": 4.76,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "id": "soybean",
+      "members": {
+        "f03-july-2025-replay": [
+          {
+            "date": "2025-07-02",
+            "cover": "soybean",
+            "etc_mm": 5.4,
+            "eta_mm": 5.4,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-03",
+            "cover": "soybean",
+            "etc_mm": 6.83,
+            "eta_mm": 6.83,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-04",
+            "cover": "soybean",
+            "etc_mm": 7.16,
+            "eta_mm": 7.16,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-05",
+            "cover": "soybean",
+            "etc_mm": 3.47,
+            "eta_mm": 3.47,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-06",
+            "cover": "soybean",
+            "etc_mm": 6.14,
+            "eta_mm": 6.14,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-07",
+            "cover": "soybean",
+            "etc_mm": 6.07,
+            "eta_mm": 6.07,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-08",
+            "cover": "soybean",
+            "etc_mm": 5.54,
+            "eta_mm": 5.54,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-09",
+            "cover": "soybean",
+            "etc_mm": 6.39,
+            "eta_mm": 6.39,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-10",
+            "cover": "soybean",
+            "etc_mm": 5.69,
+            "eta_mm": 5.69,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-11",
+            "cover": "soybean",
+            "etc_mm": 2.66,
+            "eta_mm": 2.66,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-12",
+            "cover": "soybean",
+            "etc_mm": 5.42,
+            "eta_mm": 5.42,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-13",
+            "cover": "soybean",
+            "etc_mm": 5.68,
+            "eta_mm": 5.68,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-14",
+            "cover": "soybean",
+            "etc_mm": 6.24,
+            "eta_mm": 6.24,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-15",
+            "cover": "soybean",
+            "etc_mm": 6.53,
+            "eta_mm": 6.53,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-16",
+            "cover": "soybean",
+            "etc_mm": 4.81,
+            "eta_mm": 4.81,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          },
+          {
+            "date": "2025-07-17",
+            "cover": "soybean",
+            "etc_mm": 4.57,
+            "eta_mm": 4.57,
+            "stress": false,
+            "wet_stress": null,
+            "irrigation_mm": 0.0
+          }
+        ]
+      }
+    }
+  ]
+}
