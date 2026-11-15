@@ -38,11 +38,19 @@ export function FieldWaterPanel({ field, forecast, season, pending, error, reloa
     {error && <ErrorBox message={error} retry={reload} />}
     {!pending && !current && <p className="analytics-empty">{label('No current water estimate. Select a supported crop and calculate a forecast in the controls below. Weather remains available independently.', 'Немає актуальної оцінки води. Оберіть підтримувану культуру й розрахуйте прогноз у керуванні нижче. Погода доступна незалежно.')}</p>}
     {current && first && metrics && <>
-      <p role="note">{display.caveat}</p>
-      <p>{display.limitation}</p>
       <h3>{label('Water reserve today', 'Запас води сьогодні')}</h3>
       <p>{label('Today', 'Сьогодні')}: <time dateTime={today}>{fullDate(today)}</time> · UTC · {crop(current.crop)}</p>
       <div className="water-today-reading"><strong>{num(first.reserve_mm, mm)}</strong><span>{label('modeled reserve at day end', 'розрахунковий запас на кінець дня')}</span></div>
+      <p role="note">{display.caveat}</p>
+      <p className="water-domain-limit">{label('Reference model only: freezing, thawing and dormancy are not modeled; reserve is not measured liquid plant-available water.', 'Лише довідкова модель: замерзання, відтавання й стан спокою не враховано; запас не є виміряною доступною рослинам рідкою водою.')}</p>
+      <h3>{label('Water reserve for the coming days', 'Запас води на найближчі дні')}</h3><p className="analytics-meta">{fullDate(days[0].date)} — {fullDate(days.at(-1)!.date)} · UTC · {label('Reference threshold', 'Довідковий поріг')}: {num(current.threshold_mm, mm)}</p>
+      <dl className="water-result-lines">
+        <div><dt>{label('First day below threshold', 'Перший день нижче порога')}</dt><dd>{metrics.firstBelow ? shortDate(metrics.firstBelow) : label('None in this period', 'Немає в цьому періоді')}</dd></div>
+        <div><dt>{label('Minimum reserve', 'Мінімальний запас')}</dt><dd>{num(metrics.minimum?.reserve_mm, mm)} · {metrics.minimum && shortDate(metrics.minimum.date)}</dd></div>
+        <div><dt>{label('Days below threshold', 'Днів нижче порога')}</dt><dd>{metrics.stressDays}</dd></div>
+      </dl>
+      <details className="analytics-disclosure"><summary>{label('Daily calculation and assumptions', 'Щоденний розрахунок і припущення')}</summary><div className="analytics-details-body">
+        <p>{display.limitation}</p>
       <div className="water-reading-line"><p>{label('Threshold', 'Поріг')}: <strong>{num(current.threshold_mm, mm)}</strong></p><p>{label('Margin above threshold', 'Запас над порогом')}: <strong>{num(first.reserve_mm - current.threshold_mm, mm)}</strong></p><p>{label('Daily change', 'Зміна за добу')}: <strong>{num(first.reserve_mm - first.opening_mm, mm)}</strong></p></div>
       <h3>{label('Water movement during the day', 'Рух води за день')}</h3>
       <p>{label('Opening reserve', 'Початковий запас')}: {num(first.opening_mm, mm)} · {label('Rain', 'Опади')}: {num(first.rain_mm, mm)} · {label('Irrigation', 'Полив')}: {num(first.irrigation_mm, mm)} · {label('Modeled water use', 'Розрахункове водоспоживання')}: {num(first.water_use_mm, mm)} · {label('Drainage', 'Дренаж')}: {num(first.drainage_mm, mm)} · {label('Closing reserve', 'Кінцевий запас')}: {num(first.reserve_mm, mm)}</p>
@@ -58,15 +66,12 @@ export function FieldWaterPanel({ field, forecast, season, pending, error, reloa
         <polyline fill="none" stroke="currentColor" strokeWidth="3" points={days.map((d,i) => `${60+560*i/Math.max(1,days.length-1)},${160-130*d.reserve_mm/Math.max(1,current.capacity_mm)}`).join(' ')} />
         <text x="60" y="177">{fullDate(days[0].date)}</text><text x="620" y="177" textAnchor="end">{fullDate(days.at(-1)!.date)}</text>
       </svg>
-      <dl className="water-result-lines">
-        <div><dt>{label('First day below threshold', 'Перший день нижче порога')}</dt><dd>{metrics.firstBelow ? shortDate(metrics.firstBelow) : label('None in this period', 'Немає в цьому періоді')}</dd></div>
-        <div><dt>{label('Minimum reserve', 'Мінімальний запас')}</dt><dd>{num(metrics.minimum?.reserve_mm, mm)} · {metrics.minimum && shortDate(metrics.minimum.date)}</dd></div>
-        <div><dt>{label('Days below threshold', 'Днів нижче порога')}</dt><dd>{metrics.stressDays}</dd></div>
+      <dl className="water-result-lines water-detail-metrics">
         <div><dt>{label('Longest continuous shortage', 'Найдовший безперервний дефіцит')}</dt><dd>{metrics.longest} {label('days', 'днів')} {metrics.longestStart && `· ${shortDate(metrics.longestStart)} — ${shortDate(metrics.longestEnd!)}`}</dd></div>
         <div><dt>{label('Flowering-period stress', 'Стрес у період цвітіння')}</dt><dd>{label('No estimate — no confirmed flowering window in this forecast', 'Немає оцінки — у прогнозі немає підтвердженого вікна цвітіння')}</dd></div>
       </dl>
       <p>{label('Period totals', 'Суми за період')}: {label('rain', 'опади')} {num(metrics.rain, mm)} · {label('irrigation', 'полив')} {num(metrics.irrigation, mm)} · {label('water use', 'витрата води')} {num(metrics.use, mm)} · {label('drainage', 'дренаж')} {num(metrics.drainage, mm)}</p>
-      <details className="analytics-disclosure"><summary>{label('Daily calculation and assumptions', 'Щоденний розрахунок і припущення')}</summary><div className="analytics-details-body">
+
         <p>{label('Capacity', 'Місткість')}: {num(current.capacity_mm, mm)} · {label('Root depth', 'Глибина коріння')}: {num(current.root_depth_m, label('m', 'м'))}</p>
         <p>{label('Forecast initialized', 'Прогноз ініціалізовано')}: {current.initialized_at} · {label('Calculated', 'Розраховано')}: {current.generated_at}</p>
         <p>{current.provider} · {current.physical_model_version} · <a href={current.source_url} target="_blank" rel="noreferrer">{label('Source', 'Джерело')}</a></p>

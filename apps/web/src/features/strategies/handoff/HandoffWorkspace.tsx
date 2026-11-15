@@ -30,7 +30,7 @@ export function HandoffWorkspace({ field, openCalendar, openAgent }: { field: Fi
   const calendarAction = <button type="button" className={`button${failed ? ' primary' : ''}`} onClick={openCalendar}>{text('Find the next calendar opportunity', 'Знайти найближчу календарну можливість')}</button>
   return <section className="handoff-workspace" aria-labelledby="handoff-title">
     <div className="strategies-purpose"><div><h2 id="handoff-title">{text('Compare what to grow on this field', 'Порівняйте, що вирощувати на цьому полі')}</h2>
-      <p>{field.name} · {text('Compare dated crop sequences against water conditions and your resources. Results are experimental estimates, not validated field forecasts.', 'Порівняйте датовані послідовності культур за водними умовами та вашими ресурсами. Результати — експериментальні оцінки, не перевірені польові прогнози.')}</p></div>
+      <p>{text('Dated crop plans · water and resource tradeoffs · experimental, not validated field forecasts.', 'Датовані плани культур · вода та ресурси · експериментальні оцінки, не перевірені польові прогнози.')}</p></div>
       {!failed && calendarAction}</div>
     {resource.pending && <Loading text={text('Loading the model catalog…', 'Завантажуємо каталог моделі…')} />}
     {resource.error && <ErrorBox message={resource.error} retry={resource.reload} />}
@@ -58,7 +58,8 @@ export function HandoffWorkspace({ field, openCalendar, openAgent }: { field: Fi
           <label>{text('Plans to compare', 'Планів для порівняння')}<select value={draft.plans.length} onChange={event => { const count = Number(event.target.value); edit(current => ({ ...current, plans: Array.from({ length: count }, (_, i) => current.plans[i] ?? { id: `plan-${String.fromCharCode(97 + i)}`, crops: current.cycles.map(newCrop), irrigation: [] }) })) }}>{[2, 3].map(count => <option key={count}>{count}</option>)}</select></label>
           <label>{text('Rank by', 'Ранжувати за')}<select value={draft.priority} onChange={event => edit(current => ({ ...current, priority: event.target.value }))}><option value="">{text('Compare without ranking', 'Порівняти без ранжування')}</option>{priorityOptions(catalog).map(priority => <option key={priority} value={priority}>{label(priorityLabels, priority, uk)}</option>)}</select></label>
         </div>
-        <p className="handoff-note">{text('Cycles are dated growing periods, not harvest-year allocation slots. Reducing a count removes its later inputs. All plans share the dates; overlapping crop periods are rejected.', 'Цикли — датовані періоди росту, а не річні комірки розподілу. Зменшення кількості видаляє пізніші дані. Плани мають спільні дати; періоди культур не можуть перекриватися.')}</p>
+        <p className="handoff-note">{text('Reducing a count removes its later inputs.', 'Зменшення кількості видаляє пізніші дані.')}</p>
+        <details><summary>{text('How crop cycles work', 'Як працюють цикли культур')}</summary><p>{text('Cycles are dated growing periods, not harvest-year allocation slots. All plans share the dates; overlapping crop periods are rejected.', 'Цикли — датовані періоди росту, а не річні комірки розподілу. Плани мають спільні дати; періоди культур не можуть перекриватися.')}</p></details>
         <div className="handoff-cycles">{draft.cycles.map((cycle, index) => <fieldset key={index}><legend>{text('Cycle', 'Цикл')} {index + 1}</legend>
           <label>{text('Planting date', 'Дата сівби')} · {index + 1}<input type="date" required value={cycle.planting} min={new Date().toISOString().slice(0, 10)} onChange={event => updateCycle(index, { planting: event.target.value })} /></label>
           <details><summary>{text('Period and opening moisture', 'Період та початкова вологість')}</summary>
