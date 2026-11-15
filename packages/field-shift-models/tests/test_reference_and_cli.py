@@ -126,3 +126,26 @@ def test_explicit_land_evidence_changes_identity_without_changing_baseline_numbe
             assert {k: v for k, v in a.items() if k not in identities} == {
                 k: v for k, v in b.items() if k not in identities
             }
+
+
+def test_ci_interpreter_protocol_preserves_all_frozen_scientific_fields():
+    import hashlib
+    import json
+
+    reports = Path(__file__).resolve().parents[1] / "reports"
+    old_bytes = (reports / "cpu-v6.json").read_bytes()
+    # CPU-v6 is historical evidence, not a mutable expected-output fixture.
+    assert hashlib.sha256(old_bytes).hexdigest() == (
+        "9f158233d6958872b83d6d9ab2436c0e2a477b59c6c5fd7a605d6a674899dacb"
+    )
+    old = stable_report(json.loads(old_bytes))
+    new = stable_report(json.loads((reports / "cpu-v7.json").read_text()))
+    assert old["python"] == "3.12.16"
+    assert new["python"] == "3.12.13"
+    assert old != new  # Interpreter identity remains inside the strict comparison.
+    assert {key for key in old.keys() | new.keys() if old.get(key) != new.get(key)} == {"python"}
+    # Compare every other field, including engine/input/evaluation identities and
+    # numbers. This scoped migration assertion does not relax the CLI comparator.
+    assert {k: v for k, v in old.items() if k != "python"} == {
+        k: v for k, v in new.items() if k != "python"
+    }

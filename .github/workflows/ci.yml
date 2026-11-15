@@ -408,7 +408,7 @@ jobs:
       - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
         with:
           version: '0.11.0'
-          python-version: '3.12'
+          python-version: '3.12.13'
           enable-cache: true
           cache-dependency-glob: |
             apps/api/uv.lock
@@ -417,9 +417,9 @@ jobs:
         with:
           node-version: '24'
       - run: uv sync --project apps/api --locked --extra dev
-      - run: uv sync --project packages/field-shift-models --locked --python 3.12
+      - run: uv sync --project packages/field-shift-models --locked --python 3.12.13
       - run: packages/field-shift-models/.venv/bin/python -m pytest -q packages/field-shift-models/tests
-      - run: packages/field-shift-models/.venv/bin/python -m field_shift_models.cli benchmark --check packages/field-shift-models/reports/cpu-v6.json
+      - run: packages/field-shift-models/.venv/bin/python -m field_shift_models.cli benchmark --check packages/field-shift-models/reports/cpu-v7.json
       - run: npm ci --prefix apps/web && npm ci --prefix services/agent && npm ci --prefix services/agent/frontend
       - run: apps/api/.venv/bin/python -m field_shift_contracts.planning_v1.export --repo-root . --check
       - run: node contracts/planning-v1/check.mjs && apps/web/node_modules/.bin/tsc -p contracts/planning-v1/tsconfig.json
