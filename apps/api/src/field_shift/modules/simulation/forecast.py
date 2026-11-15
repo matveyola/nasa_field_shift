@@ -128,6 +128,13 @@ def latest_water_forecast(session: Session, field_id: str) -> WaterForecast | No
     if data is None:
         return None
     result = WaterForecast.model_validate(data)
+    # Crop edits do not change boundary_revision. Keep the old run archived,
+    # but never present its crop-specific balance as the current field state.
+    if (
+        crop_water_parameters(field.crop) is None
+        or field.crop.strip().casefold() != result.crop.strip().casefold()
+    ):
+        return None
     if result.model_version is not None:
         correction = active_root_zone_correction()
         if correction is None or correction.version != result.model_version:
