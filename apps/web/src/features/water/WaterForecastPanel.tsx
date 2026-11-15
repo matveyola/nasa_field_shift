@@ -1,4 +1,4 @@
-import { ArrowPathIcon, CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import { ArrowPathIcon, InformationCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '../../api/client'
 import { ContextHelp } from '../../shared/ContextHelp'
@@ -8,6 +8,7 @@ import { JobStatus } from '../../shared/JobStatus'
 import { Empty, ErrorBox, Loading } from '../../shared/ui'
 import { useResource } from '../../shared/useResource'
 import { selectWaterForecast } from './waterForecast'
+import { waterReferenceDisplay } from './waterReferenceDisplay'
 import { getCurrentWaterOutlook } from './waterOutlook'
 import { WaterForecastChart } from './WaterForecastChart'
 import { WaterBudgetPanel } from './WaterBudgetPanel'
@@ -32,6 +33,7 @@ export function WaterForecastPanel({ fieldId, boundaryRevision, forecastDay }: {
   const forecast = selectWaterForecast(fieldId, (job?.boundary_revision ?? 0) === boundaryRevision ? job : undefined, saved.data)
   const today = new Date().toISOString().slice(0, 10)
   const outlook = getCurrentWaterOutlook(forecast, fieldId, today)
+  const display = waterReferenceDisplay(forecast?.applicability, outlook.kind === 'shortage', language)
   const days = outlook.kind === 'unavailable' ? [] : outlook.days
   const hasModelEstimate = forecast === saved.data && forecast?.method === 'ml'
     && days.some(({ root_zone_estimate_mm }) => root_zone_estimate_mm != null)
@@ -70,17 +72,16 @@ export function WaterForecastPanel({ fieldId, boundaryRevision, forecastDay }: {
       </div>
       {forecast && outlook.kind !== 'unavailable' && (
         <>
-          <div className="water-outlook" data-status={outlook.kind}>
+          <div className="water-outlook" data-status={display.tone}>
             <div className="water-outlook-status">
-              {outlook.kind === 'shortage' ? <ExclamationTriangleIcon aria-hidden="true" /> : <CheckCircleIcon aria-hidden="true" />}
+              {display.tone === 'shortage' ? <ExclamationTriangleIcon aria-hidden="true" /> : <InformationCircleIcon aria-hidden="true" />}
               <div>
-                <strong>{outlook.kind === 'shortage'
-                  ? <>{t('Water shortage risk from')}{' '}<time dateTime={outlook.firstShortage.date}>{shortDate(outlook.firstShortage.date)}</time></>
-                  : t('No water shortage expected')}</strong>
-                <p>{t('Stress threshold')} — {number(outlook.thresholdMm)} {t('mm')}</p>
+                <strong>{display.summary}{outlook.kind === 'shortage' && <> · <time dateTime={outlook.firstShortage.date}>{shortDate(outlook.firstShortage.date)}</time></>}</strong>
+                <p>{language === 'uk' ? 'Довідковий поріг' : 'Reference threshold'} — {number(outlook.thresholdMm)} {t('mm')}</p>
               </div>
             </div>
           </div>
+          <p role="note">{display.caveat} {display.limitation}</p>
           {forecast.days.some(({ date }) => date < today) && (
             <p className="analysis-day-source" role="status">{t('Showing the remaining days from an earlier run.')}</p>
           )}

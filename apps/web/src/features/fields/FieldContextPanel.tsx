@@ -1,4 +1,4 @@
-import { CheckCircleIcon, ChevronLeftIcon, ChevronRightIcon, ExclamationTriangleIcon, SparklesIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { InformationCircleIcon, ChevronLeftIcon, ChevronRightIcon, ExclamationTriangleIcon, SparklesIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from 'react'
 import { api } from '../../api/client'
 import type { Field } from '../../api/contracts'
@@ -7,6 +7,7 @@ import { CropIcon } from '../../shared/CropIcon'
 import { useLocale } from '../../shared/locale'
 import { useResource } from '../../shared/useResource'
 import { FieldWaterAssistant } from '../agent/FieldWaterAssistant'
+import { waterReferenceDisplay } from '../water/waterReferenceDisplay'
 import { getCurrentWaterOutlook } from '../water/waterOutlook'
 import type { VegetationResult } from '../../api/analytics'
 import { FieldVegetationSignal } from '../agent/FieldVegetationSignal'
@@ -58,7 +59,7 @@ export function FieldContextPanel({ field, season, openStrategies, openAnalytics
 }
 
 function FieldContextSheet({ field, season, openStrategies, openAnalytics, openAgent, surface, openForecast, surfaceForecastOpen, onSheetPosition, children, analysis, vegetation, initialAnalysis, mapFirst }: Omit<Props, 'canSwitch' | 'onStep'>) {
-  const { t, number, shortDate } = useLocale()
+  const { t, number, shortDate, language } = useLocale()
   const load = useCallback((signal: AbortSignal) => api.waterForecast(field.id, signal), [field.id])
   const saved = useResource(load, 5 * 60 * 1000)
   const outlook = getCurrentWaterOutlook(saved.data, field.id, new Date().toISOString().slice(0, 10), season)
@@ -122,17 +123,17 @@ function FieldContextSheet({ field, season, openStrategies, openAnalytics, openA
   }
 
   const risk = outlook.kind === 'shortage'
-  const summary = outlook.kind === 'unavailable' ? t('Plan your next sowing')
-    : t(risk ? 'Water shortage expected' : 'No water shortage expected')
+  const display = waterReferenceDisplay(saved.data?.applicability, risk, language)
+  const summary = outlook.kind === 'unavailable' ? t('Plan your next sowing') : display.summary
 
   return (
       <div ref={sheet} className={'field-context-sheet' + (expanded ? ' is-expanded' : '')}
         onKeyDown={(event) => { if (event.key === 'Escape' && expanded && mobile) { event.stopPropagation(); closeSheet() } }}>
         <span className="field-sheet-handle" aria-hidden="true" />
-        <button type="button" ref={trigger} className={'field-sheet-trigger is-' + outlook.kind}
+        <button type="button" ref={trigger} className={'field-sheet-trigger is-' + (outlook.kind === 'unavailable' ? outlook.kind : display.tone)}
           aria-expanded={expanded} aria-controls={sheetId} onClick={() => { restoreFocus.current = true; setExpanded(true) }}>
-          {risk ? <ExclamationTriangleIcon aria-hidden="true" /> : outlook.kind === 'clear' ? <CheckCircleIcon aria-hidden="true" /> : <SparklesIcon aria-hidden="true" />}
-          <span><strong>{summary}</strong><small>{risk ? t('From') + ' ' + shortDate(outlook.firstShortage.date) : field.name}</small></span>
+          {outlook.kind === 'unavailable' ? <SparklesIcon aria-hidden="true" /> : display.tone === 'shortage' ? <ExclamationTriangleIcon aria-hidden="true" /> : <InformationCircleIcon aria-hidden="true" />}
+          <span><strong>{summary}</strong><small>{outlook.kind === 'unavailable' ? field.name : display.compact}</small>{risk && <small>{t('From')} {shortDate(outlook.firstShortage.date)}</small>}</span>
           <ChevronRightIcon aria-hidden="true" />
         </button>
         <div id={sheetId} className="field-sheet-body" inert={mobile && !expanded}>

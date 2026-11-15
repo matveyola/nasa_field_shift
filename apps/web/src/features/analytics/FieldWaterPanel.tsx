@@ -4,6 +4,7 @@ import { fieldWeatherApi, type SeasonalWaterRow } from '../../api/fieldWeather'
 import { useResource } from '../../shared/useResource'
 import { useLocale } from '../../shared/locale'
 import { ErrorBox } from '../../shared/ui'
+import { waterReferenceDisplay } from '../water/waterReferenceDisplay'
 import { getCurrentWaterOutlook } from '../water/waterOutlook'
 import { waterMetrics, seasonalGroups, range } from './waterMetrics'
 
@@ -23,6 +24,7 @@ export function FieldWaterPanel({ field, forecast, season, pending, error, reloa
   const metrics = current ? waterMetrics(days, current.threshold_mm) : null
   const first = days[0]
   const applicability = current?.applicability
+  const display = waterReferenceDisplay(applicability, outlook.kind === 'shortage', language)
   const seasonalLoad = useCallback((signal: AbortSignal) => fieldWeatherApi.seasonal(field.id, signal), [field.id, field.boundary_revision])
   const seasonal = useResource(seasonalLoad)
   const rows = seasonal.data?.field_id === field.id && seasonal.data.geometry_revision === field.boundary_revision
@@ -36,12 +38,8 @@ export function FieldWaterPanel({ field, forecast, season, pending, error, reloa
     {error && <ErrorBox message={error} retry={reload} />}
     {!pending && !current && <p className="analytics-empty">{label('No current water estimate. Select a supported crop and calculate a forecast in the controls below. Weather remains available independently.', 'Немає актуальної оцінки води. Оберіть підтримувану культуру й розрахуйте прогноз у керуванні нижче. Погода доступна незалежно.')}</p>}
     {current && first && metrics && <>
-      <p role="note">{applicability?.status === 'review_required'
-        ? label('Review required: the grid forecast has daily mean soil temperature at or below 0 °C in the shallow 0–7 cm layer. This does not establish freezing throughout the root zone.', 'Потрібна перевірка: прогноз сітки має середньодобову температуру ґрунту 0 °C або нижче у поверхневому шарі 0–7 см. Це не доводить промерзання всієї кореневої зони.')
-        : !applicability
-          ? label('Temperature applicability is unknown for this saved run; no shallow-soil diagnostic was stored.', 'Температурна застосовність цього збереженого розрахунку невідома: діагностику поверхневого ґрунту не збережено.')
-          : label('Above-zero shallow soil temperatures do not establish crop suitability or liquid water throughout the root zone.', 'Додатна температура поверхневого ґрунту не доводить придатності для культури чи наявності рідкої води в усій кореневій зоні.')}</p>
-      <p>{label('This reference bucket does not model freezing, thawing or dormancy. Its reserve and threshold are not a measurement of liquid plant-available water or a crop-growth assessment.', 'Ця довідкова балансова модель не враховує замерзання, відтавання чи стан спокою. Її запас і поріг не є вимірюванням доступної рослинам рідкої води або оцінкою росту культури.')}</p>
+      <p role="note">{display.caveat}</p>
+      <p>{display.limitation}</p>
       <h3>{label('Water reserve today', 'Запас води сьогодні')}</h3>
       <p>{label('Today', 'Сьогодні')}: <time dateTime={today}>{fullDate(today)}</time> · UTC · {crop(current.crop)}</p>
       <div className="water-today-reading"><strong>{num(first.reserve_mm, mm)}</strong><span>{label('modeled reserve at day end', 'розрахунковий запас на кінець дня')}</span></div>

@@ -3,6 +3,7 @@ import { useId } from 'react'
 import type { Field, WaterForecast } from '../../api/contracts'
 import { useLocale } from '../../shared/locale'
 import { AssistantMark } from '../../shared/AssistantMark'
+import { waterReferenceDisplay } from '../water/waterReferenceDisplay'
 import type { getWaterOutlook } from '../water/waterOutlook'
 import './fieldWaterAssistant.css'
 
@@ -20,6 +21,7 @@ export function FieldWaterAssistant({ field, forecast, outlook, openForecast }: 
   const shortage = outlook.kind === 'shortage'
   const available = outlook.kind !== 'unavailable'
   const applicability = available ? forecast.data?.applicability : null
+  const display = waterReferenceDisplay(applicability, shortage, language)
   const digits = shortage && number(outlook.firstShortage.reserve_mm) === number(outlook.thresholdMm) ? 4 : 1
   let unavailableMessage = t('No forecast for the upcoming days yet.')
   if (forecast.pending) unavailableMessage = t('Loading root-zone forecast…')
@@ -36,13 +38,11 @@ export function FieldWaterAssistant({ field, forecast, outlook, openForecast }: 
         <h2 id={headingId}>{t('Field assistant')}</h2>
         <span className="field-water-assistant-badge">{t('Forecast signal')}</span>
       </header>
-      <div className={`field-water-assistant-status is-${applicability?.status === 'review_required' ? 'review' : outlook.kind}`} role="status">
+      <div className={`field-water-assistant-status is-${available ? display.tone : outlook.kind}`} role="status">
         {available ? <>
           {shortage && applicability?.status !== 'review_required' ? <ExclamationTriangleIcon aria-hidden="true" /> : <InformationCircleIcon aria-hidden="true" />}
           <div>
-            <h3>{shortage
-              ? label('Modeled reserve below reference threshold', 'Розрахунковий запас нижче довідкового порога')
-              : label('Modeled reserve at or above reference threshold', 'Розрахунковий запас не нижче довідкового порога')}</h3>
+            <h3>{display.summary}</h3>
             <p>{t(shortage ? 'First day below threshold' : 'Forecast period')}{' '}
               <time dateTime={shortage ? outlook.firstShortage.date : outlook.firstDay.date}>
                 {shortDate(shortage ? outlook.firstShortage.date : outlook.firstDay.date)}
@@ -53,11 +53,7 @@ export function FieldWaterAssistant({ field, forecast, outlook, openForecast }: 
           </div>
         </> : <p>{unavailableMessage}</p>}
       </div>
-      {available && <p role="note">{applicability?.status === 'review_required'
-        ? label('Review required: forecast daily mean soil temperature is at or below 0 °C at 0–7 cm. This is not a whole-root-zone freezing assessment.', 'Потрібна перевірка: прогноз середньодобової температури ґрунту 0 °C або нижче на глибині 0–7 см. Це не оцінка промерзання всієї кореневої зони.')
-        : !applicability
-          ? label('Temperature applicability is unknown for this saved run.', 'Температурна застосовність цього збереженого розрахунку невідома.')
-          : label('Crop suitability and liquid root-zone water are not assessed.', 'Придатність для культури та рідку воду в кореневій зоні не оцінено.')} {label('This reference bucket does not model freezing, thawing or dormancy.', 'Ця довідкова балансова модель не враховує замерзання, відтавання чи стан спокою.')}</p>}
+      {available && <p role="note">{display.caveat} {display.limitation}</p>}
       {shortage && <dl className="field-assistant-risk-values">
         <div><dt>{shortDate(outlook.firstShortage.date)}</dt><dd>{number(outlook.firstShortage.reserve_mm, digits)} {t('mm')}</dd></div>
         <div><dt>{label('Reference threshold', 'Довідковий поріг')}</dt><dd>{number(outlook.thresholdMm, digits)} {t('mm')}</dd></div>
