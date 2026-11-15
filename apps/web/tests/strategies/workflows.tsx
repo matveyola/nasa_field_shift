@@ -12,7 +12,7 @@ const fields = [{ id: 'north', name: 'North field', area_ha: 20, boundary_revisi
 function Workflows() {
   const [fieldId, setFieldId] = useState('')
   return <LocaleProvider><LanguageSelect /><StrategiesPage fields={fields} field={fields.find(field => field.id === fieldId)}
-    chooseField={setFieldId} openAgent={() => {}} /></LocaleProvider>
+    chooseField={setFieldId} /></LocaleProvider>
 }
 
 createRoot(document.getElementById('root')!).render(<Workflows />)

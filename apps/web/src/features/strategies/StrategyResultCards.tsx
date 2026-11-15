@@ -2,7 +2,7 @@ import type { HandoffResult, StrategyCandidate, StrategyPriority } from '../../a
 import { CropIcon } from '../../shared/CropIcon'
 import { useLocale } from '../../shared/locale'
 import { cropNames } from './handoff/copy'
-import { metric, metricDifference, priorityMetrics, strategyResult } from './strategyResults'
+import { metric, priorityMetrics, strategyResult } from './strategyResults'
 
 const accompanying = ['water_deficit', 'water_stress', 'yield', 'revenue', 'revenue_after_seed', 'soil_cover'] as const
 
@@ -15,8 +15,8 @@ export function useStrategyLabels() {
     text, number, date,
     cropName: (id: string) => crop(cropNames[id] ?? id),
     priorityName: (id: StrategyPriority) => priorityMetrics[id][uk ? 4 : 3],
-    formatMetric: (value: { amount: number; unit: string } | null, signed = false) => value
-      ? `${number(value.amount, 2, signed)} ${uk ? (units[value.unit] ?? value.unit.replace('/ha', '/га')) : value.unit}`
+    formatMetric: (value: { amount: number; unit: string } | null) => value
+      ? `${number(value.amount, 2)} ${uk ? (units[value.unit] ?? value.unit.replace('/ha', '/га')) : value.unit}`
       : text('Unknown', 'Невідомо'),
   }
 }
@@ -69,27 +69,23 @@ export function StrategyCandidateCard({ candidate, priority, ranked, choose }: {
   </article>
 }
 
-export function StrategyResultCards({ result, priority, comparison, choose }: {
-  result: HandoffResult; priority: StrategyPriority; comparison?: [string, string]; choose?: (candidate: StrategyCandidate) => void
+export function StrategyResultCards({ result, priority, choose }: {
+  result: HandoffResult; priority: StrategyPriority; choose: (candidate: StrategyCandidate) => void
 }) {
-  const { text, cropName, formatMetric } = useStrategyLabels()
+  const { text, cropName } = useStrategyLabels()
   const { candidates, picks, ranked } = strategyResult(result)
-  const pair = comparison?.map(id => candidates.find(row => row.crop_id === id) ?? { crop_id: id, status: 'unavailable' as const, rank: null })
-  const cards = pair ?? picks
-  const delta = pair?.length === 2 && pair.every(row => row.status === 'ok') ? metricDifference(pair[0], pair[1], priority) : null
-  const excluded = !pair && candidates.filter(row => !picks.some(pick => pick.crop_id === row.crop_id))
+  const excluded = candidates.filter(row => !picks.some(pick => pick.crop_id === row.crop_id))
   return <section className="strategy-result" aria-label={text('Assessment results', 'Результати оцінки')}>
-    <h3>{pair ? text('Two crops under the same conditions', 'Дві культури за однакових умов') : text(`Available crops: ${picks.length} of 10`, `Доступні культури: ${picks.length} із 10`)}</h3>
-    {!pair && !ranked && cards.length > 0 && <p role="status">{text('A ranking is unavailable for these data. The choices are shown without ranks.', 'За цими даними рейтинг недоступний. Варіанти показано без місць.')}</p>}
-    {!pair && picks.length < 10 && <p>{text('The count reflects model support and constraints for this field and date.', 'Кількість залежить від підтримки моделі та обмежень для поля й дати.')}</p>}
-    {pair && <p role="status">{text('Difference (second crop minus first)', 'Різниця (друга культура мінус перша)')}: {formatMetric(delta, true)}</p>}
+    <h3>{text(`Available crops: ${picks.length} of 10`, `Доступні культури: ${picks.length} із 10`)}</h3>
+    {!ranked && picks.length > 0 && <p role="status">{text('The model returned crop estimates without a ranking.', 'Модель розрахувала показники культур без рейтингу.')}</p>}
+    {picks.length < 10 && <p>{text('The count reflects model support and constraints for this field and date.', 'Кількість залежить від підтримки моделі та обмежень для поля й дати.')}</p>}
     {result.reasons.map(reason => <p key={reason} role="status">{reason}</p>)}
     {result.diagnostics.map((item, i) => <p key={`${item.code}-${i}`} role="status">{item.message}</p>)}
-    <div className={pair ? 'strategy-decisions strategy-comparison' : 'strategy-decisions'}>
-      {cards.map(candidate => <StrategyCandidateCard key={candidate.crop_id} candidate={candidate} priority={priority} ranked={!pair && ranked}
-        choose={choose ? () => choose(candidate) : undefined} />)}
+    <div className="strategy-decisions">
+      {picks.map(candidate => <StrategyCandidateCard key={candidate.crop_id} candidate={candidate} priority={priority}
+        ranked={ranked} choose={() => choose(candidate)} />)}
     </div>
-    {excluded && excluded.length > 0 && <details><summary>{text('Other assessed crops and limits', 'Інші оцінені культури та обмеження')}</summary>
+    {excluded.length > 0 && <details><summary>{text('Other assessed crops and limits', 'Інші оцінені культури та обмеження')}</summary>
       <ul>{excluded.map(row => <li key={row.crop_id}>{cropName(row.crop_id)}{row.reason && ` · ${row.reason}`}
         {(row.blockers ?? []).map(blocker => <p key={blocker}>{blocker}</p>)}<CandidateDetails candidate={row} /></li>)}</ul>
     </details>}

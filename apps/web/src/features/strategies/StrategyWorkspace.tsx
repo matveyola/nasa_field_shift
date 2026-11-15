@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import type { Field } from '../../api/contracts'
 import {
-  rotationHandoffApi, rotationStrategyApi, type HandoffCatalog, type StrategyCandidate, type StrategyChoice,
-  type StrategyContext, type StrategyIrrigation, type StrategyMode, type StrategyPriority, type StrategyScenario,
+  rotationHandoffApi, rotationStrategyApi, type StrategyCandidate, type StrategyChoice,
+  type StrategyContext, type StrategyIrrigation, type StrategyPriority, type StrategyScenario,
 } from '../../api/rotationHandoff'
 import { ErrorBox, Loading } from '../../shared/ui'
 import { errorText, useResource } from '../../shared/useResource'
@@ -12,9 +12,10 @@ import { nextPlantingDate, plantingBounds, priorityMetrics, validPlantingDate } 
 import { useStrategyJob } from './useStrategyJob'
 
 type Selection = StrategyChoice & { planting_date: string; metrics: StrategyCandidate }
+export type StrategyTab = 'date' | 'scenarios'
 type Draft = {
-  count: number; priority: StrategyPriority; plantingDate: string; historyCrop: string; historyDate: string
-  irrigationStatus: StrategyIrrigation['status']; dailyM3: string; method: string; crops: [string, string]
+  count: number; priority: StrategyPriority; plantingDate: string
+  irrigationStatus: StrategyIrrigation['status']; dailyM3: string; method: string
 }
 
 function sameScope(item: { field_id: string; geometry_revision: number }, field: Field) {
@@ -29,39 +30,55 @@ function IrrigationSummary({ irrigation }: { irrigation: StrategyIrrigation }) {
   return <p>{text('Irrigation', 'Полив')}: {status}{irrigation.method && ` · ${irrigation.method}`}</p>
 }
 
-export function StrategyWorkspace({ field, mode }: { field: Field; mode: StrategyMode }) {
+export function StrategyWorkspace({ field, tab }: { field: Field; tab: StrategyTab }) {
   const { text } = useStrategyLabels()
   const [saveRevision, setSaveRevision] = useState(0)
-  const load = useCallback(async (signal: AbortSignal) => {
-    const [context, catalog] = await Promise.all([rotationStrategyApi.context(field.id, signal), rotationHandoffApi.catalog(signal)])
+  const [started, setStarted] = useState(false)
+  const onSave = () => setSaveRevision(revision => revision + 1)
+  const loadContext = useCallback(async (signal: AbortSignal) => {
+    const context = await rotationStrategyApi.context(field.id, signal)
     if (!sameScope(context, field)) throw new Error('Field or boundary changed. Reload the field.')
-    return { context, catalog }
+    return context
   }, [field.id, field.boundary_revision])
-  const resource = useResource(load)
-  if (resource.pending) return <Loading text={text('Loading field history and model…', 'Завантажуємо історію поля та модель…')} />
-  if (resource.error || !resource.data) return <ErrorBox message={resource.error ?? text('Field context unavailable', 'Дані поля недоступні')} retry={resource.reload} />
-  const { context, catalog } = resource.data
-  const ready = catalog.status === 'available' && catalog.operations.includes('climate_step')
+  const fieldContext = useResource(loadContext)
+  const model = useResource(rotationHandoffApi.catalog)
+  const context = fieldContext.data
+  const catalog = model.data
+  const ready = catalog?.status === 'available' && catalog.operations.includes('climate_step')
+  function flow(advanced: boolean) {
+    if (fieldContext.pending) return <Loading text={text('Loading field…', 'Завантажуємо поле…')} />
+    if (!context) return <ErrorBox message={fieldContext.error ?? text('Field context unavailable', 'Дані поля недоступні')} retry={fieldContext.reload} />
+    return <>
+      {model.pending ? <Loading text={text('Checking model availability…', 'Перевіряємо доступність моделі…')} /> : !ready && <div className="strategies-notice" role="status">
+        <p>{text('The rotation model is temporarily unavailable.', 'Модель сівозмін тимчасово недоступна.')}</p>
+        {catalog?.reasons.map(reason => <p key={reason}>{reason}</p>)}
+        <button type="button" className="button" onClick={model.reload}>{text('Retry connection', 'Перевірити з’єднання')}</button>
+      </div>}
+      <StrategyFlow field={field} context={context} ready={ready} advanced={advanced} onSave={onSave} />
+    </>
+  }
   return <>
-    {!ready && <div className="strategies-notice" role="status"><p>{text('The rotation model is unavailable.', 'Модель сівозмін недоступна.')}</p>
-      {catalog.reasons.map(reason => <p key={reason}>{reason}</p>)}<button type="button" className="button" onClick={resource.reload}>{text('Refresh availability', 'Оновити доступність')}</button></div>}
-    <p className="strategy-context-note">{text(`Conditional climate scenario for ${context.min_year}–${context.max_year}. Sowing months ${context.min_month}–${context.max_month}, one sowing per year, up to ${context.max_calendar_years} calendar years per scenario.`,
-      `Умовний кліматичний сценарій на ${context.min_year}–${context.max_year} рр. Місяці сівби ${context.min_month}–${context.max_month}, одна сівба на рік, до ${context.max_calendar_years} календарних років у сценарії.`)}</p>
-    <div hidden={mode !== 'sequence'} inert={mode !== 'sequence'} id="strategy-sequence"><StrategyFlow field={field} context={context} catalog={catalog} ready={ready} mode="sequence" onSave={() => setSaveRevision(revision => revision + 1)} /></div>
-    <div hidden={mode !== 'compare'} inert={mode !== 'compare'} id="strategy-compare"><StrategyFlow field={field} context={context} catalog={catalog} ready={ready} mode="compare" /></div>
-    <SavedScenarios field={field} revision={saveRevision} />
+    <div id="strategy-panel-date" role="tabpanel" aria-labelledby="strategy-tab-date" hidden={tab !== 'date'}>{flow(false)}</div>
+    <div id="strategy-panel-scenarios" role="tabpanel" aria-labelledby="strategy-tab-scenarios" hidden={tab !== 'scenarios'}>
+      <details className="strategy-new" onToggle={event => { if (event.currentTarget.open) setStarted(true) }}>
+        <summary>{text('Create a scenario', 'Створити сценарій')}</summary>
+        {started && flow(true)}
+      </details>
+      <section className="strategy-saved">
+        <h2>{text('Saved scenarios', 'Збережені сценарії')}</h2>
+        {tab === 'scenarios' && <SavedScenarioList key={saveRevision} field={field} />}
+      </section>
+    </div>
   </>
 }
 
-function StrategyFlow({ field, context, catalog, mode, ready, onSave }: {
-  field: Field; context: StrategyContext; catalog: HandoffCatalog; mode: StrategyMode; ready: boolean; onSave?: () => void
+function StrategyFlow({ field, context, advanced, ready, onSave }: {
+  field: Field; context: StrategyContext; advanced: boolean; ready: boolean; onSave: () => void
 }) {
   const { text, cropName, priorityName, date, number } = useStrategyLabels()
   const { canEdit } = useAccess()
-  const sequence = mode === 'sequence'
-  const latest = context.history[0]
-  const [draft, setDraft] = useState<Draft>(() => ({ count: 1, priority: 'water_deficit', plantingDate: nextPlantingDate(context, 1),
-    historyCrop: '', historyDate: '', irrigationStatus: 'unknown', dailyM3: '', method: '', crops: ['', ''] }))
+  const [draft, setDraft] = useState<Draft>(() => ({ count: 1, priority: 'water_deficit', plantingDate: advanced ? nextPlantingDate(context, 1) : '',
+    irrigationStatus: 'unknown', dailyM3: '', method: '' }))
   const [choices, setChoices] = useState<Selection[]>([])
   const [saved, setSaved] = useState<StrategyScenario>()
   const [saveError, setSaveError] = useState<string>()
@@ -70,22 +87,17 @@ function StrategyFlow({ field, context, catalog, mode, ready, onSave }: {
   const calculation = useStrategyJob(field)
   useEffect(() => () => saveController.current?.abort(), [])
 
-  const count = sequence ? draft.count : 1
+  const count = draft.count
   const remaining = Math.max(1, count - choices.length)
-  const complete = sequence && choices.length === count
+  const complete = choices.length === count
   const previousDate = choices.at(-1)?.planting_date
   const firstDate = choices[0]?.planting_date
   const bounds = plantingBounds(context, remaining, previousDate, firstDate)
   const dailyM3 = Number(draft.dailyM3)
   const irrigationValid = !draft.dailyM3 || (dailyM3 > 0 && dailyM3 <= 1_000_000)
-  const historyDate = latest?.sowing_date || draft.historyDate
-  const historyDateValid = !historyDate || historyDate < draft.plantingDate
-  const historyComplete = latest != null || Boolean(draft.historyCrop) === Boolean(draft.historyDate)
-  const comparisonValid = sequence || (draft.crops.every(Boolean) && draft.crops[0] !== draft.crops[1])
-  const canCalculate = ready && canEdit && !calculation.busy && !saving && !complete && comparisonValid && historyDateValid && historyComplete &&
-    validPlantingDate(draft.plantingDate, context, remaining, previousDate, firstDate) &&
+  const dateValid = validPlantingDate(draft.plantingDate, context, remaining, previousDate, firstDate)
+  const canCalculate = ready && canEdit && !calculation.busy && !saving && !complete && dateValid &&
     (draft.irrigationStatus !== 'available' || irrigationValid)
-  const options = catalog.crops.filter(crop => crop.strategy_supported ?? crop.climate_supported)
   const irrigation: StrategyIrrigation = draft.irrigationStatus === 'available' ? {
     status: 'available', ...(draft.dailyM3 ? { daily_m3: dailyM3 } : {}), ...(draft.method.trim() ? { method: draft.method.trim() } : {}),
   } : { status: draft.irrigationStatus }
@@ -102,11 +114,8 @@ function StrategyFlow({ field, context, catalog, mode, ready, onSave }: {
     event.preventDefault()
     if (!canCalculate) return
     void calculation.send({ request_id: crypto.randomUUID(), geometry_revision: field.boundary_revision,
-      mode, planting_date: draft.plantingDate, step_count: count, priority: draft.priority,
-      previous: choices.map(({ job_id, crop_id }) => ({ job_id, crop_id })),
-      ...(!sequence ? { comparison_crops: draft.crops } : {}),
-      ...(!latest?.crop_id && draft.historyCrop ? { history_crop_id: draft.historyCrop } : {}),
-      ...(!latest?.sowing_date && draft.historyDate ? { history_sowing_date: draft.historyDate } : {}), irrigation,
+      mode: 'sequence', planting_date: draft.plantingDate, step_count: count, priority: draft.priority,
+      previous: choices.map(({ job_id, crop_id }) => ({ job_id, crop_id })), irrigation,
     })
   }
 
@@ -133,7 +142,7 @@ function StrategyFlow({ field, context, catalog, mode, ready, onSave }: {
     try {
       const scenario = await rotationStrategyApi.save(field.id, field.boundary_revision, choices.map(({ job_id, crop_id }) => ({ job_id, crop_id })), controller.signal)
       if (!sameScope(scenario, field)) throw new Error('Field or boundary changed. Reload the field.')
-      if (!controller.signal.aborted) { setSaved(scenario); onSave?.() }
+      if (!controller.signal.aborted) { setSaved(scenario); onSave() }
     } catch (failure) {
       if (!controller.signal.aborted) setSaveError(errorText(failure))
     } finally {
@@ -143,42 +152,31 @@ function StrategyFlow({ field, context, catalog, mode, ready, onSave }: {
   }
 
   const result = calculation.job?.result
-  return <section className="strategy-flow" aria-labelledby={`strategy-title-${mode}`}>
-    <h2 id={`strategy-title-${mode}`}>{sequence ? text('Step-by-step rotation', 'Покрокова сівозміна') : text('Compare two crops', 'Порівняння двох культур')}</h2>
-    {sequence && !complete && <p role="status">{text(`Step ${choices.length + 1} of ${count}`, `Крок ${choices.length + 1} із ${count}`)}</p>}
+  const dateHint = advanced ? 'strategy-series-date-hint' : 'strategy-date-hint'
+  return <section className="strategy-flow">
+    {advanced && !complete && <p role="status">{text(`Step ${choices.length + 1} of ${count}`, `Крок ${choices.length + 1} із ${count}`)}</p>}
     {choices.length > 0 && <ol className="strategy-chosen" aria-label={text('Chosen sequence', 'Обрана послідовність')}>{choices.map((choice, index) => <li key={choice.job_id}>
       <strong>{cropName(choice.crop_id)}</strong> · <time dateTime={choice.planting_date}>{date(choice.planting_date)}</time>
       <button type="button" className="button" disabled={saving} onClick={() => revise(index)} aria-label={text(`Change step ${index + 1}`, `Змінити крок ${index + 1}`)}>{text('Change', 'Змінити')}</button>
     </li>)}</ol>}
     {!complete && <form className="strategy-form" onSubmit={calculate}>
       <div className="strategies-context">
-        {sequence && <label>{text('Number of steps', 'Кількість кроків')}<select value={draft.count} onChange={event => {
+        {advanced && <label>{text('Number of steps', 'Кількість кроків')}<select value={draft.count} onChange={event => {
           const count = Number(event.target.value)
           edit({ count, plantingDate: validPlantingDate(draft.plantingDate, context, count) ? draft.plantingDate : nextPlantingDate(context, count) })
         }}>{Array.from({ length: context.max_steps }, (_, index) => <option key={index + 1}>{index + 1}</option>)}</select></label>}
-        <label>{text('Priorities', 'Пріоритети')}<select value={draft.priority} onChange={e => edit({ priority: e.target.value as StrategyPriority })}>
+        {advanced && <label>{text('Priorities', 'Пріоритети')}<select value={draft.priority} onChange={e => edit({ priority: e.target.value as StrategyPriority })}>
           {(Object.keys(priorityMetrics) as StrategyPriority[]).map(priority => <option key={priority} value={priority}>{priorityName(priority)}</option>)}
-        </select></label>
-        <label>{text('Assessment / sowing date', 'Дата оцінки / сівби')}<input type="date" required min={bounds.min} max={bounds.max} value={draft.plantingDate} onChange={e => changeDate(e.target.value)} /></label>
-        {!sequence && [0, 1].map(index => <label key={index}>{index === 0 ? text('First crop', 'Перша культура') : text('Second crop', 'Друга культура')}
-          <select required value={draft.crops[index]} onChange={e => { const crops = [...draft.crops] as [string, string]; crops[index] = e.target.value; edit({ crops }) }}>
-            <option value="">{text('Choose a crop', 'Оберіть культуру')}</option>
-            {options.map(crop => <option key={crop.id} value={crop.id} disabled={crop.id === draft.crops[1 - index]}>{cropName(crop.id)}</option>)}
-          </select></label>)}
+        </select></label>}
+        <label>{text('Sowing date', 'Дата сівби')}<input type="date" required min={bounds.min} max={bounds.max} value={draft.plantingDate}
+          aria-describedby={draft.plantingDate && !dateValid ? dateHint : undefined} onChange={e => changeDate(e.target.value)} /></label>
       </div>
-      {!historyDateValid && <p role="status">{text('Assessment must be after the previous sowing date.', 'Дата оцінки має бути пізнішою за попередню сівбу.')}</p>}
-      {!historyComplete && <p role="status">{text('Enter both the previous crop and sowing date or leave both unknown.', 'Укажіть попередню культуру й дату сівби або залиште обидва значення невідомими.')}</p>}
+      {draft.plantingDate && !dateValid && <p id={dateHint} role="status">
+        {text(`Choose months ${context.min_month}–${context.max_month} between ${date(bounds.min)} and ${date(bounds.max)}.`,
+          `Оберіть місяці ${context.min_month}–${context.max_month} у межах ${date(bounds.min)} – ${date(bounds.max)}.`)}
+      </p>}
       {draft.priority === 'revenue_after_seed' && <p>{text('Gross revenue minus seed or planting material cost, per hectare.', 'Виручка мінус вартість насіння або посадкового матеріалу, на гектар.')}</p>}
-      <div className="strategies-context">
-        {latest?.crop_id ? <p><strong>{text('Previous crop', 'Попередня культура')}</strong><span>{cropName(latest.crop_id)} · {latest.season_year}</span></p>
-          : <label>{text('Previous crop, if known', 'Попередня культура, якщо відома')}<select value={draft.historyCrop} onChange={e => edit({ historyCrop: e.target.value })}>
-            <option value="">{text('Unknown', 'Невідомо')}</option>
-            {catalog.crops.map(crop => <option key={crop.id} value={crop.id}>{cropName(crop.id)}</option>)}
-          </select></label>}
-        {latest?.sowing_date ? <p><strong>{text('Previous sowing date', 'Дата попередньої сівби')}</strong><span><time dateTime={latest.sowing_date}>{date(latest.sowing_date)}</time></span></p>
-          : <label>{text('Previous sowing date, if known', 'Дата попередньої сівби, якщо відома')}<input type="date" value={draft.historyDate} onChange={e => edit({ historyDate: e.target.value })} /></label>}
-      </div>
-      <details>
+      {advanced && <details>
         <summary>{text('Irrigation (optional)', 'Полив (необов’язково)')}</summary>
         <p>{text('For a better assessment, specify irrigation availability.', 'Для кращого прогнозу уточніть можливості поливу')}</p>
         <div className="strategies-context">
@@ -192,33 +190,27 @@ function StrategyFlow({ field, context, catalog, mode, ready, onSave }: {
           </>}
         </div>
         {draft.irrigationStatus === 'available' && draft.dailyM3 && irrigationValid && context.area_ha > 0 && <p>{text('Equivalent field depth', 'Еквівалентна глибина для поля')}: {number(dailyM3 / (10 * context.area_ha), 2)} {text('mm/day', 'мм/добу')}</p>}
-      </details>
-      <button type="submit" className="button primary" disabled={!canCalculate}>{sequence ? text('Calculate this step', 'Розрахувати цей крок') : text('Compare these crops', 'Порівняти ці культури')}</button>
+      </details>}
+      <button type="submit" className="button primary" disabled={!canCalculate}>{advanced ? text('Calculate this step', 'Розрахувати цей крок') : text('Calculate', 'Розрахувати')}</button>
     </form>}
     {calculation.busy && !calculation.error && <Loading text={text('Assessing this field…', 'Оцінюємо це поле…')} />}
     {calculation.error && <ErrorBox message={calculation.error} retry={calculation.retry} />}
     {calculation.job?.status === 'failed' && <ErrorBox message={calculation.job.error ?? text('The assessment failed. Try again.', 'Розрахунок не вдався. Спробуйте ще раз.')} />}
-    {result && <StrategyResultCards result={result} priority={draft.priority} comparison={sequence ? undefined : draft.crops} choose={sequence ? choose : undefined} />}
+    {result && <>
+      {result.status === 'available' && result.payload.observed_previous_crop === null && <p>
+        {text('Assessment completed with the previous crop unknown.', 'Оцінку виконано за невідомої попередньої культури.')}
+      </p>}
+      <StrategyResultCards result={result} priority={draft.priority} choose={choose} />
+    </>}
     {complete && <section className="strategy-result">
       <h3>{text('Completed scenario', 'Завершений сценарій')}</h3><p>{priorityName(draft.priority)} · {text('Conditional climate scenario', 'Умовний кліматичний сценарій')}</p>
-      <IrrigationSummary irrigation={irrigation} />
-      <p>{text('Previous crop', 'Попередня культура')}: {latest?.crop_id || draft.historyCrop ? cropName(latest?.crop_id || draft.historyCrop) : text('Unknown', 'Невідомо')}
-        {historyDate ? ` · ${date(historyDate)}` : ` · ${text('Sowing date unknown', 'Дата сівби невідома')}`}</p>
+      {advanced && <IrrigationSummary irrigation={irrigation} />}
       <div className="strategy-decisions">{choices.map(choice => <div key={choice.job_id}><p><time dateTime={choice.planting_date}>{date(choice.planting_date)}</time></p>
         <StrategyCandidateCard candidate={choice.metrics} priority={draft.priority} /></div>)}</div>
       {saved ? <p role="status">{text('Scenario saved', 'Сценарій збережено')}</p> : canEdit && <button type="button" className="button primary" disabled={saving} onClick={() => void save()}>{text('Save completed scenario', 'Зберегти завершений сценарій')}</button>}
       {saveError && <ErrorBox message={saveError} retry={() => void save()} />}
     </section>}
   </section>
-}
-
-function SavedScenarios({ field, revision }: { field: Field; revision: number }) {
-  const { text } = useStrategyLabels()
-  const [open, setOpen] = useState(false)
-  return <details className="strategy-saved" onToggle={event => setOpen(event.currentTarget.open)}>
-    <summary>{text('Saved scenarios', 'Збережені сценарії')}</summary>
-    {open && <SavedScenarioList key={revision} field={field} />}
-  </details>
 }
 
 function SavedScenarioList({ field }: { field: Field }) {
@@ -235,7 +227,7 @@ function SavedScenarioList({ field }: { field: Field }) {
   if (resource.error) return <ErrorBox message={resource.error} retry={resource.reload} />
   const rows = resource.data ?? []
   return <>
-    {!rows.length && <p>{text('No saved scenarios on this page.', 'На цій сторінці немає збережених сценаріїв.')}</p>}
+    {!rows.length && <p>{text('No saved scenarios yet.', 'Збережених сценаріїв поки немає.')}</p>}
     <div className="strategy-saved-pages">
       <button type="button" className="button" onClick={resource.reload}>{text('Refresh saved scenarios', 'Оновити збережені сценарії')}</button>
       {page > 0 && <button type="button" className="button" onClick={() => setPage(page - 1)}>{text('Previous page', 'Попередня сторінка')}</button>}

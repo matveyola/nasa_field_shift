@@ -203,7 +203,7 @@ export function App() {
       {content}
       {keepStrategies && <div hidden={route.page !== 'strategies'} inert={route.page !== 'strategies'} className="strategies-outlet">
         <Suspense fallback={<Loading text={t('Loading workspace…')} />}><StrategiesPage field={selectedField} fields={fields}
-          chooseField={chooseWorkspaceField} openAgent={() => setAssistantOpen(true)} /></Suspense>
+          chooseField={chooseWorkspaceField} /></Suspense>
       </div>}
     </Shell>
     {farm && !route.setupId && <Assistant field={missingField ? undefined : field} season={season} scenario={scenario} runId={assistantRunId} open={assistantOpen} onOpenChange={setAssistantOpen}

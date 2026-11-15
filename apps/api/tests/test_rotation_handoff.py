@@ -1,9 +1,13 @@
+import json
 import os
 from datetime import UTC, datetime, timedelta
+from importlib.resources import files
 from uuid import uuid4
 
 import pytest
 from fastapi import HTTPException
+from field_shift_contracts.planning_v1 import FieldProfileSnapshot, ProfileWriteRequest
+from field_shift_science.fields.geometry import area_hectares
 from sqlalchemy import create_engine, select, text
 from sqlalchemy.engine import make_url
 
@@ -15,6 +19,7 @@ from field_shift.models import metadata
 from field_shift.modules.access.service import Principal
 from field_shift.modules.farm.models import Farm
 from field_shift.modules.fields.models import Field
+from field_shift.modules.fields.planning_profile.service import ProfileRepository
 from field_shift.modules.rotations.handoff import strategy
 from field_shift.modules.rotations.handoff.schemas import HandoffSubmission
 from field_shift.modules.rotations.handoff.service import catalog, read, submit
@@ -203,6 +208,96 @@ def test_strategy_replays_owned_choices_and_saves_only_explicit_completion(facto
         assert not strategy.list_saved(session, OWNER, "F-01")
         with pytest.raises(HTTPException, match="boundary changed"):
             strategy.save(session, OWNER, "F-01", confirmed)
+
+
+def test_strategy_queues_without_a_passport_or_known_crop(factory):
+    with factory.begin() as session:
+        session.get(Field, "F-01").crop = "Unknown"
+    with factory.begin() as session:
+        assert strategy.context(session, OWNER, "F-01").history == []
+        result = strategy.submit(session, OWNER, "F-01", strategy_request(history_sowing_date=None))
+    with factory() as session:
+        job = session.get(Job, result.job_id)
+        assert job.status == JobStatus.QUEUED
+        assert job.inputs["parameters"]["observed_crop_history"] == []
+        assert job.inputs["land_status"] == "unknown"
+        assert job.inputs["allow_public_data"] is True
+
+
+def test_strategy_only_uses_earlier_history_available_before_the_first_planting(factory):
+    document = json.loads(
+        files("field_shift_contracts.planning_v1")
+        .joinpath("data/planning-contracts.json")
+        .read_bytes()
+    )["field_profile"]
+    entries = [
+        (2022, None, None),
+        (2023, "2026-05-01", None),
+        (2024, "2024-04-30", "2024-10-01"),
+        (2025, "2025-12-01", "2026-04-16"),
+        (2026, "2026-04-01", None),
+        (2027, None, None),
+    ]
+    history = [
+        {
+            "season": season,
+            "crop": {"crop_id": "soybeans", "cultivar_id": None, "profile_version": None},
+            "status": "reported",
+            "sowing_date": sowing,
+            "harvest_date": harvest,
+            "source_ids": [document["sources"][0]["id"]],
+        }
+        for season, sowing, harvest in entries
+    ]
+    with factory.begin() as session:
+        field = session.get(Field, "F-01")
+        profile = FieldProfileSnapshot.model_validate_json(
+            json.dumps(
+                document
+                | {
+                    "farm_id": "1",
+                    "field_id": field.id,
+                    "geometry_revision": field.boundary_revision,
+                    "geometry": document["geometry"] | field.geometry,
+                    "area_ha": area_hectares(field.geometry["coordinates"][0]),
+                    "history": history,
+                }
+            )
+        )
+        ProfileRepository(session).write(
+            "1",
+            field.id,
+            ProfileWriteRequest(request_id="history", expected_revision=None, profile=profile),
+        )
+    with factory.begin() as session:
+        first = strategy.submit(
+            session,
+            OWNER,
+            "F-01",
+            strategy_request(planting_date="2026-04-15", history_sowing_date=None),
+        )
+        history = session.get(Job, first.job_id).inputs["parameters"]["observed_crop_history"]
+        assert [(row["season_year"], row["crop_id"]) for row in history] == [
+            (2022, "soybeans"),
+            (2024, "soybeans"),
+        ]
+        assert history[0]["planting_date"] is None
+        assert history[1]["harvest_date"] == "2024-10-01"
+        finish_strategy_step(session, first.job_id, "barley")
+    with factory.begin() as session:
+        next_step = strategy.submit(
+            session,
+            OWNER,
+            "F-01",
+            strategy_request(
+                request_id="second",
+                planting_date="2028-04-15",
+                history_sowing_date=None,
+                previous=[{"job_id": first.job_id, "crop_id": "barley"}],
+            ),
+        )
+        inputs = session.get(Job, next_step.job_id).inputs["parameters"]
+        assert inputs["observed_crop_history"] == history
 
 
 @pytest.mark.parametrize("status", ["unknown", "none"])

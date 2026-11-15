@@ -12,7 +12,7 @@
 .strategies-context p span { font-size: .78rem; color: var(--ink-2, #555); }
 .strategies-workflows { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; padding: 6px; border: 1px solid var(--line, #ddd); border-radius: 16px; background: var(--screen, #f7f7f7); }
 .strategies-workflow { border: 1px solid var(--line, #ddd); border-radius: 10px; padding: 10px 12px; min-height: 44px; text-align: center; display: grid; align-items: center; cursor: pointer; background: var(--card, white); color: var(--ink, #111); }
-.strategies-workflow[aria-pressed=true] { background: var(--ink, #111); color: var(--card, white); }
+.strategies-workflow[aria-pressed=true], .strategies-workflow[aria-selected=true] { background: var(--ink, #111); color: var(--card, white); }
 .strategies-workflow strong { font-size: .85rem; font-weight: 600; line-height: 1.4; }
 .strategies-purpose { margin: 4px 0 20px; }
 .strategies-purpose h2 { font-size: 1.3rem; margin-bottom: 8px; }
@@ -102,13 +102,14 @@
 .strategy-form, .strategy-flow, .strategy-result { display: grid; gap: 14px; min-width: 0; }
 .strategies-workflows.strategy-modes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .strategy-form > .button, .strategy-result > .button { justify-self: start; }
-.strategy-flow > h2, .strategy-result > h3, .strategy-flow > p, .strategy-result > p,
-.strategy-context-note { margin: 0; }
-.strategy-context-note { color: var(--ink-2, #555); font-size: .85rem; }
+.strategy-result > h3, .strategy-flow > p, .strategy-result > p { margin: 0; }
 .strategy-chosen { margin: 0; padding-inline-start: 28px; }
 .strategy-chosen li { padding-block: 4px; }
 .strategy-chosen .button { margin-inline-start: 8px; }
 .strategy-form details, .strategy-saved { border-block-start: 1px solid var(--line, #ddd); }
+.strategy-new { margin-block: 12px; }
+.strategy-new > summary { cursor: pointer; font-weight: 650; margin-block-end: 12px; }
+.strategy-saved h2 { font-size: 1.125rem; }
 .strategy-saved-pages { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .strategy-candidate { display: grid; gap: 12px; align-content: start; }
 .strategy-candidate h4 { display: flex; align-items: center; gap: 8px; margin: 0; }
@@ -118,10 +119,3 @@
 .strategy-metrics > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
 .strategy-metrics dd { margin: 0; text-align: end; }
 .strategy-metrics [data-primary=true] { font-weight: 650; }
-.strategy-comparison { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-@container strategy-workspace (max-width: 480px) {
-  .strategy-comparison .strategy-metrics > div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
-  .strategy-comparison .strategy-metrics dd { text-align: start; }
-  .strategy-comparison .strategy-candidate { padding: 10px; }
-  .strategy-comparison .strategy-candidate h4 { flex-wrap: wrap; font-size: 1rem; }
-}

@@ -56,7 +56,7 @@ def crop_identity(value):
     return None if crop in _UNKNOWN_CROPS else _CROP_IDS.get(crop, crop)
 
 
-def field_history(session, field):
+def field_history(session, field, *, before: date | None = None):
     try:
         profile = ProfileRepository(session).latest(field.farm_id, field.id)
     except ProfileError as error:
@@ -82,7 +82,17 @@ def field_history(session, field):
         if latest is None:
             latest = HistoryEntry(season_year=field.season, crop_id=registered, sowing_date=None)
         entries[field.season] = latest.model_copy(update={"crop_id": registered})
-    return sorted(entries.values(), key=lambda row: row.season_year, reverse=True)[:12]
+    rows = [
+        row
+        for row in entries.values()
+        if before is None
+        or (
+            row.season_year < before.year
+            and (row.sowing_date is None or row.sowing_date < before)
+            and (row.harvest_date is None or row.harvest_date < before)
+        )
+    ]
+    return sorted(rows, key=lambda row: row.season_year, reverse=True)[:12]
 
 
 def context(session, principal, field_id):
@@ -96,9 +106,7 @@ def context(session, principal, field_id):
 
 
 def observed_history(session, field, body, first_planting_date):
-    history = field_history(session, field)
-    if any(row.season_year >= first_planting_date.year for row in history):
-        raise HTTPException(422, "The scenario must follow the latest recorded crop season")
+    history = field_history(session, field, before=first_planting_date)
     crop = crop_identity(body.history_crop_id) if body.history_crop_id else None
     sowing = body.history_sowing_date
     if crop is not None or sowing is not None:
@@ -112,6 +120,8 @@ def observed_history(session, field, body, first_planting_date):
         if sowing and (sowing >= first_planting_date or sowing > datetime.now(UTC).date()):
             raise HTTPException(422, "Factual sowing must be in the past and before the scenario")
         if previous is None:
+            if sowing.year >= first_planting_date.year:
+                raise HTTPException(422, "Factual sowing must belong to an earlier season")
             history.append(HistoryEntry(season_year=sowing.year, crop_id=crop, sowing_date=sowing))
         else:
             if sowing and (

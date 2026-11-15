@@ -1,33 +1,52 @@
-import { useState } from 'react'
+import { useRef, useState, type KeyboardEvent } from 'react'
 import type { Field } from '../../api/contracts'
-import type { StrategyMode } from '../../api/rotationHandoff'
 import { useLocale } from '../../shared/locale'
 import { Empty } from '../../shared/ui'
-import { StrategyWorkspace } from './StrategyWorkspace'
+import { StrategyWorkspace, type StrategyTab } from './StrategyWorkspace'
 import './strategies.css'
 
-export function StrategiesPage({ field, fields, chooseField, openAgent }: {
-  field?: Field; fields: Field[]; chooseField: (fieldId: string) => void; openAgent: () => void
+const tabs = ['date', 'scenarios'] as const
+
+export function StrategiesPage({ field, fields, chooseField }: {
+  field?: Field; fields: Field[]; chooseField: (fieldId: string) => void
 }) {
   const { language } = useLocale()
   const text = (en: string, ua: string) => language === 'uk' ? ua : en
-  const [mode, setMode] = useState<StrategyMode>('sequence')
+  const [tab, setTab] = useState<StrategyTab>('date')
+  const buttons = useRef<Partial<Record<StrategyTab, HTMLButtonElement>>>({})
+  const labels = { date: text('Sowing date', 'Дата сівби'), scenarios: text('Scenarios', 'Сценарії') }
+
+  function navigate(event: KeyboardEvent<HTMLButtonElement>, current: StrategyTab) {
+    let next: StrategyTab
+    switch (event.key) {
+      case 'Home': next = 'date'; break
+      case 'End': next = 'scenarios'; break
+      case 'ArrowLeft':
+      case 'ArrowRight': next = current === 'date' ? 'scenarios' : 'date'; break
+      default: return
+    }
+    event.preventDefault()
+    setTab(next)
+    buttons.current[next]?.focus()
+  }
+
   return <section className="strategies-page" aria-labelledby="strategies-title">
-    <header className="strategies-heading"><div><h1 id="strategies-title">{text('What to sow next?', 'Що сіяти наступним?')}</h1></div>
-      {field && <button type="button" className="button" onClick={openAgent}>{text('Discuss with assistant', 'Обговорити з асистентом')}</button>}
-    </header>
-    <div className="strategies-context"><label>{text('Field in focus', 'Обране поле')}<select value={field?.id ?? ''} onChange={event => chooseField(event.target.value)}>
+    <header className="strategies-heading"><h1 id="strategies-title">{text('Strategies', 'Стратегії')}</h1></header>
+    <div className="strategies-context"><label htmlFor="strategy-field">{text('Field in focus', 'Обране поле')}<select id="strategy-field" value={field?.id ?? ''} onChange={event => chooseField(event.target.value)}>
       <option value="">{text('Choose a field', 'Оберіть поле')}</option>
       {fields.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
     </select></label></div>
-    {field ? <>
-      <div className="strategies-workflows strategy-modes" role="group" aria-label={text('Planning workflow', 'Спосіб планування')}>
-        <button type="button" className="strategies-workflow" aria-pressed={mode === 'sequence'} onClick={() => setMode('sequence')}>
-          <strong>{text('Step-by-step rotation', 'Покрокова сівозміна')}</strong></button>
-        <button type="button" className="strategies-workflow" aria-pressed={mode === 'compare'} onClick={() => setMode('compare')}>
-          <strong>{text('Compare two crops', 'Порівняти дві культури')}</strong></button>
-      </div>
-      <StrategyWorkspace key={JSON.stringify([field.id, field.boundary_revision])} field={field} mode={mode} />
-    </> : <Empty><p>{text('Choose a field to plan a rotation or compare crops.', 'Оберіть поле для планування сівозміни чи порівняння культур.')}</p></Empty>}
+    <div className="strategies-workflows strategy-modes" role="tablist" aria-label={text('Strategies', 'Стратегії')}>
+      {tabs.map(item => <button type="button" className="strategies-workflow" key={item} role="tab"
+        id={`strategy-tab-${item}`} aria-controls={`strategy-panel-${item}`} aria-selected={tab === item}
+        tabIndex={tab === item ? 0 : -1} ref={element => { if (element) buttons.current[item] = element }}
+        onClick={() => setTab(item)} onKeyDown={event => navigate(event, item)}>
+        <strong>{labels[item]}</strong>
+      </button>)}
+    </div>
+    {field ? <StrategyWorkspace key={JSON.stringify([field.id, field.boundary_revision])} field={field} tab={tab} />
+      : tabs.map(item => <div key={item} id={`strategy-panel-${item}`} role="tabpanel" aria-labelledby={`strategy-tab-${item}`} hidden={item !== tab}>
+        <Empty><p>{text('Choose a field to continue.', 'Оберіть поле, щоб продовжити.')}</p></Empty>
+      </div>)}
   </section>
 }
