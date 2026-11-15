@@ -1,0 +1,722 @@
+{
+  "field_id": "marsden_demo",
+  "field": {
+    "id": "marsden_demo",
+    "name": "Marsden Farm, Boone, Iowa",
+    "latitude": 42.01379,
+    "longitude": -93.78421,
+    "grid_latitude": 42.0,
+    "grid_longitude": -93.799995,
+    "location_source_url": "https://www.glten.org/experiments/380",
+    "soil_source_url": "https://docs.isric.org/globaldata/soilgrids/SoilGrids_faqs_02.html",
+    "weather_source_url": "https://archive-api.open-meteo.com/v1/archive?latitude=42.01379&longitude=-93.78421&start_date=2016-04-30&end_date=2026-09-30&models=era5_seamless&timezone=GMT&daily=rain_sum%2Ctemperature_2m_min%2Ctemperature_2m_max%2Cet0_fao_evapotranspiration%2Csoil_moisture_0_to_7cm_mean%2Csoil_moisture_7_to_28cm_mean%2Csoil_moisture_28_to_100cm_mean",
+    "reference_years": [
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025,
+      2026
+    ]
+  },
+  "dataset_id": "marsden_demo-era5-seamless-2016-2026",
+  "reference_years": [
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+  ],
+  "assumptions": [
+    "Historical ERA5-Seamless gridded reanalysis via Open-Meteo, May–September, UTC.",
+    "Both plans replay the same consecutive years ending in the selected analog year.",
+    "The planting date is May 1 in each year.",
+    "Each season opens from April 30 ERA5-Land moisture and the field's soil profile.",
+    "The model resets soil water between years.",
+    "The bucket uses fixed crop root depths and assumes no irrigation or runoff.",
+    "Sunflower potential water demand assumes a dense stand (FAO-56 mid-season Kc 1.15).",
+    "Weather is replayed as supplied. Yield loss covers the effect of water deficit.",
+    "The projection describes a range of estimates across recent historical windows."
+  ],
+  "results": [
+    {
+      "scenario": {
+        "id": "baseline",
+        "label": "Typical recent historical season",
+        "criterion": "Nearest to median rainfall and hot-day count among the remaining seasons.",
+        "analog_year": 2022,
+        "replay_years": [
+          2021,
+          2022
+        ],
+        "rain_mm": 437.9,
+        "hot_days": 16,
+        "mean_tmax_c": 26.69,
+        "weather_adjustment": "none"
+      },
+      "rotations": [
+        {
+          "rotation": {
+            "id": "marsden-a",
+            "number": 1,
+            "name": "Maize → Sunflower",
+            "crop_ids": [
+              "maize_grain",
+              "sunflower"
+            ]
+          },
+          "water_shortfall": {
+            "value_pct": 26.1,
+            "method": "formula",
+            "definition": "Percentage of potential crop water demand unmet in this scenario.",
+            "accuracy": "not_validated_for_field",
+            "validation_error_pct_points": null,
+            "source_url": "https://www.fao.org/4/X0490E/x0490e0e.htm"
+          },
+          "modeled_yield_loss_due_to_water": {
+            "value_pct": 28.2,
+            "method": "model",
+            "definition": "Equal-weight mean of the two seasonal water-related yield loss percentages.",
+            "accuracy": "not_validated_for_field",
+            "validation_error_pct_points": null,
+            "source_url": "https://www.fao.org/4/i2800e/i2800e.pdf"
+          },
+          "yield_risk": {
+            "value_pct": null,
+            "method": "unavailable",
+            "definition": "Probability of a yield loss above a specified threshold. Requires local yield data, an event threshold and model validation.",
+            "accuracy": "unavailable",
+            "validation_error_pct_points": null,
+            "source_url": null
+          },
+          "fertilizer": {
+            "n_kg_ha": null,
+            "p2o5_kg_ha": null,
+            "k2o_kg_ha": null,
+            "method": "unavailable",
+            "accuracy": "unavailable",
+            "reason": "Requires soil tests, a regional rate method, and crop and management inputs.",
+            "source_url": "https://crops.extension.iastate.edu/files/article/PM1688.pdf"
+          },
+          "crop_seasons": [
+            {
+              "year": 2021,
+              "crop_id": "maize_grain",
+              "planting_date": "2021-05-01",
+              "flowering_start": "2021-07-11",
+              "flowering_end": "2021-07-23",
+              "flowering_days": 13,
+              "flowering_stress_days": 1,
+              "water_shortfall": {
+                "value_pct": 20.1,
+                "method": "formula",
+                "definition": "Percentage of potential crop water demand unmet in this scenario.",
+                "accuracy": "not_validated_for_field",
+                "validation_error_pct_points": null,
+                "source_url": "https://www.fao.org/4/X0490E/x0490e0e.htm"
+              },
+              "modeled_yield_loss_due_to_water": {
+                "value_pct": 25.1,
+                "method": "model",
+                "definition": "Seasonal FAO yield loss relative to water-unlimited yield.",
+                "accuracy": "not_validated_for_field",
+                "validation_error_pct_points": null,
+                "source_url": "https://www.fao.org/4/i2800e/i2800e.pdf"
+              }
+            },
+            {
+              "year": 2022,
+              "crop_id": "sunflower",
+              "planting_date": "2022-05-01",
+              "flowering_start": "2022-07-16",
+              "flowering_end": "2022-08-02",
+              "flowering_days": 18,
+              "flowering_stress_days": 18,
+              "water_shortfall": {
+                "value_pct": 32.9,
+                "method": "formula",
+                "definition": "Percentage of potential crop water demand unmet in this scenario.",
+                "accuracy": "not_validated_for_field",
+                "validation_error_pct_points": null,
+                "source_url": "https://www.fao.org/4/X0490E/x0490e0e.htm"
+              },
+              "modeled_yield_loss_due_to_water": {
+                "value_pct": 31.3,
+                "method": "model",
+                "definition": "Seasonal FAO yield loss relative to water-unlimited yield.",
+                "accuracy": "not_validated_for_field",
+                "validation_error_pct_points": null,
+                "source_url": "https://www.fao.org/4/i2800e/i2800e.pdf"
+              }
+            }
+          ]
+        },
+        {
+          "rotation": {
+            "id": "marsden-b",
+            "number": 2,
+            "name": "Sunflower → Maize",
+            "crop_ids": [
+              "sunflower",
+              "maize_grain"
+            ]
+          },
+          "water_shortfall": {
+            "value_pct": 30.9,
+            "method": "formula",
+            "definition": "Percentage of potential crop water demand unmet in this scenario.",
+            "accuracy": "not_validated_for_field",
+            "validation_error_pct_points": null,
+            "source_url": "https://www.fao.org/4/X0490E/x0490e0e.htm"
+          },
+          "modeled_yield_loss_due_to_water": {
+            "value_pct": 34.3,
+            "method": "model",
+            "definition": "Equal-weight mean of the two seasonal water-related yield loss percentages.",
+            "accuracy": "not_validated_for_field",
+            "validation_error_pct_points": null,
+            "source_url": "https://www.fao.org/4/i2800e/i2800e.pdf"
+          },
+          "yield_risk": {
+            "value_pct": null,
+            "method": "unavailable",
+            "definition": "Probability of a yield loss above a specified threshold. Requires local yield data, an event threshold and model validation.",
+            "accuracy": "unavailable",
+            "validation_error_pct_points": null,
+            "source_url": null
+          },
+          "fertilizer": {
+            "n_kg_ha": null,
+            "p2o5_kg_ha": null,
+            "k2o_kg_ha": null,
+            "method": "unavailable",
+            "accuracy": "unavailable",
+            "reason": "Requires soil tests, a regional rate method, and crop and management inputs.",
+            "source_url": "https://crops.extension.iastate.edu/files/article/PM1688.pdf"
+          },
+          "crop_seasons": [
+            {
+              "year": 2021,
+              "crop_id": "sunflower",
+              "planting_date": "2021-05-01",
+              "flowering_start": "2021-07-17",
+              "flowering_end": "2021-08-03",
+              "flowering_days": 18,
+              "flowering_stress_days": 13,
+              "water_shortfall": {
+                "value_pct": 27.0,
+                "method": "formula",
+                "definition": "Percentage of potential crop water demand unmet in this scenario.",
+                "accuracy": "not_validated_for_field",
+                "validation_error_pct_points": null,
+                "source_url": "https://www.fao.org/4/X0490E/x0490e0e.htm"
+              },
+              "modeled_yield_loss_due_to_water": {
+                "value_pct": 25.7,
+                "method": "model",
+                "definition": "Seasonal FAO yield loss relative to water-unlimited yield.",
+                "accuracy": "not_validated_for_field",
+                "validation_error_pct_points": null,
+                "source_url": "https://www.fao.org/4/i2800e/i2800e.pdf"
+              }
+            },
+            {
+              "year": 2022,
+              "crop_id": "maize_grain",
+              "planting_date": "2022-05-01",
+              "flowering_start": "2022-07-11",
+              "flowering_end": "2022-07-21",
+              "flowering_days": 11,
+              "flowering_stress_days": 3,
+              "water_shortfall": {
+                "value_pct": 34.3,
+                "method": "formula",
+                "definition": "Percentage of potential crop water demand unmet in this scenario.",
+                "accuracy": "not_validated_for_field",
+                "validation_error_pct_points": null,
+                "source_url": "https://www.fao.org/4/X0490E/x0490e0e.htm"
+              },
+              "modeled_yield_loss_due_to_water": {
+                "value_pct": 42.9,
+                "method": "model",
+                "definition": "Seasonal FAO yield loss relative to water-unlimited yield.",
+                "accuracy": "not_validated_for_field",
+                "validation_error_pct_points": null,
+                "source_url": "https://www.fao.org/4/i2800e/i2800e.pdf"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "id": "drought",
+        "label": "Historical dry analog",
+        "criterion": "Lowest May–September rainfall among eligible years.",
+        "analog_year": 2023,
+        "replay_years": [
+          2022,
+          2023
+        ],
+        "rain_mm": 323.9,
+        "hot_days": 16,
+        "mean_tmax_c": 27.43,
+        "weather_adjustment": "none"
+      },
+      "rotations": [
+        {
+          "rotation": {
+            "id": "marsden-a",
+            "number": 1,
+            "name": "Maize → Sunflower",
+            "crop_ids": [
+              "maize_grain",
+              "sunflower"
+            ]
+          },
+          "water_shortfall": {
+            "value_pct": 39.0,
+            "method": "formula",
+            "definition": "Percentage of potential crop water demand unmet in this scenario.",
+            "accuracy": "not_validated_for_field",
+            "validation_error_pct_points": null,
+            "source_url": "https://www.fao.org/4/X0490E/x0490e0e.htm"
+          },
+          "modeled_yield_loss_due_to_water": {
+            "value_pct": 42.5,
+            "method": "model",
+            "definition": "Equal-weight mean of the two seasonal water-related yield loss percentages.",
+            "accuracy": "not_validated_for_field",
+            "validation_error_pct_points": null,
+            "source_url": "https://www.fao.org/4/i2800e/i2800e.pdf"
+          },
+          "yield_risk": {
+            "value_pct": null,
+            "method": "unavailable",
+            "definition": "Probability of a yield loss above a specified threshold. Requires local yield data, an event threshold and model validation.",
+            "accuracy": "unavailable",
+            "validation_error_pct_points": null,
+            "source_url": null
+          },
+          "fertilizer": {
+            "n_kg_ha": null,
+            "p2o5_kg_ha": null,
+            "k2o_kg_ha": null,
+            "method": "unavailable",
+            "accuracy": "unavailable",
+            "reason": "Requires soil tests, a regional rate method, and crop and management inputs.",
+            "source_url": "https://crops.extension.iastate.edu/files/article/PM1688.pdf"
+          },
+          "crop_seasons": [
+            {
+              "year": 2022,
+              "crop_id": "maize_grain",
+              "planting_date": "2022-05-01",
+              "flowering_start": "2022-07-11",
+              "flowering_end": "2022-07-21",
+              "flowering_days": 11,
+              "flowering_stress_days": 3,
+              "water_shortfall": {
+                "value_pct": 34.3,
+                "method": "formula",
+                "definition": "Percentage of potential crop water demand unmet in this scenario.",
+                "accuracy": "not_validated_for_field",
+                "validation_error_pct_points": null,
+                "source_url": "https://www.fao.org/4/X0490E/x0490e0e.htm"
+              },
+              "modeled_yield_loss_due_to_water": {
+                "value_pct": 42.9,
+                "method": "model",
+                "definition": "Seasonal FAO yield loss relative to water-unlimited yield.",
+                "accuracy": "not_validated_for_field",
+                "validation_error_pct_points": null,
+                "source_url": "https://www.fao.org/4/i2800e/i2800e.pdf"
+              }
+            },
+            {
+              "year": 2023,
+              "crop_id": "sunflower",
+              "planting_date": "2023-05-01",
+              "flowering_start": "2023-07-15",
+              "flowering_end": "2023-08-01",
+              "flowering_days": 18,
+              "flowering_stress_days": 18,
+              "water_shortfall": {
+                "value_pct": 44.2,
+                "method": "formula",
+                "definition": "Percentage of potential crop water demand unmet in this scenario.",
+                "accuracy": "not_validated_for_field",
+                "validation_error_pct_points": null,
+                "source_url": "https://www.fao.org/4/X0490E/x0490e0e.htm"
+              },
+              "modeled_yield_loss_due_to_water": {
+                "value_pct": 42.0,
+                "method": "model",
+                "definition": "Seasonal FAO yield loss relative to water-unlimited yield.",
+                "accuracy": "not_validated_for_field",
+                "validation_error_pct_points": null,
+                "source_url": "https://www.fao.org/4/i2800e/i2800e.pdf"
+              }
+            }
+          ]
+        },
+        {
+          "rotation": {
+            "id": "marsden-b",
+            "number": 2,
+            "name": "Sunflower → Maize",
+            "crop_ids": [
+              "sunflower",
+              "maize_grain"
+            ]
+          },
+          "water_shortfall": {
+            "value_pct": 38.9,
+            "method": "formula",
+            "definition": "Percentage of potential crop water demand unmet in this scenario.",
+            "accuracy": "not_validated_for_field",
+            "validation_error_pct_points": null,
+            "source_url": "https://www.fao.org/4/X0490E/x0490e0e.htm"
+          },
+          "modeled_yield_loss_due_to_water": {
+            "value_pct": 43.2,
+            "method": "model",
+            "definition": "Equal-weight mean of the two seasonal water-related yield loss percentages.",
+            "accuracy": "not_validated_for_field",
+            "validation_error_pct_points": null,
+            "source_url": "https://www.fao.org/4/i2800e/i2800e.pdf"
+          },
+          "yield_risk": {
+            "value_pct": null,
+            "method": "unavailable",
+            "definition": "Probability of a yield loss above a specified threshold. Requires local yield data, an event threshold and model validation.",
+            "accuracy": "unavailable",
+            "validation_error_pct_points": null,
+            "source_url": null
+          },
+          "fertilizer": {
+            "n_kg_ha": null,
+            "p2o5_kg_ha": null,
+            "k2o_kg_ha": null,
+            "method": "unavailable",
+            "accuracy": "unavailable",
+            "reason": "Requires soil tests, a regional rate method, and crop and management inputs.",
+            "source_url": "https://crops.extension.iastate.edu/files/article/PM1688.pdf"
+          },
+          "crop_seasons": [
+            {
+              "year": 2022,
+              "crop_id": "sunflower",
+              "planting_date": "2022-05-01",
+              "flowering_start": "2022-07-16",
+              "flowering_end": "2022-08-02",
+              "flowering_days": 18,
+              "flowering_stress_days": 18,
+              "water_shortfall": {
+                "value_pct": 32.9,
+                "method": "formula",
+                "definition": "Percentage of potential crop water demand unmet in this scenario.",
+                "accuracy": "not_validated_for_field",
+                "validation_error_pct_points": null,
+                "source_url": "https://www.fao.org/4/X0490E/x0490e0e.htm"
+              },
+              "modeled_yield_loss_due_to_water": {
+                "value_pct": 31.3,
+                "method": "model",
+                "definition": "Seasonal FAO yield loss relative to water-unlimited yield.",
+                "accuracy": "not_validated_for_field",
+                "validation_error_pct_points": null,
+                "source_url": "https://www.fao.org/4/i2800e/i2800e.pdf"
+              }
+            },
+            {
+              "year": 2023,
+              "crop_id": "maize_grain",
+              "planting_date": "2023-05-01",
+              "flowering_start": "2023-07-10",
+              "flowering_end": "2023-07-21",
+              "flowering_days": 12,
+              "flowering_stress_days": 11,
+              "water_shortfall": {
+                "value_pct": 44.1,
+                "method": "formula",
+                "definition": "Percentage of potential crop water demand unmet in this scenario.",
+                "accuracy": "not_validated_for_field",
+                "validation_error_pct_points": null,
+                "source_url": "https://www.fao.org/4/X0490E/x0490e0e.htm"
+              },
+              "modeled_yield_loss_due_to_water": {
+                "value_pct": 55.1,
+                "method": "model",
+                "definition": "Seasonal FAO yield loss relative to water-unlimited yield.",
+                "accuracy": "not_validated_for_field",
+                "validation_error_pct_points": null,
+                "source_url": "https://www.fao.org/4/i2800e/i2800e.pdf"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "id": "heat",
+        "label": "Historical hot analog",
+        "criterion": "Most days at or above 32°C after reserving the dry analog, then highest mean Tmax.",
+        "analog_year": 2021,
+        "replay_years": [
+          2020,
+          2021
+        ],
+        "rain_mm": 469.6,
+        "hot_days": 20,
+        "mean_tmax_c": 27.11,
+        "weather_adjustment": "none"
+      },
+      "rotations": [
+        {
+          "rotation": {
+            "id": "marsden-a",
+            "number": 1,
+            "name": "Maize → Sunflower",
+            "crop_ids": [
+              "maize_grain",
+              "sunflower"
+            ]
+          },
+          "water_shortfall": {
+            "value_pct": 32.7,
+            "method": "formula",
+            "definition": "Percentage of potential crop water demand unmet in this scenario.",
+            "accuracy": "not_validated_for_field",
+            "validation_error_pct_points": null,
+            "source_url": "https://www.fao.org/4/X0490E/x0490e0e.htm"
+          },
+          "modeled_yield_loss_due_to_water": {
+            "value_pct": 36.4,
+            "method": "model",
+            "definition": "Equal-weight mean of the two seasonal water-related yield loss percentages.",
+            "accuracy": "not_validated_for_field",
+            "validation_error_pct_points": null,
+            "source_url": "https://www.fao.org/4/i2800e/i2800e.pdf"
+          },
+          "yield_risk": {
+            "value_pct": null,
+            "method": "unavailable",
+            "definition": "Probability of a yield loss above a specified threshold. Requires local yield data, an event threshold and model validation.",
+            "accuracy": "unavailable",
+            "validation_error_pct_points": null,
+            "source_url": null
+          },
+          "fertilizer": {
+            "n_kg_ha": null,
+            "p2o5_kg_ha": null,
+            "k2o_kg_ha": null,
+            "method": "unavailable",
+            "accuracy": "unavailable",
+            "reason": "Requires soil tests, a regional rate method, and crop and management inputs.",
+            "source_url": "https://crops.extension.iastate.edu/files/article/PM1688.pdf"
+          },
+          "crop_seasons": [
+            {
+              "year": 2020,
+              "crop_id": "maize_grain",
+              "planting_date": "2020-05-01",
+              "flowering_start": "2020-07-12",
+              "flowering_end": "2020-07-22",
+              "flowering_days": 11,
+              "flowering_stress_days": 9,
+              "water_shortfall": {
+                "value_pct": 37.6,
+                "method": "formula",
+                "definition": "Percentage of potential crop water demand unmet in this scenario.",
+                "accuracy": "not_validated_for_field",
+                "validation_error_pct_points": null,
+                "source_url": "https://www.fao.org/4/X0490E/x0490e0e.htm"
+              },
+              "modeled_yield_loss_due_to_water": {
+                "value_pct": 47.0,
+                "method": "model",
+                "definition": "Seasonal FAO yield loss relative to water-unlimited yield.",
+                "accuracy": "not_validated_for_field",
+                "validation_error_pct_points": null,
+                "source_url": "https://www.fao.org/4/i2800e/i2800e.pdf"
+              }
+            },
+            {
+              "year": 2021,
+              "crop_id": "sunflower",
+              "planting_date": "2021-05-01",
+              "flowering_start": "2021-07-17",
+              "flowering_end": "2021-08-03",
+              "flowering_days": 18,
+              "flowering_stress_days": 13,
+              "water_shortfall": {
+                "value_pct": 27.0,
+                "method": "formula",
+                "definition": "Percentage of potential crop water demand unmet in this scenario.",
+                "accuracy": "not_validated_for_field",
+                "validation_error_pct_points": null,
+                "source_url": "https://www.fao.org/4/X0490E/x0490e0e.htm"
+              },
+              "modeled_yield_loss_due_to_water": {
+                "value_pct": 25.7,
+                "method": "model",
+                "definition": "Seasonal FAO yield loss relative to water-unlimited yield.",
+                "accuracy": "not_validated_for_field",
+                "validation_error_pct_points": null,
+                "source_url": "https://www.fao.org/4/i2800e/i2800e.pdf"
+              }
+            }
+          ]
+        },
+        {
+          "rotation": {
+            "id": "marsden-b",
+            "number": 2,
+            "name": "Sunflower → Maize",
+            "crop_ids": [
+              "sunflower",
+              "maize_grain"
+            ]
+          },
+          "water_shortfall": {
+            "value_pct": 28.1,
+            "method": "formula",
+            "definition": "Percentage of potential crop water demand unmet in this scenario.",
+            "accuracy": "not_validated_for_field",
+            "validation_error_pct_points": null,
+            "source_url": "https://www.fao.org/4/X0490E/x0490e0e.htm"
+          },
+          "modeled_yield_loss_due_to_water": {
+            "value_pct": 30.1,
+            "method": "model",
+            "definition": "Equal-weight mean of the two seasonal water-related yield loss percentages.",
+            "accuracy": "not_validated_for_field",
+            "validation_error_pct_points": null,
+            "source_url": "https://www.fao.org/4/i2800e/i2800e.pdf"
+          },
+          "yield_risk": {
+            "value_pct": null,
+            "method": "unavailable",
+            "definition": "Probability of a yield loss above a specified threshold. Requires local yield data, an event threshold and model validation.",
+            "accuracy": "unavailable",
+            "validation_error_pct_points": null,
+            "source_url": null
+          },
+          "fertilizer": {
+            "n_kg_ha": null,
+            "p2o5_kg_ha": null,
+            "k2o_kg_ha": null,
+            "method": "unavailable",
+            "accuracy": "unavailable",
+            "reason": "Requires soil tests, a regional rate method, and crop and management inputs.",
+            "source_url": "https://crops.extension.iastate.edu/files/article/PM1688.pdf"
+          },
+          "crop_seasons": [
+            {
+              "year": 2020,
+              "crop_id": "sunflower",
+              "planting_date": "2020-05-01",
+              "flowering_start": "2020-07-17",
+              "flowering_end": "2020-08-02",
+              "flowering_days": 17,
+              "flowering_stress_days": 17,
+              "water_shortfall": {
+                "value_pct": 36.9,
+                "method": "formula",
+                "definition": "Percentage of potential crop water demand unmet in this scenario.",
+                "accuracy": "not_validated_for_field",
+                "validation_error_pct_points": null,
+                "source_url": "https://www.fao.org/4/X0490E/x0490e0e.htm"
+              },
+              "modeled_yield_loss_due_to_water": {
+                "value_pct": 35.0,
+                "method": "model",
+                "definition": "Seasonal FAO yield loss relative to water-unlimited yield.",
+                "accuracy": "not_validated_for_field",
+                "validation_error_pct_points": null,
+                "source_url": "https://www.fao.org/4/i2800e/i2800e.pdf"
+              }
+            },
+            {
+              "year": 2021,
+              "crop_id": "maize_grain",
+              "planting_date": "2021-05-01",
+              "flowering_start": "2021-07-11",
+              "flowering_end": "2021-07-23",
+              "flowering_days": 13,
+              "flowering_stress_days": 1,
+              "water_shortfall": {
+                "value_pct": 20.1,
+                "method": "formula",
+                "definition": "Percentage of potential crop water demand unmet in this scenario.",
+                "accuracy": "not_validated_for_field",
+                "validation_error_pct_points": null,
+                "source_url": "https://www.fao.org/4/X0490E/x0490e0e.htm"
+              },
+              "modeled_yield_loss_due_to_water": {
+                "value_pct": 25.1,
+                "method": "model",
+                "definition": "Seasonal FAO yield loss relative to water-unlimited yield.",
+                "accuracy": "not_validated_for_field",
+                "validation_error_pct_points": null,
+                "source_url": "https://www.fao.org/4/i2800e/i2800e.pdf"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "projection": {
+    "method": "historical_replay_range",
+    "window_count": 10,
+    "rotations": [
+      {
+        "rotation_id": "marsden-a",
+        "water_shortfall": {
+          "minimum_pct": 9.6,
+          "median_pct": 30.5,
+          "maximum_pct": 39.0,
+          "method": "formula",
+          "accuracy": "not_validated_for_field"
+        },
+        "modeled_yield_loss_due_to_water": {
+          "minimum_pct": 10.6,
+          "median_pct": 32.0,
+          "maximum_pct": 42.5,
+          "method": "model",
+          "accuracy": "not_validated_for_field"
+        }
+      },
+      {
+        "rotation_id": "marsden-b",
+        "water_shortfall": {
+          "minimum_pct": 6.7,
+          "median_pct": 31.7,
+          "maximum_pct": 38.9,
+          "method": "formula",
+          "accuracy": "not_validated_for_field"
+        },
+        "modeled_yield_loss_due_to_water": {
+          "minimum_pct": 7.7,
+          "median_pct": 34.0,
+          "maximum_pct": 43.2,
+          "method": "model",
+          "accuracy": "not_validated_for_field"
+        }
+      }
+    ]
+  }
+}

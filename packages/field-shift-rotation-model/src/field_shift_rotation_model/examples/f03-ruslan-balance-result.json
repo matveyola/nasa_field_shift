@@ -1,0 +1,82 @@
+{
+  "field_id": "F-03",
+  "start": "2025-07-02",
+  "end": "2025-07-17",
+  "model_source": "Ruslan: fstasks-layered-bucket-v1 with v6 delayed drainage; task3_flowering_f03_2025.json (historical replay)",
+  "scenarios": {
+    "f03-july-2025-replay": {
+      "data_kind": "historical_replay",
+      "weather_source": "NASA POWER archive; observed dates substituted for the 16-day forecast in Ruslan’s replay"
+    }
+  },
+  "plans": [
+    {
+      "id": "maize",
+      "scenarios": {
+        "f03-july-2025-replay": {
+          "crop_days": 16,
+          "demand_mm": 89.53,
+          "modeled_use_mm": 89.53,
+          "deficit_mm": 0.0,
+          "water_shortfall_pct": 0.0,
+          "drought_stress_days": 0,
+          "waterlogging_stress_days": null,
+          "water_stress_days": null,
+          "water_stress_days_pct": null,
+          "filled_input_days": 0,
+          "input_gap_status_unknown_days": 16
+        }
+      },
+      "median_water_shortfall_pct": 0.0,
+      "median_water_stress_days_pct": null,
+      "irrigation_mm": 0.0,
+      "soil": {
+        "living_cover_days": null,
+        "erosion_t_ha_year": null,
+        "erosion_source": null,
+        "p2o5_removed_kg_ha": null,
+        "k2o_removed_kg_ha": null,
+        "harvest_removal_sources": null
+      },
+      "marketable_yield_t_ha": null,
+      "gross_revenue_per_ha": null,
+      "currency": null,
+      "economics": null
+    },
+    {
+      "id": "soybean",
+      "scenarios": {
+        "f03-july-2025-replay": {
+          "crop_days": 16,
+          "demand_mm": 88.6,
+          "modeled_use_mm": 88.6,
+          "deficit_mm": 0.0,
+          "water_shortfall_pct": 0.0,
+          "drought_stress_days": 0,
+          "waterlogging_stress_days": null,
+          "water_stress_days": null,
+          "water_stress_days_pct": null,
+          "filled_input_days": 0,
+          "input_gap_status_unknown_days": 16
+        }
+      },
+      "median_water_shortfall_pct": 0.0,
+      "median_water_stress_days_pct": null,
+      "irrigation_mm": 0.0,
+      "soil": {
+        "living_cover_days": null,
+        "erosion_t_ha_year": null,
+        "erosion_source": null,
+        "p2o5_removed_kg_ha": null,
+        "k2o_removed_kg_ha": null,
+        "harvest_removal_sources": null
+      },
+      "marketable_yield_t_ha": null,
+      "gross_revenue_per_ha": null,
+      "currency": null,
+      "economics": null
+    }
+  ],
+  "water_stress_comparable": false,
+  "decision": null
+}

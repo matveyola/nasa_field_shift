@@ -34,6 +34,11 @@ def _require_field_snapshot(session: Session, lease: Lease) -> Field:
 
 
 def simulation_handler(factory: sessionmaker[Session], lease: Lease) -> dict[str, Any]:
+    if lease.inputs.get("analysis") == "rotation_handoff":
+        from field_shift.modules.rotations.handoff.worker import execute
+
+        return execute(factory, lease)
+
     from field_shift_science.fields.schemas import Polygon
     from field_shift_science.simulation.schemas import WaterSource
     from field_shift_science.simulation.water_balance import WaterInputs
@@ -190,7 +195,12 @@ def process_job(
             recorded = repository.fail(session, lease, "Processing failed.", now=now)
     else:
         with factory.begin() as session:
-            recorded = repository.succeed(session, lease, result, now=now)
+            if lease.inputs.get("analysis") == "rotation_handoff":
+                from field_shift.modules.rotations.handoff.worker import succeed
+
+                recorded = succeed(session, lease, result, now=now)
+            else:
+                recorded = repository.succeed(session, lease, result, now=now)
 
     if not recorded:
         logger.warning("Discarded completion from expired lease for job %s", lease.job_id)

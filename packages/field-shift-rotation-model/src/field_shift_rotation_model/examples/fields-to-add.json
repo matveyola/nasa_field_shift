@@ -1,0 +1,42 @@
+[
+  {
+    "id": "nashua_ne",
+    "name": "Northeast Research and Demonstration Farm, Nashua, Iowa",
+    "latitude": 42.93811,
+    "longitude": -92.57018,
+    "soil_source_url": "https://docs.isric.org/globaldata/soilgrids/wcs.html",
+    "location_source_url": "https://www.mesonet.agron.iastate.edu/sites/site.php?network=ISUSM&station=NASI4",
+    "soil_layers": [
+      {
+        "top_m": 0.0,
+        "bottom_m": 0.05,
+        "field_capacity": 0.321,
+        "wilting_point": 0.165
+      },
+      {
+        "top_m": 0.05,
+        "bottom_m": 0.15,
+        "field_capacity": 0.324,
+        "wilting_point": 0.168
+      },
+      {
+        "top_m": 0.15,
+        "bottom_m": 0.3,
+        "field_capacity": 0.322,
+        "wilting_point": 0.177
+      },
+      {
+        "top_m": 0.3,
+        "bottom_m": 0.6,
+        "field_capacity": 0.318,
+        "wilting_point": 0.21
+      },
+      {
+        "top_m": 0.6,
+        "bottom_m": 1.0,
+        "field_capacity": 0.305,
+        "wilting_point": 0.214
+      }
+    ]
+  }
+]

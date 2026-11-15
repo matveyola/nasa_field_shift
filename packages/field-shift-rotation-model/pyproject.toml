@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "field-shift-rotation-model"
+version = "0.1.0"
+description = "Installed experimental rotation handoff with bounded private execution"
+requires-python = ">=3.12"
+dependencies = ["fastapi==0.162.4", "certifi==2026.10.23", "pydantic==2.14.3", "redis==8.1.0", "scipy>=1.15,<2"]
+
+[project.optional-dependencies]
+benchmark = ["field-shift-science==0.1.0"]
+
+[dependency-groups]
+dev = ["pytest>=8.3,<10", "ruff>=0.11,<1", "httpx>=0.28,<1"]
+
+[project.scripts]
+field-shift-rotation-runtime = "field_shift_rotation_model.server:main"
+field-shift-rotation-benchmark = "field_shift_rotation_model.benchmark:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"field_shift_rotation_model" = ["*.json", "NOTICE.md", "examples/**/*.json", "examples/**/*.gz", "examples/**/*.md"]
+"field_shift_rotation_model.modules.rotations" = ["artifacts/*.json", "artifacts/*.gz", "artifacts/historical-fields/*.json"]
+
+[tool.uv.sources]
+field-shift-science = { path = "../field-shift-science", editable = true }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
