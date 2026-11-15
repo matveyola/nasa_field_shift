@@ -55,7 +55,7 @@ test('saved records are read-only, scoped and safe; Escape restores the current 
   const dialog = await openHistory(page)
   await dialog.getByRole('button', { name: /Earlier irrigation question/ }).click()
   await expect(dialog.getByText(message.text, { exact: true })).toBeVisible()
-  await expect(dialog.getByText(/Harvest year: 2024 · Scenario:/)).toBeVisible()
+  await expect(dialog.getByText(/Analysis year: 2024 · Scenario:/)).toBeVisible()
   await expect(dialog.getByText('Example response', { exact: true })).toBeVisible()
   await expect(dialog.getByRole('link', { name: 'Recorded FAO source' })).toHaveAttribute('href', 'https://www.fao.org/example')
   await expect(dialog.getByRole('link', { name: /Unsafe|Credential/ })).toHaveCount(0)
