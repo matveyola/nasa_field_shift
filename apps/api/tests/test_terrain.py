@@ -2,11 +2,11 @@ from datetime import UTC, datetime
 
 import numpy as np
 import pytest
+from field_shift_science.fields.geometry import contains_point
+from field_shift_science.fields.schemas import Polygon
 from rasterio.transform import from_origin
 from rasterio.warp import transform_geom
 
-from field_shift.modules.fields.geometry import contains_point
-from field_shift.modules.fields.schemas import Polygon
 from field_shift.modules.terrain import dem, service
 
 NOW = datetime(2026, 11, 10, tzinfo=UTC)

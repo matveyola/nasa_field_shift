@@ -17,12 +17,13 @@ type Props = {
   onAddField: () => void
   openField: (id: string) => void
   openVegetation?: (id: string) => void
+  openStrategies?: () => void
   openWater?: (fieldId: string, date?: string) => void
   onDefaultsSaved?: (defaults: FarmDefaults) => void
   onObservationSaved?: (observation: Observation) => void
 }
 
-export function FarmPage({ farm, fields, refresh, onAddField, openField, openWater, openVegetation, onDefaultsSaved, onObservationSaved }: Props) {
+export function FarmPage({ farm, fields, refresh, onAddField, openField, openWater, openVegetation, openStrategies, onDefaultsSaved, onObservationSaved }: Props) {
   const { t, number } = useLocale()
   const [view, setView] = useState<'overview' | 'planning'>('overview')
   const [observationEditor, setObservationEditor] = useState<{ fieldId?: string } | null>(null)
@@ -46,13 +47,14 @@ export function FarmPage({ farm, fields, refresh, onAddField, openField, openWat
         <div id="farm-overview" hidden={view !== 'overview'}>
           <div className="farm-intro">
             <div><h2>{t('Your farm at a glance')}</h2><p>{t('Fields, crops and notes for this season.')}</p></div>
-            <span className="chip demo-chip">{t('Demo data')}</span>
+            {openStrategies && <button className="button" type="button" onClick={openStrategies}>{t('Plan upcoming sowing')}</button>}
           </div>
           <dl className="farm-summary">
             <div><dt>{t('Total area')}</dt><dd>{number(farm.total_area_ha)} <small>{t('ha')}</small></dd></div>
             <div><dt>{t('Fields')}</dt><dd>{number(fields.length, 0)}</dd></div>
             <div><dt>{t('Crops this season')}</dt><dd>{number(cropCount, 0)}</dd></div>
           </dl>
+          {fields.some(field => field.boundary_origin === 'example') && <p className="analytics-meta">{t('Includes example fields. Register your own boundaries and crop history before planning farm operations.')}</p>}
           {view === 'overview' && <FarmPriorityList fields={fields} season={farm.season} openField={openField} openWater={openWater}
             openVegetation={openVegetation} recordObservation={recordObservation} />}
           <FarmOverview fields={fields} openField={openField} onAddField={onAddField} />

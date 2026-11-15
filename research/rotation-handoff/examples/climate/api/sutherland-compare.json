@@ -1,0 +1,73 @@
+{
+  "field_id": "sutherland_nw",
+  "models": [
+    "ACCESS-CM2"
+  ],
+  "scenarios": [
+    "ssp245",
+    "ssp585"
+  ],
+  "farmer": {
+    "equipment_ids": [
+      "row_planter",
+      "grain_combine"
+    ],
+    "irrigation_available": false,
+    "priorities": [
+      "water_deficit"
+    ]
+  },
+  "plans": [
+    {
+      "id": "rotation-1",
+      "seasons": [
+        {
+          "crop_id": "maize_grain",
+          "planting_date": "2040-05-01"
+        },
+        {
+          "crop_id": "sunflower",
+          "planting_date": "2041-05-01"
+        },
+        {
+          "crop_id": "soybeans",
+          "planting_date": "2042-05-01"
+        }
+      ]
+    },
+    {
+      "id": "rotation-2",
+      "seasons": [
+        {
+          "crop_id": "sunflower",
+          "planting_date": "2040-05-01"
+        },
+        {
+          "crop_id": "soybeans",
+          "planting_date": "2041-05-01"
+        },
+        {
+          "crop_id": "maize_grain",
+          "planting_date": "2042-05-01"
+        }
+      ]
+    },
+    {
+      "id": "rotation-3",
+      "seasons": [
+        {
+          "crop_id": "soybeans",
+          "planting_date": "2040-05-01"
+        },
+        {
+          "crop_id": "maize_grain",
+          "planting_date": "2041-05-01"
+        },
+        {
+          "crop_id": "sunflower",
+          "planting_date": "2042-05-01"
+        }
+      ]
+    }
+  ]
+}

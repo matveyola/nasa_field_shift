@@ -44,9 +44,11 @@ class VerifyTests(unittest.TestCase):
                 (
                     sys.executable,
                     "-c",
-                    "from pathlib import Path; "
-                    "assert Path('order').read_text() == str(Path.cwd()); "
-                    "Path('order').write_text('complete')",
+                    (
+                        "from pathlib import Path; "
+                        "assert Path('order').read_text() == str(Path.cwd()); "
+                        "Path('order').write_text('complete')"
+                    ),
                 ),
             ),
         ]
@@ -61,7 +63,11 @@ class VerifyTests(unittest.TestCase):
             verify.Check(
                 "must not run",
                 self.root,
-                (sys.executable, "-c", "from pathlib import Path; Path('unexpected').touch()"),
+                (
+                    sys.executable,
+                    "-c",
+                    "from pathlib import Path; Path('unexpected').touch()",
+                ),
             ),
         ]
         self.assertEqual(verify.execute(checks), 7)
@@ -96,8 +102,20 @@ class VerifyTests(unittest.TestCase):
         self.assertTrue(all(1 < index < first_unit for index in builds))
         self.assertTrue(all(check.cwd.is_absolute() for check in plan))
 
+    def test_planning_contracts_precede_consumer_builds(self) -> None:
+        plan = verify.build_plan(self.root, build=True)
+        names = [check.name for check in plan]
+        for required in [
+            "planning contract freshness",
+            "planning JSON contracts",
+            "planning contract TypeScript",
+        ]:
+            self.assertIn(required, names)
+            self.assertLess(names.index(required), names.index("web production build"))
+        self.assertIn("private crop runtime lint", names)
+        self.assertIn("private crop runtime format", names)
+
     def test_fast_covers_all_unit_environments_without_implicit_sync(self) -> None:
-        (self.root / "packages/field-shift-models").mkdir(parents=True)
         plan = verify.build_plan(self.root)
         unit = {
             check.cwd.relative_to(self.root).as_posix(): check.argv
@@ -110,6 +128,7 @@ class VerifyTests(unittest.TestCase):
                 "apps/api",
                 "packages/field-shift-ml",
                 "packages/field-shift-models",
+                "packages/field-shift-rotation-model",
                 "services/agent",
                 "apps/web",
                 "services/agent/frontend",
@@ -121,30 +140,6 @@ class VerifyTests(unittest.TestCase):
                 self.assertEqual(check.argv[1:3], ("run", "--no-sync"))
         self.assertFalse(any(check.argv == ("npm", "run", "build") for check in plan))
 
-    def test_main_without_planning_package_keeps_all_existing_suites(self) -> None:
-        plan = verify.build_plan(self.root)
-        unit_paths = {
-            check.cwd.relative_to(self.root).as_posix()
-            for check in plan
-            if "unit tests" in check.name
-        }
-        self.assertEqual(
-            unit_paths,
-            {
-                "apps/api",
-                "packages/field-shift-ml",
-                "services/agent",
-                "apps/web",
-                "services/agent/frontend",
-            },
-        )
-
-    def test_incomplete_models_package_still_gets_checked(self) -> None:
-        (self.root / "packages/field-shift-models").mkdir(parents=True)
-        plan = verify.build_plan(self.root)
-        model_checks = [check for check in plan if check.name.startswith("models ")]
-        self.assertEqual(len(model_checks), 3)
-
     def test_tooling_validates_configuration_before_unit_tests(self) -> None:
         plan = verify.build_plan(self.root, mode="tooling")
         self.assertEqual(plan[0].argv, (sys.executable, "infra/check_agent_tree.py"))
@@ -152,9 +147,11 @@ class VerifyTests(unittest.TestCase):
         self.assertTrue(all(check.cwd == self.root for check in plan))
 
     def test_tooling_rejects_build_instead_of_ignoring_it(self) -> None:
-        with patch.object(verify.subprocess, "run") as run:
-            with self.assertRaises(SystemExit) as error:
-                verify.main(["--mode", "tooling", "--build"])
+        with (
+            patch.object(verify.subprocess, "run") as run,
+            self.assertRaises(SystemExit) as error,
+        ):
+            verify.main(["--mode", "tooling", "--build"])
         self.assertEqual(error.exception.code, 2)
         run.assert_not_called()
 

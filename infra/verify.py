@@ -35,6 +35,11 @@ def build_plan(root: Path, mode: str = "fast", build: bool = False) -> list[Chec
                 root,
                 (sys.executable, "-m", "unittest", "discover", "-s", "infra", "-p", "test_*.py"),
             ),
+            Check(
+                "Python package boundaries",
+                root,
+                (sys.executable, "infra/check_python_packaging.py"),
+            ),
         ]
     if mode != "fast":
         raise ValueError(f"Unknown verification mode: {mode}")
@@ -46,20 +51,98 @@ def build_plan(root: Path, mode: str = "fast", build: bool = False) -> list[Chec
 
     add("widget contract freshness", "services/agent/frontend", "npm", "run", "check:validators")
     add("agent contract TypeScript", "services/agent", "npm", "run", "check:ts")
+    add("Python package boundaries", ".", sys.executable, "infra/check_python_packaging.py")
+    for operation in ("check", "format"):
+        add(
+            f"development tooling {operation}",
+            "apps/api",
+            "uv",
+            "run",
+            "--no-sync",
+            "ruff",
+            operation,
+            *(("--check",) if operation == "format" else ()),
+            "--config",
+            "pyproject.toml",
+            "../../infra/check_agent_tree.py",
+            "../../infra/test_agent_tree.py",
+            "../../infra/test_ci_paths.py",
+            "../../infra/verify.py",
+            "../../infra/test_verify.py",
+        )
+    for operation in ("check", "format"):
+        args = ("--check",) if operation == "format" else ()
+        add(
+            f"shared Python packages {operation}",
+            "apps/api",
+            "uv",
+            "run",
+            "--no-sync",
+            "ruff",
+            operation,
+            *args,
+            "../../packages/field-shift-contracts/src",
+            "../../packages/field-shift-science/src",
+        )
+    add(
+        "planning contract freshness",
+        "apps/api",
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "-m",
+        "field_shift_contracts.planning_v1.export",
+        "--repo-root",
+        str(root),
+        "--check",
+    )
+    add("planning JSON contracts", ".", "node", "contracts/planning-v1/check.mjs")
+    add(
+        "planning contract TypeScript",
+        ".",
+        "node",
+        "apps/web/node_modules/typescript/bin/tsc",
+        "-p",
+        "contracts/planning-v1/tsconfig.json",
+    )
+    add(
+        "private crop runtime lint",
+        "apps/api",
+        "uv",
+        "run",
+        "--no-sync",
+        "ruff",
+        "check",
+        "--config",
+        "pyproject.toml",
+        "../../services/crop-model/crop_runtime",
+    )
+    add(
+        "private crop runtime format",
+        "apps/api",
+        "uv",
+        "run",
+        "--no-sync",
+        "ruff",
+        "format",
+        "--check",
+        "--config",
+        "pyproject.toml",
+        "../../services/crop-model/crop_runtime",
+    )
     if build:
         add("web production build", "apps/web", "npm", "run", "build")
         add("widget production build", "services/agent/frontend", "npm", "run", "build")
     add("web TypeScript", "apps/web", "npm", "run", "typecheck")
     add("widget TypeScript", "services/agent/frontend", "npm", "run", "typecheck")
 
-    python_packages = [
+    python_packages = (
         ("API", "apps/api"),
         ("ML", "packages/field-shift-ml"),
-    ]
-    # The crop-model package is currently delivered on the planning branch.
-    # If present (even incompletely), include its checks so failures stay visible.
-    if (root / "packages/field-shift-models").exists():
-        python_packages.append(("models", "packages/field-shift-models"))
+        ("models", "packages/field-shift-models"),
+        ("rotation model", "packages/field-shift-rotation-model"),
+    )
     for name, directory in python_packages:
         add(f"{name} lint", directory, "uv", "run", "--no-sync", "ruff", "check", ".")
         add(f"{name} format", directory, "uv", "run", "--no-sync", "ruff", "format", "--check", ".")
@@ -119,11 +202,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         else "Scope: agent tooling validation and unit tests; application suites are not run.",
         flush=True,
     )
-    root = Path(__file__).resolve().parents[1]
-    if args.mode == "fast" and not (root / "packages/field-shift-models").exists():
-        print("Inventory: field-shift-models is absent from this checkout.", flush=True)
     result = execute(
-        build_plan(root, args.mode, args.build),
+        build_plan(Path(__file__).resolve().parents[1], args.mode, args.build),
         list_only=args.list,
     )
     if result == 0:

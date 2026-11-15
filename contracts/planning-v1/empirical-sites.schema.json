@@ -1,0 +1,108 @@
+{
+  "$defs": {
+    "EmpiricalSite": {
+      "additionalProperties": false,
+      "properties": {
+        "site_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "type": "string"
+        },
+        "field_polygon_locator": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "geometry_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "issue_snapshot_locator": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "issue_snapshot_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "observations_locator": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "observations_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "permission": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "acquired_at": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "synthetic": {
+          "const": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "site_id",
+        "field_polygon_locator",
+        "geometry_sha256",
+        "issue_snapshot_locator",
+        "issue_snapshot_sha256",
+        "observations_locator",
+        "observations_sha256",
+        "permission",
+        "acquired_at",
+        "synthetic"
+      ],
+      "title": "EmpiricalSite",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "planning-empirical-v1",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "insufficient_data",
+        "acquired_not_evaluated"
+      ],
+      "type": "string"
+    },
+    "sites": {
+      "items": {
+        "$ref": "#/$defs/EmpiricalSite"
+      },
+      "maxItems": 10000,
+      "type": "array"
+    },
+    "limitations": {
+      "items": {
+        "maxLength": 2000,
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 50,
+      "minItems": 1,
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "status",
+    "sites",
+    "limitations"
+  ],
+  "title": "EmpiricalManifest",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Generated from apps/api/src/field_shift/contracts/planning_v1. Python validators additionally enforce cross-field semantics; see README.md."
+}

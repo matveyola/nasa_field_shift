@@ -13,19 +13,16 @@ from pathlib import Path
 from time import sleep
 
 import numpy as np
-from sklearn.linear_model import Ridge
-from sklearn.preprocessing import StandardScaler
-
-from field_shift.modules.crops.fao56 import crop_water_parameters
-from field_shift.modules.geo_ml.ifs import CURRENT_MODEL_CYCLE, HORIZON
-from field_shift.modules.simulation.root_zone_inputs import (
+from field_shift_science.crops.fao56 import crop_water_parameters
+from field_shift_science.geo_ml.ifs import CURRENT_MODEL_CYCLE, HORIZON
+from field_shift_science.simulation.root_zone_inputs import (
     RootZoneRun,
     RootZoneWeatherDay,
     parse_root_zone_runs,
     root_zone_run_url,
     root_zone_storage_mm,
 )
-from field_shift.modules.simulation.root_zone_model import (
+from field_shift_science.simulation.root_zone_model import (
     CAPACITY_MM,
     DEPTH_M,
     FEATURE_NAMES,
@@ -34,7 +31,10 @@ from field_shift.modules.simulation.root_zone_model import (
     root_zone_features,
     root_zone_version,
 )
-from field_shift.modules.simulation.water_balance import FAO56_BUCKET_VERSION, fao56_days
+from field_shift_science.simulation.water_balance import FAO56_BUCKET_VERSION, fao56_days
+from sklearn.linear_model import Ridge
+from sklearn.preprocessing import StandardScaler
+
 from field_shift_ml.fetch_root_zone_observations import PROTOCOL_PATH, RootZoneSite
 from field_shift_ml.train_moisture import download_features, evaluate_predictions, write_atomically
 

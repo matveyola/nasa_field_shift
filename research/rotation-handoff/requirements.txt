@@ -1,0 +1,6 @@
+fastapi==0.162.4
+certifi==2026.10.23
+pydantic==2.14.3
+redis==8.1.0
+scipy>=1.15,<2
+uvicorn==0.54.0

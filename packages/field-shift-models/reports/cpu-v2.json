@@ -1,0 +1,312 @@
+{
+  "report_version": "crop-cpu-v1",
+  "kind": "synthetic_contract",
+  "empirical_validation": "insufficient_training_data",
+  "accuracy_metrics": null,
+  "promotion": "baseline_only",
+  "python": "3.12.16",
+  "engines": [
+    {
+      "name": "aquacrop",
+      "version": "3.1.0",
+      "files_sha256": "64338b1b387c877888b580121311be3d1fe93bfbd5b39d3af01976a1a295a88a",
+      "licences": {
+        "aquacrop-3.1.0.dist-info/licenses/LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+      }
+    },
+    {
+      "name": "pcse",
+      "version": "6.0.13",
+      "files_sha256": "ad4d1d2fabd154f106e76e56fd6c15f558dd8aa9bfa2e602191381e90df207be",
+      "licences": {
+        "pcse-6.0.13.dist-info/licenses/LICENSE": "11a850f350b100f3ec4c2e45aef740c5c1506209a783eda46f324e56dc5080d3"
+      }
+    }
+  ],
+  "runs": {
+    "Maize-temperate": {
+      "input_sha256": "66ed74149ef213f12bbe246b5711e559faa836cb171f0fea0724750a5740cc66",
+      "ospy": {
+        "resources": {
+          "wall_seconds": 0.5437937269998656,
+          "cpu_seconds": 0.568719,
+          "peak_rss_kib": 99780
+        },
+        "result": {
+          "evaluation_sha256": "74a34c95caba83ea2caf66f48599204435de99221bb99cb40cd2ec8c0b8f36a0",
+          "model": {
+            "model_id": "aquacrop-ospy",
+            "version": "3.1.0",
+            "artifact_sha256": "6a420d35c8ed5d90dc2ce408db245eca564db5eed41358d3609a5af69e8a1524",
+            "parameter_sha256": "b8de732d3662f7c96677ece6e2223fb6e445809d083cf640c19c7c6e477c8687"
+          },
+          "input_sha256": "493e05175591455965796935079a39a49a6daa8ad10024a18fb8dc7adc7f9639",
+          "applicability": "baseline",
+          "seasons": [
+            {
+              "season": 2027,
+              "status": "available",
+              "harvest_basis": {
+                "basis": "dry_matter",
+                "moisture_fraction": 0.0
+              },
+              "opening_state_id": "state-6b49ce462839a7e8bf640d7a760559e3",
+              "closing_state_id": "state-4b3944730f0777566d089cf151db6c66",
+              "yield_t_ha": 14.898981298891103,
+              "root_zone_reserve_mm": 303.2107813378207,
+              "surface_moisture_m3_m3": 0.2800006922518549,
+              "stress_days": 0.0,
+              "irrigation_mm": 0.0
+            }
+          ],
+          "uncertainty_kind": "none",
+          "validated_scope": null
+        }
+      },
+      "wofost": {
+        "result": {
+          "yield_dry_t_ha": 14.903345301817815,
+          "input_sha256": "c68fde7b34a987c8e6f6fbeb0b29c90ece78e9afa8c9abd7a3cfb918fda52441",
+          "parameter_sha256": "e7d2c6058d8c36e5f92920733192e05100bd441270a3c3b431f491b8f02b2133",
+          "output_sha256": "35b5a2b5101a2072bbd508b388bc87e63b1a3e12b504a435bb9d1c0b75f63dbb",
+          "parameter_permission": "unverified; benchmark only",
+          "scope": "generic WOFOST72 water-limited classic; different bundled soil/crop parameters and year from OSPy, no empirical accuracy or paired accuracy ranking"
+        },
+        "resources": {
+          "wall_seconds": 0.41050408400042215,
+          "cpu_seconds": 0.43501199999999995,
+          "peak_rss_kib": 90592
+        }
+      },
+      "reference": {
+        "result": {
+          "model_version": "fao56-single-kc-bucket-v1",
+          "coefficient": 1.0,
+          "coefficient_scope": "existing demo Maize profile, not locally calibrated",
+          "closing_reserve_mm": 268.5,
+          "yield_t_ha": null,
+          "output_sha256": "5a62bffc5dd619ed9fb910b40cfdaad89f2ef34e92bcbbd3593757812ca1716f",
+          "max_balance_error_mm": 0.0
+        },
+        "resources": {
+          "wall_seconds": 0.21994760999950813,
+          "cpu_seconds": 0.24514999999999998,
+          "peak_rss_kib": 78748
+        }
+      }
+    },
+    "Maize-dry": {
+      "input_sha256": "79d03c97526a2fed19268d3dd9242e3994ae032c4b5b84229e6a1d6fb2615c3d",
+      "ospy": {
+        "resources": {
+          "wall_seconds": 0.5143805490006343,
+          "cpu_seconds": 0.5396,
+          "peak_rss_kib": 99060
+        },
+        "result": {
+          "evaluation_sha256": "0da8b3fc0e89fa278ae0c6630bf5f9a9d6e73341644ad33b2f1faa2f1eeffc1e",
+          "model": {
+            "model_id": "aquacrop-ospy",
+            "version": "3.1.0",
+            "artifact_sha256": "6a420d35c8ed5d90dc2ce408db245eca564db5eed41358d3609a5af69e8a1524",
+            "parameter_sha256": "b8de732d3662f7c96677ece6e2223fb6e445809d083cf640c19c7c6e477c8687"
+          },
+          "input_sha256": "deac07007e875a0d33a2fce0106b8f4f44e50fac28fd754e90b0b6d8b6f99daf",
+          "applicability": "baseline",
+          "seasons": [
+            {
+              "season": 2027,
+              "status": "available",
+              "harvest_basis": {
+                "basis": "dry_matter",
+                "moisture_fraction": 0.0
+              },
+              "opening_state_id": "state-32a20754746da9a184c69c655bbebda3",
+              "closing_state_id": "state-694e602d20c95f2d925625b178a66dd5",
+              "yield_t_ha": 1.6426958070124258,
+              "root_zone_reserve_mm": 88.30028265354333,
+              "surface_moisture_m3_m3": 0.075,
+              "stress_days": 38.0,
+              "irrigation_mm": 0.0
+            }
+          ],
+          "uncertainty_kind": "none",
+          "validated_scope": null
+        }
+      },
+      "wofost": {
+        "result": {
+          "yield_dry_t_ha": 0.00016366627452262097,
+          "input_sha256": "ebe80961db75bcaaf99853144924e7212a366516cb6654fb3c4c4697e512c2c4",
+          "parameter_sha256": "e7d2c6058d8c36e5f92920733192e05100bd441270a3c3b431f491b8f02b2133",
+          "output_sha256": "401cda78eb1edd29320fd89451e6348da84220ee14412d8f9bb86d031b0b5d3b",
+          "parameter_permission": "unverified; benchmark only",
+          "scope": "generic WOFOST72 water-limited classic; different bundled soil/crop parameters and year from OSPy, no empirical accuracy or paired accuracy ranking"
+        },
+        "resources": {
+          "wall_seconds": 0.40992387300138944,
+          "cpu_seconds": 0.436027,
+          "peak_rss_kib": 90824
+        }
+      },
+      "reference": {
+        "result": {
+          "model_version": "fao56-single-kc-bucket-v1",
+          "coefficient": 1.0,
+          "coefficient_scope": "existing demo Maize profile, not locally calibrated",
+          "closing_reserve_mm": 4.0067,
+          "yield_t_ha": null,
+          "output_sha256": "970fedf1e0b4eb6a4d2ba1955af0d6ca6acfb4643fbe9b374c7e56397f83f959",
+          "max_balance_error_mm": 3.375077994860476e-14
+        },
+        "resources": {
+          "wall_seconds": 0.2200684680028644,
+          "cpu_seconds": 0.244643,
+          "peak_rss_kib": 78860
+        }
+      }
+    },
+    "Barley-temperate": {
+      "input_sha256": "66a758aa0696fa2111e91a0885fe589ac7e6bd90f5690324f99c10034f204248",
+      "ospy": {
+        "resources": {
+          "wall_seconds": 0.43484126800103695,
+          "cpu_seconds": 0.459665,
+          "peak_rss_kib": 99288
+        },
+        "result": {
+          "evaluation_sha256": "a8e3ff18904ea821217343079067a50652cc4264e75d83c36ad1d8a262a431e1",
+          "model": {
+            "model_id": "aquacrop-ospy",
+            "version": "3.1.0",
+            "artifact_sha256": "6a420d35c8ed5d90dc2ce408db245eca564db5eed41358d3609a5af69e8a1524",
+            "parameter_sha256": "b8de732d3662f7c96677ece6e2223fb6e445809d083cf640c19c7c6e477c8687"
+          },
+          "input_sha256": "c8dd807d606b4ecf2351d1544d648ce97f9fe4a6a6c090a6e88db7cb8f5e21a2",
+          "applicability": "baseline",
+          "seasons": [
+            {
+              "season": 2027,
+              "status": "available",
+              "harvest_basis": {
+                "basis": "dry_matter",
+                "moisture_fraction": 0.0
+              },
+              "opening_state_id": "state-4c75e5b39cf895b005257ec6d683dbb1",
+              "closing_state_id": "state-1d538fea371fde2b6c9e21483fe3b3bd",
+              "yield_t_ha": 3.232754577892966,
+              "root_zone_reserve_mm": 139.0867921943312,
+              "surface_moisture_m3_m3": 0.17390149274928754,
+              "stress_days": 0.0,
+              "irrigation_mm": 0.0
+            }
+          ],
+          "uncertainty_kind": "none",
+          "validated_scope": null
+        }
+      },
+      "wofost": {
+        "result": {
+          "yield_dry_t_ha": 7.351413702880799,
+          "input_sha256": "155bec26329a7c9acd8df2af17266e5110e7bcff5b9da4c0cade8bba4de440e3",
+          "parameter_sha256": "c8e32dcdc4f5e78e91aed26bd3181895d72a4b4fa0743c466f9efa1dffe15ba4",
+          "output_sha256": "adb5da6768a2b71a8ad35fe045067793d888d2af6b6ca2236501726caa1929f4",
+          "parameter_permission": "unverified; benchmark only",
+          "scope": "generic WOFOST72 water-limited classic; different bundled soil/crop parameters and year from OSPy, no empirical accuracy or paired accuracy ranking"
+        },
+        "resources": {
+          "wall_seconds": 0.40407814100035466,
+          "cpu_seconds": 0.428927,
+          "peak_rss_kib": 90584
+        }
+      },
+      "reference": {
+        "result": {
+          "model_version": "fao56-single-kc-bucket-v1",
+          "coefficient": 1.0,
+          "coefficient_scope": "existing demo Maize profile, not locally calibrated",
+          "closing_reserve_mm": 268.5,
+          "yield_t_ha": null,
+          "output_sha256": "5a62bffc5dd619ed9fb910b40cfdaad89f2ef34e92bcbbd3593757812ca1716f",
+          "max_balance_error_mm": 0.0
+        },
+        "resources": {
+          "wall_seconds": 0.23581281299993861,
+          "cpu_seconds": 0.261223,
+          "peak_rss_kib": 78656
+        }
+      }
+    },
+    "Barley-dry": {
+      "input_sha256": "fe720a91cacdc615a7f50fba3f98168d97ae93e8d348ce8f16f9eaabb4bca6e5",
+      "ospy": {
+        "resources": {
+          "wall_seconds": 0.4682932889991207,
+          "cpu_seconds": 0.493787,
+          "peak_rss_kib": 99012
+        },
+        "result": {
+          "evaluation_sha256": "58b1c8a335fd964512da90b7dcd85998f59df7f6ea972399851a710ecd60f449",
+          "model": {
+            "model_id": "aquacrop-ospy",
+            "version": "3.1.0",
+            "artifact_sha256": "6a420d35c8ed5d90dc2ce408db245eca564db5eed41358d3609a5af69e8a1524",
+            "parameter_sha256": "b8de732d3662f7c96677ece6e2223fb6e445809d083cf640c19c7c6e477c8687"
+          },
+          "input_sha256": "19355edcffe740552ec6362805e87a188c03dfd703d6ee73755b8fac8834cd46",
+          "applicability": "baseline",
+          "seasons": [
+            {
+              "season": 2027,
+              "status": "available",
+              "harvest_basis": {
+                "basis": "dry_matter",
+                "moisture_fraction": 0.0
+              },
+              "opening_state_id": "state-95709366cf5e063f0dcbe7001831b35c",
+              "closing_state_id": "state-76dc9fa286d69d97ce6b24a158d61978",
+              "yield_t_ha": 0.9748459538025428,
+              "root_zone_reserve_mm": 39.639074562107695,
+              "surface_moisture_m3_m3": 0.075,
+              "stress_days": 43.0,
+              "irrigation_mm": 0.0
+            }
+          ],
+          "uncertainty_kind": "none",
+          "validated_scope": null
+        }
+      },
+      "wofost": {
+        "result": {
+          "yield_dry_t_ha": 0.338835792141877,
+          "input_sha256": "9f84275f1437d259452b57cb53f30cc30b4b2786984cd2844bd295d7890f36e8",
+          "parameter_sha256": "c8e32dcdc4f5e78e91aed26bd3181895d72a4b4fa0743c466f9efa1dffe15ba4",
+          "output_sha256": "393e13db8128f0c06ec166c00442d6cd4ab040f1609118624ab0208a3b458d47",
+          "parameter_permission": "unverified; benchmark only",
+          "scope": "generic WOFOST72 water-limited classic; different bundled soil/crop parameters and year from OSPy, no empirical accuracy or paired accuracy ranking"
+        },
+        "resources": {
+          "wall_seconds": 0.3988541979997535,
+          "cpu_seconds": 0.423905,
+          "peak_rss_kib": 90468
+        }
+      },
+      "reference": {
+        "result": {
+          "model_version": "fao56-single-kc-bucket-v1",
+          "coefficient": 1.0,
+          "coefficient_scope": "existing demo Maize profile, not locally calibrated",
+          "closing_reserve_mm": 4.0067,
+          "yield_t_ha": null,
+          "output_sha256": "970fedf1e0b4eb6a4d2ba1955af0d6ca6acfb4643fbe9b374c7e56397f83f959",
+          "max_balance_error_mm": 3.375077994860476e-14
+        },
+        "resources": {
+          "wall_seconds": 0.2309970569986035,
+          "cpu_seconds": 0.256107,
+          "peak_rss_kib": 78320
+        }
+      }
+    }
+  }
+}

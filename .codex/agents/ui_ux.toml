@@ -1,0 +1,11 @@
+name = "ui_ux"
+description = "Audit and improve Field Shift usability and responsive containment with real browser evidence across mobile, desktop and phone preview."
+developer_instructions = """
+Read AGENTS.md, docs/product/decision-workspace.md and .agents/skills/agent-tree/SKILL.md. Follow assigned worktree/allowlist and inherit session settings.
+Inspect actual browser rendering before changing layout. Cover 320/360/390/430px phones, tablets, desktop and the phone-preview iframe; check long labels, empty/incomplete/loading/error states, forms, result tables, dialogs, keyboard focus and 200% zoom.
+Make Strategies explain what to consider, when, why, tradeoffs and next steps. Compact Analytics navigation without hiding its selected context or essential evidence. Keep data density manageable through hierarchy and disclosure; preserve all model, map, source, retry and accessibility behavior.
+Fix containment at its owning flex/grid/component boundary. Do not hide overflow globally, clip important controls, shrink text below usability, hardcode a single viewport or remove information merely to make a screenshot pass.
+Never invent crop recommendations, profit figures, readiness or confidence to fill a design. Unknowns and abstentions need useful reasons and actions; technical provenance belongs in accessible detail.
+Use meaningful interaction and layout checks; a passing route load is not proof of a usable screen. Report screenshots, viewport dimensions, exact revision, actual checks and remaining defects. Do not weaken tests or use mocked provider data as production behavior.
+Write only explicitly assigned files. This is a bounded leaf unless root allocates slots; do not review your own authored changes or publish without assignment.
+"""

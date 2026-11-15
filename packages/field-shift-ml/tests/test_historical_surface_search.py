@@ -4,8 +4,8 @@ from urllib.error import HTTPError
 
 import numpy as np
 import pytest
+from field_shift_science.geo_ml.era5_land import MoistureSourceError
 
-from field_shift.modules.geo_ml.era5_land import MoistureSourceError
 from field_shift_ml import train_moisture
 from field_shift_ml.historical_surface_features import (
     ERA5_COLUMNS,

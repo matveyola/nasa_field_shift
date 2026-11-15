@@ -4,8 +4,9 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 Crop = Literal["Wheat", "Maize", "Soy", "Barley", "Sunflower", "Rapeseed", "Peas"]
+PlannerSeason = Annotated[int, Field(ge=2001, le=2100)]
+SeasonCount = Annotated[int, Field(ge=1, le=6, strict=True)]
 PlanningPriority = Literal["water", "soil", "low_change"]
-PlannerSeason = Annotated[int, Field(ge=2001, le=2098)]
 Hectares = Annotated[float, Field(ge=0, le=3_000_000, allow_inf_nan=False)]
 
 
@@ -40,15 +41,20 @@ class PlanningRequest(BaseModel):
     client_id: UUID
     name: Annotated[str, Field(min_length=1, max_length=120)] = "Farm rotation plan"
     start_season: PlannerSeason
+    season_count: SeasonCount = 3
     field_ids: Annotated[list[str], Field(min_length=1, max_length=30)]
-    crops: Annotated[list[CropRule], Field(min_length=2, max_length=7)]
+    crops: Annotated[list[CropRule], Field(min_length=1, max_length=7)]
     history: Annotated[list[CropDecision], Field(max_length=240)] = Field(default_factory=list)
-    locked: Annotated[list[CropDecision], Field(max_length=90)] = Field(default_factory=list)
+    locked: Annotated[list[CropDecision], Field(max_length=180)] = Field(default_factory=list)
     avoid_consecutive_family: bool = False
     require_two_crops: bool = True
 
     @model_validator(mode="after")
     def consistent_scope(self) -> "PlanningRequest":
+        if self.start_season + self.season_count - 1 > 2100:
+            raise ValueError("The last planning season must be no later than 2100.")
+        if self.season_count == 1 and self.require_two_crops:
+            raise ValueError("For one season, disable the two-crops-per-field requirement.")
         self.name = self.name.strip()
         if not self.name:
             raise ValueError("Give the plan a name.")
@@ -67,8 +73,8 @@ class PlanningRequest(BaseModel):
                 if historical:
                     if not self.start_season - 8 <= entry.season < self.start_season:
                         raise ValueError("Crop history must be within the eight preceding seasons.")
-                elif not self.start_season <= entry.season <= self.start_season + 2:
-                    raise ValueError("Locked crops must be within the three planning seasons.")
+                elif not self.start_season <= entry.season < self.start_season + self.season_count:
+                    raise ValueError("Locked crops must be within the selected planning seasons.")
                 elif entry.crop not in crop_names:
                     raise ValueError("A locked crop must be enabled for planning.")
         return self
@@ -88,6 +94,9 @@ class PlanningField(BaseModel):
 
 class PlanningContext(BaseModel):
     start_season: int
+    season_count: SeasonCount = 3
+    min_season_count: Literal[1] = 1
+    max_season_count: Literal[6] = 6
     fields: list[PlanningField]
     crops: list[dict[str, str]]
 
@@ -126,15 +135,22 @@ class PlanningResult(BaseModel):
     warnings: list[PlannerDiagnostic]
     explored_nodes: int
     node_limit: int
+    generation_nodes: int = 0
+    generation_limit: int = 60_000
+    generation_complete: bool = True
+    time_limit_seconds: float = 5.0
     objective: float | None = None
     objective_unit: Literal["preference_points_ha"] = "preference_points_ha"
-    method: Literal["bounded_branch_and_bound_v1"] = "bounded_branch_and_bound_v1"
+    method: Literal["bounded_branch_and_bound_v1", "bounded_branch_and_bound_v2"] = (
+        "bounded_branch_and_bound_v2"
+    )
 
 
 class PlanningRead(BaseModel):
     id: str
     name: str
     start_season: int
+    season_count: SeasonCount = 3
     created_at: str
     applied_at: str | None
     request: PlanningRequest
@@ -146,6 +162,7 @@ class PlanningSummary(BaseModel):
     id: str
     name: str
     start_season: int
+    season_count: SeasonCount = 3
     created_at: str
     applied_at: str | None
     status: str

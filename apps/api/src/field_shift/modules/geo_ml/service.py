@@ -3,16 +3,16 @@ from hashlib import sha256
 from random import Random
 from typing import Protocol
 
+from field_shift_science.fields.geometry import contains_point
+from field_shift_science.fields.schemas import Polygon
+from field_shift_science.geo_ml.era5_land import ERA5LandMoistureModel
+from field_shift_science.geo_ml.schemas import GeoResult, MoistureCell, SurfaceSource
 from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 from field_shift.jobs.models import Job, JobKind, JobStatus
-from field_shift.modules.fields.geometry import contains_point
 from field_shift.modules.fields.history import boundary_for_season
-from field_shift.modules.fields.schemas import Polygon
 from field_shift.modules.fields.service import require_field
-from field_shift.modules.geo_ml.era5_land import ERA5LandMoistureModel
-from field_shift.modules.geo_ml.schemas import GeoResult, MoistureCell, SurfaceSource
 
 
 class GeoModel(Protocol):

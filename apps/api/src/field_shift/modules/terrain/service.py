@@ -3,6 +3,9 @@ from hashlib import sha256
 from math import ceil, sqrt
 
 import numpy as np
+from field_shift_science.fields.geometry import contains_point
+from field_shift_science.fields.schemas import Polygon
+from field_shift_science.weather.scenarios import Scenario
 from rasterio.features import geometry_mask
 from rasterio.warp import transform, transform_geom
 from sqlalchemy import func, select
@@ -11,9 +14,7 @@ from sqlalchemy.orm import Session
 from field_shift.jobs import repository
 from field_shift.jobs.models import Job, JobKind, JobStatus
 from field_shift.jobs.schemas import JobInputs
-from field_shift.modules.fields.geometry import contains_point
 from field_shift.modules.fields.models import Field
-from field_shift.modules.fields.schemas import Polygon
 from field_shift.modules.fields.service import require_field
 from field_shift.modules.terrain.dem import (
     GRID_METERS,
@@ -23,7 +24,6 @@ from field_shift.modules.terrain.dem import (
     load_terrain_grid,
 )
 from field_shift.modules.terrain.schemas import TerrainResult, TerrainVector
-from field_shift.modules.weather.scenarios import Scenario
 
 __all__ = ["TerrainUnavailableError", "latest_terrain", "run_terrain_analysis", "submit_terrain"]
 MODEL_VERSION = "cop-dem-glo30-gradient-v1"

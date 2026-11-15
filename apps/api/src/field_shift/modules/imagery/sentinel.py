@@ -8,10 +8,9 @@ from urllib.error import URLError
 from urllib.parse import urlencode, urlsplit
 from urllib.request import Request, urlopen
 
+from field_shift_science.fields.geometry import contains_point
+from field_shift_science.fields.schemas import Polygon
 from pydantic import BaseModel
-
-from field_shift.modules.fields.geometry import contains_point
-from field_shift.modules.fields.schemas import Polygon
 
 EARLIEST_SCENE = date(2015, 6, 23)
 SEARCH_DAYS = 35

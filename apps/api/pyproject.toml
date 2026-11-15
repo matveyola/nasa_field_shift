@@ -8,6 +8,8 @@ version = "0.1.0"
 description = "Field Shift agricultural planning API and workers"
 requires-python = ">=3.11"
 dependencies = [
+    "field-shift-contracts==0.1.0",
+    "field-shift-science==0.1.0",
     "alembic>=1.15,<2",
     "celery[redis]>=5.5,<6",
     "fastapi>=0.115,<1",
@@ -15,6 +17,7 @@ dependencies = [
     "psycopg[binary]>=3.2,<4",
     "pydantic>=2.10,<3",
     "pyshp>=2.3,<4",
+    "pvlib==0.16.1",
     "rasterio>=1.4,<2",
     "shapely>=2,<3",
     "sqlalchemy>=2.0.38,<2.1",
@@ -24,6 +27,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "httpx>=0.28,<1",
+    "jsonschema>=4.26,<5",
     "pytest>=8.3,<10",
     "ruff>=0.11,<1",
 ]
@@ -31,14 +35,8 @@ dev = [
 [tool.setuptools.packages.find]
 where = ["src"]
 
-[tool.setuptools.package-data]
-"field_shift.modules.geo_ml" = ["artifacts/*.json"]
-"field_shift.modules.rotations" = ["artifacts/*.json"]
-"field_shift.modules.simulation" = ["artifacts/*.json"]
-
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src", "."]
 markers = ["integration: requires real PostgreSQL or Redis infrastructure"]
 
 [tool.ruff]
@@ -53,3 +51,7 @@ known-first-party = ["field_shift"]
 
 [tool.ruff.lint.per-file-ignores]
 "migrations/versions/*.py" = ["E501"]
+
+[tool.uv.sources]
+field-shift-contracts = { path = "../../packages/field-shift-contracts", editable = true }
+field-shift-science = { path = "../../packages/field-shift-science", editable = true }

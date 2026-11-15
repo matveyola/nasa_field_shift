@@ -4,6 +4,8 @@ from types import SimpleNamespace
 
 import pytest
 from fastapi.testclient import TestClient
+from field_shift_science.simulation.root_zone_inputs import RootZoneRun, RootZoneWeatherDay
+from field_shift_science.weather.historical import WeatherUnavailableError
 from sqlalchemy import select
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -13,10 +15,9 @@ from field_shift.jobs import repository
 from field_shift.jobs.models import Job
 from field_shift.jobs.worker import process_job
 from field_shift.models import metadata
+from field_shift.modules.fields.models import Field
 from field_shift.modules.geo_ml import refresh
 from field_shift.modules.simulation import forecast
-from field_shift.modules.simulation.root_zone_inputs import RootZoneRun, RootZoneWeatherDay
-from field_shift.modules.weather.historical import WeatherUnavailableError
 from field_shift.seed import seed_demo
 
 NOW = datetime(2026, 8, 8, tzinfo=UTC)
@@ -200,3 +201,28 @@ def test_forecast_submission_rejects_scenario_overrides(database):
         for invalid in ({"scenario": "dry_year"}, {"source": "historical"}, {"irrigation_mm": 8}):
             request = good | {"inputs": good["inputs"] | invalid}
             assert client.post("/api/jobs", json=request).status_code == 422
+
+
+@pytest.mark.parametrize("crop", ["Barley", "Unknown", ""])
+def test_current_balance_abstains_after_crop_change_but_saved_run_remains(database, crop):
+    (job_id,) = scheduled(database, NOW)
+    process_job(database, job_id, lease_seconds=135, now=NOW)
+    with TestClient(create_app(session_factory=database)) as client:
+        assert client.get("/api/water/forecast?field_id=F-03").json() is not None
+        with database() as session, session.begin():
+            field = session.get(Field, "F-03")
+            field.crop = crop
+        assert client.get("/api/water/forecast?field_id=F-03").json() is None
+        archived = client.get(f"/api/jobs/{job_id}").json()
+        assert archived["status"] == "succeeded"
+        assert archived["result"]["crop"] == "Maize"
+
+
+def test_case_only_crop_edit_does_not_invalidate_a_current_balance(database):
+    (job_id,) = scheduled(database, NOW)
+    process_job(database, job_id, lease_seconds=135, now=NOW)
+    with database() as session, session.begin():
+        field = session.get(Field, "F-03")
+        field.crop = " MAIZE "
+    with TestClient(create_app(session_factory=database)) as client:
+        assert client.get("/api/water/forecast?field_id=F-03").json()["crop"] == "Maize"

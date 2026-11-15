@@ -1,0 +1,11 @@
+{
+  "repository": "matveyola/nasa_preparation",
+  "commit": "468a03d79e596e9daab4cfdb20e9e0c8e2b83a92",
+  "original_file_sha256": {
+    "balance.py": "512b56afe40017bedfd7311c853a40345308933a567d7aaec0dd4c27152ddf27",
+    "soil.py": "f226b7d4f3c64810e6c7627212a7104d3db8db98a4c393b53187f40de1ebed1b",
+    "meteo.py": "90b144dd74d7290a7d55641402daad2b4ebab754468a80d41e4ce8bb8b18f441"
+  },
+  "promotion": false,
+  "licence": "LicenseRef-Team-Unspecified"
+}

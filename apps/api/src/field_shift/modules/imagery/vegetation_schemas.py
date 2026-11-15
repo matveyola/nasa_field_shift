@@ -1,10 +1,10 @@
 from datetime import date, datetime
 from typing import Literal
 
+from field_shift_science.fields.schemas import Polygon
 from pydantic import BaseModel, ConfigDict, Field
 
 from field_shift.jobs.schemas import JobResponse
-from field_shift.modules.fields.schemas import Polygon
 
 METHOD_VERSION = "sentinel-ndvi-monthly-v1"
 SOURCE_URL = "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a"

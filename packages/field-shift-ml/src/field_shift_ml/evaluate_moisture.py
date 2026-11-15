@@ -6,7 +6,8 @@ from datetime import date
 from hashlib import sha256
 from pathlib import Path
 
-from field_shift.modules.geo_ml.moisture_model import MoistureModel, station_distance_km
+from field_shift_science.geo_ml.moisture_model import MoistureModel, station_distance_km
+
 from field_shift_ml.train_moisture import (
     benchmark,
     join_stations,

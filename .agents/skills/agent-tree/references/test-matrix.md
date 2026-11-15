@@ -1,6 +1,6 @@
 # Test execution for Field Shift
 
-Read current `.github/workflows/ci.yml`, package manifests and test configuration before execution. This matrix is a starting inventory, not permission to skip newly added suites. The planning branch adds `packages/field-shift-models` with tests outside the current CI jobs; include it whenever present in the checkout. The runner explicitly reports when the package is absent from the branch and still checks an existing but incomplete package.
+Read current `.github/workflows/ci.yml`, package manifests and test configuration before execution. This matrix is a starting inventory, not permission to skip newly added suites. `packages/field-shift-models` and the planning integration are checked by the CI planning job.
 
 ## Modes
 
@@ -16,7 +16,8 @@ The executable entrypoint is `python3 infra/verify.py --mode fast --build` from 
 | --- | --- | --- |
 | `apps/api` | `uv sync --locked --extra dev` | `uv run --no-sync ruff check .`; `uv run --no-sync ruff format --check .`; `uv run --no-sync pytest -q -m "not integration"` |
 | `packages/field-shift-ml` | `uv sync --locked` | `uv run --no-sync ruff check .`; `uv run --no-sync ruff format --check .`; `uv run --no-sync pytest -q` |
-| `packages/field-shift-models` (when present) | `uv sync --locked` with Python `>=3.12,<3.13` | `uv run --no-sync ruff check .`; `uv run --no-sync ruff format --check .`; `uv run --no-sync pytest -q` |
+| `packages/field-shift-models` | `uv sync --locked` with Python `>=3.12,<3.13` | `uv run --no-sync ruff check .`; `uv run --no-sync ruff format --check .`; `uv run --no-sync pytest -q` |
+| `packages/field-shift-rotation-model` | `uv sync --locked --extra benchmark` | `uv run --no-sync ruff check .`; `uv run --no-sync ruff format --check .`; `uv run --no-sync pytest -q`; the frozen paired benchmark from current CI |
 | `services/agent` | `uv sync --locked` | `uv run --no-sync pytest -q` |
 | `apps/web` | `npm ci` | `npm test`; `npm run typecheck`; `npm run build` |
 | `services/agent` | `npm ci --ignore-scripts` | `npm run check:ts` |
@@ -41,6 +42,14 @@ At `services/agent/frontend`, run `npm run test:e2e` with the required Playwrigh
 
 Worktrees do not isolate PostgreSQL, Redis, ports, Docker projects, volumes or image tags. Allocate those resources per run; builds can overwrite default image tags used by the running stack. Use existing infrastructure procedures and isolated resources for affected Docker builds. For migration and backup changes, follow the integration job's fresh-database restore procedure and validate restored data. A code revert is not a database rollback test.
 
+Do not overlap Docker/Compose container or network lifecycle changes with host
+Chromium suites using localhost unless their network environments are genuinely
+isolated. Chromium can report `ERR_NETWORK_CHANGED` while importing a local Vite
+module when host network interfaces change. Distinct projects and ports do not
+prevent that event. Preserve the failed trace and source identity, diagnose the
+interruption, finish lifecycle changes, then rerun only the affected suite without
+weakening product assertions. Do not present the interrupted attempt as passing.
+
 ## Optional execution and reporting
 
 For deterministic browser runs, inspect and unset inherited `FS_E2E_LIVE`, `FS_E2E_OFFLINE` and `FS_DESIGN_SHOTS` in the child process unless explicitly in scope. Do not silently enable them. Live providers, optional embeddings/dense/reranker downloads, expensive training and model evaluation require appropriate task scope and resources. List these separately from deterministic suites. A broad test request does not silently authorize paid provider traffic.
@@ -48,3 +57,38 @@ For deterministic browser runs, inspect and unset inherited `FS_E2E_LIVE`, `FS_E
 Keep logs under a task-specific temporary directory outside delivered source. Return one row per command: checkout/revision, command, exit status, duration, counts/skips and log path. Record missing dependencies or unavailable services as limitations, not successful checks. Check that tracked and untracked deliverable source did not change during execution.
 
 For agent orchestration changes, validate TOML, role discovery, skill metadata and links, plus realistic delegation behavior. Application suites need not run when their inputs and boundaries are unchanged. When changing the existing integration helper, run its own tests under `.agents/skills/issue-worktree/` as well.
+
+
+## Planning integration boundary
+
+Fast checks include planning-v1 generated export freshness, JSON case/invalid-payload
+checks, TypeScript contract boundaries and private crop-runtime lint/format before
+consumer verification. Install `services/agent` npm dependencies as well: planning
+export uses its locked json2ts tool; never substitute a globally installed generator.
+
+Full checks additionally run `npm run test:planning` in `apps/web` (isolated port
+18086), the frozen CPU benchmark from `packages/field-shift-models`, and
+`python3 infra/verify-planning.py` at the root. The latter builds unique API/web/crop
+images, exercises authenticated real CPU inference on explicitly synthetic inputs,
+full mobile/desktop confirmation and replan, PostgreSQL/Redis tests, restart,
+fresh-database restore and isolated migration downgrade/upgrade. It requires Docker,
+local package test environments and Playwright Chromium. Use a unique
+`PLANNING_VERIFY_OUTPUT` directory per concurrent run. Inspect empirical status
+separately; no synthetic suite establishes regional yield accuracy.
+
+## Installed Python boundaries
+
+Follow `docs/python-packaging.md`. Tooling/fast include `infra/check_python_packaging.py`;
+fast also lints shared contracts/science using the prepared API Ruff environment.
+Packaging, resource, entry-point and dependency changes require
+`python3 infra/verify_python_wheels.py --output /tmp/<task>-wheels` plus affected
+Docker/live checks. Use pinned uv 0.11.0, matching CI and images, to preserve lock
+metadata. Clean wheels must work from a temporary unrelated directory under
+`python -I`, without editable imports or source-path overrides. The verifier checks
+all eight distributions and independent NumPy environments. It performs no training.
+
+For a prepared local assistant knowledge cache, export `AGENT_DATA_DIR` as the
+absolute `services/agent/data` path in that checkout before the full fast suite;
+otherwise report missing-index skips explicitly. Do not copy environments or
+private data between worktrees. Source-only fixes invalidate previously built
+same-version wheels; rebuild and reinstall them before accepting regression tests.

@@ -2,11 +2,8 @@ from datetime import UTC, date, datetime, timedelta
 from functools import lru_cache
 from time import monotonic
 
-from pydantic import BaseModel, ConfigDict, FiniteFloat, ValidationError
-from shapely.geometry import Polygon as ShapePolygon
-
-from field_shift.modules.fields.schemas import Polygon
-from field_shift.modules.weather.historical import (
+from field_shift_science.fields.schemas import Polygon
+from field_shift_science.weather.historical import (
     ARCHIVE_LAG_DAYS,
     ERA5_SPATIAL_RESOLUTION_DEGREES,
     OPEN_METEO_DOCUMENTATION,
@@ -14,6 +11,8 @@ from field_shift.modules.weather.historical import (
     load_archive,
     load_open_meteo,
 )
+from pydantic import BaseModel, ConfigDict, FiniteFloat, ValidationError
+from shapely.geometry import Polygon as ShapePolygon
 
 _EXPECTED_UNITS = {
     "temperature_2m_min": "°C",

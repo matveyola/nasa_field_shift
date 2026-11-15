@@ -1,0 +1,32 @@
+{
+  "field_id": "marsden_demo",
+  "models": [
+    "ACCESS-CM2"
+  ],
+  "scenarios": [
+    "ssp245",
+    "ssp585"
+  ],
+  "farmer": {
+    "equipment_ids": [
+      "row_planter",
+      "grain_combine"
+    ],
+    "irrigation_available": false,
+    "priorities": [
+      "revenue"
+    ]
+  },
+  "planting_date": "2040-05-01",
+  "candidates": [
+    {
+      "crop_id": "maize_grain"
+    },
+    {
+      "crop_id": "sunflower"
+    },
+    {
+      "crop_id": "soybeans"
+    }
+  ]
+}

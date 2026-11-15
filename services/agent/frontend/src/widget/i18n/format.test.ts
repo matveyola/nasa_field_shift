@@ -11,4 +11,12 @@ describe("formatQuantity", () => {
     expect(formatQuantity({ value: 290, unit: "d" }, "en")).toBe("290 days");
     expect(formatQuantity({ value: 70, unit: "kg/ha" }, "en")).toBe("70 kg/ha");
   });
+
+  it("writes money as the agent's text does: grouped, kopecks only when there are any", () => {
+    const nbsp = " ";
+    expect(formatQuantity({ value: 7500, unit: "UAH/ha" }, "uk")).toBe(`7${nbsp}500 грн/га`);
+    expect(formatQuantity({ value: 22500.5, unit: "USD" }, "uk")).toBe(`22${nbsp}500,50 дол. США`);
+    expect(formatQuantity({ value: 1250000, unit: "UAH" }, "en")).toBe("1,250,000 UAH");
+    expect(formatQuantity({ value: 120.4, unit: "USD/ha" }, "en")).toBe("120.40 USD/ha");
+  });
 });

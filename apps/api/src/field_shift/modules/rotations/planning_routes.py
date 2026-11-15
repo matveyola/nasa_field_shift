@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, Query
 
 from field_shift.db import SessionDep
 from field_shift.modules.rotations import planning_service
@@ -16,8 +16,14 @@ router = APIRouter(prefix="/planning", tags=["rotation-planning"])
 
 
 @router.get("/context", response_model=PlanningContext)
-def context(session: SessionDep, start_season: PlannerSeason = 2027):
-    return planning_service.planning_context(session, start_season)
+def context(
+    session: SessionDep,
+    start_season: PlannerSeason = 2027,
+    season_count: int = Query(default=3, ge=1, le=6),
+):
+    if start_season + season_count - 1 > 2100:
+        raise HTTPException(422, "The last planning season must be no later than 2100.")
+    return planning_service.planning_context(session, start_season, season_count)
 
 
 @router.get("/drafts", response_model=list[PlanningSummary])

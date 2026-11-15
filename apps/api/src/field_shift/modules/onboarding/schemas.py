@@ -1,9 +1,9 @@
 from typing import Annotated, Literal
 
+from field_shift_science.fields.geometry import area_hectares
+from field_shift_science.fields.schemas import MAX_AREA_HA, FieldRead, Polygon, Season
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
 
-from field_shift.modules.fields.geometry import area_hectares
-from field_shift.modules.fields.schemas import MAX_AREA_HA, FieldRead, Polygon, Season
 from field_shift.modules.rotations.planning_schemas import Crop, PlannerSeason, PlanningPriority
 
 

@@ -1,6 +1,6 @@
 import type {
   AgentReply, AgentStatus, Conversation, ConversationDetail, Farm, FarmDefaults, Field, FieldContext, Job, JobKind, JobOptions, MoistureForecast, MoistureLayer, MoistureSource,
-  NewField, NewObservation, Observation, Polygon, Position, Rotations, RotationYield, SatelliteImage, SatelliteScene, WaterForecast, WaterResult,
+  ConstraintDecision, NewField, NewObservation, Observation, PlanningConstraint, Polygon, Position, Rotations, RotationYield, SatelliteImage, SatelliteScene, WaterForecast, WaterResult,
 } from './contracts'
 
 export const apiBase = import.meta.env.VITE_API_BASE ?? '/api'
@@ -12,7 +12,8 @@ export function applicationHeaders(): Record<string, string> {
 }
 
 export class ApiError extends Error {
-  constructor(readonly status: number, message: string) { super(message) }
+  /** `body`: the API's JSON error body, for refusals that carry more than a message. */
+  constructor(readonly status: number, message: string, readonly body?: unknown) { super(message) }
 }
 
 export async function request<T>(path: string, options?: RequestInit): Promise<T> {
@@ -35,7 +36,7 @@ export async function request<T>(path: string, options?: RequestInit): Promise<T
       : undefined
     const message = typeof detail === 'string' ? detail
       : validation?.msg ?? 'Request failed (' + response.status + ').'
-    throw new ApiError(response.status, message)
+    throw new ApiError(response.status, message, error)
   }
   return await response.json() as T
 }
@@ -111,4 +112,17 @@ export const api = {
     request<Job>('/jobs/' + encodeURIComponent(id), { signal }),
   jobs: (fieldId: string, signal?: AbortSignal) =>
     request<Job[]>('/jobs?field_id=' + encodeURIComponent(fieldId), { signal }),
+  planningConstraints: (fieldId: string, season: number, signal?: AbortSignal) =>
+    request<{ constraints: PlanningConstraint[] }>(constraintsPath(fieldId, season), { signal }),
+  /** The farmer's confirmation or rejection, as the widget's compare.set_constraints envelope. */
+  decideConstraints: (fieldId: string, season: number, body: ConstraintDecision) =>
+    request<{ constraints: PlanningConstraint[]; replaced: PlanningConstraint[] }>(constraintsPath(fieldId, season), { method: 'POST', body: JSON.stringify(body) }),
+  /** Removes exactly the decision the farmer saw: refused (409) if the boundary or the decision changed since. */
+  withdrawConstraint: (fieldId: string, season: number, decision: PlanningConstraint, boundaryRevision: number) =>
+    request<{ constraints: PlanningConstraint[] }>(constraintsPath(fieldId, season) + '/' + encodeURIComponent(decision.type)
+      + '?' + new URLSearchParams({ boundary_revision: String(boundaryRevision), token: decision.token }), { method: 'DELETE' }),
+}
+
+function constraintsPath(fieldId: string, season: number) {
+  return `/agent/constraints/${encodeURIComponent(fieldId)}/${season}`
 }

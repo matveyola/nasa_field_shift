@@ -15,6 +15,9 @@ ROLES = {
     "verifier",
     "test_runner",
     "integrator",
+    "product_ceo",
+    "product_cto",
+    "ui_ux",
 }
 
 

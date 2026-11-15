@@ -14,6 +14,7 @@ import pytest
 from alembic import command
 from alembic.config import Config
 from fastapi.testclient import TestClient
+from field_shift_science.geo_ml.forecast_cache import ForecastCache
 from redis import Redis
 from sqlalchemy import create_engine, select, text
 from sqlalchemy.engine import make_url
@@ -26,7 +27,6 @@ from field_shift.jobs.dispatcher import publish_celery, run_once
 from field_shift.jobs.models import Job, JobStatus
 from field_shift.jobs.settings import JobRuntimeSettings
 from field_shift.modules.geo_ml import refresh
-from field_shift.modules.geo_ml.forecast_cache import ForecastCache
 
 pytestmark = pytest.mark.integration
 API_DIR = Path(__file__).resolve().parents[2]

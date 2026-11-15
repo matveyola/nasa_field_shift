@@ -18,25 +18,24 @@ from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 import numpy as np
-from sklearn import __version__ as sklearn_version
-from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.linear_model import Ridge
-from sklearn.model_selection import GroupKFold
-from sklearn.preprocessing import StandardScaler
-
-from field_shift.modules.geo_ml.era5_land import MoistureSourceError
-from field_shift.modules.geo_ml.moisture_features import (
+from field_shift_science.geo_ml.era5_land import MoistureSourceError
+from field_shift_science.geo_ml.moisture_features import (
     FEATURE_NAMES,
     MoistureFeatures,
     moisture_feature_url,
     parse_moisture_features,
 )
-from field_shift.modules.geo_ml.moisture_model import (
+from field_shift_science.geo_ml.moisture_model import (
     ARTIFACT_SCHEMA,
     MoistureModel,
     artifact_version,
     station_distance_km,
 )
+from sklearn import __version__ as sklearn_version
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.linear_model import Ridge
+from sklearn.model_selection import GroupKFold
+from sklearn.preprocessing import StandardScaler
 
 _FIT_END = date(2024, 12, 31)
 _HOLDOUT_START = date(2025, 1, 1)

@@ -5,6 +5,7 @@ from uuid import UUID, uuid4
 
 import pytest
 from fastapi.testclient import TestClient
+from field_shift_science.fields.geometry import area_hectares
 from sqlalchemy import event, func, select, update
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -13,7 +14,6 @@ from field_shift.config import Settings
 from field_shift.db import build_session_factory
 from field_shift.models import metadata
 from field_shift.modules.farm.models import Farm
-from field_shift.modules.fields.geometry import area_hectares
 from field_shift.modules.fields.models import Field, FieldBoundaryVersion
 from field_shift.modules.onboarding import service
 from field_shift.modules.onboarding.models import FieldSetup
@@ -292,3 +292,24 @@ def test_team_access_guards_setup_reads_and_writes(database):
             client.post(PATH + "/complete", headers={"X-Field-Shift-Request": "1"}).status_code
             == 401
         )
+
+
+@pytest.mark.parametrize("start_season", [2026, 2099, 2100])
+def test_one_crop_field_creation_does_not_require_a_three_year_demo(client, database, start_season):
+    answers = {**ANSWERS, "history": [], "allowed_crops": ["Soy"], "start_season": start_season}
+    response = client.put(PATH, json=answers)
+    assert response.status_code == 200, response.text
+    completed = client.post(PATH + "/complete")
+    assert completed.status_code == 200, completed.text
+    result = completed.json()
+    assert result["demo_plan"] is None
+    assert result["inputs"]["allowed_crops"] == ["Soy"]
+    assert result["field"]["crop"] == "Unknown"
+    assert client.post(PATH + "/complete").json() == result
+    with database() as session:
+        assert session.scalar(select(func.count()).select_from(RotationPreference)) == 0
+    context = client.get(
+        f"/api/rotations/planning/context?start_season={start_season}&season_count=1"
+    ).json()
+    field = next(row for row in context["fields"] if row["id"] == result["field"]["id"])
+    assert field["allowed_crops"] == ["Soy"]

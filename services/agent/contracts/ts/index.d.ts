@@ -115,7 +115,11 @@ export interface Quantity {
     | "g/kg"
     | "cmol/kg"
     | "MJ/m2/d"
-    | "m/s";
+    | "m/s"
+    | "UAH"
+    | "USD"
+    | "UAH/ha"
+    | "USD/ha";
   uncertainty?: Uncertainty | null;
 }
 export interface Uncertainty {
@@ -193,7 +197,11 @@ export interface TimeseriesInfo {
     | "g/kg"
     | "cmol/kg"
     | "MJ/m2/d"
-    | "m/s";
+    | "m/s"
+    | "UAH"
+    | "USD"
+    | "UAH/ha"
+    | "USD/ha";
   range: TimeRange;
   provenance: Provenance;
 }
@@ -427,7 +435,8 @@ export interface ToolStartedEvent {
     | "get_weather_forecast"
     | "get_season_weather"
     | "check_sowing_soil"
-    | "analyze_soil_photo";
+    | "analyze_soil_photo"
+    | "calculate_farm_budget";
 }
 export interface ToolFinishedEvent {
   event: "tool.finished";
@@ -690,7 +699,11 @@ export interface Timeseries {
     | "g/kg"
     | "cmol/kg"
     | "MJ/m2/d"
-    | "m/s";
+    | "m/s"
+    | "UAH"
+    | "USD"
+    | "UAH/ha"
+    | "USD/ha";
   aggregation: "daily" | "dekad" | "monthly";
   points: [string, number | null][];
   provenance: Provenance;
@@ -762,7 +775,11 @@ export interface Score {
     | "g/kg"
     | "cmol/kg"
     | "MJ/m2/d"
-    | "m/s";
+    | "m/s"
+    | "UAH"
+    | "USD"
+    | "UAH/ha"
+    | "USD/ha";
   uncertainty?: Uncertainty | null;
   provenance: Provenance;
 }

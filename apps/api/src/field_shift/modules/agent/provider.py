@@ -4,16 +4,18 @@ from math import isfinite
 from typing import Literal, Protocol
 from uuid import UUID
 
+from field_shift_science.fields.schemas import FieldRead
+from field_shift_science.simulation.schemas import WaterForecast, WaterResult
+
 from field_shift.modules.agent.schemas import (
     AgentAction,
     AgentCitation,
     AgentProviderName,
     MessageRead,
 )
+from field_shift.modules.agent.signing import LOCAL_PRINCIPAL
 from field_shift.modules.farm.schemas import ScoutingEvidence
-from field_shift.modules.fields.schemas import FieldRead
 from field_shift.modules.imagery.vegetation_schemas import VegetationSeason
-from field_shift.modules.simulation.schemas import WaterForecast, WaterResult
 
 
 @dataclass(frozen=True, slots=True)
@@ -32,6 +34,7 @@ class AgentContext:
     locale: Literal["uk", "en"] | None = None
     conversation_id: UUID | None = None
     scouting: tuple[ScoutingEvidence, ...] = ()
+    principal: str = LOCAL_PRINCIPAL  # the attested caller (signing.agent_principal)
 
 
 @dataclass(frozen=True, slots=True)

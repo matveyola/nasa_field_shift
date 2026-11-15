@@ -2,12 +2,17 @@ from datetime import UTC, datetime
 from typing import Literal
 from uuid import UUID, uuid4
 
+from field_shift_science.fields.schemas import FieldRead
+from field_shift_science.simulation.schemas import WaterResult, WaterSource
+from field_shift_science.weather.scenarios import Scenario
+from pydantic import ValidationError
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from field_shift.errors import ConflictError, NotFoundError
 from field_shift.jobs.models import Job, JobKind, JobStatus
-from field_shift.modules.agent.field_context import build_field_context
+from field_shift.modules.agent.constraints import agent_constraints
+from field_shift.modules.agent.field_context import HISTORICAL_CHART, build_field_context
 from field_shift.modules.agent.models import Conversation, Message
 from field_shift.modules.agent.provider import AgentContext, AgentProvider
 from field_shift.modules.agent.schemas import (
@@ -17,13 +22,13 @@ from field_shift.modules.agent.schemas import (
     ConversationDetail,
     MessageRead,
 )
+from field_shift.modules.agent.signing import LOCAL_PRINCIPAL
 from field_shift.modules.farm.service import recent_scouting
-from field_shift.modules.fields.schemas import FieldRead
 from field_shift.modules.fields.service import require_field
+from field_shift.modules.geo_ml.service import latest_surface_moisture
 from field_shift.modules.imagery.vegetation import vegetation_footprint, vegetation_season
 from field_shift.modules.simulation.forecast import latest_water_forecast
-from field_shift.modules.simulation.schemas import WaterResult
-from field_shift.modules.weather.scenarios import Scenario
+from field_shift.modules.terrain.service import latest_terrain
 
 
 def _get_conversation(
@@ -72,18 +77,22 @@ def conversation_detail(session: Session, conversation_id: UUID) -> Conversation
     )
 
 
-def _stored_water_result(
-    session: Session, payload: AgentRequest, boundary_revision: int
-) -> WaterResult | None:
-    if payload.run_id is None:
-        return None
-
-    job = session.get(Job, str(payload.run_id))
+def _saved_water_run(
+    session: Session,
+    run_id: UUID,
+    field_id: str,
+    season: int,
+    scenario: Scenario,
+    boundary_revision: int,
+) -> WaterResult:
+    """The completed water-balance run the farmer selected, for exactly this field context.
+    The caller has already checked the field belongs to the caller's farm (require_field)."""
+    job = session.get(Job, str(run_id))
     if (
         job is None
         or job.kind != JobKind.SIMULATION
         or job.analysis != "water_balance"
-        or job.field_id != payload.field_id
+        or job.field_id != field_id
     ):
         raise NotFoundError("The simulation run was not found for this field")
     if job.status != JobStatus.SUCCEEDED or job.result is None:
@@ -91,42 +100,88 @@ def _stored_water_result(
     if job.boundary_revision != boundary_revision:
         raise ConflictError("The field boundary changed. Run a new simulation.")
 
-    result = WaterResult.model_validate(job.result)
-    if (result.field_id, result.season, result.scenario) != (
-        payload.field_id,
-        payload.season,
-        payload.scenario,
-    ):
+    try:
+        result = WaterResult.model_validate(job.result)
+    except ValidationError:
+        raise ConflictError("The simulation run has no completed result") from None
+    if (result.field_id, result.season, result.scenario) != (field_id, season, scenario):
         raise ConflictError("The simulation result does not match the requested field context")
     return result
 
 
+def _stored_water_result(
+    session: Session, payload: AgentRequest, boundary_revision: int
+) -> WaterResult | None:
+    if payload.run_id is None:
+        return None
+    return _saved_water_run(
+        session,
+        payload.run_id,
+        payload.field_id,
+        payload.season,
+        payload.scenario,
+        boundary_revision,
+    )
+
+
 def assistant_field_context(
-    session: Session, field_id: str, season: int, scenario: Scenario, locale: Literal["uk", "en"]
+    session: Session,
+    field_id: str,
+    season: int,
+    scenario: Scenario,
+    locale: Literal["uk", "en"],
+    run_id: UUID | None = None,
 ) -> dict:
     """The «Польовий помічник» widget's field context: the same saved evidence as chat,
-    built here, never taken from the browser. The agent's own tools may fetch weather."""
+    built here, never taken from the browser. The agent's own tools may fetch weather.
+
+    With `run_id` (the farmer explicitly selected a saved run) the context explains that
+    historical run instead of the current forecast; without it no saved run is ever attached."""
     now = datetime.now(UTC)
     field = require_field(session, field_id)
     field_read = FieldRead.model_validate(field)
-    forecast = latest_water_forecast(session, field.id) if season == now.year else None
+    water = None
+    if run_id is not None:
+        water = _saved_water_run(
+            session, run_id, field.id, season, scenario, field.boundary_revision
+        )
+        if water.demo or water.source != WaterSource.HISTORICAL or water.provenance is None:
+            raise ConflictError("The selected run is a demo, not a historical simulation")
+    # A selected historical run is never shown next to (or as) the current forecast or NDVI.
+    current = run_id is None
+    forecast = latest_water_forecast(session, field.id) if current and season == now.year else None
     vegetation = (
         vegetation_season(session, field.id, season, now=now, include_cells=False)
-        if 2017 <= season <= now.year
+        if current and 2017 <= season <= now.year
         else None
     )
+    # Stored reads only: a missing ERA5-Land or terrain result stays missing, nothing is computed.
+    surface_moisture = latest_surface_moisture(session, field.id, season, "historical")
+    terrain = latest_terrain(session, field.id)
     scouting = recent_scouting(session, field.id, season, now.date())
+    # The farmer's own decisions, from the host's record: never the browser's context or history.
+    decided = agent_constraints(session, field.id, season, field.boundary_revision)
     session.rollback()  # the agent turn never holds a DB connection or row lock
-    return build_field_context(
+    context = build_field_context(
         field_read,
         season=season,
         locale=locale,
         now=now,
         forecast=forecast,
         vegetation=vegetation,
+        water=water,
+        surface_moisture=surface_moisture,
+        terrain=terrain,
         scenario=scenario,
         scouting=scouting,
+        constraints=decided,
     )
+    if water is not None and not any(
+        chart["chart_id"] == HISTORICAL_CHART for chart in context["available_charts"]
+    ):
+        # The saved days or provenance failed the evidence checks: say so, never fall back.
+        raise ConflictError("The selected run cannot be used as evidence. Run a new simulation.")
+    return context
 
 
 def _check_context(conversation: Conversation, payload: AgentRequest) -> None:
@@ -138,7 +193,12 @@ def _check_context(conversation: Conversation, payload: AgentRequest) -> None:
         raise ConflictError("Start a new conversation for a different field context")
 
 
-def chat(session: Session, payload: AgentRequest, provider: AgentProvider) -> AgentReply:
+def chat(
+    session: Session,
+    payload: AgentRequest,
+    provider: AgentProvider,
+    principal: str = LOCAL_PRINCIPAL,
+) -> AgentReply:
     now = datetime.now(UTC)
     conversation_id = payload.conversation_id or uuid4()
     field = require_field(session, payload.field_id)
@@ -182,6 +242,7 @@ def chat(session: Session, payload: AgentRequest, provider: AgentProvider) -> Ag
             locale=payload.locale,
             conversation_id=conversation_id,
             scouting=scouting,
+            principal=principal,
         ),
     )
     now = datetime.now(UTC)

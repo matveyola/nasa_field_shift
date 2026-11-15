@@ -14,9 +14,9 @@ from tempfile import NamedTemporaryFile
 from urllib.request import Request, urlopen
 
 import numpy as np
+from field_shift_science.rotations.yield_model import SOURCE_URL, effect_features
 from sklearn.linear_model import Ridge
 
-from field_shift.modules.rotations.yield_model import SOURCE_URL, effect_features
 from field_shift_ml.train_moisture import evaluate_predictions, write_atomically
 from field_shift_ml.train_rotation_yield import (
     CALIBRATION_FARMS,

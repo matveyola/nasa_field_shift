@@ -12,10 +12,11 @@ from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-from field_shift.modules.geo_ml.era5_land import UNIT, latest_archive_day
-from field_shift.modules.simulation.root_zone_inputs import root_zone_storage_mm
-from field_shift.modules.simulation.root_zone_model import DEPTH_M
-from field_shift.modules.weather.historical import OPEN_METEO_ARCHIVE, OPEN_METEO_CUSTOMER_ARCHIVE
+from field_shift_science.geo_ml.era5_land import UNIT, latest_archive_day
+from field_shift_science.simulation.root_zone_inputs import root_zone_storage_mm
+from field_shift_science.simulation.root_zone_model import DEPTH_M
+from field_shift_science.weather.historical import OPEN_METEO_ARCHIVE, OPEN_METEO_CUSTOMER_ARCHIVE
+
 from field_shift_ml.fetch_observations import write_atomic
 from field_shift_ml.fetch_root_zone_observations import PROTOCOL_PATH, RootZoneSite
 from field_shift_ml.train_moisture import write_atomically

@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "field_id": "marsden_demo",
+  "point": {
+    "latitude": 42.01379,
+    "longitude": -93.78421
+  },
+  "reference": {
+    "source_url": "https://pubs.acs.org/doi/10.1021/acs.est.8b02193",
+    "table": "Table 4 — Soil Sediment Yields, Total N Runoff, Total P Runoff, and Nitrate-N Leaching Losses As Affected by Contrasting Rotation Systems and Herbicide Regimes",
+    "period": "2008–2016",
+    "method": "ArcSWAT/MUSLE simulation of the Marsden Farm watershed. Published annual treatment means per hectare and standard errors. The simulated watershed sediment yield and nutrient loads are historical model estimates. They do not describe the proposed maize–sunflower plans.",
+    "columns": {
+      "rotation": "rotation",
+      "herbicide": "herbicide",
+      "sediment_yield_t_ha_year": "soil sediment yields (Mg ha−1)",
+      "n_runoff_kg_ha_year": "total N runoff (kg N ha−1)",
+      "p_runoff_kg_ha_year": "total P runoff (kg P ha−1)",
+      "nitrate_n_leached_kg_ha_year": "NO3−-N leached (kg NO3−-N ha−1)"
+    },
+    "values": [
+      {
+        "rotation": "2 year",
+        "crop_sequence": ["maize", "soybean"],
+        "herbicide": "CONV",
+        "sediment_yield_t_ha_year": 2.6,
+        "sediment_yield_se": 0.5,
+        "n_runoff_kg_ha_year": 10.0,
+        "n_runoff_se": 1.8,
+        "p_runoff_kg_ha_year": 2.3,
+        "p_runoff_se": 0.5,
+        "nitrate_n_leached_kg_ha_year": 20,
+        "nitrate_n_leached_se": 7
+      },
+      {
+        "rotation": "2 year",
+        "crop_sequence": ["maize", "soybean"],
+        "herbicide": "LOW",
+        "sediment_yield_t_ha_year": 2.6,
+        "sediment_yield_se": 0.5,
+        "n_runoff_kg_ha_year": 10.0,
+        "n_runoff_se": 1.8,
+        "p_runoff_kg_ha_year": 2.2,
+        "p_runoff_se": 0.4,
+        "nitrate_n_leached_kg_ha_year": 20,
+        "nitrate_n_leached_se": 7
+      },
+      {
+        "rotation": "3 year",
+        "crop_sequence": ["maize", "soybean", "oat/red clover"],
+        "herbicide": "CONV",
+        "sediment_yield_t_ha_year": 1.7,
+        "sediment_yield_se": 0.3,
+        "n_runoff_kg_ha_year": 6.5,
+        "n_runoff_se": 1.0,
+        "p_runoff_kg_ha_year": 1.6,
+        "p_runoff_se": 0.2,
+        "nitrate_n_leached_kg_ha_year": 22,
+        "nitrate_n_leached_se": 6
+      },
+      {
+        "rotation": "3 year",
+        "crop_sequence": ["maize", "soybean", "oat/red clover"],
+        "herbicide": "LOW",
+        "sediment_yield_t_ha_year": 1.6,
+        "sediment_yield_se": 0.3,
+        "n_runoff_kg_ha_year": 6.3,
+        "n_runoff_se": 1.0,
+        "p_runoff_kg_ha_year": 1.4,
+        "p_runoff_se": 0.2,
+        "nitrate_n_leached_kg_ha_year": 22,
+        "nitrate_n_leached_se": 6
+      },
+      {
+        "rotation": "4 year",
+        "crop_sequence": ["maize", "soybean", "oat/alfalfa", "alfalfa"],
+        "herbicide": "CONV",
+        "sediment_yield_t_ha_year": 1.0,
+        "sediment_yield_se": 0.2,
+        "n_runoff_kg_ha_year": 6.2,
+        "n_runoff_se": 0.9,
+        "p_runoff_kg_ha_year": 1.6,
+        "p_runoff_se": 0.2,
+        "nitrate_n_leached_kg_ha_year": 15,
+        "nitrate_n_leached_se": 5
+      },
+      {
+        "rotation": "4 year",
+        "crop_sequence": ["maize", "soybean", "oat/alfalfa", "alfalfa"],
+        "herbicide": "LOW",
+        "sediment_yield_t_ha_year": 1.0,
+        "sediment_yield_se": 0.2,
+        "n_runoff_kg_ha_year": 6.1,
+        "n_runoff_se": 0.9,
+        "p_runoff_kg_ha_year": 1.5,
+        "p_runoff_se": 0.2,
+        "nitrate_n_leached_kg_ha_year": 15,
+        "nitrate_n_leached_se": 4
+      }
+    ]
+  },
+  "shared_factors": {
+    "r": 2912.405582104384,
+    "k": 0.036876,
+    "ls": 0.2649220142896712,
+    "source": "Marsden point screening: GloRESatE v2 (https://zenodo.org/records/11078865), USDA NRCS SSURGO map unit 2834849 (https://sdmdataaccess.nrcs.usda.gov/), USDA Agriculture Handbook 703.",
+    "scope": "Desktop point screening for the demo coordinates. R is a modeled grid-cell mean; K and slope characteristics are representative soil-survey data. The result is not an average over the experiment boundary. Management C and support-practice P depend on the plan and are supplied separately.",
+    "r_detail": {
+      "source_url": "https://zenodo.org/records/11078865",
+      "publication_url": "https://doi.org/10.1038/s41597-024-03756-5",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "citation": "Das et al. (2024), GloRESatE, v2. A single unchanged cell was extracted from the released global raster.",
+      "method": "Modeled long-term mean annual erosivity combining CMORPH and IMERG satellite precipitation, ERA5-Land, and gauge-derived erosivity.",
+      "file": "GloRESatE.zip/GloRESatE/GloRESatE.tif",
+      "download_md5": "7af7154e0c6913c0d0adba1ed74996f2",
+      "band": 1,
+      "unit": "MJ mm/(ha h year)",
+      "resolution_degrees": 0.1,
+      "cell_column_zero_based": 862,
+      "cell_row_zero_based": 479,
+      "cell_center_latitude": 42.05,
+      "cell_center_longitude": -93.75
+    },
+    "k_ls_detail": {
+      "source_url": "https://sdmdataaccess.nrcs.usda.gov/webservicehelp.aspx",
+      "endpoint": "https://sdmdataaccess.sc.egov.usda.gov/Tabular/post.rest",
+      "method_source_url": "https://www.ars.usda.gov/ARSUserFiles/60600505/RUSLE/AH_703%20-%20Predicting%20Soil%20Erosion%20by%20Water%20%28RUSLE%29.pdf",
+      "k_method": "Use chorizon.kffact for the surface horizon. Convert US-customary K to metric by multiplying by 0.1317, Agriculture Handbook 703 Appendix A, Table A-1.",
+      "ls_method": "AH 703 equations 4-1 to 4-4, applied to component.slope_r and component.slopelenusle_r for a representative uniform cropland slope and moderate rill/interrill susceptibility.",
+      "mapunit": {
+        "mukey": "2834849",
+        "musym": "L55",
+        "muname": "Nicollet loam, 1 to 3 percent slopes"
+      },
+      "component": {
+        "cokey": "28627779",
+        "compname": "Nicollet",
+        "comppct_r": 85,
+        "drainagecl": "Somewhat poorly drained",
+        "slope_r": 2,
+        "slopelenusle_r": 30
+      },
+      "chorizon": {
+        "hzdept_r": 0,
+        "hzdepb_r": 20,
+        "kffact": 0.28,
+        "kwfact": 0.28,
+        "om_r": 6,
+        "ph1to1h2o_r": 6.2,
+        "ksat_r": 9.17
+      },
+      "sacatalog": {
+        "saverest": "2026-09-08"
+      }
+    }
+  }
+}

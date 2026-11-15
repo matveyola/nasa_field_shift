@@ -1,27 +1,27 @@
 import logging
 from datetime import UTC, date, datetime, time, timedelta
 
-from pydantic import ValidationError
-from sqlalchemy import select
-from sqlalchemy.orm import Session
-
-from field_shift.jobs.models import Job, JobKind, JobStatus
-from field_shift.modules.fields.schemas import Polygon
-from field_shift.modules.fields.service import require_field
-from field_shift.modules.geo_ml.era5_land import field_location
-from field_shift.modules.geo_ml.forecast_model import ForecastCorrection, get_forecast_correction
-from field_shift.modules.geo_ml.ifs import (
+from field_shift_science.fields.schemas import Polygon
+from field_shift_science.geo_ml.era5_land import field_location
+from field_shift_science.geo_ml.forecast_model import ForecastCorrection, get_forecast_correction
+from field_shift_science.geo_ml.ifs import (
     CURRENT_MODEL_CYCLE,
     GRID_KM,
     MODEL_DOCUMENTATION,
     MODEL_NAME,
     fetch_ifs_run,
 )
-from field_shift.modules.geo_ml.schemas import (
+from field_shift_science.geo_ml.schemas import (
     MoistureForecast,
     MoistureForecastDay,
     MoistureInterval,
 )
+from pydantic import ValidationError
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from field_shift.jobs.models import Job, JobKind, JobStatus
+from field_shift.modules.fields.service import require_field
 
 logger = logging.getLogger(__name__)
 

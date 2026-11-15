@@ -11,7 +11,8 @@ from hashlib import sha256
 from io import StringIO
 from pathlib import Path
 
-from field_shift.modules.geo_ml.ifs import HORIZON
+from field_shift_science.geo_ml.ifs import HORIZON
+
 from field_shift_ml.fetch_observations import (
     USCRN,
     DownloadCache,

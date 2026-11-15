@@ -1,10 +1,12 @@
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import type { Citation, Constraint, Fact, UIActionEnvelope } from "../contracts";
+import { editBlock, unsupportedCrops } from "../actions/editing";
 import { requiresClick } from "../actions/policy";
 import { constraintText, formatQuantity } from "../i18n/format";
 import { fmt, label } from "../i18n/strings";
 import { proposedConstraints, type AssistantItem } from "../state/conversation";
 import { errorTopic } from "../transport/errors";
+import { ConstraintEditor } from "./ConstraintEditor";
 import { useEnv } from "./context";
 import * as I from "./icons";
 import { PresentationBlock } from "./Blocks";
@@ -132,48 +134,141 @@ function Evidence({ facts }: { facts: Fact[] }) {
 }
 
 function ConstraintGroup({ item, constraints }: { item: AssistantItem; constraints: Constraint[] }) {
-  const { d, ctx, assistant } = useEnv();
+  const { d, ctx, crops, assistant } = useEnv();
   const sameField = ctx?.field_id === item.fieldId;
-  const inContext = (c: Constraint) =>
-    sameField && (ctx?.constraints ?? []).some((k) => k.status === "confirmed" && k.type === c.type && JSON.stringify(k.value) === JSON.stringify(c.value));
-  const phaseOf = (c: Constraint) => (inContext(c) ? "confirmed" : (item.constraints[c.id]?.phase ?? "proposed"));
+  const cropLabels = useMemo(() => Object.fromEntries(crops.map((c) => [c.id, c.label])), [crops]);
+  // The farmer's edits of proposals, applied but not decided (nothing is saved), and the editor that is open.
+  // Both belong to the field view they were made in: another field or revision discards them.
+  const [edits, setEdits] = useState<Record<string, Constraint>>({});
+  const [editing, setEditing] = useState<string | null>(null);
+  const editButtons = useRef(new Map<string, HTMLButtonElement | null>());
+  const view = `${ctx?.field_id ?? ""}#${ctx?.revision ?? ""}`;
+  const [editedFor, setEditedFor] = useState(view);
+  if (editedFor !== view) {
+    setEditedFor(view);
+    setEdits({});
+    setEditing(null);
+  }
+  const closeEditor = (id: string) => {
+    setEditing(null);
+    queueMicrotask(() => editButtons.current.get(id)?.focus());
+  };
+
+  // The host's live context is the record of the farmer's decisions: a constraint shows as confirmed or rejected
+  // only once the host holds it so, never on the widget's word alone. The decided value is the one sent: the
+  // farmer's edit, if any.
+  const inContext = (c: Constraint, status: "confirmed" | "rejected" = "confirmed") =>
+    sameField && (ctx?.constraints ?? []).some((k) => k.status === status && k.type === c.type && JSON.stringify(k.value) === JSON.stringify(c.value));
+  const decidedValue = (c: Constraint): Constraint => {
+    const state = item.constraints[c.id];
+    return (state && "constraint" in state && state.constraint) || edits[c.id] || c;
+  };
+  // A decision this conversation made (or is making) for the constraint, as opposed to one the host already held.
+  const ownDecision = (c: Constraint) => {
+    const phase = item.constraints[c.id]?.phase;
+    return phase === "applying" || phase === "confirmed" || phase === "declined";
+  };
+  const phaseOf = (c: Constraint) => {
+    const v = decidedValue(c);
+    if (!ownDecision(c)) {
+      // The host already holds this exact decision, saved before: say so, never as if it had just been saved.
+      if (inContext(v)) return "heldConfirmed";
+      if (inContext(v, "rejected")) return "heldRejected";
+    }
+    return inContext(v) ? "confirmed" : inContext(v, "rejected") ? "declined" : (item.constraints[c.id]?.phase ?? "proposed");
+  };
   const pending = constraints.filter((c) => phaseOf(c) === "proposed");
   return (
     <section className="fsa-group" aria-label={d.constraints.heading}>
       <h3 className="fsa-group-title">{d.constraints.heading}</h3>
       <ul className="fsa-constraints">
         {constraints.map((c) => {
-          const text = constraintText(d, c);
+          const current = decidedValue(c);
+          const edited = current !== c;
+          const text = constraintText(d, current, cropLabels);
           const phase = phaseOf(c);
           const state = item.constraints[c.id];
-          // Shown as confirmed only when the host's live FieldContext holds it confirmed.
-          const shown = phase === "confirmed" && !inContext(c) ? "applying" : phase;
+          // Shown as decided only when the host's live FieldContext holds that decision.
+          const shown =
+            (phase === "confirmed" && !inContext(current)) || (phase === "declined" && !inContext(current, "rejected")) ? "applying" : phase;
+          const open = editing === c.id && shown === "proposed" && sameField;
+          const block = editBlock(c, crops);
+          const held = shown === "heldConfirmed" || shown === "heldRejected";
+          const look = shown === "heldConfirmed" ? "confirmed" : shown === "heldRejected" ? "declined" : shown;
           return (
-            <li key={c.id} className={`fsa-constraint fsa-constraint--${shown}`}>
+            <li key={c.id} className={`fsa-constraint fsa-constraint--${look}${edited ? " fsa-constraint--edited" : ""}`}>
               <div className="fsa-constraint-main">
                 <span className="fsa-constraint-icon" aria-hidden="true">{c.type === "irrigation_available" ? <I.Drop /> : <I.Sprout />}</span>
                 <span className="fsa-constraint-text">{text}</span>
                 <span className="fsa-state">
-                  {shown === "proposed" && d.constraints.proposed}
+                  {shown === "proposed" && (edited ? d.constraints.edited : d.constraints.proposed)}
                   {shown === "applying" && d.constraints.applying}
                   {shown === "confirmed" && <><I.Check className="fsa-ico" /> {d.constraints.confirmed}</>}
+                  {shown === "declined" && d.constraints.declined}
+                  {shown === "heldConfirmed" && <><I.Check className="fsa-ico" /> {d.constraints.heldConfirmed}</>}
+                  {shown === "heldRejected" && d.constraints.heldRejected}
                   {shown === "dismissed" && d.constraints.dismissed}
                 </span>
               </div>
               <p className="fsa-constraint-why">
-                {c.source === "agent_inferred" ? d.constraints.inferred : c.evidence ? fmt(d.constraints.evidence, { e: c.evidence }) : null}
+                {edited
+                  ? <>{d.constraints.chosenInApp}. {fmt(d.constraints.proposedWas, { v: constraintText(d, c, cropLabels) })}</>
+                  : c.source === "agent_inferred" ? d.constraints.inferred : c.evidence ? fmt(d.constraints.evidence, { e: c.evidence }) : null}
               </p>
               {state?.phase === "rejected" && (
                 <p className="fsa-note fsa-note--warn" role="status">
                   {state.reason === "field_changed" ? d.constraints.stale : fmt(d.constraints.rejected, { reason: d.actions.rejected[state.reason] })}
                 </p>
               )}
-              {shown === "proposed" && sameField && (
+              {shown === "proposed" && sameField && block === "unshared_crops" && (
+                <p className="fsa-note">
+                  {fmt(d.constraints.cannotEditCrops, { v: unsupportedCrops(c, crops).map((id) => d.crops[id] ?? id.replace(/_/g, " ")).join(", ") })}
+                </p>
+              )}
+              {held && edited && sameField && (
                 <div className="fsa-row">
-                  <button type="button" className="fsa-btn fsa-btn--primary fsa-btn--sm" aria-label={fmt(d.constraints.confirmLabel, { c: text })} onClick={() => void assistant.confirmConstraints(item.id, [c], text)}>
+                  <button type="button" className="fsa-btn fsa-btn--ghost fsa-btn--sm" aria-label={fmt(d.constraints.restoreLabel, { c: constraintText(d, c, cropLabels) })}
+                    onClick={() => setEdits((all) => { const rest = { ...all }; delete rest[c.id]; return rest; })}>
+                    {d.constraints.restore}
+                  </button>
+                </div>
+              )}
+              {open && (
+                <ConstraintEditor
+                  constraint={current}
+                  proposal={c}
+                  onApply={(next) => {
+                    setEdits((all) => {
+                      const rest = { ...all };
+                      delete rest[c.id];
+                      return next === c ? rest : { ...rest, [c.id]: next };
+                    });
+                    closeEditor(c.id);
+                  }}
+                  onCancel={() => closeEditor(c.id)}
+                />
+              )}
+              {shown === "proposed" && sameField && !open && (
+                <div className="fsa-row">
+                  <button type="button" className="fsa-btn fsa-btn--primary fsa-btn--sm" aria-label={fmt(d.constraints.confirmLabel, { c: text })} onClick={() => void assistant.confirmConstraints(item.id, [current], text)}>
                     <I.Check className="fsa-ico" /> {d.constraints.confirm}
                   </button>
-                  <button type="button" className="fsa-btn fsa-btn--ghost fsa-btn--sm" aria-label={fmt(d.constraints.dismissLabel, { c: text })} onClick={() => assistant.dismissConstraint(item.id, c.id)}>
+                  <button type="button" className="fsa-btn fsa-btn--outline fsa-btn--sm" aria-label={fmt(d.constraints.rejectLabel, { c: text })} onClick={() => void assistant.rejectConstraints(item.id, [current], text)}>
+                    {d.constraints.reject}
+                  </button>
+                  {block === null && (
+                    <button type="button" className="fsa-btn fsa-btn--ghost fsa-btn--sm" aria-label={fmt(d.constraints.editLabel, { c: text })}
+                      ref={(el) => { editButtons.current.set(c.id, el); }} onClick={() => setEditing(c.id)}>
+                      {d.constraints.edit}
+                    </button>
+                  )}
+                  {edited && (
+                    <button type="button" className="fsa-btn fsa-btn--ghost fsa-btn--sm" aria-label={fmt(d.constraints.restoreLabel, { c: constraintText(d, c, cropLabels) })}
+                      onClick={() => setEdits((all) => { const rest = { ...all }; delete rest[c.id]; return rest; })}>
+                      {d.constraints.restore}
+                    </button>
+                  )}
+                  <button type="button" className="fsa-btn fsa-btn--ghost fsa-btn--sm" aria-label={fmt(d.constraints.dismissLabel, { c: text })} title={d.constraints.dismissHint} onClick={() => assistant.dismissConstraint(item.id, c.id)}>
                     {d.constraints.dismiss}
                   </button>
                 </div>
@@ -182,8 +277,8 @@ function ConstraintGroup({ item, constraints }: { item: AssistantItem; constrain
           );
         })}
       </ul>
-      {pending.length > 1 && sameField && (
-        <button type="button" className="fsa-btn fsa-btn--outline fsa-btn--sm" onClick={() => void assistant.confirmConstraints(item.id, pending, pending.map((c) => constraintText(d, c)).join(", "))}>
+      {pending.length > 1 && sameField && editing === null && (
+        <button type="button" className="fsa-btn fsa-btn--outline fsa-btn--sm" onClick={() => void assistant.confirmConstraints(item.id, pending.map(decidedValue), pending.map((c) => constraintText(d, decidedValue(c), cropLabels)).join(", "))}>
           {d.constraints.confirmAll}
         </button>
       )}

@@ -2,9 +2,8 @@ from datetime import date
 from typing import Annotated, Literal
 from uuid import UUID
 
+from field_shift_science.fields.schemas import BoundaryRevision, Season
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
-
-from field_shift.modules.fields.schemas import BoundaryRevision, Season
 
 Name = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=100)]
 Rate = Annotated[float, Field(ge=0, le=10_000_000, allow_inf_nan=False)]

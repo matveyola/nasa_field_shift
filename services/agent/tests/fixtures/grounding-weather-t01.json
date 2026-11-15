@@ -1,0 +1,194 @@
+{
+  "description": "Actual dedicated-QA SSE final evidence, 2026-11-15; provider pre-grounding draft was not exposed. No empirical labels.",
+  "facts": [
+    {
+      "id": "wx.2026-11-14.alert",
+      "domain": "climate",
+      "label_key": "fact.frost_heat",
+      "quantity": null,
+      "category": "frost possible",
+      "depth_cm": null,
+      "provenance": {
+        "kind": "deterministic_calc",
+        "data_status": "live",
+        "source": null,
+        "method": "Lowest temperature 0 °C or below: frost possible; highest 30 °C or above: heat.",
+        "model": null,
+        "inputs": [
+          "wx.2026-11-14.temp_max",
+          "wx.2026-11-14.temp_min",
+          "wx.2026-11-14.rain",
+          "wx.2026-11-14.rain_chance",
+          "wx.2026-11-14.wind",
+          "wx.2026-11-14.gusts"
+        ],
+        "spatial": null,
+        "temporal": {
+          "start": "2026-11-14",
+          "end": "2026-11-14",
+          "aggregation": null
+        },
+        "retrieved_at": "2026-11-15T03:41:14.810066Z"
+      }
+    },
+    {
+      "id": "wx.2026-11-15.alert",
+      "domain": "climate",
+      "label_key": "fact.frost_heat",
+      "quantity": null,
+      "category": "frost possible",
+      "depth_cm": null,
+      "provenance": {
+        "kind": "deterministic_calc",
+        "data_status": "live",
+        "source": null,
+        "method": "Lowest temperature 0 °C or below: frost possible; highest 30 °C or above: heat.",
+        "model": null,
+        "inputs": [
+          "wx.2026-11-15.temp_max",
+          "wx.2026-11-15.temp_min",
+          "wx.2026-11-15.rain",
+          "wx.2026-11-15.rain_chance",
+          "wx.2026-11-15.wind",
+          "wx.2026-11-15.gusts"
+        ],
+        "spatial": null,
+        "temporal": {
+          "start": "2026-11-15",
+          "end": "2026-11-15",
+          "aggregation": null
+        },
+        "retrieved_at": "2026-11-15T03:41:14.810066Z"
+      }
+    },
+    {
+      "id": "wx.2026-11-16.alert",
+      "domain": "climate",
+      "label_key": "fact.frost_heat",
+      "quantity": null,
+      "category": "frost possible",
+      "depth_cm": null,
+      "provenance": {
+        "kind": "deterministic_calc",
+        "data_status": "live",
+        "source": null,
+        "method": "Lowest temperature 0 °C or below: frost possible; highest 30 °C or above: heat.",
+        "model": null,
+        "inputs": [
+          "wx.2026-11-16.temp_max",
+          "wx.2026-11-16.temp_min",
+          "wx.2026-11-16.rain",
+          "wx.2026-11-16.rain_chance",
+          "wx.2026-11-16.wind",
+          "wx.2026-11-16.gusts"
+        ],
+        "spatial": null,
+        "temporal": {
+          "start": "2026-11-16",
+          "end": "2026-11-16",
+          "aggregation": null
+        },
+        "retrieved_at": "2026-11-15T03:41:14.810066Z"
+      }
+    },
+    {
+      "id": "season.rain",
+      "domain": "water",
+      "label_key": "fact.precipitation_total",
+      "quantity": {
+        "value": 1415.1,
+        "unit": "mm",
+        "uncertainty": null
+      },
+      "category": null,
+      "depth_cm": null,
+      "provenance": {
+        "kind": "weather_data",
+        "data_status": "live",
+        "source": {
+          "provider": "Open-Meteo",
+          "product_id": "open-meteo-archive (ERA5) + recent days",
+          "version": "unverified",
+          "level": null,
+          "doi": null,
+          "url": "https://open-meteo.com/"
+        },
+        "method": "daily sums, 379/379 days",
+        "model": null,
+        "inputs": [],
+        "spatial": null,
+        "temporal": {
+          "start": "2025-11-01",
+          "end": "2026-11-14",
+          "aggregation": "sum"
+        },
+        "retrieved_at": "2026-11-15T03:41:15.050740Z"
+      }
+    },
+    {
+      "id": "season.et0",
+      "domain": "water",
+      "label_key": "fact.reference_et0",
+      "quantity": {
+        "value": 1024.2,
+        "unit": "mm",
+        "uncertainty": null
+      },
+      "category": null,
+      "depth_cm": null,
+      "provenance": {
+        "kind": "weather_data",
+        "data_status": "live",
+        "source": {
+          "provider": "Open-Meteo",
+          "product_id": "open-meteo-archive (ERA5) + recent days",
+          "version": "unverified",
+          "level": null,
+          "doi": null,
+          "url": "https://open-meteo.com/"
+        },
+        "method": "FAO-56 Penman-Monteith reference evapotranspiration, daily sums, 379/379 days",
+        "model": null,
+        "inputs": [],
+        "spatial": null,
+        "temporal": {
+          "start": "2025-11-01",
+          "end": "2026-11-14",
+          "aggregation": "sum"
+        },
+        "retrieved_at": "2026-11-15T03:41:15.050740Z"
+      }
+    },
+    {
+      "id": "season.water_balance",
+      "domain": "water",
+      "label_key": "fact.water_balance",
+      "quantity": {
+        "value": 390.9,
+        "unit": "mm",
+        "uncertainty": null
+      },
+      "category": null,
+      "depth_cm": null,
+      "provenance": {
+        "kind": "deterministic_calc",
+        "data_status": "live",
+        "source": null,
+        "method": "Rain minus reference (grass) evaporation, FAO-56, without crop or soil water. Negative means more evaporated than fell.",
+        "model": null,
+        "inputs": [
+          "season.rain",
+          "season.et0"
+        ],
+        "spatial": null,
+        "temporal": {
+          "start": "2025-11-01",
+          "end": "2026-11-14",
+          "aggregation": "sum"
+        },
+        "retrieved_at": "2026-11-15T03:41:15.050740Z"
+      }
+    }
+  ],
+  "final_markdown": "The field-facts lookup returned no available field data. **frost possible** (calculated) **frost possible** (calculated) **frost possible** (calculated)\n\n It includes rain, evaporation, and their balance, but no crop-specific assessment because no crop was specified. The balance does not include water stored in the soil. **1415.1 mm** **1024.2 mm** **390.9 mm** (calculated)"
+}

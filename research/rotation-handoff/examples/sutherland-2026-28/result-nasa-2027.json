@@ -1,0 +1,367 @@
+{
+  "field_id": "sutherland_nw",
+  "previous_crop": {
+    "crop_id": "maize_grain",
+    "planting_date": "2026-05-01"
+  },
+  "planting_date": "2027-05-01",
+  "historical_analog_years": [
+    2019,
+    2023
+  ],
+  "archive_cutoff": "2026-11-07",
+  "nasa": {
+    "dataset": "NASA Earth Exchange NEX-GDDP-CMIP6",
+    "version": "2.0",
+    "source_url": "https://www.nccs.nasa.gov/data-collections/nex-gddp-cmip6/",
+    "sha256": "5bc476c8680da400230a88a508176bd0343a24459834fa90f7608bfd3e3d9312",
+    "overlay_start": "2027-05-01",
+    "overlay_end": "2027-09-30",
+    "members": {
+      "ACCESS-CM2__ssp245__r1i1p1f1": {
+        "model": "ACCESS-CM2",
+        "scenario": "ssp245",
+        "member": "r1i1p1f1",
+        "grid_latitude": 42.875,
+        "grid_longitude": -95.625
+      },
+      "MPI-ESM1-2-HR__ssp245__r1i1p1f1": {
+        "model": "MPI-ESM1-2-HR",
+        "scenario": "ssp245",
+        "member": "r1i1p1f1",
+        "grid_latitude": 42.875,
+        "grid_longitude": -95.625
+      }
+    }
+  },
+  "ensemble": {
+    "history_weight": 0.5,
+    "nasa_weight": 0.5,
+    "method": "Weighted sum of group medians after simulating each weather sequence separately.",
+    "weight_kind": "planning_setting"
+  },
+  "candidates": {
+    "maize_grain": {
+      "return_interval_status": "qualitative_guidance",
+      "historical": {
+        "2019": {
+          "opening_water_mm": 155.6675,
+          "season_end": "2027-09-26",
+          "end_reason": "maturity",
+          "modeled_crop_days": 149,
+          "water_shortfall_mm": 115.811,
+          "water_shortfall_pct": 22.2,
+          "drought_stress_days": 53
+        },
+        "2023": {
+          "opening_water_mm": 148.07567065444033,
+          "season_end": "2027-09-13",
+          "end_reason": "maturity",
+          "modeled_crop_days": 136,
+          "water_shortfall_mm": 173.108,
+          "water_shortfall_pct": 29.6,
+          "drought_stress_days": 69
+        }
+      },
+      "nasa": {
+        "ACCESS-CM2__ssp245__r1i1p1f1": {
+          "2019": {
+            "opening_water_mm": 155.6675,
+            "season_end": "2027-09-06",
+            "end_reason": "maturity",
+            "modeled_crop_days": 129,
+            "water_shortfall_mm": 232.699,
+            "water_shortfall_pct": 37.3,
+            "drought_stress_days": 56
+          },
+          "2023": {
+            "opening_water_mm": 148.07567065444033,
+            "season_end": "2027-09-06",
+            "end_reason": "maturity",
+            "modeled_crop_days": 129,
+            "water_shortfall_mm": 232.699,
+            "water_shortfall_pct": 37.3,
+            "drought_stress_days": 56
+          }
+        },
+        "MPI-ESM1-2-HR__ssp245__r1i1p1f1": {
+          "2019": {
+            "opening_water_mm": 155.6675,
+            "season_end": "2027-09-05",
+            "end_reason": "maturity",
+            "modeled_crop_days": 128,
+            "water_shortfall_mm": 365.668,
+            "water_shortfall_pct": 55.4,
+            "drought_stress_days": 72
+          },
+          "2023": {
+            "opening_water_mm": 148.07567065444033,
+            "season_end": "2027-09-05",
+            "end_reason": "maturity",
+            "modeled_crop_days": 128,
+            "water_shortfall_mm": 365.668,
+            "water_shortfall_pct": 55.4,
+            "drought_stress_days": 72
+          }
+        }
+      },
+      "median_historical_water_shortfall_pct": 25.9,
+      "median_water_shortfall_pct_by_nasa_model": {
+        "ACCESS-CM2__ssp245__r1i1p1f1": 37.3,
+        "MPI-ESM1-2-HR__ssp245__r1i1p1f1": 55.4
+      },
+      "median_nasa_water_shortfall_pct": 46.349999999999994,
+      "ensemble_score": 36.125
+    },
+    "soybeans": {
+      "return_interval_status": "qualitative_guidance",
+      "historical": {
+        "2019": {
+          "opening_water_mm": 155.6675,
+          "season_end": "2027-09-20",
+          "end_reason": "maturity",
+          "modeled_crop_days": 143,
+          "water_shortfall_mm": 169.877,
+          "water_shortfall_pct": 30.9,
+          "drought_stress_days": 68
+        },
+        "2023": {
+          "opening_water_mm": 148.07567065444033,
+          "season_end": "2027-09-08",
+          "end_reason": "maturity",
+          "modeled_crop_days": 131,
+          "water_shortfall_mm": 263.322,
+          "water_shortfall_pct": 42.6,
+          "drought_stress_days": 101
+        }
+      },
+      "nasa": {
+        "ACCESS-CM2__ssp245__r1i1p1f1": {
+          "2019": {
+            "opening_water_mm": 155.6675,
+            "season_end": "2027-09-04",
+            "end_reason": "maturity",
+            "modeled_crop_days": 127,
+            "water_shortfall_mm": 299.158,
+            "water_shortfall_pct": 45.7,
+            "drought_stress_days": 69
+          },
+          "2023": {
+            "opening_water_mm": 148.07567065444033,
+            "season_end": "2027-09-04",
+            "end_reason": "maturity",
+            "modeled_crop_days": 127,
+            "water_shortfall_mm": 299.158,
+            "water_shortfall_pct": 45.7,
+            "drought_stress_days": 69
+          }
+        },
+        "MPI-ESM1-2-HR__ssp245__r1i1p1f1": {
+          "2019": {
+            "opening_water_mm": 155.6675,
+            "season_end": "2027-09-03",
+            "end_reason": "maturity",
+            "modeled_crop_days": 126,
+            "water_shortfall_mm": 462.028,
+            "water_shortfall_pct": 65.8,
+            "drought_stress_days": 93
+          },
+          "2023": {
+            "opening_water_mm": 148.07567065444033,
+            "season_end": "2027-09-03",
+            "end_reason": "maturity",
+            "modeled_crop_days": 126,
+            "water_shortfall_mm": 468.33,
+            "water_shortfall_pct": 66.7,
+            "drought_stress_days": 93
+          }
+        }
+      },
+      "median_historical_water_shortfall_pct": 36.75,
+      "median_water_shortfall_pct_by_nasa_model": {
+        "ACCESS-CM2__ssp245__r1i1p1f1": 45.7,
+        "MPI-ESM1-2-HR__ssp245__r1i1p1f1": 66.25
+      },
+      "median_nasa_water_shortfall_pct": 55.975,
+      "ensemble_score": 46.3625
+    },
+    "sunflower": {
+      "return_interval_status": "incomplete_history",
+      "historical": {
+        "2019": {
+          "opening_water_mm": 155.6675,
+          "season_end": "2027-09-12",
+          "end_reason": "maturity",
+          "modeled_crop_days": 135,
+          "water_shortfall_mm": 119.109,
+          "water_shortfall_pct": 24.9,
+          "drought_stress_days": 61
+        },
+        "2023": {
+          "opening_water_mm": 148.07567065444033,
+          "season_end": "2027-09-01",
+          "end_reason": "maturity",
+          "modeled_crop_days": 124,
+          "water_shortfall_mm": 156.932,
+          "water_shortfall_pct": 29.8,
+          "drought_stress_days": 84
+        }
+      },
+      "nasa": {
+        "ACCESS-CM2__ssp245__r1i1p1f1": {
+          "2019": {
+            "opening_water_mm": 155.6675,
+            "season_end": "2027-08-28",
+            "end_reason": "maturity",
+            "modeled_crop_days": 120,
+            "water_shortfall_mm": 205.69,
+            "water_shortfall_pct": 36.3,
+            "drought_stress_days": 55
+          },
+          "2023": {
+            "opening_water_mm": 148.07567065444033,
+            "season_end": "2027-08-28",
+            "end_reason": "maturity",
+            "modeled_crop_days": 120,
+            "water_shortfall_mm": 205.69,
+            "water_shortfall_pct": 36.3,
+            "drought_stress_days": 55
+          }
+        },
+        "MPI-ESM1-2-HR__ssp245__r1i1p1f1": {
+          "2019": {
+            "opening_water_mm": 155.6675,
+            "season_end": "2027-08-27",
+            "end_reason": "maturity",
+            "modeled_crop_days": 119,
+            "water_shortfall_mm": 361.472,
+            "water_shortfall_pct": 58.0,
+            "drought_stress_days": 74
+          },
+          "2023": {
+            "opening_water_mm": 148.07567065444033,
+            "season_end": "2027-08-27",
+            "end_reason": "maturity",
+            "modeled_crop_days": 119,
+            "water_shortfall_mm": 365.527,
+            "water_shortfall_pct": 58.6,
+            "drought_stress_days": 74
+          }
+        }
+      },
+      "median_historical_water_shortfall_pct": 27.35,
+      "median_water_shortfall_pct_by_nasa_model": {
+        "ACCESS-CM2__ssp245__r1i1p1f1": 36.3,
+        "MPI-ESM1-2-HR__ssp245__r1i1p1f1": 58.3
+      },
+      "median_nasa_water_shortfall_pct": 47.3,
+      "ensemble_score": 37.325
+    },
+    "wheat_spring": {
+      "return_interval_status": "no_matching_guidance",
+      "historical": {
+        "2019": {
+          "opening_water_mm": 155.6675,
+          "season_end": "2027-09-15",
+          "end_reason": "maturity",
+          "modeled_crop_days": 138,
+          "water_shortfall_mm": 107.555,
+          "water_shortfall_pct": 21.0,
+          "drought_stress_days": 59
+        },
+        "2023": {
+          "opening_water_mm": 148.07567065444033,
+          "season_end": "2027-09-07",
+          "end_reason": "maturity",
+          "modeled_crop_days": 130,
+          "water_shortfall_mm": 168.814,
+          "water_shortfall_pct": 29.2,
+          "drought_stress_days": 83
+        }
+      },
+      "nasa": {
+        "ACCESS-CM2__ssp245__r1i1p1f1": {
+          "2019": {
+            "opening_water_mm": 155.6675,
+            "season_end": "2027-09-06",
+            "end_reason": "maturity",
+            "modeled_crop_days": 129,
+            "water_shortfall_mm": 228.735,
+            "water_shortfall_pct": 36.1,
+            "drought_stress_days": 64
+          },
+          "2023": {
+            "opening_water_mm": 148.07567065444033,
+            "season_end": "2027-09-06",
+            "end_reason": "maturity",
+            "modeled_crop_days": 129,
+            "water_shortfall_mm": 228.735,
+            "water_shortfall_pct": 36.1,
+            "drought_stress_days": 64
+          }
+        },
+        "MPI-ESM1-2-HR__ssp245__r1i1p1f1": {
+          "2019": {
+            "opening_water_mm": 155.6675,
+            "season_end": "2027-09-07",
+            "end_reason": "maturity",
+            "modeled_crop_days": 130,
+            "water_shortfall_mm": 394.132,
+            "water_shortfall_pct": 56.9,
+            "drought_stress_days": 82
+          },
+          "2023": {
+            "opening_water_mm": 148.07567065444033,
+            "season_end": "2027-09-07",
+            "end_reason": "maturity",
+            "modeled_crop_days": 130,
+            "water_shortfall_mm": 394.132,
+            "water_shortfall_pct": 56.9,
+            "drought_stress_days": 82
+          }
+        }
+      },
+      "median_historical_water_shortfall_pct": 25.1,
+      "median_water_shortfall_pct_by_nasa_model": {
+        "ACCESS-CM2__ssp245__r1i1p1f1": 36.1,
+        "MPI-ESM1-2-HR__ssp245__r1i1p1f1": 56.9
+      },
+      "median_nasa_water_shortfall_pct": 46.5,
+      "ensemble_score": 35.8
+    }
+  },
+  "ranking_by_water_shortfall": {
+    "historical": [
+      "wheat_spring",
+      "maize_grain",
+      "sunflower",
+      "soybeans"
+    ],
+    "nasa_models": {
+      "ACCESS-CM2__ssp245__r1i1p1f1": [
+        "wheat_spring",
+        "sunflower",
+        "maize_grain",
+        "soybeans"
+      ],
+      "MPI-ESM1-2-HR__ssp245__r1i1p1f1": [
+        "maize_grain",
+        "wheat_spring",
+        "sunflower",
+        "soybeans"
+      ]
+    },
+    "nasa": [
+      "maize_grain",
+      "wheat_spring",
+      "sunflower",
+      "soybeans"
+    ],
+    "ensemble": [
+      "wheat_spring",
+      "maize_grain",
+      "sunflower",
+      "soybeans"
+    ]
+  }
+}

@@ -7,6 +7,8 @@ from hashlib import sha256
 from json import dumps
 from time import monotonic
 
+from field_shift_science.fields.schemas import Polygon
+from field_shift_science.weather.scenarios import Scenario
 from sqlalchemy import select
 from sqlalchemy.orm import Session, defer, sessionmaker
 
@@ -15,7 +17,6 @@ from field_shift.jobs.models import Job, JobKind, JobStatus
 from field_shift.jobs.schemas import JobInputs
 from field_shift.modules.fields.history import boundary_for_season
 from field_shift.modules.fields.models import Field, FieldPlanting
-from field_shift.modules.fields.schemas import Polygon
 from field_shift.modules.fields.service import require_field
 from field_shift.modules.imagery.vegetation_catalog import (
     VegetationUnavailableError,
@@ -31,7 +32,6 @@ from field_shift.modules.imagery.vegetation_schemas import (
     VegetationSceneResult,
     VegetationSeason,
 )
-from field_shift.modules.weather.scenarios import Scenario
 
 logger = logging.getLogger(__name__)
 ACTIVE = (JobStatus.QUEUED, JobStatus.RUNNING, JobStatus.RETRYING)

@@ -17,6 +17,8 @@ from warnings import catch_warnings, filterwarnings
 
 import numpy as np
 import rasterio
+from field_shift_science.fields.geometry import contains_point
+from field_shift_science.fields.schemas import Polygon
 from pydantic import BaseModel
 from rasterio.enums import Resampling
 from rasterio.errors import NotGeoreferencedWarning, RasterioError
@@ -29,8 +31,6 @@ from rasterio.windows import Window
 from shapely.geometry import Point, mapping, shape
 from shapely.geometry import Polygon as ShapelyPolygon
 
-from field_shift.modules.fields.geometry import contains_point
-from field_shift.modules.fields.schemas import Polygon
 from field_shift.modules.imagery.sentinel import (
     CatalogUnavailableError,
     SatelliteImage,
