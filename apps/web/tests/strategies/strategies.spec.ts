@@ -1,6 +1,4 @@
-import { createRequire } from 'node:module'
-import type { Page } from '../../../../services/agent/frontend/node_modules/@playwright/test'
-const { test, expect } = createRequire(import.meta.url)('../../../../services/agent/frontend/node_modules/@playwright/test') as typeof import('../../../../services/agent/frontend/node_modules/@playwright/test')
+import { test, expect, type Page } from '@playwright/test'
 import { opportunities } from './opportunityFixtures'
 import { fixture } from '../planning/fixtures'
 import type { FarmPlanningRequest } from '../../src/api/planningV1.generated'

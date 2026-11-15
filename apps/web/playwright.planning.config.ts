@@ -1,4 +1,4 @@
-import { defineConfig, devices } from '../../services/agent/frontend/node_modules/@playwright/test/index.mjs'
+import { defineConfig, devices } from '@playwright/test'
 
 export default defineConfig({
   testDir: './e2e/planning-v1', testMatch: '**/*.spec.ts', fullyParallel: false, workers: 1,

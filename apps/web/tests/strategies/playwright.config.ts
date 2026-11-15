@@ -1,6 +1,5 @@
-import { createRequire } from 'node:module'
-const playwright = createRequire(import.meta.url)('../../../../services/agent/frontend/node_modules/@playwright/test') as typeof import('../../../../services/agent/frontend/node_modules/@playwright/test')
-export default playwright.defineConfig({
+import { defineConfig } from '@playwright/test'
+export default defineConfig({
   testDir: '.', testMatch: '**/*.spec.ts', workers: 1, timeout: 30000,
   outputDir: '../../test-results/strategies', reporter: [['list']],
   use: { baseURL: 'http://127.0.0.1:18096', screenshot: 'only-on-failure' },

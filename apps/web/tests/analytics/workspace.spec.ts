@@ -1,6 +1,4 @@
-import { createRequire } from 'node:module'
-const playwright = createRequire(import.meta.url)('../../../../services/agent/frontend/node_modules/@playwright/test/index.js') as typeof import('../../../../services/agent/frontend/node_modules/@playwright/test/index.js')
-const { test, expect } = playwright
+import { test, expect } from '@playwright/test'
 import { example } from '../../../../contracts/planning-v1/examples/roundtrip.generated'
 
 const observations = ['2026-09-15', '2026-10-15'].map(date => ({ date, scene_id: `scene-${date}`, mean_ndvi: .6, p10_ndvi: .4, p90_ndvi: .8, valid_percent: 85, pixel_count: 100, catalog_url: 'https://example.test/scene', mean_msavi: .5 }))
