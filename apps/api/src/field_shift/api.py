@@ -19,6 +19,7 @@ from field_shift.modules.fields.boundary_suggestion_routes import (
 )
 from field_shift.modules.fields.history_routes import router as field_history_router
 from field_shift.modules.fields.planning_profile.routes import router as profile_router
+from field_shift.modules.fields.planting_opportunities.routes import router as opportunities_router
 from field_shift.modules.fields.routes import router as fields_router
 from field_shift.modules.imagery.routes import router as imagery_router
 from field_shift.modules.onboarding.routes import router as onboarding_router
@@ -90,6 +91,7 @@ def create_app(
         rotation_planning_router,
         precision_router,
         fields_router,
+        opportunities_router,
         imagery_router,
         terrain_router,
         weather_router,
